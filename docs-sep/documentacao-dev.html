@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEP - Documentação Técnica (Dev)</title>
+<style>
+  :root {
+    --primary: #0b5ed7;
+    --primary-light: #3b82f6;
+    --primary-dark: #0a2540;
+    --accent: #22d3ee;
+    --accent-warm: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --bg: #0f172a;
+    --bg-soft: #1e293b;
+    --card: #ffffff;
+    --text: #0f172a;
+    --text-light: #e2e8f0;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --code-bg: #0f172a;
+    --code-text: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f8fafc;
+    color: var(--text);
+    line-height: 1.65;
+  }
+  .hero {
+    background:
+      linear-gradient(135deg, rgba(10,37,64,0.95) 0%, rgba(11,94,215,0.92) 100%),
+      repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px);
+    color: white;
+    padding: 80px 40px;
+    text-align: center;
+    border-bottom: 4px solid var(--accent);
+  }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(34,211,238,0.18);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .hero h1 { font-size: 46px; font-weight: 800; margin-bottom: 16px; }
+  .hero p { font-size: 19px; opacity: 0.92; max-width: 800px; margin: 0 auto; }
+  .hero .meta {
+    margin-top: 32px;
+    font-size: 13px;
+    opacity: 0.8;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .nav {
+    position: sticky;
+    top: 0;
+    background: var(--primary-dark);
+    padding: 12px 40px;
+    z-index: 100;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 20px;
+    padding: 6px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .nav a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .container { max-width: 1220px; margin: 0 auto; padding: 60px 40px; }
+  section { margin-bottom: 80px; }
+  section h2 {
+    font-size: 30px;
+    color: var(--primary-dark);
+    margin-bottom: 10px;
+    border-left: 4px solid var(--accent);
+    padding-left: 16px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-weight: 700;
+  }
+  section .subtitle { font-size: 15px; color: var(--muted); margin-bottom: 34px; }
+  h3 { font-size: 20px; color: var(--primary); margin: 32px 0 14px; }
+  h4 { font-size: 16px; color: var(--primary-dark); margin: 20px 0 8px; }
+  p { margin-bottom: 12px; }
+  code {
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 13px;
+    background: #eef2ff;
+    color: var(--primary);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.55;
+    border: 1px solid #1e293b;
+    margin: 14px 0;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  pre code { background: transparent; color: inherit; padding: 0; font-size: 13px; }
+  pre .kw { color: #f472b6; }
+  pre .str { color: #86efac; }
+  pre .com { color: #64748b; font-style: italic; }
+  pre .num { color: #fbbf24; }
+  pre .ty { color: #22d3ee; }
+  .grid { display: grid; gap: 20px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 32px; }
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    box-shadow: 0 1px 3px rgba(15,30,74,0.04);
+  }
+  .card h4 {
+    font-size: 15px;
+    margin-top: 0;
+    color: var(--primary-dark);
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .card .small { font-size: 12px; color: var(--muted); }
+  .diagram-wrapper {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    overflow-x: auto;
+    box-shadow: 0 1px 3px rgba(15,30,74,0.04);
+  }
+  .diagram-wrapper svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .caption {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 12px;
+    font-style: italic;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  th {
+    background: var(--primary-dark);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  td { padding: 11px 12px; border-top: 1px solid var(--border); }
+  tr:hover td { background: #f8fafc; }
+  .badge-inline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-right: 6px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .bg-get { background: #dbeafe; color: #1e40af; }
+  .bg-post { background: #dcfce7; color: #166534; }
+  .bg-patch { background: #fef3c7; color: #854d0e; }
+  .bg-del { background: #fee2e2; color: #991b1b; }
+  .sprint-block {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 18px;
+  }
+  .sprint-block .sprint-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .sprint-block .deps {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .task {
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-top: 12px;
+  }
+  .task .task-num {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .task h5 { font-size: 14px; color: var(--primary-dark); margin-bottom: 8px; display: inline-block; }
+  .task ul { margin: 8px 0 0 18px; font-size: 13px; }
+  .task ul li { margin-bottom: 3px; }
+  .alert {
+    background: #fff7ed;
+    border-left: 4px solid var(--accent-warm);
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .alert strong { color: #9a3412; }
+  .alert-info {
+    background: #eff6ff;
+    border-left: 4px solid var(--primary);
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  footer {
+    background: var(--primary-dark);
+    color: white;
+    padding: 32px 40px;
+    text-align: center;
+    font-size: 13px;
+    opacity: 0.92;
+  }
+  ul.list-sep li { margin-bottom: 5px; }
+  .two-col-list { columns: 2; column-gap: 30px; }
+  @media (max-width: 700px) { .two-col-list { columns: 1; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">// VERSÃO DESENVOLVEDOR</div>
+  <h1>SEP · Documentação Técnica</h1>
+  <p>Guia de engenharia do backend SEP — arquitetura, stack, estrutura de pacotes, endpoints, segurança, sprints, tasks, convenções e pipeline.</p>
+  <div class="meta">java 21 · spring boot · postgresql · jwt · gradle · flyway · docker compose</div>
+</div>
+
+<nav class="nav">
+  <a href="#stack">Stack</a>
+  <a href="#arquitetura">Arquitetura</a>
+  <a href="#pacotes">Pacotes</a>
+  <a href="#fluxo">Fluxo de Requisição</a>
+  <a href="#dominio">Domínio</a>
+  <a href="#endpoints">Endpoints</a>
+  <a href="#seguranca">Segurança</a>
+  <a href="#sprints">Sprints · Tasks</a>
+  <a href="#infra">Infraestrutura</a>
+  <a href="#pipeline">Pipeline GitHub</a>
+  <a href="#convencoes">Convenções</a>
+  <a href="#testes">Testes</a>
+</nav>
+
+<div class="container">
+
+<section id="stack">
+  <h2>1. Stack Técnico</h2>
+  <div class="subtitle">Decisões de tecnologia consolidadas para o backend e ambiente de desenvolvimento.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 940 460" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="devStackHdr" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#0a2540"/><stop offset="100%" stop-color="#0b5ed7"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="940" height="50" fill="url(#devStackHdr)"/>
+      <text x="470" y="32" text-anchor="middle" fill="white" font-size="16" font-weight="700">STACK BACKEND · API SEP</text>
+
+      <!-- Camada Runtime -->
+      <rect x="20" y="70" width="280" height="370" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+      <text x="160" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">LINGUAGEM · RUNTIME</text>
+      <line x1="40" y1="108" x2="280" y2="108" stroke="#3b82f6" stroke-opacity="0.3"/>
+
+      <rect x="40" y="120" width="240" height="38" rx="6" fill="white" stroke="#bfdbfe"/>
+      <text x="56" y="144" font-size="13" fill="#1e293b" font-weight="600">☕ Java 21</text>
+      <text x="270" y="144" text-anchor="end" font-size="11" fill="#64748b">LTS</text>
+
+      <rect x="40" y="168" width="240" height="38" rx="6" fill="white" stroke="#bfdbfe"/>
+      <text x="56" y="192" font-size="13" fill="#1e293b" font-weight="600">🌱 Spring Boot</text>
+      <text x="270" y="192" text-anchor="end" font-size="11" fill="#64748b">3.x</text>
+
+      <rect x="40" y="216" width="240" height="38" rx="6" fill="white" stroke="#bfdbfe"/>
+      <text x="56" y="240" font-size="13" fill="#1e293b" font-weight="600">🔐 Spring Security</text>
+      <text x="270" y="240" text-anchor="end" font-size="11" fill="#64748b">JWT</text>
+
+      <rect x="40" y="264" width="240" height="38" rx="6" fill="white" stroke="#bfdbfe"/>
+      <text x="56" y="288" font-size="13" fill="#1e293b" font-weight="600">🗄️ Spring Data JPA</text>
+      <text x="270" y="288" text-anchor="end" font-size="11" fill="#64748b">auditing</text>
+
+      <rect x="40" y="312" width="240" height="38" rx="6" fill="white" stroke="#bfdbfe"/>
+      <text x="56" y="336" font-size="13" fill="#1e293b" font-weight="600">✅ Bean Validation</text>
+      <text x="270" y="336" text-anchor="end" font-size="11" fill="#64748b">starter-validation</text>
+
+      <rect x="40" y="360" width="240" height="38" rx="6" fill="white" stroke="#bfdbfe"/>
+      <text x="56" y="384" font-size="13" fill="#1e293b" font-weight="600">🔄 ModelMapper</text>
+      <text x="270" y="384" text-anchor="end" font-size="11" fill="#64748b">DTO mapping</text>
+
+      <!-- Camada Infra -->
+      <rect x="320" y="70" width="280" height="370" rx="10" fill="#f0fdfa" stroke="#14b8a6" stroke-width="2"/>
+      <text x="460" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#0f766e">INFRA LOCAL · PERSISTÊNCIA</text>
+      <line x1="340" y1="108" x2="580" y2="108" stroke="#14b8a6" stroke-opacity="0.3"/>
+
+      <rect x="340" y="120" width="240" height="38" rx="6" fill="white" stroke="#99f6e4"/>
+      <text x="356" y="144" font-size="13" fill="#1e293b" font-weight="600">🐘 PostgreSQL</text>
+      <text x="570" y="144" text-anchor="end" font-size="11" fill="#64748b">uuid nativo</text>
+
+      <rect x="340" y="168" width="240" height="38" rx="6" fill="white" stroke="#99f6e4"/>
+      <text x="356" y="192" font-size="13" fill="#1e293b" font-weight="600">🐳 Docker + Compose</text>
+      <text x="570" y="192" text-anchor="end" font-size="11" fill="#64748b">dev local</text>
+
+      <rect x="340" y="216" width="240" height="38" rx="6" fill="white" stroke="#99f6e4"/>
+      <text x="356" y="240" font-size="13" fill="#1e293b" font-weight="600">🔄 Flyway</text>
+      <text x="570" y="240" text-anchor="end" font-size="11" fill="#64748b">migrations</text>
+
+      <rect x="340" y="264" width="240" height="38" rx="6" fill="white" stroke="#99f6e4"/>
+      <text x="356" y="288" font-size="13" fill="#1e293b" font-weight="600">🆔 java-uuid-generator</text>
+      <text x="570" y="288" text-anchor="end" font-size="11" fill="#64748b">5.1.0 · v6</text>
+
+      <rect x="340" y="312" width="240" height="38" rx="6" fill="white" stroke="#99f6e4"/>
+      <text x="356" y="336" font-size="13" fill="#1e293b" font-weight="600">🔑 BCrypt</text>
+      <text x="570" y="336" text-anchor="end" font-size="11" fill="#64748b">senhas</text>
+
+      <rect x="340" y="360" width="240" height="38" rx="6" fill="white" stroke="#99f6e4"/>
+      <text x="356" y="384" font-size="13" fill="#1e293b" font-weight="600">📦 Gradle</text>
+      <text x="570" y="384" text-anchor="end" font-size="11" fill="#64748b">build</text>
+
+      <!-- Camada Docs/Observabilidade -->
+      <rect x="620" y="70" width="300" height="370" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+      <text x="770" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#b45309">DOCS · OBSERVABILIDADE · CONFIG</text>
+      <line x1="640" y1="108" x2="900" y2="108" stroke="#f59e0b" stroke-opacity="0.3"/>
+
+      <rect x="640" y="120" width="260" height="38" rx="6" fill="white" stroke="#fde68a"/>
+      <text x="656" y="144" font-size="13" fill="#1e293b" font-weight="600">📝 Springdoc OpenAPI</text>
+      <text x="890" y="144" text-anchor="end" font-size="11" fill="#64748b">Swagger UI</text>
+
+      <rect x="640" y="168" width="260" height="38" rx="6" fill="white" stroke="#fde68a"/>
+      <text x="656" y="192" font-size="13" fill="#1e293b" font-weight="600">❤️ Spring Boot Actuator</text>
+      <text x="890" y="192" text-anchor="end" font-size="11" fill="#64748b">healthcheck</text>
+
+      <rect x="640" y="216" width="260" height="38" rx="6" fill="white" stroke="#fde68a"/>
+      <text x="656" y="240" font-size="13" fill="#1e293b" font-weight="600">🌎 Locale pt-BR</text>
+      <text x="890" y="240" text-anchor="end" font-size="11" fill="#64748b">regional</text>
+
+      <rect x="640" y="264" width="260" height="38" rx="6" fill="white" stroke="#fde68a"/>
+      <text x="656" y="288" font-size="13" fill="#1e293b" font-weight="600">⏰ America/Sao_Paulo</text>
+      <text x="890" y="288" text-anchor="end" font-size="11" fill="#64748b">timezone</text>
+
+      <rect x="640" y="312" width="260" height="38" rx="6" fill="white" stroke="#fde68a"/>
+      <text x="656" y="336" font-size="13" fill="#1e293b" font-weight="600">🌐 CORS explícito</text>
+      <text x="890" y="336" text-anchor="end" font-size="11" fill="#64748b">integração Angular</text>
+
+      <rect x="640" y="360" width="260" height="38" rx="6" fill="white" stroke="#fde68a"/>
+      <text x="656" y="384" font-size="13" fill="#1e293b" font-weight="600">📐 ISO-8601 com offset</text>
+      <text x="890" y="384" text-anchor="end" font-size="11" fill="#64748b">datas da API</text>
+    </svg>
+    <div class="caption">Pilha tecnológica distribuída em runtime, infraestrutura local e observabilidade/config.</div>
+  </div>
+
+  <h3>Dependência Gradle crítica</h3>
+  <pre><code><span class="com">// build.gradle</span>
+dependencies {
+    <span class="com">// Geração de UUID v6</span>
+    implementation <span class="str">'com.fasterxml.uuid:java-uuid-generator:5.1.0'</span>
+
+    <span class="com">// Validação declarativa de DTOs</span>
+    implementation <span class="str">'org.springframework.boot:spring-boot-starter-validation'</span>
+
+    <span class="com">// Demais starters: web, security, data-jpa, actuator, flyway, etc.</span>
+}</code></pre>
+</section>
+
+<section id="arquitetura">
+  <h2>2. Arquitetura do Backend</h2>
+  <div class="subtitle">Monolito modular com camadas explícitas. Microsserviços ficam fora da fase atual.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 940 520" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="layerWeb" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#0b5ed7"/><stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+        <linearGradient id="layerSec" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#b91c1c"/>
+        </linearGradient>
+        <linearGradient id="layerSvc" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#10b981"/>
+        </linearGradient>
+        <linearGradient id="layerRep" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#8b5cf6"/>
+        </linearGradient>
+        <linearGradient id="layerDb" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#0369a1"/><stop offset="100%" stop-color="#0284c7"/>
+        </linearGradient>
+      </defs>
+
+      <text x="470" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0a2540">Arquitetura em camadas · Monolito Modular</text>
+
+      <!-- Cliente -->
+      <rect x="30" y="60" width="880" height="60" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="4,4"/>
+      <text x="470" y="85" text-anchor="middle" font-size="14" fill="#475569" font-weight="700">Cliente HTTP</text>
+      <text x="470" y="104" text-anchor="middle" font-size="12" fill="#64748b">Angular · Swagger UI · curl · Postman</text>
+
+      <!-- Seta -->
+      <polygon points="460,120 480,120 475,140 465,140" fill="#94a3b8"/>
+
+      <!-- Camada Web -->
+      <rect x="30" y="145" width="880" height="70" rx="8" fill="url(#layerWeb)"/>
+      <text x="470" y="170" text-anchor="middle" fill="white" font-size="14" font-weight="700">web.controller</text>
+      <text x="470" y="190" text-anchor="middle" fill="white" font-size="11" opacity="0.92">AuthController · UsuarioController</text>
+      <text x="470" y="206" text-anchor="middle" fill="#fef3c7" font-size="10">Recebe Request → valida DTO → delega para Service → devolve Response</text>
+
+      <polygon points="460,215 480,215 475,235 465,235" fill="#94a3b8"/>
+
+      <!-- Camada Segurança -->
+      <rect x="30" y="240" width="880" height="70" rx="8" fill="url(#layerSec)"/>
+      <text x="470" y="265" text-anchor="middle" fill="white" font-size="14" font-weight="700">security</text>
+      <text x="470" y="285" text-anchor="middle" fill="white" font-size="11" opacity="0.92">JwtAuthenticationFilter · JwtTokenProvider · CustomUserDetailsService</text>
+      <text x="470" y="301" text-anchor="middle" fill="#fee2e2" font-size="10">Valida JWT · popula SecurityContext · aplica perfil e ownership</text>
+
+      <polygon points="460,310 480,310 475,330 465,330" fill="#94a3b8"/>
+
+      <!-- Camada Service -->
+      <rect x="30" y="335" width="880" height="70" rx="8" fill="url(#layerSvc)"/>
+      <text x="470" y="360" text-anchor="middle" fill="white" font-size="14" font-weight="700">service</text>
+      <text x="470" y="380" text-anchor="middle" fill="white" font-size="11" opacity="0.92">AuthService · UsuarioService</text>
+      <text x="470" y="396" text-anchor="middle" fill="#d1fae5" font-size="10">Regras de negócio · validação de ownership · mapeamento DTO ↔ entidade</text>
+
+      <polygon points="460,405 480,405 475,425 465,425" fill="#94a3b8"/>
+
+      <!-- Camada Repository -->
+      <rect x="30" y="430" width="880" height="60" rx="8" fill="url(#layerRep)"/>
+      <text x="470" y="455" text-anchor="middle" fill="white" font-size="14" font-weight="700">repository</text>
+      <text x="470" y="475" text-anchor="middle" fill="white" font-size="11" opacity="0.92">UsuarioRepository (Spring Data JPA)</text>
+
+      <polygon points="460,490 480,490 475,510 465,510" fill="#94a3b8"/>
+
+      <!-- DB -->
+      <rect x="30" y="515" width="880" height="0" fill="transparent"/>
+    </svg>
+    <div class="caption">Fluxo vertical: cliente → controller → security → service → repository → banco.</div>
+  </div>
+
+  <div class="alert">
+    <strong>Regra das camadas:</strong> controllers não implementam regra de negócio, DTOs não são reutilizados como entidades JPA, classes de segurança não carregam regra de domínio, services não acessam HTTP diretamente.
+  </div>
+</section>
+
+<section id="pacotes">
+  <h2>3. Estrutura de Pacotes</h2>
+  <div class="subtitle">Separação clara por responsabilidade desde o início.</div>
+
+  <pre><code>com.dynamis.broker_app
+├── <span class="ty">config</span>                    <span class="com"># LocaleConfig, SecurityConfig, OpenApiConfig,</span>
+│                             <span class="com"># SpringJpaAuditingConfig</span>
+├── <span class="ty">security</span>                  <span class="com"># JwtTokenProvider, JwtAuthenticationFilter,</span>
+│                             <span class="com"># CustomUserDetailsService</span>
+├── <span class="ty">exception</span>                 <span class="com"># ApiExceptionHandler, exceções de domínio</span>
+├── <span class="ty">model</span>                     <span class="com"># Usuario (entidade JPA)</span>
+├── <span class="ty">repository</span>                <span class="com"># UsuarioRepository</span>
+├── <span class="ty">service</span>                   <span class="com"># AuthService, UsuarioService</span>
+└── <span class="ty">web</span>
+    ├── <span class="ty">controller</span>            <span class="com"># AuthController, UsuarioController</span>
+    └── <span class="ty">dto</span>                   <span class="com"># UsuarioCreateDto, LoginRequestDto, ...</span>
+        └── <span class="ty">mapper</span>            <span class="com"># UsuarioMapper</span></code></pre>
+
+  <h3>Subdivisões quando o domínio crescer</h3>
+  <p>À medida que novas épicas entrarem (onboarding, crédito, formalização, cobrança), recomenda-se subdividir por agregado: <code>service.auth</code>, <code>service.usuario</code>, <code>service.onboarding</code>, <code>repository.usuario</code>, <code>web.controller.auth</code>, <code>web.controller.usuario</code>, etc.</p>
+</section>
+
+<section id="fluxo">
+  <h2>4. Fluxo de Requisição Autenticada</h2>
+  <div class="subtitle">Sequência completa de uma chamada HTTP protegida por JWT.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 940 540" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrA" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#0b5ed7"/>
+        </marker>
+      </defs>
+
+      <text x="470" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0a2540">Sequência · GET /api/v1/usuarios/{id}</text>
+
+      <!-- Atores -->
+      <g font-size="12" font-weight="700" fill="white" text-anchor="middle">
+        <rect x="30" y="55" width="130" height="34" rx="6" fill="#334155"/>
+        <text x="95" y="77">Cliente</text>
+        <rect x="190" y="55" width="130" height="34" rx="6" fill="#0b5ed7"/>
+        <text x="255" y="77">JwtAuthFilter</text>
+        <rect x="350" y="55" width="130" height="34" rx="6" fill="#0b5ed7"/>
+        <text x="415" y="77">Controller</text>
+        <rect x="510" y="55" width="130" height="34" rx="6" fill="#059669"/>
+        <text x="575" y="77">Service</text>
+        <rect x="670" y="55" width="130" height="34" rx="6" fill="#7c3aed"/>
+        <text x="735" y="77">Repository</text>
+        <rect x="820" y="55" width="100" height="34" rx="6" fill="#0369a1"/>
+        <text x="870" y="77">PostgreSQL</text>
+      </g>
+
+      <!-- Linhas verticais -->
+      <g stroke="#cbd5e1" stroke-dasharray="3,4">
+        <line x1="95" y1="90" x2="95" y2="500"/>
+        <line x1="255" y1="90" x2="255" y2="500"/>
+        <line x1="415" y1="90" x2="415" y2="500"/>
+        <line x1="575" y1="90" x2="575" y2="500"/>
+        <line x1="735" y1="90" x2="735" y2="500"/>
+        <line x1="870" y1="90" x2="870" y2="500"/>
+      </g>
+
+      <!-- Passo 1: Request -->
+      <line x1="95" y1="120" x2="253" y2="120" stroke="#0b5ed7" stroke-width="2" marker-end="url(#arrA)"/>
+      <text x="170" y="114" text-anchor="middle" font-size="11" fill="#0a2540" font-weight="600">GET + Bearer token</text>
+
+      <!-- Passo 2: valida JWT -->
+      <rect x="205" y="140" width="100" height="20" rx="3" fill="#fef3c7"/>
+      <text x="255" y="155" text-anchor="middle" font-size="10" fill="#78350f">validate JWT</text>
+      <text x="255" y="175" text-anchor="middle" font-size="10" fill="#64748b">(assinatura · expiração · claims)</text>
+
+      <!-- Passo 3: popula context → controller -->
+      <line x1="255" y1="195" x2="413" y2="195" stroke="#0b5ed7" stroke-width="2" marker-end="url(#arrA)"/>
+      <text x="335" y="189" text-anchor="middle" font-size="11" fill="#0a2540" font-weight="600">SecurityContext populado</text>
+
+      <!-- Passo 4: Controller → Service -->
+      <line x1="415" y1="225" x2="573" y2="225" stroke="#0b5ed7" stroke-width="2" marker-end="url(#arrA)"/>
+      <text x="495" y="219" text-anchor="middle" font-size="11" fill="#0a2540" font-weight="600">buscarPorId(uuid, principal)</text>
+
+      <!-- Passo 5: ownership check -->
+      <rect x="515" y="245" width="120" height="22" rx="3" fill="#dcfce7"/>
+      <text x="575" y="260" text-anchor="middle" font-size="10" fill="#14532d">ownership / role check</text>
+
+      <!-- Passo 6: Service → Repo -->
+      <line x1="575" y1="290" x2="733" y2="290" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrA)"/>
+      <text x="655" y="284" text-anchor="middle" font-size="11" fill="#0a2540" font-weight="600">findById(uuid)</text>
+
+      <!-- Passo 7: Repo → DB -->
+      <line x1="735" y1="320" x2="868" y2="320" stroke="#0369a1" stroke-width="2" marker-end="url(#arrA)"/>
+      <text x="800" y="314" text-anchor="middle" font-size="11" fill="#0a2540" font-weight="600">SELECT ... WHERE id=?</text>
+
+      <!-- Respostas -->
+      <line x1="868" y1="355" x2="737" y2="355" stroke="#0369a1" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrA)"/>
+      <text x="800" y="349" text-anchor="middle" font-size="11" fill="#64748b">row</text>
+
+      <line x1="735" y1="385" x2="577" y2="385" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrA)"/>
+      <text x="655" y="379" text-anchor="middle" font-size="11" fill="#64748b">Optional&lt;Usuario&gt;</text>
+
+      <!-- Mapper -->
+      <rect x="515" y="400" width="120" height="22" rx="3" fill="#e0e7ff"/>
+      <text x="575" y="415" text-anchor="middle" font-size="10" fill="#3730a3">map → UsuarioResponseDto</text>
+
+      <line x1="575" y1="440" x2="417" y2="440" stroke="#059669" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrA)"/>
+      <text x="495" y="434" text-anchor="middle" font-size="11" fill="#64748b">UsuarioResponseDto</text>
+
+      <line x1="415" y1="470" x2="97" y2="470" stroke="#0b5ed7" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrA)"/>
+      <text x="250" y="464" text-anchor="middle" font-size="11" fill="#0a2540" font-weight="600">200 OK · JSON</text>
+    </svg>
+    <div class="caption">Diagrama de sequência de uma chamada autenticada. Falhas retornam payload padronizado via ApiExceptionHandler.</div>
+  </div>
+</section>
+
+<section id="dominio">
+  <h2>5. Modelo de Domínio e DTOs</h2>
+  <div class="subtitle">Entidade principal e contratos de DTO da fase atual.</div>
+
+  <h3>Entidade <code>Usuario</code></h3>
+  <pre><code><span class="kw">@Entity</span>
+<span class="kw">@Table</span>(name = <span class="str">"usuario"</span>)
+<span class="kw">@EntityListeners</span>(AuditingEntityListener.class)
+<span class="kw">public class</span> <span class="ty">Usuario</span> {
+
+    <span class="kw">@Id</span>
+    <span class="kw">@Column</span>(name = <span class="str">"id"</span>, columnDefinition = <span class="str">"uuid"</span>)
+    <span class="kw">private</span> <span class="ty">UUID</span> id;                    <span class="com">// UUID v6</span>
+
+    <span class="kw">@Column</span>(name = <span class="str">"username"</span>, unique = <span class="kw">true</span>, nullable = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="ty">String</span> username;              <span class="com">// e-mail</span>
+
+    <span class="kw">@Column</span>(name = <span class="str">"password"</span>, nullable = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="ty">String</span> password;              <span class="com">// BCrypt hash</span>
+
+    <span class="kw">@Enumerated</span>(EnumType.STRING)
+    <span class="kw">@Column</span>(name = <span class="str">"role"</span>, nullable = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="ty">Role</span> role;                   <span class="com">// ADMIN | CLIENTE</span>
+
+    <span class="kw">@CreatedDate</span>       <span class="kw">private</span> <span class="ty">OffsetDateTime</span> dataCriacao;
+    <span class="kw">@LastModifiedDate</span>  <span class="kw">private</span> <span class="ty">OffsetDateTime</span> dataModificacao;
+    <span class="kw">@CreatedBy</span>         <span class="kw">private</span> <span class="ty">String</span> criadoPor;      <span class="com">// UUID ou "system"</span>
+    <span class="kw">@LastModifiedBy</span>    <span class="kw">private</span> <span class="ty">String</span> modificadoPor;  <span class="com">// UUID ou "system"</span>
+}</code></pre>
+
+  <h3>DTOs</h3>
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>UsuarioCreateDto</h4>
+      <p class="small">Cadastro público · sem autenticação.</p>
+      <pre style="margin-top:8px;"><code>{
+  <span class="str">"username"</span>: <span class="str">"admin@empresa.com"</span>,
+  <span class="str">"password"</span>: <span class="str">"123456"</span>,
+  <span class="str">"role"</span>: <span class="str">"ADMIN"</span>
+}</code></pre>
+      <p class="small" style="margin-top:8px;"><code>@Email</code>, <code>@Size(min=6, max=6)</code>, <code>role ∈ {ADMIN, CLIENTE}</code></p>
+    </div>
+
+    <div class="card">
+      <h4>UsuarioResponseDto</h4>
+      <p class="small">Resposta pública · nunca expõe senha.</p>
+      <pre style="margin-top:8px;"><code>{
+  <span class="str">"id"</span>: <span class="str">"1f0799c0-...-7d6f5b771001"</span>,
+  <span class="str">"username"</span>: <span class="str">"admin@empresa.com"</span>,
+  <span class="str">"role"</span>: <span class="str">"ADMIN"</span>,
+  <span class="str">"dataCriacao"</span>: <span class="str">"2026-04-24T18:30:00-03:00"</span>,
+  <span class="str">"dataModificacao"</span>: <span class="str">"2026-04-24T18:30:00-03:00"</span>,
+  <span class="str">"criadoPor"</span>: <span class="str">"system"</span>,
+  <span class="str">"modificadoPor"</span>: <span class="str">"system"</span>
+}</code></pre>
+    </div>
+
+    <div class="card">
+      <h4>UsuarioSenhaUpdateDto</h4>
+      <p class="small">Troca da própria senha.</p>
+      <pre style="margin-top:8px;"><code>{
+  <span class="str">"passwordAtual"</span>: <span class="str">"123456"</span>,
+  <span class="str">"novaSenha"</span>: <span class="str">"654321"</span>
+}</code></pre>
+    </div>
+
+    <div class="card">
+      <h4>LoginRequestDto / TokenResponseDto</h4>
+      <p class="small">Autenticação e emissão de JWT.</p>
+      <pre style="margin-top:8px;"><code>{
+  <span class="str">"accessToken"</span>: <span class="str">"jwt-..."</span>,
+  <span class="str">"tokenType"</span>: <span class="str">"Bearer"</span>,
+  <span class="str">"expiresIn"</span>: <span class="num">3600</span>,
+  <span class="str">"usuario"</span>: { ... }
+}</code></pre>
+    </div>
+
+    <div class="card" style="grid-column: 1 / -1;">
+      <h4>ErrorResponseDto (padrão do ApiExceptionHandler)</h4>
+      <pre style="margin-top:8px;"><code>{
+  <span class="str">"timestamp"</span>: <span class="str">"2026-04-24T18:35:00-03:00"</span>,
+  <span class="str">"status"</span>: <span class="num">400</span>,
+  <span class="str">"error"</span>: <span class="str">"Bad Request"</span>,
+  <span class="str">"message"</span>: <span class="str">"password deve conter exatamente 6 caracteres"</span>,
+  <span class="str">"path"</span>: <span class="str">"/api/v1/usuarios"</span>,
+  <span class="str">"traceId"</span>: <span class="str">"opcional, recomendado para evolução"</span>
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section id="endpoints">
+  <h2>6. Endpoints da Fase Atual</h2>
+  <div class="subtitle">Todos em <code>/api/v1/*</code>. Datas em ISO-8601 com offset.</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Método</th>
+        <th>Path</th>
+        <th>Acesso</th>
+        <th>Finalidade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge-inline bg-post">POST</span></td>
+        <td>/api/v1/usuarios</td>
+        <td>público</td>
+        <td>Criar usuário (ADMIN ou CLIENTE)</td>
+      </tr>
+      <tr>
+        <td><span class="badge-inline bg-get">GET</span></td>
+        <td>/api/v1/usuarios/{id}</td>
+        <td>ADMIN (qualquer) · CLIENTE (próprio)</td>
+        <td>Consultar usuário por id</td>
+      </tr>
+      <tr>
+        <td><span class="badge-inline bg-get">GET</span></td>
+        <td>/api/v1/usuarios</td>
+        <td>ADMIN</td>
+        <td>Listar todos os usuários</td>
+      </tr>
+      <tr>
+        <td><span class="badge-inline bg-patch">PATCH</span></td>
+        <td>/api/v1/usuarios/{id}/senha</td>
+        <td>próprio usuário autenticado</td>
+        <td>Alterar a própria senha</td>
+      </tr>
+      <tr>
+        <td><span class="badge-inline bg-post">POST</span></td>
+        <td>/api/v1/auth/login</td>
+        <td>público</td>
+        <td>Autenticar e receber JWT</td>
+      </tr>
+      <tr>
+        <td><span class="badge-inline bg-get">GET</span></td>
+        <td>/api/v1/auth/me</td>
+        <td>autenticado</td>
+        <td>Retornar o usuário do token</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Exemplo · <code>POST /api/v1/auth/login</code></h3>
+  <pre><code><span class="com"># Request</span>
+{
+  <span class="str">"username"</span>: <span class="str">"admin@empresa.com"</span>,
+  <span class="str">"password"</span>: <span class="str">"123456"</span>
+}
+
+<span class="com"># Response 200 OK</span>
+{
+  <span class="str">"accessToken"</span>: <span class="str">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+  <span class="str">"tokenType"</span>: <span class="str">"Bearer"</span>,
+  <span class="str">"expiresIn"</span>: <span class="num">3600</span>,
+  <span class="str">"usuario"</span>: {
+    <span class="str">"id"</span>: <span class="str">"1f0799c0-98b9-6d9d-bc4a-7d6f5b771001"</span>,
+    <span class="str">"username"</span>: <span class="str">"admin@empresa.com"</span>,
+    <span class="str">"role"</span>: <span class="str">"ADMIN"</span>,
+    <span class="str">"dataCriacao"</span>: <span class="str">"2026-04-24T18:30:00-03:00"</span>,
+    <span class="str">"dataModificacao"</span>: <span class="str">"2026-04-24T18:30:00-03:00"</span>,
+    <span class="str">"criadoPor"</span>: <span class="str">"system"</span>,
+    <span class="str">"modificadoPor"</span>: <span class="str">"system"</span>
+  }
+}</code></pre>
+</section>
+
+<section id="seguranca">
+  <h2>7. Segurança · JWT · Auditoria</h2>
+  <div class="subtitle">Estratégia de autenticação, autorização e rastreabilidade.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 920 380" xmlns="http://www.w3.org/2000/svg">
+      <text x="460" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0a2540">Anatomia do JWT emitido pelo /auth/login</text>
+
+      <!-- Header -->
+      <rect x="40" y="70" width="260" height="250" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <text x="170" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="#991b1b">HEADER</text>
+      <line x1="60" y1="108" x2="280" y2="108" stroke="#dc2626" stroke-opacity="0.3"/>
+      <text x="60" y="140" font-size="12" font-family="monospace" fill="#7f1d1d">{</text>
+      <text x="80" y="160" font-size="12" font-family="monospace" fill="#7f1d1d">"alg": "HS256",</text>
+      <text x="80" y="180" font-size="12" font-family="monospace" fill="#7f1d1d">"typ": "JWT"</text>
+      <text x="60" y="200" font-size="12" font-family="monospace" fill="#7f1d1d">}</text>
+
+      <!-- Payload -->
+      <rect x="320" y="70" width="260" height="250" rx="8" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+      <text x="450" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a8a">PAYLOAD (claims)</text>
+      <line x1="340" y1="108" x2="560" y2="108" stroke="#1d4ed8" stroke-opacity="0.3"/>
+      <text x="340" y="140" font-size="12" font-family="monospace" fill="#1e3a8a">{</text>
+      <text x="360" y="160" font-size="12" font-family="monospace" fill="#1e3a8a">"sub": "&lt;UUID&gt;",</text>
+      <text x="360" y="180" font-size="12" font-family="monospace" fill="#1e3a8a">"email": "...",</text>
+      <text x="360" y="200" font-size="12" font-family="monospace" fill="#1e3a8a">"roles": ["ADMIN"],</text>
+      <text x="360" y="220" font-size="12" font-family="monospace" fill="#1e3a8a">"exp": 1716659200,</text>
+      <text x="360" y="240" font-size="12" font-family="monospace" fill="#1e3a8a">"iat": 1716655600</text>
+      <text x="340" y="260" font-size="12" font-family="monospace" fill="#1e3a8a">}</text>
+      <text x="450" y="295" text-anchor="middle" font-size="10" fill="#1e3a8a" font-style="italic">claims obrigatórias: sub · email · roles</text>
+
+      <!-- Signature -->
+      <rect x="600" y="70" width="280" height="250" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+      <text x="740" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="#14532d">SIGNATURE</text>
+      <line x1="620" y1="108" x2="860" y2="108" stroke="#15803d" stroke-opacity="0.3"/>
+      <text x="740" y="150" text-anchor="middle" font-size="11" font-family="monospace" fill="#14532d">HMAC_SHA256(</text>
+      <text x="740" y="170" text-anchor="middle" font-size="11" font-family="monospace" fill="#14532d">  base64(header) +</text>
+      <text x="740" y="190" text-anchor="middle" font-size="11" font-family="monospace" fill="#14532d">  "." +</text>
+      <text x="740" y="210" text-anchor="middle" font-size="11" font-family="monospace" fill="#14532d">  base64(payload),</text>
+      <text x="740" y="230" text-anchor="middle" font-size="11" font-family="monospace" fill="#14532d">  SECRET_KEY</text>
+      <text x="740" y="250" text-anchor="middle" font-size="11" font-family="monospace" fill="#14532d">)</text>
+      <text x="740" y="295" text-anchor="middle" font-size="10" fill="#14532d" font-style="italic">sem refresh token nesta fase</text>
+
+      <!-- Nota -->
+      <text x="460" y="360" text-anchor="middle" font-size="12" fill="#475569" font-style="italic">sub carrega o UUID do usuário · logout tratado no cliente · backend valida assinatura, expiração e integridade em toda rota protegida</text>
+    </svg>
+    <div class="caption">JWT emitido: header + claims mínimas + assinatura HMAC. Sem refresh token nesta fase.</div>
+  </div>
+
+  <h3>Auditoria JPA</h3>
+  <ul class="list-sep">
+    <li>Campos obrigatórios em toda entidade relevante: <code>dataCriacao</code>, <code>dataModificacao</code>, <code>criadoPor</code>, <code>modificadoPor</code>.</li>
+    <li><code>criadoPor</code> e <code>modificadoPor</code> priorizam o <strong>UUID do usuário autenticado</strong>.</li>
+    <li>Fallback técnico quando não há autenticação: valor literal <code>"system"</code>.</li>
+    <li>O <code>AuditorAware&lt;String&gt;</code> deve extrair o <code>sub</code> do token a partir do <code>SecurityContextHolder</code>.</li>
+    <li><strong>Sem soft delete</strong> nesta fase — exclusões são físicas ou evitadas por regra de negócio.</li>
+  </ul>
+
+  <h3>Autorização</h3>
+  <ul class="list-sep">
+    <li>Perfis disponíveis: <code>ROLE_ADMIN</code> e <code>ROLE_CLIENTE</code>.</li>
+    <li>Admin: consulta/lista qualquer usuário.</li>
+    <li>Cliente: consulta apenas o próprio (<em>ownership</em> validado no service comparando <code>principal.id</code> com <code>pathVariable id</code>).</li>
+    <li>Cliente recebe <code>403 Forbidden</code> ao tentar listar.</li>
+  </ul>
+</section>
+
+<section id="sprints">
+  <h2>8. Sprints · Tasks · Arquivos Esperados</h2>
+  <div class="subtitle">Backlog técnico implementável. Cada task fecha com teste local manual.</div>
+
+  <div class="alert-info" style="margin-bottom: 28px;">
+    <strong>Governança por specs:</strong> cada sprint possui um arquivo spec próprio na pasta <code>specs/</code> do repositório, derivado da metodologia SDD (Spec-Driven Development). O PRD mantém apenas o planejamento de alto nível; a execução é governada pelo spec correspondente, que contém detalhes de arquivos esperados, critérios de verificação, dependências internas e cenários de verificação manual.
+    <ul style="margin-top: 10px; padding-left: 22px;">
+      <li><code>specs/001-sprint-1-fundacao-tecnica.md</code> — fundação técnica (Gradle, Docker, Flyway, Actuator)</li>
+      <li><code>specs/002-sprint-2-gestao-usuarios.md</code> — entidade Usuario, DTOs, criação pública</li>
+      <li><code>specs/003-sprint-3-seguranca-autenticacao.md</code> — JWT, ownership, alteração de senha</li>
+      <li><code>specs/004-sprint-4-erros-docs-testes.md</code> — ApiExceptionHandler, Swagger, testes</li>
+    </ul>
+  </div>
+
+  <div class="sprint-block">
+    <div class="sprint-title">Sprint 1 · Fundação Técnica</div>
+    <div class="deps">Depende de: aprovação do PRD · Java 21 + Docker funcionais. Responsável: Dev Senior. Spec: <code>specs/001-sprint-1-fundacao-tecnica.md</code>.</div>
+
+    <div class="task">
+      <span class="task-num">1.1</span><h5>Projeto backend base com Gradle, profiles e dependências</h5>
+      <ul>
+        <li>Arquivos: <code>build.gradle</code>, <code>settings.gradle</code>, <code>application.yml</code>, <code>application-dev.yml</code></li>
+        <li>Verificação: projeto sobe, profile <code>dev</code> ativo, starter-validation disponível</li>
+        <li>Sem dependências técnicas anteriores</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">1.2</span><h5>PostgreSQL local com Docker Compose</h5>
+      <ul>
+        <li>Arquivo: <code>docker-compose.yml</code></li>
+        <li>Verificação: <code>docker compose up -d</code> sobe o banco; aplicação conecta</li>
+        <li>Depende de: Task 1.1</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">1.3</span><h5>Locale, Timezone, CORS e Actuator</h5>
+      <ul>
+        <li>Arquivos: <code>config/LocaleConfig.java</code>, <code>config/SecurityConfig.java</code>, <code>application.yml</code></li>
+        <li>Verificação: timezone correto, CORS básico, healthcheck responde</li>
+        <li>Depende de: Task 1.1 · pode rodar em paralelo com Task 1.2</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">1.4</span><h5>Flyway e migration inicial</h5>
+      <ul>
+        <li>Arquivos: <code>src/main/resources/db/migration/V1__init.sql</code></li>
+        <li>Verificação: schema criado no boot, tabela com tipo <code>uuid</code> nativo</li>
+        <li>Depende de: Tasks 1.1 e 1.2</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sprint-block">
+    <div class="sprint-title">Sprint 2 · Gestão de Usuários</div>
+    <div class="deps">Depende de: Sprint 1 concluída · banco e Flyway funcionais. Responsável: Dev Senior. Spec: <code>specs/002-sprint-2-gestao-usuarios.md</code>.</div>
+
+    <div class="task">
+      <span class="task-num">2.1</span><h5>Entidade Usuario com UUID v6, auditoria e repositório</h5>
+      <ul>
+        <li>Arquivos: <code>model/Usuario.java</code>, <code>repository/UsuarioRepository.java</code>, <code>config/SpringJpaAuditingConfig.java</code></li>
+        <li>Verificação: persistência usa <code>UUID</code> no Java e <code>uuid</code> nativo no PG, auditoria preenchida</li>
+        <li>Depende de: Task 1.4</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">2.2</span><h5>DTOs e Mapper de usuário</h5>
+      <ul>
+        <li>Arquivos: <code>web/dto/UsuarioCreateDto.java</code>, <code>UsuarioResponseDto.java</code>, <code>UsuarioSenhaUpdateDto.java</code>, <code>web/dto/mapper/UsuarioMapper.java</code></li>
+        <li>Verificação: senha jamais aparece na resposta; mapeamento correto</li>
+        <li>Depende parcialmente de Task 2.1</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">2.3</span><h5>Criação pública de usuário</h5>
+      <ul>
+        <li>Arquivos: <code>service/UsuarioService.java</code>, <code>web/controller/UsuarioController.java</code></li>
+        <li>Verificação: <code>POST /usuarios</code> cria ADMIN e CLIENTE; validações de e-mail e senha ativas</li>
+        <li>Depende de: Tasks 2.1 e 2.2</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sprint-block">
+    <div class="sprint-title">Sprint 3 · Segurança · JWT · Autorização</div>
+    <div class="deps">Depende de: Sprint 2 · criação de usuário funcional. Responsável: Dev Senior. Spec: <code>specs/003-sprint-3-seguranca-autenticacao.md</code>.</div>
+
+    <div class="task">
+      <span class="task-num">3.1</span><h5>Segurança JWT, BCrypt e login</h5>
+      <ul>
+        <li>Arquivos: <code>security/JwtTokenProvider.java</code>, <code>JwtAuthenticationFilter.java</code>, <code>CustomUserDetailsService.java</code>, <code>service/AuthService.java</code>, <code>web/controller/AuthController.java</code>, <code>web/dto/LoginRequestDto.java</code>, <code>web/dto/TokenResponseDto.java</code></li>
+        <li>Validação: <code>LoginRequestDto.username</code> com <code>@NotBlank @Email</code>; <code>LoginRequestDto.password</code> com <code>@NotBlank</code></li>
+        <li>Verificação: login gera token, claims <code>sub</code>/<code>email</code>/<code>roles</code>/<code>iat</code>/<code>exp</code> presentes, senha validada por BCrypt</li>
+        <li>Depende de: Task 2.3</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">3.2</span><h5>Autorização por perfil e ownership</h5>
+      <ul>
+        <li>Arquivos: <code>config/SecurityConfig.java</code>, <code>service/UsuarioService.java</code>, <code>web/controller/UsuarioController.java</code></li>
+        <li>Verificação: admin consulta qualquer, cliente só o próprio, cliente recebe 403 na listagem</li>
+        <li>Depende de: Tasks 3.1 e 2.3</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">3.3</span><h5>Alteração da própria senha</h5>
+      <ul>
+        <li>Arquivos: <code>service/UsuarioService.java</code>, <code>web/controller/UsuarioController.java</code></li>
+        <li>Verificação: usuário altera a própria, terceiro não altera alheia</li>
+        <li>Depende de: Tasks 3.1 e 3.2</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sprint-block">
+    <div class="sprint-title">Sprint 4 · Erros · Docs · Testes</div>
+    <div class="deps">Depende de: Sprint 3 concluída · endpoints estabilizados. Responsável: Dev Senior. Spec: <code>specs/004-sprint-4-erros-docs-testes.md</code>.</div>
+
+    <div class="task">
+      <span class="task-num">4.1</span><h5>ApiExceptionHandler e payload padrão de erro</h5>
+      <ul>
+        <li>Arquivos: <code>exception/ApiExceptionHandler.java</code>, <code>web/dto/ErrorResponseDto.java</code></li>
+        <li>Verificação: validação, autenticação, autorização e conflito seguem formato padrão</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">4.2</span><h5>Springdoc OpenAPI e Swagger UI</h5>
+      <ul>
+        <li>Arquivos: <code>config/OpenApiConfig.java</code> · controllers anotados</li>
+        <li>Verificação: Swagger UI exposta, schemas e exemplos coerentes com o PRD</li>
+        <li>Depende de: Tasks 2.2, 2.3, 3.1, 3.2</li>
+      </ul>
+    </div>
+
+    <div class="task">
+      <span class="task-num">4.3</span><h5>Testes de autenticação e autorização</h5>
+      <ul>
+        <li>Arquivos: <code>src/test/java/...</code></li>
+        <li>Verificação: testes locais verdes, cenários críticos cobertos</li>
+        <li>Depende de: Tasks 3.1, 3.2, 3.3 e parcialmente 4.1</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert-info">
+    <strong>Regra de execução:</strong> ao final de cada task, o agente deve parar para teste local manual. Commits podem ser feitos pelo agente. Push e PR são manuais. CI/CD e GitHub Actions ficam para fase posterior.
+  </div>
+</section>
+
+<section id="roadmap-epics">
+  <h2>8.1 Roadmap Técnico · Épicos do Projeto</h2>
+  <div class="subtitle">Visão consolidada de todas as grandes implementações previstas para a plataforma SEP, conforme o PRD.</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>Epic 1 · Fundação da API</h4>
+      <ul class="list-sep">
+        <li>Configuração de Docker Compose, banco dev, locale, timezone, auditoria JPA, Flyway, Actuator, CORS e UUID.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 2 · Gestão de Usuários</h4>
+      <ul class="list-sep">
+        <li>Modelagem da entidade <code>Usuario</code> com UUID v6, auditoria, DTOs, mappers, criação pública e hash de senha seguro.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 3 · Segurança, Autenticação e Autorização</h4>
+      <ul class="list-sep">
+        <li>JWT, login, claims, consulta de usuário, listagem restrita, alteração de senha, SecurityConfig consolidada e auditoria do usuário autenticado.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 4 · Tratamento de Erros, Documentação e Testes</h4>
+      <ul class="list-sep">
+        <li>ApiExceptionHandler, payload padronizado, documentação OpenAPI, Swagger UI e testes automatizados dos cenários críticos.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 5 · Infraestrutura Futura</h4>
+      <ul class="list-sep">
+        <li>Planejamento de ambientes, VPS, seeds, deploy por branch e ambiente.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 6 · Onboarding KYC/KYB</h4>
+      <ul class="list-sep">
+        <li>Onboarding documental, coleta e validação de documentos, verificações de identidade, trilha operacional de aprovação e pendências.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 7 · Análise de Crédito</h4>
+      <ul class="list-sep">
+        <li>Esteira de análise, parecer operacional, score, decisão, fundamentos e integração ao fluxo de proposta.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 8 · Formalização Contratual</h4>
+      <ul class="list-sep">
+        <li>Geração de contrato, aceite, assinatura, status de formalização, bloqueio de desembolso e integração futura com assinatura eletrônica.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 9 · Cobrança e Inadimplência</h4>
+      <ul class="list-sep">
+        <li>Cobrança de parcelas, agenda, status, histórico, acompanhamento de atraso, reprocessos e suporte ao financeiro.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 10 · Backoffice Operacional</h4>
+      <ul class="list-sep">
+        <li>Fila operacional, visibilidade consolidada, tratamento manual de inconsistências, comentários e organização da operação assistida.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 11 · Jornada da Empresa Credora</h4>
+      <ul class="list-sep">
+        <li>Onboarding, elegibilidade, governança, aportes, alocações, visão de carteira e acompanhamento das operações financiadas.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 12 · Administração e Governança</h4>
+      <ul class="list-sep">
+        <li>RBAC evoluído, perfis internos, parametrizações, auditoria administrativa, cadastros mestres e controles operacionais.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 13 · Frontend SEP</h4>
+      <ul class="list-sep">
+        <li>Reaproveitamento do template Angular, adaptação de componentes, alinhamento de versão e implementação das jornadas no frontend.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 14 · Movimentação Pix</h4>
+      <ul class="list-sep">
+        <li>Desembolso, recebimento, conciliação, webhooks, rastreabilidade, idempotência, auditoria e integração operacional do Pix.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</section>
+
+<section id="infra">
+  <h2>9. Infraestrutura · Atual e Futura</h2>
+  <div class="subtitle">Docker Compose local agora. VPS segmentadas depois.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 940 520" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="dkNow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0284c7"/><stop offset="100%" stop-color="#0369a1"/>
+        </linearGradient>
+        <linearGradient id="vpsShared" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#b45309"/>
+        </linearGradient>
+        <linearGradient id="vpsProd" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#7f1d1d"/>
+        </linearGradient>
+      </defs>
+
+      <text x="470" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0a2540">Topologia · Fase atual (local) vs. Futuro (VPS)</text>
+
+      <!-- Agora -->
+      <rect x="20" y="60" width="440" height="430" rx="12" fill="#f0f9ff" stroke="#0ea5e9" stroke-width="2"/>
+      <text x="240" y="90" text-anchor="middle" font-size="15" font-weight="700" fill="#0369a1">AGORA · Máquina do desenvolvedor</text>
+
+      <rect x="50" y="115" width="380" height="110" rx="8" fill="white" stroke="#0ea5e9"/>
+      <text x="240" y="138" text-anchor="middle" font-size="13" font-weight="700" fill="#0a2540">Spring Boot App</text>
+      <text x="240" y="158" text-anchor="middle" font-size="11" fill="#334155">Java 21 · :8080</text>
+      <text x="240" y="178" text-anchor="middle" font-size="11" fill="#334155">profile=dev · Gradle bootRun</text>
+      <text x="240" y="198" text-anchor="middle" font-size="11" fill="#64748b">/actuator/health · /swagger-ui.html</text>
+
+      <line x1="240" y1="225" x2="240" y2="255" stroke="#0369a1" stroke-width="2"/>
+      <polygon points="235,253 245,253 240,263" fill="#0369a1"/>
+      <text x="260" y="245" font-size="11" fill="#334155" font-family="monospace">JDBC</text>
+
+      <rect x="50" y="265" width="380" height="120" rx="8" fill="url(#dkNow)"/>
+      <text x="240" y="290" text-anchor="middle" fill="white" font-size="13" font-weight="700">🐳 Docker Compose</text>
+      <rect x="120" y="305" width="240" height="65" rx="6" fill="white" opacity="0.95"/>
+      <text x="240" y="328" text-anchor="middle" font-size="12" fill="#0a2540" font-weight="700">PostgreSQL :5432</text>
+      <text x="240" y="346" text-anchor="middle" font-size="10" fill="#334155">imagem oficial · volume persistente</text>
+      <text x="240" y="362" text-anchor="middle" font-size="10" fill="#64748b">database: sep_dev</text>
+
+      <text x="240" y="420" text-anchor="middle" font-size="12" fill="#0369a1">✓ Flyway migra no boot</text>
+      <text x="240" y="440" text-anchor="middle" font-size="12" fill="#0369a1">✓ Actuator /health local</text>
+      <text x="240" y="460" text-anchor="middle" font-size="12" fill="#0369a1">✓ Swagger local</text>
+      <text x="240" y="478" text-anchor="middle" font-size="11" fill="#64748b" font-style="italic">Sem deploy remoto nesta fase</text>
+
+      <!-- Futuro -->
+      <rect x="480" y="60" width="440" height="430" rx="12" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+      <text x="700" y="90" text-anchor="middle" font-size="15" font-weight="700" fill="#b45309">FUTURO · Infra remota (Épico E14)</text>
+
+      <!-- VPS compartilhada -->
+      <rect x="500" y="115" width="400" height="150" rx="8" fill="white" stroke="#f59e0b"/>
+      <text x="700" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#78350f">VPS 1 · compartilhada</text>
+      <rect x="520" y="150" width="180" height="95" rx="6" fill="url(#vpsShared)"/>
+      <text x="610" y="175" text-anchor="middle" fill="white" font-size="12" font-weight="700">develop</text>
+      <text x="610" y="195" text-anchor="middle" fill="white" font-size="10">Spring Boot</text>
+      <text x="610" y="215" text-anchor="middle" fill="white" font-size="10">PostgreSQL dedicada</text>
+      <text x="610" y="235" text-anchor="middle" fill="#fef3c7" font-size="10" font-style="italic">branch: develop</text>
+
+      <rect x="710" y="150" width="180" height="95" rx="6" fill="url(#vpsShared)"/>
+      <text x="800" y="175" text-anchor="middle" fill="white" font-size="12" font-weight="700">homologação</text>
+      <text x="800" y="195" text-anchor="middle" fill="white" font-size="10">Spring Boot</text>
+      <text x="800" y="215" text-anchor="middle" fill="white" font-size="10">PostgreSQL dedicada</text>
+      <text x="800" y="235" text-anchor="middle" fill="#fef3c7" font-size="10" font-style="italic">branch: homolog</text>
+
+      <!-- VPS prod -->
+      <rect x="500" y="285" width="400" height="120" rx="8" fill="white" stroke="#dc2626"/>
+      <text x="700" y="310" text-anchor="middle" font-size="13" font-weight="700" fill="#7f1d1d">VPS 2 · isolada</text>
+      <rect x="550" y="320" width="300" height="70" rx="6" fill="url(#vpsProd)"/>
+      <text x="700" y="345" text-anchor="middle" fill="white" font-size="12" font-weight="700">produção</text>
+      <text x="700" y="365" text-anchor="middle" fill="white" font-size="10">Spring Boot · PostgreSQL dedicada</text>
+      <text x="700" y="381" text-anchor="middle" fill="#fecaca" font-size="10" font-style="italic">branch: main · VPS separada</text>
+
+      <!-- Regras -->
+      <text x="700" y="430" text-anchor="middle" font-size="11" fill="#78350f">1 banco por ambiente · secrets separados no GitHub</text>
+      <text x="700" y="448" text-anchor="middle" font-size="11" fill="#78350f">migrations versionadas · seeds por ambiente</text>
+      <text x="700" y="466" text-anchor="middle" font-size="11" fill="#78350f">deploy por branch · GitHub Actions (futuro)</text>
+
+      <text x="470" y="510" text-anchor="middle" font-size="12" fill="#475569" font-style="italic">Planejamento registrado no PRD · não é implementação ativa da fase atual</text>
+    </svg>
+    <div class="caption">Hoje: Docker Compose local. Futuro: duas VPS, uma compartilhada (dev + homolog) e uma isolada (prod).</div>
+  </div>
+
+  <h3>docker-compose.yml (exemplo orientativo)</h3>
+  <pre><code><span class="kw">services</span>:
+  <span class="ty">postgres</span>:
+    image: postgres:16
+    container_name: sep-postgres-dev
+    environment:
+      POSTGRES_DB: sep_dev
+      POSTGRES_USER: sep
+      POSTGRES_PASSWORD: sep
+    ports:
+      - <span class="str">"5432:5432"</span>
+    volumes:
+      - sep-pg-data:/var/lib/postgresql/data
+
+<span class="kw">volumes</span>:
+  <span class="ty">sep-pg-data</span>:</code></pre>
+</section>
+
+<section id="pipeline">
+  <h2>10. Pipeline GitHub</h2>
+  <div class="subtitle">Fluxo atual (manual) e automação futura planejada no Épico E14.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 940 460" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ghgit" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#24292e"/><stop offset="100%" stop-color="#1b1f24"/>
+        </linearGradient>
+        <linearGradient id="stepNow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0b5ed7"/><stop offset="100%" stop-color="#0a2540"/>
+        </linearGradient>
+        <linearGradient id="stepFuture" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#64748b"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Faixa AGORA -->
+      <text x="40" y="40" font-size="14" font-weight="700" fill="#0a2540">FASE ATUAL · manual</text>
+      <rect x="30" y="55" width="880" height="150" rx="10" fill="#eff6ff" stroke="#3b82f6"/>
+
+      <!-- Cards -->
+      <g>
+        <rect x="50" y="80" width="130" height="100" rx="8" fill="url(#stepNow)"/>
+        <text x="115" y="105" text-anchor="middle" fill="white" font-size="13" font-weight="700">1. Local</text>
+        <text x="115" y="125" text-anchor="middle" fill="#cbd5e1" font-size="10">Desenvolvedor implementa</text>
+        <text x="115" y="140" text-anchor="middle" fill="#cbd5e1" font-size="10">a task</text>
+        <text x="115" y="160" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">./gradlew test</text>
+      </g>
+
+      <polygon points="185,127 205,127 205,120 220,130 205,140 205,133 185,133" fill="#3b82f6"/>
+
+      <g>
+        <rect x="225" y="80" width="130" height="100" rx="8" fill="url(#stepNow)"/>
+        <text x="290" y="105" text-anchor="middle" fill="white" font-size="13" font-weight="700">2. Commit</text>
+        <text x="290" y="125" text-anchor="middle" fill="#cbd5e1" font-size="10">Agente pode fazer</text>
+        <text x="290" y="140" text-anchor="middle" fill="#cbd5e1" font-size="10">sob demanda</text>
+        <text x="290" y="160" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">git commit</text>
+      </g>
+
+      <polygon points="360,127 380,127 380,120 395,130 380,140 380,133 360,133" fill="#3b82f6"/>
+
+      <g>
+        <rect x="400" y="80" width="130" height="100" rx="8" fill="url(#stepNow)"/>
+        <text x="465" y="105" text-anchor="middle" fill="white" font-size="13" font-weight="700">3. Push + PR</text>
+        <text x="465" y="125" text-anchor="middle" fill="#cbd5e1" font-size="10">Sempre manual</text>
+        <text x="465" y="140" text-anchor="middle" fill="#cbd5e1" font-size="10">pelo desenvolvedor</text>
+        <text x="465" y="160" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">git push origin</text>
+      </g>
+
+      <polygon points="535,127 555,127 555,120 570,130 555,140 555,133 535,133" fill="#3b82f6"/>
+
+      <g>
+        <rect x="575" y="80" width="130" height="100" rx="8" fill="url(#ghgit)"/>
+        <text x="640" y="105" text-anchor="middle" fill="white" font-size="13" font-weight="700">4. GitHub</text>
+        <text x="640" y="125" text-anchor="middle" fill="#cbd5e1" font-size="10">Code review</text>
+        <text x="640" y="140" text-anchor="middle" fill="#cbd5e1" font-size="10">Discussão do PR</text>
+        <text x="640" y="160" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">revisão humana</text>
+      </g>
+
+      <polygon points="710,127 730,127 730,120 745,130 730,140 730,133 710,133" fill="#3b82f6"/>
+
+      <g>
+        <rect x="750" y="80" width="130" height="100" rx="8" fill="url(#stepNow)"/>
+        <text x="815" y="105" text-anchor="middle" fill="white" font-size="13" font-weight="700">5. Merge</text>
+        <text x="815" y="125" text-anchor="middle" fill="#cbd5e1" font-size="10">Manual</text>
+        <text x="815" y="140" text-anchor="middle" fill="#cbd5e1" font-size="10">após aprovação</text>
+        <text x="815" y="160" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">main / develop</text>
+      </g>
+
+      <!-- Faixa FUTURO -->
+      <text x="40" y="250" font-size="14" font-weight="700" fill="#475569">FASE FUTURA (E14) · GitHub Actions · CI/CD</text>
+      <rect x="30" y="265" width="880" height="180" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="6,4"/>
+
+      <g>
+        <rect x="50" y="290" width="150" height="130" rx="8" fill="url(#stepFuture)"/>
+        <text x="125" y="315" text-anchor="middle" fill="white" font-size="13" font-weight="700">CI Build</text>
+        <text x="125" y="335" text-anchor="middle" fill="white" font-size="10">on: pull_request</text>
+        <text x="125" y="352" text-anchor="middle" fill="white" font-size="10">gradle build</text>
+        <text x="125" y="369" text-anchor="middle" fill="white" font-size="10">gradle test</text>
+        <text x="125" y="386" text-anchor="middle" fill="white" font-size="10">Flyway validate</text>
+        <text x="125" y="406" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">workflows/ci.yml</text>
+      </g>
+
+      <polygon points="205,355 225,355 225,348 240,358 225,368 225,361 205,361" fill="#94a3b8"/>
+
+      <g>
+        <rect x="245" y="290" width="150" height="130" rx="8" fill="url(#stepFuture)"/>
+        <text x="320" y="315" text-anchor="middle" fill="white" font-size="13" font-weight="700">Deploy develop</text>
+        <text x="320" y="335" text-anchor="middle" fill="white" font-size="10">on: push develop</text>
+        <text x="320" y="352" text-anchor="middle" fill="white" font-size="10">→ VPS compartilhada</text>
+        <text x="320" y="369" text-anchor="middle" fill="white" font-size="10">migrations + seeds dev</text>
+        <text x="320" y="406" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">secrets: DEV_*</text>
+      </g>
+
+      <polygon points="400,355 420,355 420,348 435,358 420,368 420,361 400,361" fill="#94a3b8"/>
+
+      <g>
+        <rect x="440" y="290" width="150" height="130" rx="8" fill="url(#stepFuture)"/>
+        <text x="515" y="315" text-anchor="middle" fill="white" font-size="13" font-weight="700">Deploy homolog</text>
+        <text x="515" y="335" text-anchor="middle" fill="white" font-size="10">on: push homolog</text>
+        <text x="515" y="352" text-anchor="middle" fill="white" font-size="10">→ VPS compartilhada</text>
+        <text x="515" y="369" text-anchor="middle" fill="white" font-size="10">migrations + seeds hom</text>
+        <text x="515" y="406" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">secrets: HOM_*</text>
+      </g>
+
+      <polygon points="595,355 615,355 615,348 630,358 615,368 615,361 595,361" fill="#94a3b8"/>
+
+      <g>
+        <rect x="635" y="290" width="150" height="130" rx="8" fill="#64748b"/>
+        <text x="710" y="315" text-anchor="middle" fill="white" font-size="13" font-weight="700">Deploy produção</text>
+        <text x="710" y="335" text-anchor="middle" fill="white" font-size="10">on: push main</text>
+        <text x="710" y="352" text-anchor="middle" fill="white" font-size="10">→ VPS isolada</text>
+        <text x="710" y="369" text-anchor="middle" fill="white" font-size="10">migrations prod</text>
+        <text x="710" y="386" text-anchor="middle" fill="white" font-size="10">aprovação manual</text>
+        <text x="710" y="406" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">secrets: PROD_*</text>
+      </g>
+
+      <rect x="795" y="290" width="95" height="130" rx="8" fill="white" stroke="#94a3b8" stroke-dasharray="4,3"/>
+      <text x="843" y="330" text-anchor="middle" font-size="11" fill="#475569">Observabilidade</text>
+      <text x="843" y="346" text-anchor="middle" font-size="10" fill="#64748b">health</text>
+      <text x="843" y="362" text-anchor="middle" font-size="10" fill="#64748b">logs</text>
+      <text x="843" y="378" text-anchor="middle" font-size="10" fill="#64748b">métricas</text>
+      <text x="843" y="398" text-anchor="middle" font-size="10" fill="#64748b">(roadmap)</text>
+    </svg>
+    <div class="caption">Pipeline atual controlado pelo humano. Automação GitHub Actions e deploy por branch/ambiente ficam para E14.</div>
+  </div>
+
+  <h3>Estrutura de workflows planejada (E14)</h3>
+  <pre><code>.github/workflows/
+├── ci.yml              <span class="com"># on: pull_request · build + test + flyway validate</span>
+├── deploy-develop.yml  <span class="com"># on: push [develop] · deploy VPS compartilhada</span>
+├── deploy-homolog.yml  <span class="com"># on: push [homolog] · deploy VPS compartilhada</span>
+└── deploy-prod.yml     <span class="com"># on: push [main] · deploy VPS isolada · aprovação manual</span></code></pre>
+</section>
+
+<section id="convencoes">
+  <h2>11. Convenções Obrigatórias</h2>
+  <div class="subtitle">Checklist de padrões que toda task deve respeitar.</div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>IDs · Persistência</h4>
+      <ul class="list-sep" style="font-size: 13px; margin-top: 8px;">
+        <li><code>UUID</code> em todas as entidades</li>
+        <li>Geração via <code>java-uuid-generator 5.1.0</code>, preferência <code>v6</code></li>
+        <li>Tipo <code>uuid</code> nativo no PostgreSQL</li>
+        <li><code>java.util.UUID</code> no Java</li>
+        <li>Tabelas e colunas em <strong>português</strong></li>
+        <li>Sem soft delete nesta fase</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Segurança</h4>
+      <ul class="list-sep" style="font-size: 13px; margin-top: 8px;">
+        <li>Senhas com <code>BCryptPasswordEncoder</code></li>
+        <li>JWT sem refresh token</li>
+        <li>Claims mínimas: <code>sub</code>, <code>email</code>, <code>roles</code></li>
+        <li><code>sub</code> carrega o UUID do usuário</li>
+        <li>Logout tratado no cliente (descarta o token)</li>
+        <li>CORS explícito no <code>SecurityConfig</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Auditoria</h4>
+      <ul class="list-sep" style="font-size: 13px; margin-top: 8px;">
+        <li>JPA Auditing com <code>@EntityListeners(AuditingEntityListener.class)</code></li>
+        <li>Campos <code>dataCriacao</code>, <code>dataModificacao</code>, <code>criadoPor</code>, <code>modificadoPor</code></li>
+        <li><code>AuditorAware&lt;String&gt;</code> retorna UUID do principal</li>
+        <li>Fallback <code>"system"</code> quando não há autenticação</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Contratos da API</h4>
+      <ul class="list-sep" style="font-size: 13px; margin-top: 8px;">
+        <li>Versionamento em <code>/api/v1</code></li>
+        <li>DTOs obrigatórios, ModelMapper obrigatório</li>
+        <li>Datas em ISO-8601 com offset</li>
+        <li>Termos <code>username</code>, <code>role</code>, <code>accessToken</code>, <code>tokenType</code> podem ficar em inglês</li>
+        <li>Listas simples como array nesta fase, evoluindo para paginação sem quebra</li>
+        <li><code>ApiExceptionHandler</code> com payload padronizado</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Regras das Camadas</h4>
+      <ul class="list-sep" style="font-size: 13px; margin-top: 8px;">
+        <li>Controllers só recebem request e devolvem response</li>
+        <li>Regras ficam no <code>service</code></li>
+        <li>Acesso a banco só no <code>repository</code></li>
+        <li>Entidades JPA só no <code>model</code></li>
+        <li>DTOs não são reutilizados como entidade</li>
+        <li>Classes de segurança não carregam regra de domínio</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Operacional</h4>
+      <ul class="list-sep" style="font-size: 13px; margin-top: 8px;">
+        <li>Flyway aplica migrations no boot</li>
+        <li>Actuator expõe <code>/actuator/health</code></li>
+        <li>Swagger UI disponível em ambiente de dev</li>
+        <li>Locale <code>pt-BR</code> · Timezone <code>America/Sao_Paulo</code></li>
+        <li>Parar para teste local manual ao final de cada task</li>
+        <li>Commits pelo agente · push e PR manuais</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="testes">
+  <h2>12. Cenários de Teste Obrigatórios</h2>
+  <div class="subtitle">Cobertura mínima da Sprint 4 · Task 4.3.</div>
+
+  <div class="two-col-list">
+    <ul class="list-sep" style="font-size: 14px;">
+      <li>Criar usuário com e-mail válido</li>
+      <li>Rejeitar e-mail inválido</li>
+      <li>Rejeitar e-mail duplicado</li>
+      <li>Rejeitar senha com tamanho diferente de 6</li>
+      <li>Autenticar com credenciais válidas</li>
+      <li>Falhar autenticação com senha inválida</li>
+      <li>Admin consultar qualquer usuário</li>
+      <li>Cliente consultar apenas o próprio</li>
+      <li>Cliente não listar usuários (403)</li>
+      <li>Admin listar usuários</li>
+      <li>Usuário alterar a própria senha</li>
+      <li>Usuário não alterar senha de terceiro</li>
+      <li>Auditoria preencher criação e modificação</li>
+      <li>Documentação expor rotas de auth e usuários</li>
+      <li>Migrations subirem corretamente no boot</li>
+      <li>Healthcheck responder com sucesso</li>
+      <li>Respostas de erro seguirem payload padronizado</li>
+      <li>Token expirado ser rejeitado</li>
+      <li>Token inválido ser rejeitado</li>
+      <li>Claims <code>sub</code>, <code>email</code>, <code>roles</code> presentes no JWT</li>
+      <li>Auditoria usar o UUID do usuário autenticado</li>
+      <li>Auditoria usar fallback <code>system</code> sem autenticação</li>
+    </ul>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div style="max-width: 1220px; margin: 0 auto;">
+    <strong>SEP · Documentação Técnica</strong> · Versão Desenvolvedor<br>
+    Baseado no <em>PRD.md</em> e <em>CONTEXT.md</em> · Atualizado em 24/04/2026<br>
+    <span style="font-family: monospace; opacity: 0.7;">java 21 · spring boot · postgresql · docker · gradle · flyway · jwt</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEP - Documentação do Produto (PO)</title>
+<style>
+  :root {
+    --primary: #1e3a8a;
+    --primary-light: #3b82f6;
+    --primary-dark: #0f1e4a;
+    --accent: #f59e0b;
+    --success: #059669;
+    --danger: #dc2626;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+    color: white;
+    padding: 80px 40px;
+    text-align: center;
+  }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    font-size: 20px;
+    opacity: 0.92;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .hero .audience {
+    margin-top: 32px;
+    font-size: 14px;
+    opacity: 0.85;
+  }
+  .nav {
+    position: sticky;
+    top: 0;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 40px;
+    z-index: 100;
+    overflow-x: auto;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 24px;
+    padding: 6px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+  section { margin-bottom: 80px; }
+  section h2 {
+    font-size: 32px;
+    color: var(--primary-dark);
+    margin-bottom: 12px;
+    border-left: 4px solid var(--accent);
+    padding-left: 16px;
+  }
+  section .subtitle {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 36px;
+  }
+  h3 {
+    font-size: 20px;
+    color: var(--primary);
+    margin: 32px 0 12px;
+  }
+  p { margin-bottom: 12px; }
+  .grid {
+    display: grid;
+    gap: 20px;
+  }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 800px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 32px; }
+    .hero p { font-size: 16px; }
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15,30,74,0.08);
+  }
+  .card h4 {
+    font-size: 17px;
+    color: var(--primary-dark);
+    margin-bottom: 10px;
+  }
+  .card .num {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  .card .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #dbeafe;
+    color: var(--primary);
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  .card .tag.done { background: #d1fae5; color: var(--success); }
+  .card .tag.next { background: #fef3c7; color: #92400e; }
+  .card .tag.later { background: #f1f5f9; color: var(--muted); }
+  .diagram-wrapper {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    overflow-x: auto;
+  }
+  .diagram-wrapper svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .caption {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 12px;
+    font-style: italic;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+  @media (max-width: 800px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat .num-big {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .stat .label {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: var(--primary-dark);
+    color: white;
+    padding: 14px;
+    text-align: left;
+    font-size: 14px;
+  }
+  td {
+    padding: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+  }
+  tr:hover td { background: #f8fafc; }
+  ul.clean { list-style: none; padding: 0; }
+  ul.clean li {
+    padding: 8px 0 8px 28px;
+    position: relative;
+  }
+  ul.clean li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--success);
+    font-weight: 700;
+  }
+  .alert {
+    background: #fffbeb;
+    border-left: 4px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 20px 0;
+  }
+  .alert strong { color: #92400e; }
+  footer {
+    background: var(--primary-dark);
+    color: white;
+    padding: 32px 40px;
+    text-align: center;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+  .legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend .dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">VERSÃO PRODUCT OWNER</div>
+  <h1>Plataforma SEP</h1>
+  <p>Documentação de produto da plataforma de empréstimos para empresas — visão, jornadas, épicos e roadmap consolidado para acompanhamento executivo e priorização.</p>
+  <div class="audience">Documento elaborado para: Product Owners · Gerentes de Produto · Stakeholders de Negócio</div>
+</div>
+
+<nav class="nav">
+  <a href="#visao">Visão</a>
+  <a href="#jornadas">4 Jornadas</a>
+  <a href="#epicos">Épicos</a>
+  <a href="#historias">Histórias</a>
+  <a href="#roadmap">Roadmap</a>
+  <a href="#sprints">Sprints</a>
+  <a href="#arquitetura">Arquitetura</a>
+  <a href="#stack">Stack</a>
+  <a href="#infra">Infraestrutura</a>
+  <a href="#pipeline">Pipeline GitHub</a>
+  <a href="#sucesso">Critérios de Sucesso</a>
+</nav>
+
+<div class="container">
+
+<section id="visao">
+  <h2>1. Visão do Produto</h2>
+  <div class="subtitle">Plataforma SEP com foco em capital de giro PJ, apoiada em infraestrutura Banking as a Service.</div>
+
+  <div class="stats">
+    <div class="stat"><div class="num-big">14</div><div class="label">Épicos no Roadmap</div></div>
+    <div class="stat"><div class="num-big">4</div><div class="label">Jornadas de Negócio</div></div>
+    <div class="stat"><div class="num-big">4</div><div class="label">Sprints (Fase 1)</div></div>
+    <div class="stat"><div class="num-big">6</div><div class="label">Endpoints Iniciais</div></div>
+  </div>
+
+  <p>O produto SEP é uma plataforma que conecta empresas tomadoras de empréstimo a empresas credoras, com operação assistida por um time financeiro interno e governança do administrador do sistema. A fase atual entrega a <strong>fundação técnica da API</strong>, preparando o terreno para as próximas ondas funcionais: onboarding, análise de crédito, formalização contratual e cobrança.</p>
+
+  <div class="alert">
+    <strong>Importante:</strong> esta fase não entrega o produto completo. Ela constrói a base segura, auditável e documentada sobre a qual as jornadas de negócio serão construídas em ondas.
+  </div>
+</section>
+
+<section id="jornadas">
+  <h2>2. As Quatro Jornadas</h2>
+  <div class="subtitle">Todas as jornadas existem formalmente na modelagem do produto, mas são executadas em ondas.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gTomador" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1e3a8a"/>
+        </linearGradient>
+        <linearGradient id="gCredora" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#b45309"/>
+        </linearGradient>
+        <linearGradient id="gFinanceiro" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#047857"/>
+        </linearGradient>
+        <linearGradient id="gAdmin" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#5b21b6"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Centro -->
+      <circle cx="450" cy="260" r="80" fill="#0f1e4a"/>
+      <text x="450" y="255" text-anchor="middle" fill="white" font-size="18" font-weight="700">SEP</text>
+      <text x="450" y="278" text-anchor="middle" fill="#fbbf24" font-size="12">Plataforma</text>
+
+      <!-- Tomador -->
+      <g>
+        <rect x="60" y="60" width="260" height="130" rx="12" fill="url(#gTomador)"/>
+        <text x="190" y="95" text-anchor="middle" fill="white" font-size="18" font-weight="700">1. Tomador</text>
+        <text x="190" y="120" text-anchor="middle" fill="white" font-size="13" opacity="0.9">Pessoa ou empresa que</text>
+        <text x="190" y="138" text-anchor="middle" fill="white" font-size="13" opacity="0.9">solicita empréstimo</text>
+        <text x="190" y="168" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Onboarding · Crédito · Contrato</text>
+        <line x1="320" y1="125" x2="378" y2="220" stroke="#1e3a8a" stroke-width="2" stroke-dasharray="4,4"/>
+      </g>
+
+      <!-- Credora -->
+      <g>
+        <rect x="580" y="60" width="260" height="130" rx="12" fill="url(#gCredora)"/>
+        <text x="710" y="95" text-anchor="middle" fill="white" font-size="18" font-weight="700">2. Empresa Credora</text>
+        <text x="710" y="120" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Empresa que aporta</text>
+        <text x="710" y="138" text-anchor="middle" fill="white" font-size="13" opacity="0.95">recursos à plataforma</text>
+        <text x="710" y="168" text-anchor="middle" fill="#fff5d6" font-size="12" font-weight="600">Aporte · Carteira · Governança</text>
+        <line x1="580" y1="125" x2="522" y2="220" stroke="#b45309" stroke-width="2" stroke-dasharray="4,4"/>
+      </g>
+
+      <!-- Financeiro -->
+      <g>
+        <rect x="60" y="340" width="260" height="130" rx="12" fill="url(#gFinanceiro)"/>
+        <text x="190" y="375" text-anchor="middle" fill="white" font-size="18" font-weight="700">3. Financeiro Interno</text>
+        <text x="190" y="400" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Operação assistida</text>
+        <text x="190" y="418" text-anchor="middle" fill="white" font-size="13" opacity="0.95">do backoffice</text>
+        <text x="190" y="448" text-anchor="middle" fill="#d1fae5" font-size="12" font-weight="600">Análise · Cobrança · Conciliação</text>
+        <line x1="320" y1="405" x2="378" y2="300" stroke="#047857" stroke-width="2" stroke-dasharray="4,4"/>
+      </g>
+
+      <!-- Admin -->
+      <g>
+        <rect x="580" y="340" width="260" height="130" rx="12" fill="url(#gAdmin)"/>
+        <text x="710" y="375" text-anchor="middle" fill="white" font-size="18" font-weight="700">4. Administrador</text>
+        <text x="710" y="400" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Governança e</text>
+        <text x="710" y="418" text-anchor="middle" fill="white" font-size="13" opacity="0.95">parametrização do sistema</text>
+        <text x="710" y="448" text-anchor="middle" fill="#e9d5ff" font-size="12" font-weight="600">RBAC · Cadastros · Auditoria</text>
+        <line x1="580" y1="405" x2="522" y2="300" stroke="#5b21b6" stroke-width="2" stroke-dasharray="4,4"/>
+      </g>
+    </svg>
+    <div class="caption">As quatro jornadas orbitam a plataforma SEP. Cada uma evolui em ondas, na ordem de prioridade do roadmap.</div>
+  </div>
+</section>
+
+<section id="epicos">
+  <h2>3. Épicos do Roadmap</h2>
+  <div class="subtitle">Catorze épicos mapeados, com priorização funcional consolidada.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 920 620" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="epicFase1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#10b981"/>
+        </linearGradient>
+        <linearGradient id="epicFase2" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/>
+        </linearGradient>
+        <linearGradient id="epicFase3" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#60a5fa"/>
+        </linearGradient>
+        <linearGradient id="epicFase4" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#cbd5e1"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Fase 1: Fundação -->
+      <text x="20" y="30" font-size="15" font-weight="700" fill="#059669">FASE 1 · Fundação da API (em execução)</text>
+      <g>
+        <rect x="20" y="45" width="210" height="70" rx="8" fill="url(#epicFase1)"/>
+        <text x="125" y="72" text-anchor="middle" fill="white" font-size="13" font-weight="700">E1 · Fundação da API</text>
+        <text x="125" y="92" text-anchor="middle" fill="white" font-size="11" opacity="0.95">Docker, Flyway, Actuator, UUID</text>
+      </g>
+      <g>
+        <rect x="240" y="45" width="210" height="70" rx="8" fill="url(#epicFase1)"/>
+        <text x="345" y="72" text-anchor="middle" fill="white" font-size="13" font-weight="700">E2 · Gestão de Usuários</text>
+        <text x="345" y="92" text-anchor="middle" fill="white" font-size="11" opacity="0.95">Sprint 2 · criação pública</text>
+      </g>
+      <g>
+        <rect x="460" y="45" width="210" height="70" rx="8" fill="url(#epicFase1)"/>
+        <text x="565" y="72" text-anchor="middle" fill="white" font-size="13" font-weight="700">E3 · Segurança e Auth</text>
+        <text x="565" y="92" text-anchor="middle" fill="white" font-size="11" opacity="0.95">Sprint 3 · JWT + ownership</text>
+      </g>
+      <g>
+        <rect x="680" y="45" width="210" height="70" rx="8" fill="url(#epicFase1)"/>
+        <text x="785" y="72" text-anchor="middle" fill="white" font-size="13" font-weight="700">E4 · Erros, Docs e Testes</text>
+        <text x="785" y="92" text-anchor="middle" fill="white" font-size="11" opacity="0.95">Sprint 4 · qualidade final</text>
+      </g>
+
+      <!-- Fase 2: Contratação -->
+      <text x="20" y="165" font-size="15" font-weight="700" fill="#d97706">FASE 2 · Jornada de Contratação do Empréstimo</text>
+      <g>
+        <rect x="20" y="180" width="210" height="70" rx="8" fill="url(#epicFase2)"/>
+        <text x="125" y="207" text-anchor="middle" fill="#7c2d12" font-size="13" font-weight="700">E5 · Onboarding KYC/KYB</text>
+        <text x="125" y="227" text-anchor="middle" fill="#7c2d12" font-size="11">Documentos, identidade</text>
+      </g>
+      <g>
+        <rect x="240" y="180" width="210" height="70" rx="8" fill="url(#epicFase2)"/>
+        <text x="345" y="207" text-anchor="middle" fill="#7c2d12" font-size="13" font-weight="700">E6 · Análise de Crédito</text>
+        <text x="345" y="227" text-anchor="middle" fill="#7c2d12" font-size="11">Parecer, score, decisão</text>
+      </g>
+      <g>
+        <rect x="460" y="180" width="210" height="70" rx="8" fill="url(#epicFase2)"/>
+        <text x="565" y="207" text-anchor="middle" fill="#7c2d12" font-size="13" font-weight="700">E7 · Formalização</text>
+        <text x="565" y="227" text-anchor="middle" fill="#7c2d12" font-size="11">Contrato, aceite, CCB</text>
+      </g>
+      <g>
+        <rect x="680" y="180" width="210" height="70" rx="8" fill="url(#epicFase2)"/>
+        <text x="785" y="207" text-anchor="middle" fill="#7c2d12" font-size="13" font-weight="700">E8 · Cobrança</text>
+        <text x="785" y="227" text-anchor="middle" fill="#7c2d12" font-size="11">Parcelas, inadimplência</text>
+      </g>
+
+      <!-- Fase 3: Operação e jornadas -->
+      <text x="20" y="300" font-size="15" font-weight="700" fill="#1d4ed8">FASE 3 · Operação e Jornadas Completas</text>
+      <g>
+        <rect x="20" y="315" width="210" height="70" rx="8" fill="url(#epicFase3)"/>
+        <text x="125" y="342" text-anchor="middle" fill="white" font-size="13" font-weight="700">E9 · Backoffice</text>
+        <text x="125" y="362" text-anchor="middle" fill="white" font-size="11" opacity="0.95">Fila, pendências, reprocesso</text>
+      </g>
+      <g>
+        <rect x="240" y="315" width="210" height="70" rx="8" fill="url(#epicFase3)"/>
+        <text x="345" y="342" text-anchor="middle" fill="white" font-size="13" font-weight="700">E10 · Empresa Credora</text>
+        <text x="345" y="362" text-anchor="middle" fill="white" font-size="11" opacity="0.95">Aporte, carteira, alocação</text>
+      </g>
+      <g>
+        <rect x="460" y="315" width="210" height="70" rx="8" fill="url(#epicFase3)"/>
+        <text x="565" y="342" text-anchor="middle" fill="white" font-size="13" font-weight="700">E11 · Administração</text>
+        <text x="565" y="362" text-anchor="middle" fill="white" font-size="11" opacity="0.95">RBAC, cadastros mestres</text>
+      </g>
+      <g>
+        <rect x="680" y="315" width="210" height="70" rx="8" fill="url(#epicFase3)"/>
+        <text x="785" y="342" text-anchor="middle" fill="white" font-size="13" font-weight="700">E12 · Frontend SEP</text>
+        <text x="785" y="362" text-anchor="middle" fill="white" font-size="11" opacity="0.95">Angular + Datta Able</text>
+      </g>
+
+      <!-- Fase 4: Capacidades expandidas -->
+      <text x="20" y="435" font-size="15" font-weight="700" fill="#475569">FASE 4 · Capacidades Expandidas</text>
+      <g>
+        <rect x="20" y="450" width="210" height="70" rx="8" fill="url(#epicFase4)"/>
+        <text x="125" y="477" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">E13 · Movimentação Pix</text>
+        <text x="125" y="497" text-anchor="middle" fill="#334155" font-size="11">Desembolso + recebimento</text>
+      </g>
+      <g>
+        <rect x="240" y="450" width="210" height="70" rx="8" fill="url(#epicFase4)"/>
+        <text x="345" y="477" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">E14 · Infra Futura</text>
+        <text x="345" y="497" text-anchor="middle" fill="#334155" font-size="11">Homologação, produção, VPS</text>
+      </g>
+
+      <!-- Legenda -->
+      <rect x="480" y="470" width="16" height="16" fill="url(#epicFase1)"/>
+      <text x="502" y="483" font-size="12" fill="#334155">Em execução</text>
+      <rect x="600" y="470" width="16" height="16" fill="url(#epicFase2)"/>
+      <text x="622" y="483" font-size="12" fill="#334155">Próxima onda</text>
+      <rect x="720" y="470" width="16" height="16" fill="url(#epicFase3)"/>
+      <text x="742" y="483" font-size="12" fill="#334155">Expansão</text>
+      <rect x="480" y="495" width="16" height="16" fill="url(#epicFase4)"/>
+      <text x="502" y="508" font-size="12" fill="#334155">Posterior</text>
+
+      <text x="20" y="595" font-size="13" fill="#64748b" font-style="italic">Análise de crédito foi priorizada explicitamente antes de Pix. Tudo que impacta contratação vem antes de capacidades financeiras expandidas.</text>
+    </svg>
+    <div class="caption">Roadmap de épicos em quatro fases, respeitando a ordem de prioridade funcional consolidada no PRD.</div>
+  </div>
+</section>
+
+<section id="historias">
+  <h2>4. Épicos → Histórias</h2>
+  <div class="subtitle">Decomposição dos épicos ativos em histórias de usuário organizadas por valor de negócio.</div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h4><span class="num">1</span>Fundação da API</h4>
+      <p style="color: var(--muted); font-size: 14px;">Base técnica que sustenta todas as jornadas futuras.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Configurar Docker Compose com PostgreSQL local</li>
+        <li>Configurar locale pt-BR e timezone America/Sao_Paulo</li>
+        <li>Implementar auditoria JPA (criação e modificação)</li>
+        <li>Padronizar identificadores UUID em todas as entidades</li>
+        <li>Configurar Flyway para versionamento do banco</li>
+        <li>Expor endpoint de healthcheck via Actuator</li>
+        <li>Prever CORS para integração futura com Angular</li>
+      </ul>
+      <span class="tag done">Fase atual</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">2</span>Gestão de Usuários <span style="font-size: 12px; color: var(--muted); font-weight: 500;">(Sprint 2)</span></h4>
+      <p style="color: var(--muted); font-size: 14px;">Base de identidade da plataforma — criação de contas.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Como visitante, posso criar um usuário sem autenticação</li>
+        <li>Os dados do usuário ficam persistidos com identificador estável (UUID)</li>
+        <li>Auditoria registra quem criou e quando, com fallback técnico quando não há login</li>
+        <li>Minha senha fica armazenada de forma segura (hash BCrypt)</li>
+        <li>Em nenhuma resposta da API a senha aparece</li>
+      </ul>
+      <span class="tag done">Fase atual</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">3</span>Segurança, Autenticação e Autorização <span style="font-size: 12px; color: var(--muted); font-weight: 500;">(Sprint 3)</span></h4>
+      <p style="color: var(--muted); font-size: 14px;">Controle de acesso seguro, auditável e com ownership.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Como usuário, posso autenticar com e-mail e senha</li>
+        <li>O sistema emite um JWT com identificador e perfil do usuário</li>
+        <li>Como usuário autenticado, posso consultar meus dados em /me</li>
+        <li>Como admin, posso consultar qualquer usuário pelo id</li>
+        <li>Como cliente, posso consultar apenas os meus dados</li>
+        <li>Como admin, posso listar todos os usuários</li>
+        <li>Como usuário autenticado, posso alterar minha própria senha</li>
+        <li>Autorização respeita perfil e ownership do recurso</li>
+      </ul>
+      <span class="tag done">Fase atual</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">4</span>Tratamento de Erros, Documentação e Testes <span style="font-size: 12px; color: var(--muted); font-weight: 500;">(Sprint 4)</span></h4>
+      <p style="color: var(--muted); font-size: 14px;">Contratos estáveis e qualidade comprovada por testes.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Todos os erros da API seguem um payload padronizado</li>
+        <li>A documentação OpenAPI fica disponível via Swagger UI</li>
+        <li>Cada endpoint possui exemplos e schemas explícitos</li>
+        <li>Os códigos de resposta seguem convenção REST</li>
+        <li>Os cenários críticos de autenticação e autorização são cobertos por testes automatizados</li>
+      </ul>
+      <span class="tag done">Fase atual</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">5</span>Onboarding KYC/KYB</h4>
+      <p style="color: var(--muted); font-size: 14px;">Validação cadastral e documental de pessoas e empresas.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Coleta e validação de documentos obrigatórios</li>
+        <li>Verificação de identidade e dados cadastrais</li>
+        <li>Trilha operacional de aprovação, rejeição e pendências</li>
+        <li>Preparação para integrações futuras (OCR, biometria)</li>
+      </ul>
+      <span class="tag next">Próxima onda</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">6</span>Análise de Crédito</h4>
+      <p style="color: var(--muted); font-size: 14px;">Esteira de decisão de risco da proposta.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Parecer operacional e score interno da proposta</li>
+        <li>Decisão de aprovação, rejeição ou pendência</li>
+        <li>Análise assistida pelo time interno</li>
+        <li>Histórico de alterações e fundamentos da decisão</li>
+      </ul>
+      <span class="tag next">Próxima onda</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">7</span>Formalização Contratual</h4>
+      <p style="color: var(--muted); font-size: 14px;">Preparação legal da operação.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Geração de contrato e artefatos formais</li>
+        <li>Etapa de aceite e assinatura pelo tomador</li>
+        <li>Bloqueio de desembolso sem formalização concluída</li>
+        <li>Preparação para assinatura eletrônica e CCB</li>
+      </ul>
+      <span class="tag next">Próxima onda</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">8</span>Cobrança e Inadimplência</h4>
+      <p style="color: var(--muted); font-size: 14px;">Gestão de parcelas e recuperação.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Agenda de parcelas, status e histórico de recebimentos</li>
+        <li>Acompanhamento de atraso e inadimplência</li>
+        <li>Reprocessos operacionais e trilha de cobrança</li>
+        <li>Suporte ao financeiro na conciliação</li>
+      </ul>
+      <span class="tag next">Próxima onda</span>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <h2>5. Roadmap Visual</h2>
+  <div class="subtitle">Timeline das ondas de entrega e posicionamento relativo dos épicos.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">
+      <!-- Trilha -->
+      <line x1="60" y1="180" x2="840" y2="180" stroke="#cbd5e1" stroke-width="3"/>
+
+      <!-- Marcos -->
+      <g>
+        <circle cx="120" cy="180" r="18" fill="#059669"/>
+        <text x="120" y="186" text-anchor="middle" fill="white" font-size="12" font-weight="700">1</text>
+        <text x="120" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Agora</text>
+        <text x="120" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Fundação API</text>
+        <text x="120" y="236" text-anchor="middle" font-size="11" fill="#64748b">E1 · E2 · E3 · E4</text>
+      </g>
+
+      <g>
+        <circle cx="300" cy="180" r="18" fill="#f59e0b"/>
+        <text x="300" y="186" text-anchor="middle" fill="white" font-size="12" font-weight="700">2</text>
+        <text x="300" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#d97706">Próxima</text>
+        <text x="300" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Contratação</text>
+        <text x="300" y="236" text-anchor="middle" font-size="11" fill="#64748b">E5 · E6 · E7 · E8</text>
+      </g>
+
+      <g>
+        <circle cx="480" cy="180" r="18" fill="#3b82f6"/>
+        <text x="480" y="186" text-anchor="middle" fill="white" font-size="12" font-weight="700">3</text>
+        <text x="480" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">Expansão</text>
+        <text x="480" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Jornadas completas</text>
+        <text x="480" y="236" text-anchor="middle" font-size="11" fill="#64748b">E9 · E10 · E11 · E12</text>
+      </g>
+
+      <g>
+        <circle cx="680" cy="180" r="18" fill="#94a3b8"/>
+        <text x="680" y="186" text-anchor="middle" fill="white" font-size="12" font-weight="700">4</text>
+        <text x="680" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">Posterior</text>
+        <text x="680" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Pix + Infra remota</text>
+        <text x="680" y="236" text-anchor="middle" font-size="11" fill="#64748b">E13 · E14</text>
+      </g>
+
+      <g>
+        <circle cx="820" cy="180" r="14" fill="#8b5cf6"/>
+        <text x="820" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#5b21b6">Futuro</text>
+        <text x="820" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Automação</text>
+        <text x="820" y="236" text-anchor="middle" font-size="11" fill="#64748b">Pix avançado</text>
+      </g>
+
+      <!-- Regra -->
+      <text x="450" y="300" text-anchor="middle" font-size="13" fill="#64748b" font-style="italic">Regra de priorização: tudo que impacta diretamente a contratação do empréstimo vem antes de capacidades financeiras expandidas.</text>
+    </svg>
+    <div class="caption">Ondas de entrega do produto SEP.</div>
+  </div>
+</section>
+
+<section id="sprints">
+  <h2>6. Sprints da Fase Atual</h2>
+  <div class="subtitle">Organização das sprints da fundação técnica (visão alto nível).</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="spr" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Sprint 1 -->
+      <rect x="30" y="50" width="200" height="280" rx="10" fill="url(#spr)"/>
+      <text x="130" y="82" text-anchor="middle" fill="white" font-size="16" font-weight="700">Sprint 1</text>
+      <text x="130" y="104" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Fundação técnica</text>
+      <line x1="50" y1="118" x2="210" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="50" y="145" fill="white" font-size="12">• Projeto Gradle base</text>
+      <text x="50" y="168" fill="white" font-size="12">• PostgreSQL + Docker</text>
+      <text x="50" y="191" fill="white" font-size="12">• Locale, Timezone, CORS</text>
+      <text x="50" y="214" fill="white" font-size="12">• Actuator healthcheck</text>
+      <text x="50" y="237" fill="white" font-size="12">• Flyway + migration inicial</text>
+      <text x="50" y="295" text-anchor="start" fill="#fbbf24" font-size="11" font-weight="600">Depende de:</text>
+      <text x="50" y="312" fill="white" font-size="11" opacity="0.85">Aprovação do PRD</text>
+
+      <!-- Sprint 2 -->
+      <rect x="250" y="50" width="200" height="280" rx="10" fill="url(#spr)"/>
+      <text x="350" y="82" text-anchor="middle" fill="white" font-size="16" font-weight="700">Sprint 2</text>
+      <text x="350" y="104" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Gestão de Usuários</text>
+      <line x1="270" y1="118" x2="430" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="270" y="145" fill="white" font-size="12">• Entidade Usuario (UUID)</text>
+      <text x="270" y="168" fill="white" font-size="12">• Repositório e auditoria</text>
+      <text x="270" y="191" fill="white" font-size="12">• DTOs e Mapper</text>
+      <text x="270" y="214" fill="white" font-size="12">• Criação pública de usuário</text>
+      <text x="270" y="237" fill="white" font-size="12">• Validações de email e senha</text>
+      <text x="270" y="295" text-anchor="start" fill="#fbbf24" font-size="11" font-weight="600">Depende de:</text>
+      <text x="270" y="312" fill="white" font-size="11" opacity="0.85">Sprint 1 concluída</text>
+
+      <!-- Sprint 3 -->
+      <rect x="470" y="50" width="200" height="280" rx="10" fill="url(#spr)"/>
+      <text x="570" y="82" text-anchor="middle" fill="white" font-size="16" font-weight="700">Sprint 3</text>
+      <text x="570" y="104" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Segurança e Auth</text>
+      <line x1="490" y1="118" x2="650" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="490" y="145" fill="white" font-size="12">• JWT + BCrypt</text>
+      <text x="490" y="168" fill="white" font-size="12">• Login + /auth/me</text>
+      <text x="490" y="191" fill="white" font-size="12">• Autorização por perfil</text>
+      <text x="490" y="214" fill="white" font-size="12">• Controle de ownership</text>
+      <text x="490" y="237" fill="white" font-size="12">• Alteração da própria senha</text>
+      <text x="490" y="295" text-anchor="start" fill="#fbbf24" font-size="11" font-weight="600">Depende de:</text>
+      <text x="490" y="312" fill="white" font-size="11" opacity="0.85">Sprint 2 concluída</text>
+
+      <!-- Sprint 4 -->
+      <rect x="690" y="50" width="200" height="280" rx="10" fill="url(#spr)"/>
+      <text x="790" y="82" text-anchor="middle" fill="white" font-size="16" font-weight="700">Sprint 4</text>
+      <text x="790" y="104" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Erros + Docs + Testes</text>
+      <line x1="710" y1="118" x2="870" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="710" y="145" fill="white" font-size="12">• ApiExceptionHandler</text>
+      <text x="710" y="168" fill="white" font-size="12">• Payload padrão de erro</text>
+      <text x="710" y="191" fill="white" font-size="12">• Springdoc OpenAPI</text>
+      <text x="710" y="214" fill="white" font-size="12">• Swagger UI</text>
+      <text x="710" y="237" fill="white" font-size="12">• Testes de auth/autorização</text>
+      <text x="710" y="295" text-anchor="start" fill="#fbbf24" font-size="11" font-weight="600">Depende de:</text>
+      <text x="710" y="312" fill="white" font-size="11" opacity="0.85">Sprint 3 concluída</text>
+
+      <!-- Setas -->
+      <polygon points="230,190 248,190 248,185 254,195 248,205 248,200 230,200" fill="#f59e0b"/>
+      <polygon points="450,190 468,190 468,185 474,195 468,205 468,200 450,200" fill="#f59e0b"/>
+      <polygon points="670,190 688,190 688,185 694,195 688,205 688,200 670,200" fill="#f59e0b"/>
+    </svg>
+    <div class="caption">Sequência das sprints da fase atual. Cada sprint depende da conclusão da anterior.</div>
+  </div>
+
+  <div class="alert" style="margin-top: 28px;">
+    <strong>Governança de execução:</strong> cada sprint desta fase possui um <em>spec</em> técnico próprio na pasta <code>specs/</code> do repositório, com detalhamento de tasks, arquivos esperados, critérios de verificação e dependências internas. O PRD mantém apenas o planejamento de alto nível; a execução é governada pelos specs <code>001-sprint-1-fundacao-tecnica.md</code>, <code>002-sprint-2-gestao-usuarios.md</code>, <code>003-sprint-3-seguranca-autenticacao.md</code> e <code>004-sprint-4-erros-docs-testes.md</code>.
+  </div>
+
+  <h3>Composição da Equipe</h3>
+  <div class="grid grid-3">
+    <div class="card">
+      <h4>Dev Senior</h4>
+      <p style="font-size: 14px; color: var(--muted);">Ownership do backend, contratos da API, segurança, persistência, auditoria e migrations.</p>
+    </div>
+    <div class="card">
+      <h4>Dev Pleno Frontend 1</h4>
+      <p style="font-size: 14px; color: var(--muted);">Estudo e adaptação do template Angular, shell, layout e navegação.</p>
+    </div>
+    <div class="card">
+      <h4>Dev Pleno Frontend 2</h4>
+      <p style="font-size: 14px; color: var(--muted);">Preparação de mocks de consumo, revisão de contratos e telas funcionais futuras.</p>
+    </div>
+  </div>
+</section>
+
+<section id="arquitetura">
+  <h2>7. Arquitetura em Alto Nível</h2>
+  <div class="subtitle">Visão simplificada de como o produto se organiza.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lAngular" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#991b1b"/>
+        </linearGradient>
+        <linearGradient id="lAPI" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#1e40af"/>
+        </linearGradient>
+        <linearGradient id="lDB" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#336791"/><stop offset="100%" stop-color="#1e3a5c"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Usuários -->
+      <g>
+        <circle cx="100" cy="220" r="36" fill="#64748b"/>
+        <text x="100" y="225" text-anchor="middle" fill="white" font-size="14" font-weight="700">👤</text>
+        <text x="100" y="278" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">Usuário</text>
+        <text x="100" y="296" text-anchor="middle" font-size="11" fill="#64748b">Tomador / Credora</text>
+        <text x="100" y="312" text-anchor="middle" font-size="11" fill="#64748b">Financeiro / Admin</text>
+      </g>
+
+      <!-- Frontend -->
+      <rect x="210" y="150" width="180" height="140" rx="12" fill="url(#lAngular)"/>
+      <text x="300" y="185" text-anchor="middle" fill="white" font-size="16" font-weight="700">Frontend</text>
+      <text x="300" y="210" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Angular + Bootstrap</text>
+      <text x="300" y="232" text-anchor="middle" fill="#fef3c7" font-size="11">Template Datta Able</text>
+      <text x="300" y="258" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Fase posterior ao backend</text>
+
+      <!-- API -->
+      <rect x="430" y="150" width="220" height="140" rx="12" fill="url(#lAPI)"/>
+      <text x="540" y="185" text-anchor="middle" fill="white" font-size="16" font-weight="700">API SEP</text>
+      <text x="540" y="210" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Spring Boot · Java 21</text>
+      <text x="540" y="232" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Monolito modular</text>
+      <text x="540" y="256" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Auth · Users · Auditoria</text>
+      <text x="540" y="272" text-anchor="middle" fill="white" font-size="11" opacity="0.85">JWT · Swagger · Actuator</text>
+
+      <!-- Database -->
+      <g>
+        <ellipse cx="780" cy="160" rx="60" ry="15" fill="url(#lDB)"/>
+        <rect x="720" y="160" width="120" height="100" fill="url(#lDB)"/>
+        <ellipse cx="780" cy="260" rx="60" ry="15" fill="#1e3a5c"/>
+        <ellipse cx="780" cy="200" rx="60" ry="15" fill="none" stroke="white" stroke-opacity="0.3"/>
+        <ellipse cx="780" cy="230" rx="60" ry="15" fill="none" stroke="white" stroke-opacity="0.3"/>
+        <text x="780" y="205" text-anchor="middle" fill="white" font-size="14" font-weight="700">PostgreSQL</text>
+      </g>
+
+      <!-- Conexões -->
+      <line x1="140" y1="220" x2="206" y2="220" stroke="#64748b" stroke-width="2"/>
+      <polygon points="204,215 214,220 204,225" fill="#64748b"/>
+      <text x="170" y="212" text-anchor="middle" font-size="11" fill="#64748b">HTTP</text>
+
+      <line x1="390" y1="220" x2="426" y2="220" stroke="#64748b" stroke-width="2"/>
+      <polygon points="424,215 434,220 424,225" fill="#64748b"/>
+      <text x="408" y="212" text-anchor="middle" font-size="11" fill="#64748b">REST</text>
+
+      <line x1="650" y1="220" x2="716" y2="210" stroke="#64748b" stroke-width="2"/>
+      <polygon points="714,205 724,210 716,217" fill="#64748b"/>
+      <text x="680" y="202" text-anchor="middle" font-size="11" fill="#64748b">JPA</text>
+
+      <!-- BaaS Future -->
+      <rect x="430" y="340" width="220" height="80" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="6,4" stroke-width="2"/>
+      <text x="540" y="370" text-anchor="middle" fill="#475569" font-size="14" font-weight="700">Celcoin BaaS</text>
+      <text x="540" y="392" text-anchor="middle" fill="#64748b" font-size="12">Pix · Conta escrow</text>
+      <text x="540" y="410" text-anchor="middle" fill="#94a3b8" font-size="11" font-style="italic">Fase futura (E13)</text>
+
+      <line x1="540" y1="290" x2="540" y2="338" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
+
+      <!-- Legenda -->
+      <text x="450" y="50" text-anchor="middle" font-size="18" font-weight="700" fill="#0f1e4a">Visão de componentes do produto SEP</text>
+      <text x="450" y="72" text-anchor="middle" font-size="12" fill="#64748b">Contornos tracejados representam componentes planejados mas ainda não implementados</text>
+    </svg>
+    <div class="caption">Frontend Angular consome a API SEP via REST. A API grava em PostgreSQL. A integração com Celcoin BaaS entra em fase posterior.</div>
+  </div>
+
+  <div class="alert">
+    <strong>Arquitetura inicial:</strong> monolito modular. Microsserviços não fazem parte da fase inicial — essa decisão reduz risco e complexidade até a estabilização do fluxo de contratação.
+  </div>
+</section>
+
+<section id="stack">
+  <h2>8. Stack Tecnológica</h2>
+  <div class="subtitle">Tecnologias escolhidas para apoiar a plataforma.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg">
+      <text x="450" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0f1e4a">Pilares tecnológicos</text>
+
+      <!-- Backend -->
+      <rect x="30" y="60" width="270" height="330" rx="12" fill="#1e3a8a"/>
+      <text x="165" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">BACKEND</text>
+      <line x1="50" y1="102" x2="280" y2="102" stroke="#fbbf24"/>
+      <text x="165" y="130" text-anchor="middle" fill="white" font-size="14">☕ Java 21</text>
+      <text x="165" y="155" text-anchor="middle" fill="white" font-size="14">🌱 Spring Boot</text>
+      <text x="165" y="180" text-anchor="middle" fill="white" font-size="14">🐘 PostgreSQL</text>
+      <text x="165" y="205" text-anchor="middle" fill="white" font-size="14">🔐 Spring Security + JWT</text>
+      <text x="165" y="230" text-anchor="middle" fill="white" font-size="14">📦 Gradle</text>
+      <text x="165" y="255" text-anchor="middle" fill="white" font-size="14">🔄 Flyway (migrations)</text>
+      <text x="165" y="280" text-anchor="middle" fill="white" font-size="14">📝 Springdoc OpenAPI</text>
+      <text x="165" y="305" text-anchor="middle" fill="white" font-size="14">❤️ Actuator (saúde)</text>
+      <text x="165" y="330" text-anchor="middle" fill="white" font-size="14">🔑 BCrypt (senhas)</text>
+      <text x="165" y="355" text-anchor="middle" fill="white" font-size="14">🆔 UUID v6</text>
+
+      <!-- Frontend -->
+      <rect x="315" y="60" width="270" height="330" rx="12" fill="#dc2626"/>
+      <text x="450" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">FRONTEND</text>
+      <line x1="335" y1="102" x2="565" y2="102" stroke="#fbbf24"/>
+      <text x="450" y="130" text-anchor="middle" fill="white" font-size="14">🅰️ Angular</text>
+      <text x="450" y="155" text-anchor="middle" fill="white" font-size="14">🧩 Standalone Components</text>
+      <text x="450" y="180" text-anchor="middle" fill="white" font-size="14">⚡ Signals</text>
+      <text x="450" y="205" text-anchor="middle" fill="white" font-size="14">🎨 Bootstrap 5</text>
+      <text x="450" y="230" text-anchor="middle" fill="white" font-size="14">🖼️ Template Datta Able</text>
+      <text x="450" y="280" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">Reaproveitamento do</text>
+      <text x="450" y="298" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">template como base visual</text>
+      <text x="450" y="330" text-anchor="middle" fill="#fef3c7" font-size="12">Versão ajustável para</text>
+      <text x="450" y="348" text-anchor="middle" fill="#fef3c7" font-size="12">compatibilidade com o template</text>
+
+      <!-- Infra -->
+      <rect x="600" y="60" width="270" height="330" rx="12" fill="#0f766e"/>
+      <text x="735" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">INFRA</text>
+      <line x1="620" y1="102" x2="850" y2="102" stroke="#fbbf24"/>
+      <text x="735" y="130" text-anchor="middle" fill="white" font-size="14">🐳 Docker</text>
+      <text x="735" y="155" text-anchor="middle" fill="white" font-size="14">🐙 Docker Compose</text>
+      <text x="735" y="180" text-anchor="middle" fill="white" font-size="14">🌎 Locale pt-BR</text>
+      <text x="735" y="205" text-anchor="middle" fill="white" font-size="14">⏰ America/Sao_Paulo</text>
+      <text x="735" y="230" text-anchor="middle" fill="white" font-size="14">🐙 GitHub (repositório)</text>
+      <text x="735" y="285" text-anchor="middle" fill="#a7f3d0" font-size="12" font-style="italic">Ambiente local develop</text>
+      <text x="735" y="303" text-anchor="middle" fill="#a7f3d0" font-size="12" font-style="italic">funcional desde a Sprint 1</text>
+      <text x="735" y="340" text-anchor="middle" fill="#a7f3d0" font-size="12">VPS e ambientes remotos</text>
+      <text x="735" y="358" text-anchor="middle" fill="#a7f3d0" font-size="12">ficam para fase posterior</text>
+    </svg>
+    <div class="caption">Três pilares tecnológicos que sustentam a plataforma SEP.</div>
+  </div>
+</section>
+
+<section id="infra">
+  <h2>9. Infraestrutura e Ambientes</h2>
+  <div class="subtitle">Evolução planejada dos ambientes ao longo do tempo.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="envDev" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#047857"/>
+        </linearGradient>
+        <linearGradient id="envHom" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#b45309"/>
+        </linearGradient>
+        <linearGradient id="envProd" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#7f1d1d"/>
+        </linearGradient>
+      </defs>
+
+      <text x="450" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0f1e4a">Ambientes · agora vs. futuro</text>
+
+      <!-- Agora -->
+      <rect x="40" y="70" width="260" height="300" rx="12" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+      <text x="170" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#047857">AGORA (Fase 1)</text>
+
+      <rect x="70" y="125" width="200" height="90" rx="8" fill="url(#envDev)"/>
+      <text x="170" y="155" text-anchor="middle" fill="white" font-size="14" font-weight="700">develop (local)</text>
+      <text x="170" y="180" text-anchor="middle" fill="white" font-size="11">PostgreSQL · Docker Compose</text>
+      <text x="170" y="198" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Máquina do desenvolvedor</text>
+
+      <text x="170" y="250" text-anchor="middle" font-size="12" fill="#047857">✓ Build local com Gradle</text>
+      <text x="170" y="272" text-anchor="middle" font-size="12" fill="#047857">✓ Flyway aplica migrations no boot</text>
+      <text x="170" y="294" text-anchor="middle" font-size="12" fill="#047857">✓ Swagger local</text>
+      <text x="170" y="316" text-anchor="middle" font-size="12" fill="#047857">✓ Actuator local</text>
+      <text x="170" y="340" text-anchor="middle" font-size="11" fill="#64748b" font-style="italic">Sem deploy remoto nesta fase</text>
+
+      <!-- Seta -->
+      <polygon points="310,220 340,220 340,210 360,225 340,240 340,230 310,230" fill="#94a3b8"/>
+
+      <!-- Futuro -->
+      <rect x="380" y="70" width="480" height="300" rx="12" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+      <text x="620" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#b45309">FUTURO (Infra posterior · E14)</text>
+
+      <!-- VPS compartilhada -->
+      <rect x="400" y="125" width="220" height="100" rx="8" fill="#fef3c7" stroke="#f59e0b"/>
+      <text x="510" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#78350f">VPS compartilhada</text>
+      <rect x="415" y="160" width="90" height="50" rx="6" fill="url(#envDev)"/>
+      <text x="460" y="182" text-anchor="middle" fill="white" font-size="11" font-weight="700">develop</text>
+      <text x="460" y="198" text-anchor="middle" fill="white" font-size="9">PostgreSQL</text>
+      <rect x="515" y="160" width="90" height="50" rx="6" fill="url(#envHom)"/>
+      <text x="560" y="182" text-anchor="middle" fill="white" font-size="11" font-weight="700">homologação</text>
+      <text x="560" y="198" text-anchor="middle" fill="white" font-size="9">PostgreSQL</text>
+
+      <!-- VPS prod -->
+      <rect x="640" y="125" width="200" height="100" rx="8" fill="#fef2f2" stroke="#dc2626"/>
+      <text x="740" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#7f1d1d">VPS isolada</text>
+      <rect x="660" y="160" width="160" height="50" rx="6" fill="url(#envProd)"/>
+      <text x="740" y="182" text-anchor="middle" fill="white" font-size="11" font-weight="700">produção</text>
+      <text x="740" y="198" text-anchor="middle" fill="white" font-size="9">PostgreSQL · dedicada</text>
+
+      <!-- Regras futuras -->
+      <text x="620" y="260" text-anchor="middle" font-size="12" fill="#78350f">✓ Deploy por branch e ambiente</text>
+      <text x="620" y="282" text-anchor="middle" font-size="12" fill="#78350f">✓ Secrets separados no GitHub</text>
+      <text x="620" y="304" text-anchor="middle" font-size="12" fill="#78350f">✓ Migrations versionadas</text>
+      <text x="620" y="326" text-anchor="middle" font-size="12" fill="#78350f">✓ Seeds por ambiente</text>
+      <text x="620" y="354" text-anchor="middle" font-size="11" fill="#94a3b8" font-style="italic">Fase posterior ao fluxo de contratação</text>
+    </svg>
+    <div class="caption">Evolução dos ambientes: começa local, evolui para VPS separadas conforme o produto amadurece.</div>
+  </div>
+</section>
+
+<section id="pipeline">
+  <h2>10. Pipeline GitHub (Visão de Produto)</h2>
+  <div class="subtitle">Como o fluxo de entrega se conecta ao GitHub — visão alto nível.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="pipe" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#0f1e4a"/><stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+      </defs>
+
+      <text x="450" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0f1e4a">Fluxo de entrega atual (manual) · Automação futura planejada</text>
+
+      <!-- Dev -->
+      <circle cx="80" cy="200" r="40" fill="#64748b"/>
+      <text x="80" y="205" text-anchor="middle" fill="white" font-size="14">👨‍💻</text>
+      <text x="80" y="260" text-anchor="middle" font-size="13" font-weight="700" fill="#1e293b">Dev</text>
+      <text x="80" y="278" text-anchor="middle" font-size="11" fill="#64748b">Implementa task</text>
+
+      <line x1="125" y1="200" x2="188" y2="200" stroke="#94a3b8" stroke-width="2"/>
+      <polygon points="186,195 196,200 186,205" fill="#94a3b8"/>
+
+      <!-- Commit local -->
+      <rect x="200" y="160" width="130" height="80" rx="8" fill="url(#pipe)"/>
+      <text x="265" y="190" text-anchor="middle" fill="white" font-size="13" font-weight="700">Commit local</text>
+      <text x="265" y="210" text-anchor="middle" fill="#fbbf24" font-size="10">Agente pode fazer</text>
+      <text x="265" y="224" text-anchor="middle" fill="#fbbf24" font-size="10">sob demanda</text>
+
+      <line x1="330" y1="200" x2="388" y2="200" stroke="#94a3b8" stroke-width="2"/>
+      <polygon points="386,195 396,200 386,205" fill="#94a3b8"/>
+
+      <!-- Push manual -->
+      <rect x="400" y="160" width="130" height="80" rx="8" fill="url(#pipe)"/>
+      <text x="465" y="190" text-anchor="middle" fill="white" font-size="13" font-weight="700">Push + PR</text>
+      <text x="465" y="210" text-anchor="middle" fill="#fbbf24" font-size="10">Manual</text>
+      <text x="465" y="224" text-anchor="middle" fill="#fbbf24" font-size="10">(nesta fase)</text>
+
+      <line x1="530" y1="200" x2="588" y2="200" stroke="#94a3b8" stroke-width="2"/>
+      <polygon points="586,195 596,200 586,205" fill="#94a3b8"/>
+
+      <!-- GitHub -->
+      <rect x="600" y="160" width="130" height="80" rx="8" fill="#24292e"/>
+      <text x="665" y="190" text-anchor="middle" fill="white" font-size="13" font-weight="700">GitHub</text>
+      <text x="665" y="210" text-anchor="middle" fill="#fbbf24" font-size="11">Repositório</text>
+      <text x="665" y="225" text-anchor="middle" fill="white" font-size="10" opacity="0.8">revisão + merge</text>
+
+      <!-- Automação futura -->
+      <rect x="200" y="300" width="530" height="60" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="6,4"/>
+      <text x="465" y="326" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">GitHub Actions · CI/CD · Deploy automatizado</text>
+      <text x="465" y="346" text-anchor="middle" font-size="11" fill="#94a3b8" font-style="italic">Fase posterior (E14) · deploy por branch, secrets por ambiente, seeds dedicados</text>
+
+      <line x1="665" y1="240" x2="665" y2="298" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
+
+      <!-- Regra -->
+      <text x="70" y="100" font-size="12" font-weight="600" fill="#059669">Nesta fase</text>
+      <text x="70" y="118" font-size="11" fill="#475569">• Commit pode ser feito pelo agente quando solicitado</text>
+      <text x="70" y="134" font-size="11" fill="#475569">• Push e PR ficam com o desenvolvedor</text>
+      <text x="70" y="150" font-size="11" fill="#475569">• Testes, build e deploy em GitHub Actions ficam para fase futura</text>
+    </svg>
+    <div class="caption">Fluxo de entrega atual: manual, controlado, com automação planejada para quando a fundação estiver estável.</div>
+  </div>
+</section>
+
+<section id="sucesso">
+  <h2>11. Critérios de Sucesso da Fase Atual</h2>
+  <div class="subtitle">O que precisa estar funcionando para considerarmos a fundação entregue.</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 60%;">Critério</th>
+        <th>Área</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Usuários podem ser criados com validação correta de e-mail e senha</td><td>Gestão de Usuários</td></tr>
+      <tr><td>Autenticação com JWT funcionando (login e /me)</td><td>Segurança</td></tr>
+      <tr><td>Autorização por perfil e ownership aplicada aos endpoints</td><td>Segurança</td></tr>
+      <tr><td>Auditoria preenche criação e modificação corretamente</td><td>Auditoria</td></tr>
+      <tr><td>API documentada para usuários e autenticação</td><td>Documentação</td></tr>
+      <tr><td>Ambiente local sobe com PostgreSQL em Docker Compose</td><td>Infraestrutura</td></tr>
+      <tr><td>Testes de autenticação e autorização implementados e passando</td><td>Qualidade</td></tr>
+      <tr><td>Migrations aplicadas com Flyway no boot da aplicação</td><td>Persistência</td></tr>
+      <tr><td>Senhas persistidas com BCrypt</td><td>Segurança</td></tr>
+      <tr><td>Endpoint de healthcheck funcional</td><td>Observabilidade</td></tr>
+      <tr><td>JWT respeitando claims sub, email e roles</td><td>Segurança</td></tr>
+      <tr><td>Respostas de erro em payload padronizado</td><td>Contratos</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Fronteiras entre Épicos</h3>
+  <p>Para evitar sobreposição de responsabilidades, as fronteiras entre épicos foram explicitadas no PRD: onboarding não substitui a jornada da credora; análise de crédito não substitui o backoffice; formalização não substitui a análise; cobrança não substitui o meio de pagamento; Pix não substitui cobrança, análise ou formalização; frontend não concentra regra de negócio de domínio.</p>
+</section>
+
+</div>
+
+<footer>
+  <div style="max-width: 1180px; margin: 0 auto;">
+    <strong>Plataforma SEP</strong> · Documentação de Produto · Versão Product Owner<br>
+    Baseado no <em>PRD.md</em> e <em>CONTEXT.md</em> do projeto · Atualizado em 24/04/2026
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEP - Apresentação do Produto</title>
+<style>
+  :root {
+    --primary: #0ea5e9;
+    --primary-dark: #0369a1;
+    --primary-deep: #0c4a6e;
+    --accent: #f59e0b;
+    --accent-deep: #b45309;
+    --success: #10b981;
+    --success-deep: #047857;
+    --purple: #8b5cf6;
+    --bg: #f0f9ff;
+    --bg-soft: #e0f2fe;
+    --card: #ffffff;
+    --text: #0f172a;
+    --text-soft: #334155;
+    --muted: #64748b;
+    --border: #cbd5e1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+  }
+  .hero {
+    background:
+      radial-gradient(circle at 20% 20%, rgba(14,165,233,0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 60%, rgba(139,92,246,0.25) 0%, transparent 50%),
+      linear-gradient(135deg, #0c4a6e 0%, #0369a1 60%, #0ea5e9 100%);
+    color: white;
+    padding: 90px 40px 100px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      radial-gradient(circle at 10% 90%, rgba(255,255,255,0.08) 0%, transparent 30%),
+      radial-gradient(circle at 90% 10%, rgba(255,255,255,0.06) 0%, transparent 30%);
+    pointer-events: none;
+  }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    padding: 8px 20px;
+    border-radius: 24px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+  }
+  .hero h1 {
+    font-size: 52px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    letter-spacing: -1px;
+    position: relative;
+  }
+  .hero p.subtitle-hero {
+    font-size: 22px;
+    opacity: 0.95;
+    max-width: 780px;
+    margin: 0 auto;
+    font-weight: 400;
+    line-height: 1.5;
+    position: relative;
+  }
+  .hero .audience {
+    margin-top: 36px;
+    font-size: 13px;
+    opacity: 0.85;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .nav {
+    position: sticky;
+    top: 0;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 40px;
+    z-index: 100;
+    overflow-x: auto;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(14,165,233,0.08);
+  }
+  .nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 28px;
+    padding: 6px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+  .container { max-width: 1180px; margin: 0 auto; padding: 70px 40px; }
+  section { margin-bottom: 90px; }
+  section h2 {
+    font-size: 34px;
+    color: var(--primary-deep);
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  section .subtitle {
+    font-size: 17px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    max-width: 840px;
+  }
+  h3 {
+    font-size: 22px;
+    color: var(--primary-dark);
+    margin: 40px 0 18px;
+    font-weight: 700;
+  }
+  h4 { font-size: 17px; color: var(--primary-deep); margin: 22px 0 10px; font-weight: 700; }
+  p { margin-bottom: 14px; color: var(--text-soft); }
+
+  .big-intro {
+    background: linear-gradient(135deg, white 0%, var(--bg-soft) 100%);
+    border-radius: 18px;
+    padding: 36px 40px;
+    margin-bottom: 36px;
+    border-left: 5px solid var(--primary);
+    box-shadow: 0 4px 20px rgba(14,165,233,0.08);
+  }
+  .big-intro p { font-size: 17px; line-height: 1.7; }
+  .big-intro p strong { color: var(--primary-deep); }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 30px 0 50px;
+  }
+  .stat-box {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 28px 20px;
+    text-align: center;
+    border: 2px solid var(--bg-soft);
+    box-shadow: 0 2px 12px rgba(14,165,233,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 24px rgba(14,165,233,0.15);
+  }
+  .stat-box .num {
+    font-size: 42px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1;
+  }
+  .stat-box .label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+  }
+
+  .journey-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+  .journey-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    border-top: 4px solid var(--primary);
+    box-shadow: 0 2px 14px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .journey-card:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(14,165,233,0.12); }
+  .journey-card.tomador { border-top-color: var(--primary); }
+  .journey-card.credora { border-top-color: var(--accent); }
+  .journey-card.financeiro { border-top-color: var(--success); }
+  .journey-card.admin { border-top-color: var(--purple); }
+  .journey-card .icon {
+    font-size: 34px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .journey-card h4 { font-size: 20px; margin-bottom: 8px; color: var(--primary-deep); }
+  .journey-card p { font-size: 15px; line-height: 1.6; margin-bottom: 12px; }
+  .journey-card .role {
+    display: inline-block;
+    font-size: 11px;
+    background: var(--bg-soft);
+    color: var(--primary-dark);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .feature-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 26px;
+  }
+  .feature-item {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 24px 26px;
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .feature-item.done { border-left-color: var(--success); }
+  .feature-item.now { border-left-color: var(--primary); }
+  .feature-item.next { border-left-color: var(--accent); }
+  .feature-item.later { border-left-color: var(--muted); }
+  .feature-item h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0;
+  }
+  .feature-item .phase-tag {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .phase-tag.done { background: #d1fae5; color: var(--success-deep); }
+  .phase-tag.now { background: #dbeafe; color: var(--primary-dark); }
+  .phase-tag.next { background: #fef3c7; color: var(--accent-deep); }
+  .phase-tag.later { background: #e2e8f0; color: #475569; }
+
+  .feature-item p { font-size: 14px; margin-bottom: 0; line-height: 1.6; }
+  .feature-item ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+  }
+  .feature-item ul li {
+    font-size: 14px;
+    color: var(--text-soft);
+    padding: 5px 0 5px 22px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .feature-item ul li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--success);
+    font-weight: 700;
+  }
+
+  .phase-timeline {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 36px 40px;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.08);
+  }
+  .phase {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 28px;
+    padding: 26px 0;
+    border-bottom: 1px dashed var(--border);
+    align-items: start;
+  }
+  .phase:last-child { border-bottom: none; }
+  .phase-left {
+    text-align: right;
+    padding-right: 4px;
+  }
+  .phase-left .phase-num {
+    font-size: 34px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1;
+  }
+  .phase-left .phase-time {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .phase-left .phase-status {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .phase-right h3 { margin: 0 0 8px 0; font-size: 22px; color: var(--primary-deep); }
+  .phase-right .phase-goal { font-size: 15px; color: var(--text-soft); margin-bottom: 14px; }
+  .phase-right .phase-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .phase-right .phase-list span {
+    background: var(--bg-soft);
+    color: var(--primary-dark);
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .callout {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left: 5px solid var(--accent);
+    border-radius: 12px;
+    padding: 22px 28px;
+    margin: 24px 0;
+    color: #78350f;
+  }
+  .callout strong { color: #78350f; }
+  .callout.info {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-left-color: var(--primary);
+    color: var(--primary-deep);
+  }
+  .callout.info strong { color: var(--primary-deep); }
+  .callout.success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-left-color: var(--success);
+    color: var(--success-deep);
+  }
+  .callout.success strong { color: var(--success-deep); }
+
+  .diagram-wrapper {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 30px 0;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.06);
+    overflow-x: auto;
+  }
+  .diagram-wrapper svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  .caption {
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 18px;
+    font-style: italic;
+  }
+
+  .faq-item {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-bottom: 14px;
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .faq-item h4 {
+    font-size: 17px;
+    color: var(--primary-deep);
+    margin: 0 0 10px 0;
+  }
+  .faq-item p { font-size: 15px; margin-bottom: 0; line-height: 1.65; }
+
+  .highlight-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 32px 0;
+  }
+  .highlight-card {
+    background: var(--card);
+    padding: 28px 24px;
+    border-radius: 14px;
+    text-align: center;
+    border-top: 4px solid var(--primary);
+    box-shadow: 0 3px 16px rgba(0,0,0,0.05);
+  }
+  .highlight-card .big-icon {
+    font-size: 42px;
+    display: block;
+    margin-bottom: 14px;
+  }
+  .highlight-card h4 {
+    font-size: 18px;
+    margin: 8px 0 10px;
+    color: var(--primary-deep);
+  }
+  .highlight-card p {
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  footer {
+    background: var(--primary-deep);
+    color: #bae6fd;
+    padding: 40px 40px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  footer strong { color: white; }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 36px; }
+    .hero p.subtitle-hero { font-size: 17px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .journey-grid, .feature-block, .highlight-row { grid-template-columns: 1fr; }
+    .phase { grid-template-columns: 1fr; }
+    .phase-left { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">APRESENTAÇÃO AO CLIENTE</div>
+  <h1>Plataforma SEP</h1>
+  <p class="subtitle-hero">Conectamos empresas que precisam de capital de giro a empresas que querem investir, com operação segura, assistida e auditável do começo ao fim.</p>
+  <div class="audience">Documento elaborado para visão executiva e acompanhamento do cliente</div>
+</div>
+
+<nav class="nav">
+  <a href="#visao">Visão</a>
+  <a href="#jornadas">Quem Participa</a>
+  <a href="#funcionalidades">Funcionalidades</a>
+  <a href="#cronograma">Cronograma</a>
+  <a href="#fase-atual">Fase Atual</a>
+  <a href="#proximos">Próximos Marcos</a>
+  <a href="#faq">Perguntas Comuns</a>
+</nav>
+
+<div class="container">
+
+<section id="visao">
+  <h2>1. O que é a SEP</h2>
+  <div class="subtitle">Uma plataforma de crédito desenhada para aproximar tomadores e investidores com confiança.</div>
+
+  <div class="big-intro">
+    <p>A <strong>SEP</strong> é uma plataforma digital que organiza, de ponta a ponta, o processo de empréstimo entre empresas. De um lado, <strong>empresas que precisam de capital de giro</strong> para crescer; do outro, <strong>empresas credoras que querem investir seus recursos</strong>. No meio, um time financeiro interno que conduz a operação com cuidado, e um administrador que garante que tudo funcione dentro das regras.</p>
+    <p>Tudo é construído com uma preocupação dupla: <strong>segurança</strong> para quem aporta o dinheiro e <strong>agilidade</strong> para quem precisa dele. O sistema registra cada passo, documenta cada decisão e deixa pronto o terreno para integrações financeiras modernas como Pix.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="num">4</div>
+      <div class="label">Tipos de Usuário</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">14</div>
+      <div class="label">Blocos Funcionais</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">4</div>
+      <div class="label">Fases de Entrega</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <strong>Como lemos este documento:</strong> as entregas estão organizadas em <em>fases</em>. Cada fase abre um conjunto de capacidades novas, começando pela fundação técnica e avançando até movimentações financeiras integradas. A ordem respeita uma prioridade clara: o que fecha a jornada do empréstimo vem antes do que amplia as capacidades financeiras.
+  </div>
+
+  <div class="callout success">
+    <strong>Aceleração com agentes de IA:</strong> o projeto é executado por 3 desenvolvedores apoiados por agentes de inteligência artificial, atuando cerca de 6 horas por dia cada. Somado à especificação detalhada que já existe (PRD + specs por sprint), isso permite uma cadência significativamente maior do que a de um projeto tradicional — os prazos apresentados aqui já consideram esse ganho.
+  </div>
+</section>
+
+<section id="jornadas">
+  <h2>2. Quem Vai Usar a Plataforma</h2>
+  <div class="subtitle">Quatro perfis interagem com a SEP, cada um com seus objetivos e responsabilidades.</div>
+
+  <div class="journey-grid">
+    <div class="journey-card tomador">
+      <span class="icon">🏢</span>
+      <h4>Empresa Tomadora</h4>
+      <p>Empresa que busca capital de giro para sustentar ou expandir o negócio. Faz cadastro, envia documentos, passa por análise e, se aprovada, recebe o valor contratado.</p>
+      <span class="role">Solicita empréstimo</span>
+    </div>
+
+    <div class="journey-card credora">
+      <span class="icon">💰</span>
+      <h4>Empresa Credora</h4>
+      <p>Empresa que aporta recursos na plataforma para financiar operações de crédito. Acompanha o retorno, a carteira investida e a governança dos valores alocados.</p>
+      <span class="role">Aporta recursos</span>
+    </div>
+
+    <div class="journey-card financeiro">
+      <span class="icon">🧑‍💼</span>
+      <h4>Financeiro Interno</h4>
+      <p>Time operacional que conduz a esteira de análise, aprovações, cobrança e conciliação. Atua de forma assistida, com apoio da plataforma para decisões e pendências.</p>
+      <span class="role">Opera e analisa</span>
+    </div>
+
+    <div class="journey-card admin">
+      <span class="icon">⚙️</span>
+      <h4>Administrador</h4>
+      <p>Responsável pela governança do sistema, por definir regras e permissões, acompanhar auditoria e manter os cadastros mestres da operação.</p>
+      <span class="role">Governa a plataforma</span>
+    </div>
+  </div>
+</section>
+
+<section id="funcionalidades">
+  <h2>3. O que a Plataforma Vai Entregar</h2>
+  <div class="subtitle">Capacidades agrupadas por valor de negócio, com indicação da fase em que cada bloco fica disponível.</div>
+
+  <h3>🧩 Base do sistema</h3>
+  <div class="feature-block">
+    <div class="feature-item now">
+      <h4>Cadastro e autenticação <span class="phase-tag now">Em execução</span></h4>
+      <p>Qualquer pessoa pode se cadastrar na plataforma. Depois disso, entra com e-mail e senha e recebe uma sessão segura para acessar seus dados.</p>
+      <ul>
+        <li>Cadastro com validação de e-mail e senha</li>
+        <li>Login com proteção segura</li>
+        <li>Perfis diferentes para administrador e cliente</li>
+      </ul>
+    </div>
+
+    <div class="feature-item now">
+      <h4>Controle de acesso e privacidade <span class="phase-tag now">Em execução</span></h4>
+      <p>Cada usuário vê e altera apenas o que lhe pertence. O administrador tem visibilidade ampla; o cliente, só o próprio cadastro. A senha é armazenada com proteção criptográfica.</p>
+      <ul>
+        <li>Clientes acessam apenas os próprios dados</li>
+        <li>Administradores podem listar e consultar todos</li>
+        <li>Troca de senha restrita ao próprio usuário</li>
+      </ul>
+    </div>
+
+    <div class="feature-item now">
+      <h4>Auditoria automática <span class="phase-tag now">Em execução</span></h4>
+      <p>Toda alteração fica registrada: quem criou, quem alterou, quando aconteceu. Isso cria rastreabilidade desde o primeiro dia — base essencial para operações financeiras.</p>
+    </div>
+
+    <div class="feature-item now">
+      <h4>Plataforma pronta para integração <span class="phase-tag now">Em execução</span></h4>
+      <p>A API nasce documentada, com contratos claros, para que o aplicativo web (frontend) e parceiros futuros possam integrar com previsibilidade.</p>
+    </div>
+  </div>
+
+  <h3>📄 Jornada de contratação do empréstimo</h3>
+  <div class="feature-block">
+    <div class="feature-item next">
+      <h4>Onboarding da tomadora (KYC/KYB) <span class="phase-tag next">Próxima onda</span></h4>
+      <p>A empresa que busca crédito envia os documentos obrigatórios, passa por validações de identidade e recebe acompanhamento de eventuais pendências cadastrais.</p>
+      <ul>
+        <li>Coleta e conferência de documentos</li>
+        <li>Verificação de identidade</li>
+        <li>Trilha de aprovação, rejeição e pendências</li>
+      </ul>
+    </div>
+
+    <div class="feature-item next">
+      <h4>Análise de crédito <span class="phase-tag next">Próxima onda</span></h4>
+      <p>A proposta passa por uma esteira de análise com score interno e parecer operacional. O time financeiro pode aprovar, rejeitar ou pedir ajustes, sempre com o fundamento registrado.</p>
+      <ul>
+        <li>Parecer e score da proposta</li>
+        <li>Decisão com fundamentação registrada</li>
+        <li>Histórico completo das alterações</li>
+      </ul>
+    </div>
+
+    <div class="feature-item next">
+      <h4>Formalização do contrato <span class="phase-tag next">Próxima onda</span></h4>
+      <p>Com a proposta aprovada, o contrato é gerado, aceito e assinado. Sem essa etapa concluída, nenhum valor sai da plataforma — garantia de segurança jurídica.</p>
+      <ul>
+        <li>Geração automática do contrato</li>
+        <li>Aceite e assinatura digital</li>
+        <li>Preparação para CCB e assinatura eletrônica</li>
+      </ul>
+    </div>
+
+    <div class="feature-item next">
+      <h4>Cobrança e acompanhamento <span class="phase-tag next">Próxima onda</span></h4>
+      <p>Após a liberação, a plataforma acompanha parcelas, registra recebimentos, sinaliza atrasos e apoia o time na conciliação financeira.</p>
+      <ul>
+        <li>Agenda de parcelas e recebimentos</li>
+        <li>Acompanhamento de inadimplência</li>
+        <li>Suporte ao financeiro na conciliação</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>🏦 Operação ampliada e jornadas completas</h3>
+  <div class="feature-block">
+    <div class="feature-item later">
+      <h4>Backoffice operacional <span class="phase-tag later">Expansão</span></h4>
+      <p>Uma central de operação para o time financeiro lidar com propostas, pendências, exceções e reprocessos. Organiza a operação assistida antes da automação ampla.</p>
+    </div>
+
+    <div class="feature-item later">
+      <h4>Jornada da empresa credora <span class="phase-tag later">Expansão</span></h4>
+      <p>O ambiente completo para quem investe na plataforma: onboarding próprio, acompanhamento da carteira, visão das operações financiadas e governança dos aportes.</p>
+    </div>
+
+    <div class="feature-item later">
+      <h4>Governança e administração <span class="phase-tag later">Expansão</span></h4>
+      <p>Controles avançados de acesso, cadastros mestres, parametrizações e auditoria administrativa. À medida que a operação cresce, o admin ganha ferramentas mais robustas.</p>
+    </div>
+
+    <div class="feature-item later">
+      <h4>Aplicação web (frontend) <span class="phase-tag later">Expansão</span></h4>
+      <p>A interface visual da plataforma, feita sobre um template profissional já aprovado, adaptada a cada uma das quatro jornadas de usuário.</p>
+    </div>
+  </div>
+
+  <h3>💸 Movimentação financeira integrada</h3>
+  <div class="feature-block">
+    <div class="feature-item later">
+      <h4>Pix integrado <span class="phase-tag later">Fase posterior</span></h4>
+      <p>A plataforma ganha movimentação financeira nativa via Pix — desembolso dos empréstimos aprovados e recebimento das parcelas, tudo rastreado e conciliado automaticamente.</p>
+      <ul>
+        <li>Pix de desembolso ao tomador</li>
+        <li>Pix de recebimento de parcelas</li>
+        <li>Conciliação e tratamento de eventos</li>
+      </ul>
+    </div>
+
+    <div class="feature-item later">
+      <h4>Ambientes e infraestrutura completos <span class="phase-tag later">Fase posterior</span></h4>
+      <p>Ambientes dedicados de homologação e produção, publicação automática e monitoramento contínuo — a plataforma passa de uma base de desenvolvimento para uma operação em escala.</p>
+    </div>
+  </div>
+</section>
+
+<section id="cronograma">
+  <h2>4. Cronograma de Entrega</h2>
+  <div class="subtitle">Visão aproximada das fases e dos prazos previstos. Os tempos são estimativas; podem variar conforme prioridades e validações.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 940 420" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="barNow" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#0369a1"/><stop offset="100%" stop-color="#0ea5e9"/>
+        </linearGradient>
+        <linearGradient id="barNext" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#b45309"/><stop offset="100%" stop-color="#f59e0b"/>
+        </linearGradient>
+        <linearGradient id="barExp" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6d28d9"/><stop offset="100%" stop-color="#8b5cf6"/>
+        </linearGradient>
+        <linearGradient id="barLater" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#475569"/><stop offset="100%" stop-color="#94a3b8"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Título -->
+      <text x="470" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#0c4a6e">Linha do tempo estimada · meses a partir do início (3 devs + agentes IA, 6h/dia)</text>
+
+      <!-- Eixo -->
+      <line x1="210" y1="60" x2="900" y2="60" stroke="#cbd5e1" stroke-width="2"/>
+      <line x1="210" y1="60" x2="210" y2="390" stroke="#cbd5e1" stroke-width="2"/>
+
+      <!-- Marcações de tempo (M0 a M8, de 1 em 1 mês) -->
+      <text x="210" y="52" text-anchor="middle" font-size="11" fill="#64748b">M0</text>
+      <text x="296" y="52" text-anchor="middle" font-size="11" fill="#64748b">M1</text>
+      <text x="382" y="52" text-anchor="middle" font-size="11" fill="#64748b">M2</text>
+      <text x="469" y="52" text-anchor="middle" font-size="11" fill="#64748b">M3</text>
+      <text x="555" y="52" text-anchor="middle" font-size="11" fill="#64748b">M4</text>
+      <text x="641" y="52" text-anchor="middle" font-size="11" fill="#64748b">M5</text>
+      <text x="728" y="52" text-anchor="middle" font-size="11" fill="#64748b">M6</text>
+      <text x="814" y="52" text-anchor="middle" font-size="11" fill="#64748b">M7</text>
+      <text x="900" y="52" text-anchor="middle" font-size="11" fill="#64748b">M8</text>
+
+      <!-- Linhas verticais guia -->
+      <g stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3">
+        <line x1="296" y1="60" x2="296" y2="390"/>
+        <line x1="382" y1="60" x2="382" y2="390"/>
+        <line x1="469" y1="60" x2="469" y2="390"/>
+        <line x1="555" y1="60" x2="555" y2="390"/>
+        <line x1="641" y1="60" x2="641" y2="390"/>
+        <line x1="728" y1="60" x2="728" y2="390"/>
+        <line x1="814" y1="60" x2="814" y2="390"/>
+      </g>
+
+      <!-- Fase 1 · Fundação (M0 → M1, ~1 mês) -->
+      <text x="200" y="100" text-anchor="end" font-size="13" font-weight="700" fill="#0369a1">Fundação técnica</text>
+      <text x="200" y="116" text-anchor="end" font-size="10" fill="#64748b">Fase 1 · ~1 mês</text>
+      <rect x="210" y="82" width="86" height="36" rx="6" fill="url(#barNow)"/>
+      <text x="253" y="105" text-anchor="middle" fill="white" font-size="11" font-weight="700">Em execução</text>
+
+      <!-- Fase 2 · Contratação (M1 → M4, ~3 meses) -->
+      <text x="200" y="168" text-anchor="end" font-size="13" font-weight="700" fill="#b45309">Jornada de contratação</text>
+      <text x="200" y="184" text-anchor="end" font-size="10" fill="#64748b">Fase 2 · ~3 meses</text>
+      <rect x="296" y="150" width="259" height="36" rx="6" fill="url(#barNext)"/>
+      <text x="425" y="173" text-anchor="middle" fill="white" font-size="11" font-weight="700">Onboarding · Crédito · Contrato · Cobrança</text>
+
+      <!-- Fase 3 · Operação ampla (M4 → M6, ~2 meses) -->
+      <text x="200" y="236" text-anchor="end" font-size="13" font-weight="700" fill="#6d28d9">Operação ampla e jornadas</text>
+      <text x="200" y="252" text-anchor="end" font-size="10" fill="#64748b">Fase 3 · ~2 meses</text>
+      <rect x="555" y="218" width="173" height="36" rx="6" fill="url(#barExp)"/>
+      <text x="641" y="241" text-anchor="middle" fill="white" font-size="11" font-weight="700">Backoffice · Credora · Frontend</text>
+
+      <!-- Fase 4 · Pix + Infra (M6 → M7.5, ~1.5 meses) -->
+      <text x="200" y="304" text-anchor="end" font-size="13" font-weight="700" fill="#475569">Pix e infra completa</text>
+      <text x="200" y="320" text-anchor="end" font-size="10" fill="#64748b">Fase 4 · ~1,5 mês</text>
+      <rect x="728" y="286" width="129" height="36" rx="6" fill="url(#barLater)"/>
+      <text x="792" y="309" text-anchor="middle" fill="white" font-size="11" font-weight="700">Pix · Ambientes</text>
+
+      <!-- Marco atual -->
+      <line x1="210" y1="60" x2="210" y2="390" stroke="#10b981" stroke-width="3"/>
+      <circle cx="210" cy="60" r="6" fill="#10b981"/>
+      <text x="210" y="405" text-anchor="middle" font-size="11" font-weight="700" fill="#047857">AGORA</text>
+
+      <!-- Marco final -->
+      <line x1="857" y1="60" x2="857" y2="390" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,3"/>
+      <circle cx="857" cy="60" r="5" fill="#8b5cf6"/>
+      <text x="857" y="405" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">~M7,5</text>
+
+      <!-- Legenda -->
+      <g transform="translate(210, 360)">
+        <rect x="0" y="0" width="14" height="14" fill="url(#barNow)"/>
+        <text x="20" y="11" font-size="11" fill="#334155">Fase atual</text>
+        <rect x="100" y="0" width="14" height="14" fill="url(#barNext)"/>
+        <text x="120" y="11" font-size="11" fill="#334155">Próxima onda</text>
+        <rect x="230" y="0" width="14" height="14" fill="url(#barExp)"/>
+        <text x="250" y="11" font-size="11" fill="#334155">Expansão</text>
+        <rect x="340" y="0" width="14" height="14" fill="url(#barLater)"/>
+        <text x="360" y="11" font-size="11" fill="#334155">Fase posterior</text>
+      </g>
+    </svg>
+    <div class="caption">Cronograma estimado em meses, considerando 3 desenvolvedores apoiados por agentes de IA (≈6h/dia cada) e especificação SDD já pronta. O projeto termina em torno de M7,5. Estimativas podem variar conforme priorização conjunta.</div>
+  </div>
+
+  <div class="phase-timeline">
+    <div class="phase">
+      <div class="phase-left">
+        <div class="phase-num">Fase 1</div>
+        <div class="phase-time">~1 mês</div>
+        <span class="phase-status phase-tag now">Em execução</span>
+      </div>
+      <div class="phase-right">
+        <h3>Fundação técnica da plataforma</h3>
+        <p class="phase-goal">Construir a base segura, auditável e documentada sobre a qual todas as jornadas de negócio serão construídas. Sem essa fundação, nenhuma outra entrega é possível com segurança.</p>
+        <div class="phase-list">
+          <span>Cadastro de usuário</span>
+          <span>Login seguro</span>
+          <span>Controle de acesso</span>
+          <span>Troca de senha</span>
+          <span>Auditoria automática</span>
+          <span>Base para integração</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-left">
+        <div class="phase-num">Fase 2</div>
+        <div class="phase-time">~3 meses</div>
+        <span class="phase-status phase-tag next">Próxima onda</span>
+      </div>
+      <div class="phase-right">
+        <h3>Jornada de contratação do empréstimo</h3>
+        <p class="phase-goal">Abrir a operação de ponta a ponta: da entrada da empresa tomadora até a cobrança das parcelas. Essa é a fase que transforma a plataforma em produto operacional.</p>
+        <div class="phase-list">
+          <span>Onboarding documental</span>
+          <span>Análise de crédito</span>
+          <span>Contrato digital</span>
+          <span>Assinatura eletrônica</span>
+          <span>Cobrança e parcelas</span>
+          <span>Acompanhamento de atraso</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-left">
+        <div class="phase-num">Fase 3</div>
+        <div class="phase-time">~2 meses</div>
+        <span class="phase-status phase-tag later">Expansão</span>
+      </div>
+      <div class="phase-right">
+        <h3>Operação ampla e jornadas completas</h3>
+        <p class="phase-goal">Ampliar a plataforma para suportar a jornada da empresa credora, o backoffice operacional, a governança administrativa e a interface visual completa.</p>
+        <div class="phase-list">
+          <span>Backoffice</span>
+          <span>Jornada da credora</span>
+          <span>Governança avançada</span>
+          <span>Interface web (Angular)</span>
+          <span>Cadastros mestres</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-left">
+        <div class="phase-num">Fase 4</div>
+        <div class="phase-time">~1,5 mês</div>
+        <span class="phase-status phase-tag later">Fase posterior</span>
+      </div>
+      <div class="phase-right">
+        <h3>Movimentação financeira e infra completa</h3>
+        <p class="phase-goal">Integrar movimentação Pix para desembolso e recebimento, e estruturar os ambientes de homologação e produção com operação em escala.</p>
+        <div class="phase-list">
+          <span>Pix desembolso</span>
+          <span>Pix recebimento</span>
+          <span>Conciliação automática</span>
+          <span>Ambiente de homologação</span>
+          <span>Ambiente de produção</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Sobre os prazos:</strong> os tempos apresentados são estimativas com base no escopo atual e na composição da equipe. Podem variar conforme validações de produto, ajustes de prioridade, dependências externas e decisões tomadas durante a execução.
+  </div>
+</section>
+
+<section id="roadmap-epics">
+  <h2>Visão Completa do Roadmap</h2>
+  <div class="subtitle">Confira todas as grandes etapas planejadas para a evolução da plataforma SEP. Cada bloco representa uma entrega relevante para o negócio.</div>
+  <div class="feature-block">
+    <div class="feature-item done">
+      <h4>Epic 1 · Fundação da API</h4>
+      <p>Base técnica: ambiente local, banco, auditoria, segurança, documentação e padrões para crescer com segurança.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Epic 2 · Gestão de Usuários</h4>
+      <p>Cadastro, perfis, controle de acesso, auditoria e proteção de dados dos usuários.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Epic 3 · Segurança e Autenticação</h4>
+      <p>Login seguro, autenticação JWT, autorização por perfil, alteração de senha e rastreabilidade de ações.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Epic 4 · Erros, Documentação e Testes</h4>
+      <p>Tratamento padronizado de erros, documentação interativa da API e testes automatizados dos fluxos críticos.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 5 · Infraestrutura Futura</h4>
+      <p>Planejamento de ambientes, deploy, seeds e estrutura para escalar a operação.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 6 · Onboarding KYC/KYB</h4>
+      <p>Envio e validação de documentos, verificação de identidade e trilha de aprovação para empresas tomadoras.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 7 · Análise de Crédito</h4>
+      <p>Esteira de análise, score, decisão fundamentada e integração ao fluxo de propostas.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 8 · Formalização Contratual</h4>
+      <p>Geração, aceite e assinatura de contratos, bloqueio de desembolso e integração futura com assinatura eletrônica.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 9 · Cobrança e Inadimplência</h4>
+      <p>Gestão de parcelas, status, histórico, acompanhamento de atrasos e suporte ao financeiro.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 10 · Backoffice Operacional</h4>
+      <p>Fila operacional, visibilidade consolidada, tratamento manual de exceções e organização da operação assistida.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 11 · Jornada da Empresa Credora</h4>
+      <p>Onboarding, governança, aportes, visão de carteira e acompanhamento das operações financiadas.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 12 · Administração e Governança</h4>
+      <p>Controles avançados, perfis internos, parametrizações, auditoria administrativa e cadastros mestres.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 13 · Frontend SEP</h4>
+      <p>Adaptação do template Angular, componentes visuais e implementação das jornadas no frontend.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 14 · Movimentação Pix</h4>
+      <p>Desembolso, recebimento, conciliação, rastreabilidade e integração operacional do Pix.</p>
+    </div>
+  </div>
+</section>
+</section>
+
+<section id="sprints">
+  <h2>Resumo das Sprints de Entrega</h2>
+  <div class="subtitle">Veja abaixo as etapas técnicas já planejadas e validadas para a construção da plataforma SEP.</div>
+  <div class="feature-block">
+    <div class="feature-item done">
+      <h4>Sprint 1 · Fundação Técnica</h4>
+      <p>Criação da base técnica do backend: projeto Java 21 + Spring Boot, ambiente local com PostgreSQL em Docker, configuração regional do Brasil, CORS, endpoint de saúde e migrations Flyway. Tudo pronto para as próximas jornadas.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprint 2 · Gestão de Usuários</h4>
+      <p>Modelagem da entidade de usuário, contratos de DTO, mapeamento, cadastro público com validação, persistência segura de senha (BCrypt), auditoria automática e controle de perfis (admin/cliente).</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprint 3 · Segurança e Autenticação</h4>
+      <p>Implementação de login com JWT, filtro de autenticação, controle de acesso por perfil e ownership, endpoints de autenticação e consulta do usuário autenticado, além de auditoria persistindo o responsável por cada ação.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprint 4 · Erros, Documentação e Testes</h4>
+      <p>Tratamento centralizado de erros com payload padronizado, documentação OpenAPI completa via Swagger UI e cobertura mínima de testes automatizados para cenários críticos de autenticação e autorização.</p>
+    </div>
+  </div>
+</section>
+</section>
+
+<section id="fase-atual">
+  <h2>5. O que Está Sendo Construído Agora</h2>
+  <div class="subtitle">Detalhes da fase em execução — a fundação técnica da plataforma.</div>
+
+  <p>Esta é a fase mais silenciosa para quem olha de fora, mas a mais crítica para o sucesso do produto. Estamos preparando <strong>o chão</strong> sobre o qual todas as funcionalidades serão construídas: a segurança, a identidade dos usuários, a auditoria de cada ação, a documentação da API e o ambiente operacional.</p>
+
+  <div class="highlight-row">
+    <div class="highlight-card">
+      <span class="big-icon">🔒</span>
+      <h4>Segurança desde o dia um</h4>
+      <p>Senhas protegidas criptograficamente, acesso controlado por perfil, sessões seguras.</p>
+    </div>
+    <div class="highlight-card">
+      <span class="big-icon">📝</span>
+      <h4>Tudo auditável</h4>
+      <p>Cada criação e alteração registra automaticamente quem fez, quando e em qual recurso.</p>
+    </div>
+    <div class="highlight-card">
+      <span class="big-icon">🔌</span>
+      <h4>Pronta para integrar</h4>
+      <p>Documentação automática e contratos claros para o frontend e parceiros futuros.</p>
+    </div>
+  </div>
+
+  <h3>Em quatro blocos curtos de cerca de uma semana</h3>
+  <p>A fase atual é executada em quatro blocos curtos, cada um com um objetivo específico. Com a equipe apoiada por agentes de IA e especificação detalhada pronta, cada bloco roda em aproximadamente uma semana. Ao final de cada bloco, há validação para garantir que a base está firme antes de avançar.</p>
+
+  <div class="feature-block">
+    <div class="feature-item done">
+      <h4>Bloco 1 · Preparação do ambiente <span class="phase-tag done">~1 semana</span></h4>
+      <p>Configuração do ambiente de desenvolvimento, banco de dados local, aspectos regionais brasileiros (idioma e fuso horário) e preparo do sistema de versionamento do banco.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Bloco 2 · Usuários e cadastro <span class="phase-tag done">~1 semana</span></h4>
+      <p>Primeira capacidade de negócio: permitir que alguém se cadastre na plataforma. Inclui validações, armazenamento seguro da senha e auditoria do registro.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Bloco 3 · Login e controle de acesso <span class="phase-tag done">~1 semana</span></h4>
+      <p>O usuário passa a poder entrar na plataforma, acessar seus dados, trocar a própria senha, e o administrador passa a poder listar e consultar todos os usuários.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Bloco 4 · Qualidade e documentação <span class="phase-tag done">~1 semana</span></h4>
+      <p>Padronização de mensagens de erro, documentação interativa da API acessível em uma página dedicada e cobertura dos cenários críticos com testes automatizados.</p>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <strong>Por que entregar em blocos curtos:</strong> cada bloco é testado e validado antes do próximo começar. Isso reduz retrabalho, permite ajustes rápidos e dá visibilidade constante do progresso.
+  </div>
+</section>
+
+<section id="proximos">
+  <h2>6. Próximos Marcos</h2>
+  <div class="subtitle">O que vem logo depois da fundação técnica.</div>
+
+  <div class="feature-block">
+    <div class="feature-item next">
+      <h4>Onboarding da empresa tomadora <span class="phase-tag next">Fase 2</span></h4>
+      <p>Primeira onda funcional depois da fundação. A empresa que quer tomar o empréstimo começa a jornada enviando documentos e passando por validações cadastrais. Marca simbólico: primeira <em>proposta</em> entra na plataforma.</p>
+    </div>
+
+    <div class="feature-item next">
+      <h4>Primeira análise de crédito <span class="phase-tag next">Fase 2</span></h4>
+      <p>Com a tomadora cadastrada, começa a esteira de análise. O time financeiro interno conduz a decisão com apoio da plataforma. Marco simbólico: primeira <em>aprovação</em> registrada.</p>
+    </div>
+
+    <div class="feature-item next">
+      <h4>Primeiro contrato formalizado <span class="phase-tag next">Fase 2</span></h4>
+      <p>A proposta aprovada vira contrato, com aceite e assinatura registrados. Marco simbólico: primeira <em>operação fechada</em>.</p>
+    </div>
+
+    <div class="feature-item next">
+      <h4>Primeira cobrança acompanhada <span class="phase-tag next">Fase 2</span></h4>
+      <p>Com o contrato vivo, as parcelas passam a ser acompanhadas. Marco simbólico: primeiro <em>recebimento conciliado</em>.</p>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <strong>Sobre a prioridade:</strong> decidimos conscientemente priorizar <em>a jornada de contratação do empréstimo</em> antes de capacidades financeiras expandidas como Pix. Isso garante que a plataforma entregue seu valor essencial primeiro — fechar operações de empréstimo de ponta a ponta — antes de ganhar recursos adicionais.
+  </div>
+</section>
+
+<section id="faq">
+  <h2>7. Perguntas Comuns</h2>
+  <div class="subtitle">Respostas diretas para o que costuma surgir na visão executiva do projeto.</div>
+
+  <div class="faq-item">
+    <h4>Quando vou ver o sistema funcionando para usuário real?</h4>
+    <p>O uso real por empresas tomadoras e credoras começa na <strong>Fase 2</strong>, com o onboarding e a análise de crédito. A Fase 1 é a fundação técnica — invisível do lado do usuário final, mas indispensável para o resto.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>Por que Pix não entra desde o início?</h4>
+    <p>Porque o valor da plataforma não é o meio de pagamento — é a <em>jornada de crédito</em>. Entregar Pix antes de ter operações de crédito fechadas seria construir o meio de transporte sem a mercadoria para transportar. Pix entra depois que já houver empréstimos prontos para desembolsar e parcelas para receber.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>Como sei que o que está sendo construído está certo?</h4>
+    <p>Cada bloco termina com testes de validação manual. A Fase 1 também entrega uma <em>documentação interativa</em> da API, onde é possível ver todos os recursos disponíveis e, se quiser, testá-los. Auditoria automática garante que cada ação no sistema fica registrada.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>O que é o "frontend" mencionado na Fase 3?</h4>
+    <p>É a <strong>aplicação web</strong> — a interface visual pela qual os usuários realmente vão acessar a plataforma (tela de login, dashboards, formulários). Ela será construída sobre um template profissional já aprovado, adaptado para a identidade da SEP e para cada um dos quatro perfis de usuário.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>Os prazos podem mudar?</h4>
+    <p>Sim. Os tempos apresentados são estimativas com base no escopo atual e na equipe prevista. Prioridades podem ser ajustadas em conjunto ao longo do projeto, e o cronograma é revisitado a cada fase. O compromisso é com <em>transparência</em> sobre desvios, não com a rigidez de uma data.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>Quem acompanha o dia a dia?</h4>
+    <p>A execução técnica é conduzida por um time com um desenvolvedor sênior responsável pelo backend e dois desenvolvedores focados no frontend. Do lado do produto, o acompanhamento executivo fica com a liderança do projeto, com pontos regulares de status.</p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div style="max-width: 1180px; margin: 0 auto;">
+    <strong>Plataforma SEP</strong> · Apresentação Executiva ao Cliente<br>
+    Documento elaborado para visão de negócio, prazos e entregas · Atualizado em 24/04/2026
+  </div>
+</footer>
+
+</body>
+</html>
