@@ -99,8 +99,9 @@ Essa ordem foi refinada depois para refletir melhor a jornada de contratacao do 
 10. Jornada da empresa credora
 11. Administracao e governanca
 12. Frontend SEP
-13. Movimentacao Pix
-14. Infraestrutura futura
+13. Mobile SEP
+14. Movimentacao Pix
+15. Infraestrutura futura
 
 Foi decidido explicitamente que `Analise de credito` e mais urgente que `Pix`, e que os topicos que impactam diretamente a contratacao devem vir antes dos topicos financeiros expandidos.
 
@@ -108,7 +109,7 @@ Com isso, o entendimento correto do PRD passa a ser:
 - entrega inicial: fundacao tecnica da API
 - produto futuro priorizado: onboarding, analise de credito, formalizacao e cobranca
 - capacidades operacionais e de jornada posteriores: backoffice, jornada da credora e administracao/governanca
-- capacidades expandidas posteriores: frontend completo, Pix e infraestrutura remota
+- capacidades expandidas posteriores: frontend completo, mobile, Pix e infraestrutura remota
 
 Tambem foi adicionada ao PRD uma secao de `Fronteiras entre epicos`, para reduzir duplicidade entre capacidades de dominio, jornadas, operacao interna, governanca e meios de movimentacao financeira.
 
@@ -123,6 +124,18 @@ As seguintes decisoes foram tomadas:
 - Bootstrap
 - existe um prototipo visual em Angular + Bootstrap que deve ser reaproveitado como base
 - foi explicitamente aceito que pode haver downgrade de versao do Angular se isso facilitar a absorcao do template
+
+### Mobile
+- o projeto tera um marco futuro chamado `Mobile SEP`
+- stack recomendada: `Ionic v8 + Angular + Capacitor`
+- a versao Angular do mobile deve acompanhar a versao final escolhida para o frontend web
+- se o frontend web sofrer downgrade para Angular abaixo da versao `16`, a decisao por Ionic v8 deve ser reavaliada
+- o mobile sera iniciado junto com a fundacao do frontend, como trilha paralela dependente dos mesmos contratos da API
+- o primeiro recorte mobile cobre somente tomador de emprestimo e empresa credora
+- o mobile nao tera visao do financeiro interno, backoffice operacional, administracao completa, governanca, cadastros mestres ou telas de auditoria nesta fase
+- a primeira validacao mobile pode ser PWA/browser, evoluindo depois para Android/iOS via Capacitor
+- Flutter e React Native nao foram recomendados nesta fase para evitar nova stack e duplicacao tecnica
+- o mobile nao deve concentrar regra de negocio; decisoes, status, permissoes e dados operacionais devem vir da API
 
 ### Backend
 - Java 21
@@ -148,7 +161,7 @@ As seguintes decisoes foram tomadas:
 - fallback tecnico de auditoria quando nao houver autenticacao, como `system`
 - tabelas e colunas devem permanecer em portugues
 - sem soft delete na fase inicial
-- estrutura inicial de pacotes do Spring Boot ja definida no PRD
+- estrutura inicial de pacotes do Spring Boot foi replanejada para monolito modular DDD
 - contratos iniciais de DTO tambem ja definidos no PRD
 - contratos JSON iniciais dos endpoints tambem ja definidos no PRD
 - backlog tecnico implementavel por sprints e tasks tambem ja foi preparado no PRD
@@ -162,24 +175,57 @@ As seguintes decisoes foram tomadas:
 - orquestracao com Docker Compose
 
 ### Arquitetura inicial
-- monolito modular
+- monolito modular orientado a DDD
 - sem microservicos na fase inicial
+- backend em unico deploy Spring Boot
+- banco unico PostgreSQL nesta fase
+- web e mobile consomem a mesma API publica, sem backends separados neste momento
+- separacao por modulos de dominio, nao por camadas globais `model`, `repository`, `service` e `controller`
+- modulos planejados:
+  - `identity`
+  - `usuarios`
+  - `onboarding`
+  - `credito`
+  - `contratos`
+  - `cobranca`
+  - `backoffice`
+  - `financeiro`
+  - `credores`
+  - `pix`
+  - `shared`
+- cada modulo deve conter suas proprias camadas internas `domain`, `application`, `infrastructure` e `web`
+- microservicos so devem ser reavaliados quando houver escala independente, deploy independente, isolamento regulatorio, banco separado, integracoes criticas ou ownership por equipe
 
 ## Ambiente e infraestrutura
 
 Foi decidido que:
-- nesta fase inicial, apenas o ambiente `develop` sera implementado localmente
-- futuramente o projeto tera `develop`, `homologacao` e `producao`
-- cada ambiente deve ter sua propria instancia PostgreSQL
-- no futuro:
-  - `develop` e `homologacao` ficarao em uma VPS
-  - `producao` ficara em uma VPS separada
+- nesta fase inicial, apenas o ambiente `dev-local` sera implementado localmente
+- ate a conclusao completa do sistema de login, autenticacao e autorizacao, o banco oficial sera PostgreSQL local via Docker Compose
+- a implantacao AWS, incluindo EC2 e RDS, nao deve iniciar antes da conclusao da Sprint 3 / Epic 3
+- a recomendacao operacional e iniciar AWS preferencialmente apos a Sprint 4, caso a equipe queira chegar ao ambiente remoto com tratamento de erros, documentacao e testes criticos estabilizados
+- futuramente o projeto tera `aws-develop`, `homologacao` e `producao`
+- a infraestrutura remota sera baseada em AWS
+- os servidores da aplicacao usarao `Amazon EC2`
+- o banco remoto usara `Amazon RDS for PostgreSQL`
+- o banco de dados nao ficara hospedado na EC2/VPS da aplicacao
+- cada ambiente deve ter sua propria instancia RDS PostgreSQL
+- `aws-develop` e `homologacao` poderao compartilhar uma EC2, com isolamento por containers, portas, variaveis e bancos
+- `producao` tera EC2 propria e RDS proprio
 
 Tambem foi definido que, na fase de infraestrutura:
+- AWS e uma trilha tecnica habilitadora, nao uma funcionalidade de negocio concorrente com Pix, credito ou formalizacao
+- a fase AWS pode ser antecipada antes de Pix se houver necessidade de ambiente remoto para validacao, homologacao ou integracao, desde que respeite o gate minimo da Sprint 3
+- Docker ou Docker Compose nas EC2 poderao ser usados apenas para aplicacao, frontend, proxy e servicos auxiliares; PostgreSQL remoto deve ficar no RDS
+- CI/CD com GitHub Actions nao e pre-requisito obrigatorio para o primeiro ambiente AWS nao produtivo, mas deve ser planejado na mesma fase
+- enquanto CI/CD nao estiver pronto, qualquer deploy remoto inicial deve ser manual, documentado e restrito a ambiente nao produtivo
 - o deploy sera por branch/ambiente
 - os secrets serao separados por ambiente no GitHub
 - migrations serao versionadas
 - seeds serao separados por ambiente
+- a regiao AWS recomendada sera `sa-east-1` (Sao Paulo)
+- `Amazon Lightsail` fica apenas como alternativa de baixo custo, nao como recomendacao principal
+- producao deve usar Security Groups restritivos, backups automaticos, encryption habilitada, acesso privado ao banco, logs e monitoramento
+- Multi-AZ no RDS de producao deve ser avaliado quando houver trafego real ou necessidade formal de alta disponibilidade
 
 Por enquanto, tudo isso permanece apenas como planejamento, nao implementacao.
 
@@ -275,7 +321,8 @@ Algumas regras importantes foram definidas durante a conversa:
 - commits podem ser feitos pelo agente quando solicitado
 - push e PR serao manuais
 - testes locais devem acontecer ao final de cada task quando a implementacao comecar
-- CI/CD, GitHub Actions, deploy e VPS serao tratados em uma fase separada de infraestrutura
+- CI/CD, GitHub Actions, AWS, EC2, RDS e deploy remoto serao tratados em uma fase separada de infraestrutura
+- a fase de infraestrutura AWS so podera iniciar, no minimo, apos a conclusao completa do login, autenticacao e autorizacao
 
 ## Situacao atual
 
@@ -302,7 +349,17 @@ No estado atual:
   - `Backoffice operacional`
   - `Jornada da empresa credora`
   - `Administracao e governanca`
+- foi adicionado o marco e epic futura `Mobile SEP`, iniciado junto com a fundacao do frontend, usando Ionic v8 + Angular + Capacitor
+- o mobile ficou limitado inicialmente a tomador e empresa credora, sem financeiro interno, backoffice ou administracao completa
+- Mobile SEP foi posicionado antes de Pix para ajudar a validar a jornada de contratacao com usuarios reais
+- a arquitetura do backend foi replanejada para monolito modular DDD, mantendo um unico Spring Boot e banco unico nesta fase
+- a estrutura antiga por camadas globais foi substituida por modulos de dominio com fronteiras internas claras
+- `identity` e `usuarios` serao os primeiros modulos reais; autenticacao permanece dentro do monolito, sem virar microservico nesta fase
 - Pix foi reposicionado para depois dos blocos que impactam diretamente a contratacao do emprestimo
+- a infraestrutura futura foi refinada para AWS, com Amazon EC2 para servidores e Amazon RDS for PostgreSQL para banco gerenciado fora da EC2
+- foi definido que AWS/EC2/RDS so entram, no minimo, apos a conclusao completa da Sprint 3 / Epic 3 de login, autenticacao e autorizacao; ate la, o banco permanece local em Docker Compose
+- a nomenclatura foi refinada para evitar ambiguidade: `dev-local` representa o desenvolvimento local com Docker Compose, enquanto `aws-develop` representa o futuro ambiente remoto de desenvolvimento na AWS
+- a infraestrutura AWS ficou registrada como trilha tecnica habilitadora, podendo ocorrer antes de Pix se o time precisar de ambiente remoto, mas sem quebrar a prioridade funcional da jornada de contratacao
 
 ## Proximo passo mais natural
 

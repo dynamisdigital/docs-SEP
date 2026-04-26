@@ -103,7 +103,7 @@ Essa base devera ser usada como referencia oficial de layout e componentes na fa
 - automacao financeira avancada nesta etapa inicial
 - deploy remoto
 - GitHub Actions
-- VPS
+- Amazon EC2
 - homologacao e producao
 - pipelines CI/CD
 
@@ -250,6 +250,15 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 - Springdoc OpenAPI / Swagger
 - Spring Boot Actuator
 
+### Diretriz arquitetural do backend
+- o backend sera um unico deploy Spring Boot nesta fase
+- a arquitetura sera um `monolito modular orientado a DDD`
+- nao serao criados microservicos na fase inicial
+- o backend deve ser organizado por modulos de dominio, nao por camadas globais como `model`, `repository`, `service` e `controller`
+- o banco sera unico nesta fase, com PostgreSQL e migrations Flyway em um unico backend
+- frontend web e mobile devem consumir a mesma API publica, sem backends separados neste momento
+- microservicos so devem ser reavaliados se houver necessidade real de escala independente, deploy independente, isolamento regulatorio, banco separado ou ownership por equipe
+
 ### Base definida para o frontend futuro
 - Angular com versao alinhada ao template adotado
 - Bootstrap 5
@@ -258,6 +267,9 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
   - dependencias Angular `20.0.x` no `package.json`
   - estrutura principal em `src/app/theme`, `src/app/demo` e `src/assets`
   - componentes de layout e compartilhados reaproveitaveis em `theme/layout` e `theme/shared`
+- plano oficial de telas web:
+  - [`WEB-SCREENS-PLAN.md`](./WEB-SCREENS-PLAN.md)
+  - este artefato define ordem de implementacao visual, telas por perfil, matriz tela x endpoint e lacunas antes da implementacao completa do web
 
 ### Diretriz de reaproveitamento do frontend
 - o template existente sera a base visual inicial do sistema
@@ -266,6 +278,18 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 - a implementacao do frontend deve adaptar o template ao dominio SEP, em vez de redesenhar a interface do zero
 - a versao do Angular do frontend pode ser ajustada para coincidir com a versao suportada pelo template, incluindo downgrade se isso reduzir risco de integracao
 - a decisao de versao final do frontend deve priorizar compatibilidade com o template e velocidade de adocao na fase inicial
+
+### Base definida para o mobile futuro
+- o projeto mobile deve ser planejado como `Mobile SEP`
+- stack recomendada: `Ionic v8 + Angular + Capacitor`
+- a versao Angular do mobile deve acompanhar a versao final escolhida para o frontend web
+- se o frontend web sofrer downgrade para Angular abaixo da versao `16`, a decisao por Ionic v8 deve ser reavaliada antes da implementacao
+- o mobile deve reutilizar contratos, DTOs, autenticacao JWT, guards e padroes de integracao HTTP definidos para o frontend web
+- o template administrativo Datta Able nao deve ser reaproveitado diretamente no mobile; devem ser reaproveitados apenas identidade visual, tokens de cor, padroes de marca e conceitos de componentes
+- Flutter e React Native nao sao recomendados nesta fase por adicionarem nova stack, curva de aprendizado e duplicacao tecnica para uma equipe ja orientada a Angular
+- plano oficial de telas mobile:
+  - [`MOBILE-SCREENS-PLAN.md`](./MOBILE-SCREENS-PLAN.md)
+  - este artefato define ordem de implementacao visual mobile, telas por jornada, matriz tela x endpoint, escopo reduzido do app e lacunas antes da implementacao completa do mobile
 
 ### Convencoes obrigatorias
 - uso de DTOs
@@ -287,6 +311,8 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 - o backend deve possuir ao menos um endpoint de saude para monitoramento
 - o padrao de auditoria deve priorizar o `UUID` do usuario autenticado, com fallback seguro
 - a persistencia deve seguir convencoes consistentes de nomes de tabelas e colunas
+- cada modulo de dominio deve encapsular suas entidades, repositories, DTOs, mappers, casos de uso e controllers
+- regras de negocio devem permanecer no backend e dentro do modulo dono da regra
 - soft delete nao sera adotado nesta fase inicial
 
 ### Dependencias tecnicas ja definidas
@@ -296,17 +322,67 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 ## 12. Ambiente e Evolucao de Infraestrutura
 
 ### Nesta fase
-- apenas `develop` sera implementado localmente
+- apenas `dev-local` sera implementado localmente nesta etapa
 - banco PostgreSQL em Docker Compose
+- ate a conclusao completa do sistema de login, autenticacao e autorizacao, o banco oficial do projeto sera apenas PostgreSQL local via Docker Compose
+- a implantacao AWS, incluindo EC2 e RDS, nao deve iniciar antes da conclusao da Sprint 3 / Epic 3
+- recomendacao operacional: iniciar a fase AWS preferencialmente apos a Sprint 4, quando erros, documentacao e testes criticos tambem estiverem estabilizados
+
+### Nomenclatura de ambientes
+- `dev-local`: ambiente de desenvolvimento local, com PostgreSQL em Docker Compose
+- `aws-develop`: futuro ambiente remoto de desenvolvimento na AWS, com EC2 e RDS proprios ou compartilhados conforme custo
+- `homologacao`: futuro ambiente remoto de validacao funcional e tecnica, separado de `dev-local`
+- `producao`: futuro ambiente remoto produtivo, isolado de desenvolvimento e homologacao
 
 ### Planejamento futuro ja definido
-- `develop`, `homologacao` e `producao`
-- 1 instancia PostgreSQL por ambiente
-- VPS compartilhada para `develop + homologacao`
-- VPS isolada para `producao`
+- a infraestrutura remota sera baseada em AWS
+- a fase AWS depende, no minimo, da conclusao completa do login, autenticacao e autorizacao
+- servidores da aplicacao devem usar `Amazon EC2`
+- o banco remoto deve usar `Amazon RDS for PostgreSQL`
+- o banco de dados nao deve ficar hospedado dentro da EC2/VPS da aplicacao
+- `aws-develop`, `homologacao` e `producao` devem ter bancos separados
+- cada ambiente deve ter sua propria instancia RDS PostgreSQL
+- `aws-develop` e `homologacao` podem compartilhar uma EC2, separando containers, portas, variaveis e bancos
+- `producao` deve usar EC2 separada
+- `producao` deve usar RDS PostgreSQL separado, com backups automaticos, encryption at rest, acesso privado, logs e monitoramento
+- a regiao AWS recomendada e `sa-east-1` (Sao Paulo)
 - migrations versionadas
 - seeds por ambiente
 - deploy por branch e ambiente
+
+### Decisao AWS recomendada
+- `Amazon EC2` sera o equivalente AWS da VPS para hospedar os servidores da aplicacao
+- `Amazon RDS for PostgreSQL` sera usado como banco gerenciado
+- `Amazon Lightsail` fica registrado apenas como alternativa de baixo custo, nao como recomendacao principal deste projeto
+- Docker ou Docker Compose podem continuar sendo usados nas EC2 nas primeiras fases remotas apenas para aplicacao, frontend, proxy e servicos auxiliares
+- PostgreSQL remoto nao deve rodar em container na EC2; o banco remoto oficial sera RDS
+- a escolha final de tamanho das instancias EC2 e RDS deve ser definida na fase de orcamento
+
+### Gate e ordem da fase AWS
+- a fase AWS e uma trilha tecnica habilitadora, nao uma funcionalidade de negocio da jornada de emprestimo
+- gate minimo: somente pode iniciar apos Sprint 3 / Epic 3 concluida, com login, autenticacao e autorizacao funcionando
+- gate recomendado: iniciar apos Sprint 4, com erros padronizados, documentacao OpenAPI e testes criticos estabilizados
+- a execucao AWS pode ser antecipada antes de Pix e das capacidades financeiras expandidas se o time precisar de ambiente remoto para validacao, homologacao ou integracao
+- CI/CD com GitHub Actions nao e pre-requisito obrigatorio para o primeiro ambiente AWS, mas deve ser planejado na mesma fase de infraestrutura
+- enquanto CI/CD nao estiver pronto, qualquer deploy remoto inicial deve ser manual, documentado e restrito a ambiente nao produtivo
+
+### Arquitetura remota por ambiente
+- `aws-develop`
+  - EC2 compartilhada com homologacao ou EC2 pequena dedicada, conforme custo
+  - RDS PostgreSQL proprio
+  - sem Multi-AZ inicialmente
+- `homologacao`
+  - EC2 compartilhada com aws-develop, com isolamento por containers, portas e variaveis
+  - RDS PostgreSQL proprio
+  - dados sinteticos ou anonimizados
+- `producao`
+  - EC2 propria
+  - RDS PostgreSQL proprio
+  - Security Groups restritivos
+  - backups automaticos
+  - encryption habilitada
+  - acesso privado ao banco
+  - avaliar Multi-AZ quando houver trafego real ou necessidade formal de alta disponibilidade
 
 ## 13. Padrao de Erros da API
 
@@ -405,34 +481,57 @@ Mesmo nesta fase inicial, a API deve nascer preparada para operacao futura com:
 
 ## 19. Estrutura Inicial de Pacotes
 
-O backend deve nascer com separacao clara por responsabilidade, evitando concentrar tudo em poucos pacotes.
+O backend deve nascer como monolito modular orientado a DDD. A separacao principal deve ser por modulo de dominio, nao por camada global.
 
-### Estrutura base sugerida
+### Estrutura base recomendada
 - `com.dynamis.broker_app`
-- `com.dynamis.broker_app.config`
-- `com.dynamis.broker_app.security`
-- `com.dynamis.broker_app.exception`
-- `com.dynamis.broker_app.model`
-- `com.dynamis.broker_app.repository`
-- `com.dynamis.broker_app.service`
-- `com.dynamis.broker_app.web.controller`
-- `com.dynamis.broker_app.web.dto`
-- `com.dynamis.broker_app.web.dto.mapper`
+- `com.dynamis.broker_app.identity`
+- `com.dynamis.broker_app.usuarios`
+- `com.dynamis.broker_app.onboarding`
+- `com.dynamis.broker_app.credito`
+- `com.dynamis.broker_app.contratos`
+- `com.dynamis.broker_app.cobranca`
+- `com.dynamis.broker_app.backoffice`
+- `com.dynamis.broker_app.financeiro`
+- `com.dynamis.broker_app.credores`
+- `com.dynamis.broker_app.pix`
+- `com.dynamis.broker_app.shared`
 
-### Subdivisoes recomendadas quando o dominio crescer
-- `service.auth`
-- `service.usuario`
-- `repository.usuario`
-- `web.controller.auth`
-- `web.controller.usuario`
+### Responsabilidade dos modulos
+- `identity`: autenticacao, JWT, senha, roles, permissoes e usuario autenticado
+- `usuarios`: cadastro de usuario, perfil inicial, ownership e dados basicos
+- `onboarding`: KYC/KYB, documentos e validacoes cadastrais
+- `credito`: proposta, analise de credito, parecer e decisao
+- `contratos`: formalizacao, aceite, assinatura e status contratual
+- `cobranca`: parcelas, vencimentos, cobranca e inadimplencia
+- `backoffice`: filas, pendencias, excecoes, comentarios e reprocessos
+- `financeiro`: conciliacao, controles internos e visao operacional financeira
+- `credores`: jornada da empresa credora, carteira, aportes e operacoes financiadas
+- `pix`: movimentacao Pix futura, webhooks, conciliacao e status
+- `shared`: excecoes, auditoria, configuracoes transversais, utilitarios e tipos comuns realmente compartilhados
+
+### Padrao interno de cada modulo
+- `domain`: entidades, value objects, enums e regras centrais do dominio
+- `application`: casos de uso e servicos de aplicacao
+- `infrastructure`: repositories, integracoes externas e persistencia
+- `web`: controllers, DTOs e mappers daquele modulo
+
+Exemplo conceitual:
+- `com.dynamis.broker_app.identity.domain`
+- `com.dynamis.broker_app.identity.application`
+- `com.dynamis.broker_app.identity.infrastructure`
+- `com.dynamis.broker_app.identity.web`
 
 ### Regras de organizacao
 - controladores apenas recebem request e devolvem response
-- regras de negocio ficam em `service`
-- acesso ao banco fica em `repository`
-- entidades JPA ficam em `model`
-- DTOs nao devem ser reutilizados como entidades
+- controllers nao acessam repositories diretamente
+- um modulo nao deve acessar repository interno de outro modulo
+- comunicacao entre modulos deve ocorrer por servicos publicos internos, interfaces de aplicacao ou eventos de dominio
+- DTOs de API ficam na borda `web` do modulo correspondente
+- entidades JPA devem permanecer encapsuladas no modulo dono do dominio
 - classes de seguranca nao devem conter regra de negocio de dominio
+- seguranca e JWT ficam em `identity`, mas autorizacao por regra de negocio continua no modulo dono da regra
+- `shared` deve permanecer pequeno e nao deve virar deposito generico de dominio
 
 ## 20. Contratos Iniciais de DTO
 
@@ -695,20 +794,24 @@ Exemplo:
 - Sprint 1:
   - depende da aprovacao do PRD
   - depende de ambiente local com Java 21 e Docker
+  - deve criar a base do monolito modular e os pacotes raiz dos modulos DDD
 - Sprint 2:
   - depende da conclusao da Sprint 1
   - depende do banco local, Flyway e auditoria base estarem funcionando
+  - deve implementar `identity` e `usuarios` como primeiros modulos reais do monolito modular
 - Sprint 3:
   - depende da conclusao da Sprint 2
   - depende da entidade `Usuario`, DTOs e criacao publica de usuario estarem funcionais
+  - deve consolidar autenticacao e autorizacao dentro de `identity`, sem transformar auth em microservico
 - Sprint 4:
   - depende da conclusao da Sprint 3
   - depende dos endpoints principais e das regras de seguranca estarem estabilizados
+  - deve validar documentacao e testes respeitando as fronteiras dos modulos
 
 ### Sprint 1
 
 Objetivo de planejamento:
-- entregar a fundacao tecnica do backend SEP (projeto Gradle, PostgreSQL local, configuracao regional, CORS, Actuator e Flyway com migration inicial)
+- entregar a fundacao tecnica do backend SEP como monolito modular DDD (projeto Gradle, modulos raiz, PostgreSQL local, configuracao regional, CORS, Actuator e Flyway com migration inicial)
 
 Tema:
 - Fundacao Tecnica
@@ -731,7 +834,7 @@ Detalhamento das tasks:
 ### Sprint 2
 
 Objetivo de planejamento:
-- entregar a base de dominio da API: entidade `Usuario` com UUID v6 e auditoria, DTOs e mapper obrigatorios, criacao publica de usuario com validacao e hash de senha via BCrypt
+- entregar a base dos modulos `identity` e `usuarios`: entidade `Usuario` com UUID v6 e auditoria, DTOs e mapper obrigatorios, criacao publica de usuario com validacao e hash de senha via BCrypt
 
 Tema:
 - Gestao de Usuarios
@@ -753,7 +856,7 @@ Detalhamento das tasks:
 ### Sprint 3
 
 Objetivo de planejamento:
-- entregar o mecanismo completo de autenticacao e autorizacao: login com emissao de JWT, filtro de validacao, recurso `/auth/me`, autorizacao por perfil e ownership nos endpoints de usuario, e alteracao da propria senha pelo usuario autenticado
+- entregar o mecanismo completo de autenticacao e autorizacao dentro do modulo `identity`: login com emissao de JWT, filtro de validacao, recurso `/auth/me`, autorizacao por perfil e ownership nos endpoints de usuario, e alteracao da propria senha pelo usuario autenticado
 
 Tema:
 - Seguranca e Autenticacao JWT
@@ -878,6 +981,15 @@ Esta fase sera considerada bem-sucedida quando:
 
 ### Epic 5 - Infraestrutura futura
 - manter apenas como planejamento nesta fase
+- iniciar somente apos a conclusao completa do sistema de login, autenticacao e autorizacao
+- usar PostgreSQL local via Docker Compose como banco oficial ate esse marco
+- preferencialmente iniciar apos a Sprint 4, caso a equipe queira levar documentacao, tratamento de erros e testes criticos ja estabilizados para o ambiente remoto
+- usar AWS como plataforma de infraestrutura remota
+- usar Amazon EC2 para servidores de aplicacao
+- usar Amazon RDS for PostgreSQL para banco gerenciado fora da EC2
+- planejar develop e homologacao em EC2 compartilhada, com bancos RDS separados
+- planejar producao com EC2 e RDS proprios
+- considerar `sa-east-1` como regiao recomendada
 
 ### Epic 6 - Onboarding KYC/KYB
 - implementar onboarding documental de pessoa e empresa
@@ -933,6 +1045,28 @@ Esta fase sera considerada bem-sucedida quando:
 - importar layout, shell, navegacao e assets necessarios
 - adaptar componentes existentes para as jornadas de tomador, credor, financeiro e administrador
 - alinhar a versao do Angular do projeto com a versao mais adequada para absorver o template com menor retrabalho
+
+### Epic futura - Mobile SEP
+- iniciar junto com a fundacao do frontend, como trilha paralela dependente dos mesmos contratos da API
+- usar `Ionic v8 + Angular + Capacitor`, desde que a versao Angular final permaneca compativel com Ionic v8
+- validar primeiro em PWA/browser e evoluir para Android/iOS via Capacitor em fase posterior
+- incluir apenas as jornadas mobile do tomador de emprestimo e da empresa credora
+- excluir a visao do financeiro interno, backoffice operacional, administracao, governanca, cadastros mestres e telas de auditoria
+- nao criar regra de negocio propria no app; decisoes de credito, status, permissoes e dados operacionais devem vir da API
+- iniciar funcionalmente apos autenticacao documentada e estavel, preferencialmente apos Sprint 4
+- nao antecipar telas funcionais alem de login antes de existirem APIs minimas de onboarding, analise de credito e formalizacao
+- manter o mobile antes de Pix e automacoes financeiras expandidas, pois ajuda a validar a jornada de contratacao com usuarios reais
+
+#### Escopo mobile do tomador
+- cadastro e login
+- acompanhamento de perfil
+- solicitacao e acompanhamento de emprestimo quando a API existir
+- status de analise, formalizacao, cobranca e pagamentos em fases futuras
+
+#### Escopo mobile da empresa credora
+- login
+- visao simplificada de oportunidades, operacoes financiadas e status
+- acompanhamento de carteira em fases futuras
 
 ### Epic futura - Movimentacao Pix
 - tratar Pix como fase posterior a fundacao atual da API e a estabilizacao das jornadas que impactam a contratacao
@@ -995,8 +1129,9 @@ Esta fase sera considerada bem-sucedida quando:
 10. Jornada da empresa credora
 11. Administracao e governanca
 12. Frontend SEP
-13. Movimentacao Pix
-14. Infraestrutura futura
+13. Mobile SEP
+14. Movimentacao Pix
+15. Infraestrutura AWS futura
 
 ### Fronteiras entre epicos
 - `Onboarding KYC/KYB`
@@ -1023,14 +1158,31 @@ Esta fase sera considerada bem-sucedida quando:
 - `Frontend SEP`
   - camada de experiencia e interface
   - nao deve concentrar regra de negocio de dominio
+- `Mobile SEP`
+  - camada de experiencia mobile para tomador e empresa credora
+  - nao substitui o frontend web/backoffice nem deve incluir financeiro interno ou administracao completa nesta fase
+  - deve compartilhar contratos e padroes de autenticacao com o frontend web
 - `Movimentacao Pix`
   - responsavel pelo meio de movimentacao e liquidacao financeira via Pix
   - nao substitui cobranca, analise de credito ou formalizacao
+- `Infraestrutura AWS futura`
+  - trilha tecnica habilitadora para ambientes remotos, banco gerenciado, deploy e observabilidade
+  - nao substitui as epics funcionais nem deve bloquear a evolucao local enquanto o produto ainda estiver nas sprints iniciais
 
 ### Regra de priorizacao
 - funcionalidades que impactam diretamente a jornada de contratacao do emprestimo devem ser implementadas antes das capacidades financeiras expandidas
 - funcionalidades operacionais posteriores, como Pix e automacoes avancadas, so entram apos estabilizacao do fluxo de contratacao
+- Mobile SEP deve iniciar junto com a fundacao do frontend, mas sua implementacao funcional depende de contratos estaveis da API e deve priorizar tomador e empresa credora
+- infraestrutura AWS nao e funcionalidade de negocio; pode ser planejada como trilha tecnica apos o gate minimo da Sprint 3, preferencialmente apos Sprint 4, mesmo que a lista funcional ainda avance para KYC/KYB, credito e formalizacao
 - as quatro jornadas do PO devem estar explicitamente refletidas em epics do roadmap, mesmo quando forem implementadas em fases diferentes
+
+### Criterios para reavaliar microservicos
+- um modulo precisa escalar independentemente
+- um modulo precisa deployar em ciclo diferente do restante do backend
+- um modulo exige banco proprio por seguranca, LGPD, auditoria ou regulacao
+- uma equipe separada passa a ser dona integral do modulo
+- integracoes externas criticas justificam isolamento operacional
+- observabilidade, CI/CD, secrets, deploy e monitoramento ja estao maduros o suficiente para sustentar operacao distribuida
 
 ## 26. Regras de Execucao
 
@@ -1039,12 +1191,21 @@ Esta fase sera considerada bem-sucedida quando:
 - commits podem ser feitos pelo agente de IA
 - push e PR serao manuais
 - testes, build e deploy no GitHub Actions ficarao para fase separada
+- AWS, EC2, RDS, CI/CD e deploy remoto serao tratados em fase separada de infraestrutura
+- a fase de infraestrutura AWS so podera iniciar, no minimo, apos a conclusao completa da Sprint 3 / Epic 3 de login, autenticacao e autorizacao
+- a primeira fase AWS pode usar deploy manual documentado em ambiente nao produtivo enquanto GitHub Actions ainda nao estiver implementado
+- deploy remoto de producao deve depender de estrategia explicita de secrets, rollback, backup, migrations e controle de acesso
+- revisao arquitetural deve acontecer a cada nova epic para confirmar se o modulo respeita suas fronteiras DDD
 
 ## 27. Premissas
 
 - esta API sera a primeira entrega do projeto antes da integracao completa com Angular
 - a politica de senha de 6 caracteres sera seguida exatamente como solicitado nesta fase
 - o cadastro publico de usuarios e valido apenas para a etapa inicial
+- antes da fase AWS, o banco oficial sera PostgreSQL local em Docker Compose
+- o backend continuara sendo um unico Spring Boot na fase inicial
+- o banco continuara unico ate decisao futura explicita
+- DDD sera usado primeiro como organizacao modular e linguagem de dominio, nao como pretexto para distribuir o sistema cedo demais
 - este arquivo representa apenas o PRD inicial
 - specs, plans e demais artefatos derivados ainda nao serao gerados
 - o frontend consumira esta API a partir de um template Angular reaproveitado
