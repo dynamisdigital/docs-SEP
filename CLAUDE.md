@@ -121,8 +121,24 @@ SEPs sao reguladas pela **Resolucao CMN nº 4.656/2018**. Implicacoes:
 1. Leia [`docs-sep/PRD.md`](docs-sep/PRD.md)
 2. Leia [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) para historico de decisoes
 3. Leia o spec relevante em `specs/`
-4. Leia ADRs em `adr/` para racional de decisoes arquiteturais
-5. Antes de propor mudanca grande, considere abrir um ADR novo
+4. Leia o steps correspondente em `steps/` (detalhamento por task antes de codificar)
+5. Leia ADRs em `adr/` para racional de decisoes arquiteturais
+6. Antes de propor mudanca grande, considere abrir um ADR novo
+
+## Hierarquia SDD do projeto
+
+```
+PRD → ADRs → Specs → Steps → Codigo
+docs-sep/  adr/  specs/  steps/
+```
+
+- **PRD** = visao do produto (alto nivel)
+- **ADRs** = decisoes arquiteturais imutaveis
+- **Specs** = o que fazer por sprint (medio nivel, com tasks numeradas)
+- **Steps** = como fazer (granular, com snippets prontos para codificar)
+- **Codigo** = a verdade final apos execucao
+
+Steps devem ser criados **just-in-time** antes de executar cada sprint, nao todos de uma vez.
 
 ## O que NAO fazer
 
