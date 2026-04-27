@@ -56,6 +56,21 @@ O repositorio consultado foi:
 
 Nao foi encontrado `SKILL.md` dentro desse repositrio, entao as orientacoes principais foram lidas a partir do `AGENTS.md`.
 
+## Marco regulatorio e BaaS Celcoin
+
+O produto opera sob a **Resolucao CMN nº 4.656/2018**, que disciplina as Sociedades de Emprestimo entre Pessoas. Implicacoes que valem desde a Sprint 1:
+- KYC/KYB obrigatorio por lei (nao opcional)
+- Segregacao patrimonial via conta escrow obrigatoria
+- PLD (consultas COAF, OFAC, INTERPOL, MTE)
+- Auditoria reforcada de operacoes financeiras
+
+A integracao com **Celcoin BaaS** e a estrategia escolhida para materializar essas obrigacoes (KYC/KYB end-to-end, escrow, Pix, Open Finance via Finansystech). Os documentos de aprendizado em `docs-sep/Aprendizado Celcoin e SEP/` consolidam o entendimento.
+
+Decorrencias arquiteturais ja incorporadas:
+- modulo `escrow` modelado desde Sprint 1 (mesmo sem Celcoin integrado)
+- `Provider Pattern` obrigatorio para isolar Celcoin de cada modulo de dominio
+- `Webhook Receiver Pattern` introduzido na Sprint 4 (preparacao para Pix)
+
 ## Direcionamento do produto
 
 O produto alvo e uma plataforma SEP com foco em capital de giro PJ.
@@ -143,20 +158,31 @@ As seguintes decisoes foram tomadas:
 - o mobile nao deve concentrar regra de negocio; decisoes, status, permissoes e dados operacionais devem vir da API
 
 ### Backend
-- Java 21
-- Spring Boot
-- Gradle
+- Java `21` LTS (Records para DTOs, Sealed types para Roles/eventos, Pattern matching, Virtual threads)
+- Spring Boot `3.5.x` (versao minor pinada)
+- Hibernate `6.x`
+- PostgreSQL `16`
+- Gradle `8.x` + Wrapper
 - backend em papel de BFF
 - identificadores com `UUID`
 - biblioteca definida para geracao de UUID:
   - `implementation 'com.fasterxml.uuid:java-uuid-generator:5.1.0'`
 - migrations versionadas com `Flyway`
-- documentacao OpenAPI com `Springdoc`
+- documentacao OpenAPI com `Springdoc 2.x`
 - senhas com hash `BCrypt`
 - endpoint de healthcheck com `Spring Boot Actuator`
+- metricas com `Micrometer + Prometheus`
 - configuracao de `CORS` ja prevista para integracao futura com Angular
 - preferencia por `UUID v6`
 - JWT sem refresh token na fase inicial
+- mapeamento com `MapStruct` (substituiu ModelMapper, type-safe e sem reflexao)
+- HTTP client `RestClient` (Spring 6) para integracoes Celcoin; `WebClient` reservado para streams
+- resiliencia com `Resilience4j` (circuit breaker, retry, timeout)
+- testes com `JUnit 5 + AssertJ + Testcontainers` (PostgreSQL real, sem H2) e test slices `@WebMvcTest`/`@DataJpaTest`/`@JsonTest`
+- qualidade com `Spotless + Palantir Java Format`, `JaCoCo target 70%`, pre-commit hooks
+- arquitetura: monolito modular DDD com `Hexagonal/Ports & Adapters` por modulo
+- `Provider Pattern` obrigatorio para integracoes externas (Celcoin)
+- modulo `escrow` modelado desde Sprint 1 (Resolucao CMN 4.656/2018 obriga segregacao patrimonial)
 - claims minimas do JWT:
   - `sub`
   - `email`
@@ -193,12 +219,13 @@ As seguintes decisoes foram tomadas:
   - `credito`
   - `contratos`
   - `cobranca`
+  - `escrow` (modulo transversal obrigatorio por Resolucao CMN 4.656/2018; modelado desde Sprint 1)
   - `backoffice`
   - `financeiro`
   - `credores`
   - `pix`
   - `shared`
-- cada modulo deve conter suas proprias camadas internas `domain`, `application`, `infrastructure` e `web`
+- cada modulo deve conter suas proprias camadas internas `domain`, `application` (com `port.out` para Provider Pattern), `infrastructure` (com `adapter` para implementar portas) e `web`
 - microservicos so devem ser reavaliados quando houver escala independente, deploy independente, isolamento regulatorio, banco separado, integracoes criticas ou ownership por equipe
 
 ## Ambiente e infraestrutura
@@ -254,7 +281,7 @@ As regras fechadas para a API sao:
 - Gradle
 - JWT para autenticacao
 - DTOs obrigatorios
-- ModelMapper obrigatorio
+- MapStruct obrigatorio (substituiu ModelMapper)
 - `ApiExceptionHandler` obrigatorio
 - `Flyway` para migrations
 - `Springdoc OpenAPI` para documentacao

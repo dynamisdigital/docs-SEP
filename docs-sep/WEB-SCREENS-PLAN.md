@@ -14,6 +14,7 @@ Este documento nao substitui o PRD. Ele detalha a camada de experiencia web e de
 - O web deve consumir a mesma API publica usada pelo mobile, sem backend separado nesta fase.
 - O web nao deve conter regra de negocio de dominio; decisoes, status e permissoes devem vir da API.
 - As telas devem ser planejadas por modulo funcional, alinhadas ao monolito modular DDD do backend.
+- A trilha de execucao do frontend e governada pela spec [`specs/100-frontend-foundation.md`](../specs/100-frontend-foundation.md), que organiza F-Sprints 0-4 em paralelo as Sprints 0-4 do backend.
 - A base visual do app web vem de dois design systems oficiais, sem template administrativo pronto e sem framework CSS de terceiros:
   - [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas (sem autenticacao): landing, login e cadastro
   - [`DESIGN-notion.md`](./DESIGN-notion.md) para todas as superficies autenticadas (dashboard, perfil, alteracao de senha, administracao de usuarios e demais jornadas)

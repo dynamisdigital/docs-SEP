@@ -1,44 +1,60 @@
-# Spec 004 - Sprint 4 - Tratamento de Erros, Documentacao e Testes
+# Spec 004 - Sprint 4 - Estabilizacao, Documentacao, Cobertura e Webhook Receiver
 
 ## Metadados
 
 - **ID da Spec**: 004
-- **Titulo**: Sprint 4 - Tratamento de Erros, Documentacao e Testes
+- **Titulo**: Sprint 4 - Estabilizacao, Documentacao, Cobertura e Webhook Receiver
 - **Status**: aprovada para execucao (apos estabilizacao da Spec 003)
-- **Fase do produto**: Epic 4 - Tratamento de erros e documentacao
+- **Fase do produto**: Epic 4 - Tratamento de erros, documentacao e testes
 - **Origem**: PRD - API SEP, Secao 22 (Backlog Tecnico Implementavel)
 - **Depende de**: [`003-sprint-3-seguranca-autenticacao.md`](./003-sprint-3-seguranca-autenticacao.md)
 - **Responsavel principal**: Dev Senior
 
 ## Objetivo
 
-Consolidar a qualidade da API fechando tres frentes finais desta fase: tratamento centralizado de erros com payload padronizado, documentacao OpenAPI completa exposta via Swagger UI e cobertura minima de testes automatizados para os cenarios criticos de autenticacao e autorizacao. Ao final desta sprint, a fundacao da API esta pronta para entrega e para integracao com o frontend Angular em fases posteriores.
+Consolidar a qualidade da API fechando quatro frentes finais desta fase:
+
+1. **Evolucao** do `ApiExceptionHandler` ja criado na Sprint 1 (mapeamento completo de excecoes — antes era um stub)
+2. Documentacao OpenAPI completa exposta via Swagger UI
+3. Cobertura JaCoCo no target 70% por modulo + smoke tests E2E (testes unitarios e de slice ja foram entregues distribuidamente nas Sprints 1-3 via TDD)
+4. **Webhook Receiver Pattern** (`/api/v1/webhooks/{provider}/{event}`) com idempotencia via `Idempotency-Key` e Outbox stub, preparando Epic 15 (Pix)
+
+Ao final desta sprint, a fundacao da API esta pronta para entrega e para integracao com o frontend Angular (em paralelo via spec 100) em fases posteriores. A trilha mobile e as Epics 5-16 podem comecar.
 
 ## Escopo
 
 ### Em escopo
-- `ApiExceptionHandler` anotado com `@RestControllerAdvice` cobrindo:
+- **evolucao** do `ApiExceptionHandler` (criado como stub na Sprint 1) com mapeamento completo:
   - validacao de `@Valid` (MethodArgumentNotValidException) -> `400`
   - violacoes de integridade (DataIntegrityViolationException, ex.: `username` duplicado) -> `409`
   - excecoes de autenticacao (AuthenticationException, BadCredentialsException) -> `401`
   - excecoes de autorizacao (AccessDeniedException) -> `403`
-  - excecoes de negocio proprias (ex.: `UsuarioNaoEncontradoException`, `SenhaAtualIncorretaException`) -> codigos apropriados
-  - fallback generico `500` para excecoes nao mapeadas
-- `ErrorResponseDto` padronizado com: `timestamp`, `status`, `error`, `message`, `path` e `traceId` opcional
+  - excecoes de negocio proprias estendendo `DomainException` (ex.: `UsuarioNaoEncontradoException`, `SenhaAtualIncorretaException`, `UsernameJaExisteException`) -> codigos apropriados
+  - fallback generico `500` para excecoes nao mapeadas, com log completo no servidor mas mensagem generica no response
+- `ErrorResponseDto` (record ja existente) padronizado com: `timestamp`, `status`, `error`, `message`, `path`, `traceId` (preenchido a partir do MDC)
 - Springdoc OpenAPI configurado com `OpenApiConfig.java`
   - info da API, `security scheme` HTTP Bearer para JWT
   - tags separando `auth` e `usuarios`
-  - exemplos coerentes com o PRD (datas ISO-8601 com offset, ids `uuid`)
-  - schemas corretos para todos os DTOs
+  - exemplos coerentes com o PRD (datas ISO-8601 com offset, ids `uuid v6`)
+  - schemas corretos para todos os DTOs (records)
   - Swagger UI acessivel em ambiente `dev`
-- Testes automatizados dos cenarios obrigatorios do PRD, concentrados nos fluxos de autenticacao e autorizacao, com teste de integracao leve quando fizer sentido
+- **Webhook Receiver Pattern**:
+  - endpoint generico `POST /api/v1/webhooks/{provider}/{event}` em `shared.web.controller.WebhookController`
+  - validacao de assinatura HMAC por provider (configuravel)
+  - idempotencia via header `Idempotency-Key` armazenado em tabela `webhook_event_log`
+  - Outbox stub para garantir processamento posterior
+  - registro de evento e retry assincronos via `@Async` (preparacao para futura fila/event bus)
+  - testes de filter, idempotencia e retry
+- cobertura JaCoCo no target 70% por modulo, validada em CI
+- smoke tests E2E com `@SpringBootTest` + RestAssured cobrindo o fluxo completo (criar usuario, login, /me)
 
 ### Fora de escopo nesta spec
-- deploy remoto
-- GitHub Actions, CI/CD e pipelines
-- observabilidade avancada alem do Actuator
+- deploy remoto (Epic 16 - Infraestrutura AWS Futura)
+- pipelines complexos (CI minimo ja entregue na Sprint 0)
+- observabilidade avancada alem do Actuator + Micrometer + Prometheus (Epic 16)
 - testes de performance ou carga
 - geracao automatica de changelog
+- implementacao real de provedor Celcoin (Epic 5+)
 
 ## Pre-requisitos globais
 
@@ -49,15 +65,18 @@ Consolidar a qualidade da API fechando tres frentes finais desta fase: tratament
 
 ## Tasks
 
-### Task 4.1 - ApiExceptionHandler e payload padrao de erro
+### Task 4.1 - Evolucao do ApiExceptionHandler
 
 **Descricao**
-Implementar o handler centralizado de excecoes e padronizar a estrutura de erro retornada pela API. O payload deve ser suficiente para apoiar o frontend e possuir espaco para evolucao futura (ex.: `traceId`).
+**Evoluir** o `ApiExceptionHandler` ja criado como stub na Sprint 1 (`shared.exception.ApiExceptionHandler`), adicionando mapeamentos completos para todos os cenarios de erro da API. O `ErrorResponseDto` (record) ja existe — apenas garantir preenchimento correto de `traceId` a partir do MDC populado pelo `CorrelationIdFilter`.
 
 **Arquivos esperados**
-- `exception/ApiExceptionHandler.java`
-- `web/dto/ErrorResponseDto.java`
-- excecoes de dominio proprias em `exception/` conforme necessidade (ex.: `UsuarioNaoEncontradoException`, `SenhaAtualIncorretaException`)
+- update em `shared/exception/ApiExceptionHandler.java` (ja existente)
+- `usuarios/application/exception/UsuarioNaoEncontradoException.java` (estende `DomainException`)
+- `identity/application/exception/CredenciaisInvalidasException.java` (se necessario, alem das de Spring Security)
+- testes obrigatorios:
+  - `ApiExceptionHandlerCompletoTest` (`@WebMvcTest` cobrindo cada mapeamento)
+  - cenarios complementam o `ApiExceptionHandlerTest` da Sprint 1 (que ja cobre os 3 mapeamentos basicos)
 
 **Formato do payload padrao**
 ```json
@@ -105,7 +124,7 @@ Implementar o handler centralizado de excecoes e padronizar a estrutura de erro 
 Configurar a documentacao OpenAPI da API com Springdoc, anotar os controllers relevantes, definir o `security scheme` para JWT e garantir que os exemplos estejam coerentes com o PRD.
 
 **Arquivos esperados**
-- `config/OpenApiConfig.java`
+- `shared/config/OpenApiConfig.java`
 - controllers anotados (`@Tag`, `@Operation`, `@ApiResponse`, `@Parameter`) conforme necessidade
 - `application.yml` com as propriedades do Springdoc (path da Swagger UI, etc.)
 
@@ -147,54 +166,107 @@ Configurar a documentacao OpenAPI da API com Springdoc, anotar os controllers re
 
 ---
 
-### Task 4.3 - Testes de autenticacao e autorizacao
+### Task 4.3 - Cobertura JaCoCo e smoke tests E2E
 
 **Descricao**
-Cobrir com testes automatizados os cenarios criticos listados no PRD para autenticacao e autorizacao, alem dos cenarios chave de validacao e auditoria. Priorizar testes de integracao leves usando `@SpringBootTest` + `MockMvc` ou `@WebMvcTest` quando aplicavel.
+Cobertura JaCoCo no target 70% por modulo. Os testes unitarios e de slice ja foram entregues distribuidamente nas Sprints 1-3 via TDD. Esta task complementa o que faltar, adiciona smoke tests E2E e ativa a verificacao JaCoCo no CI.
 
 **Arquivos esperados**
-- `src/test/java/.../UsuarioControllerTest.java`
-- `src/test/java/.../AuthControllerTest.java`
-- `src/test/java/.../security/JwtAuthenticationFilterTest.java` (ou equivalente)
-- demais classes de suporte conforme necessidade
+- testes complementares onde a cobertura ainda nao atingiu 70%
+- `src/test/java/com/dynamis/broker_app/SmokeE2ETest.java` (`@SpringBootTest` + RestAssured + Testcontainers)
+- ativacao de `jacocoTestCoverageVerification` no `build.gradle` (ja configurado na Sprint 0; agora bloqueia merge se < 70%)
 
-**Cenarios minimos cobertos**
-- criar usuario com e-mail valido
-- rejeitar e-mail invalido
-- rejeitar e-mail duplicado
-- rejeitar senha com tamanho diferente de 6
-- autenticar com credenciais validas
-- falhar autenticacao com senha invalida
-- admin consultar qualquer usuario
-- cliente consultar apenas o proprio usuario
-- cliente nao listar usuarios (`403`)
-- admin listar usuarios
-- usuario alterar a propria senha
-- usuario nao alterar senha de terceiro (`403`)
-- auditoria preencher criacao e modificacao
-- migrations subirem corretamente no boot da aplicacao
-- healthcheck responder com sucesso
-- respostas de erro seguirem payload padronizado
-- token expirado ser rejeitado (`401`)
-- token invalido ser rejeitado (`401`)
-- claims `sub`, `email` e `roles` presentes no JWT emitido
-- auditoria usar o identificador do usuario autenticado em operacao autenticada
-- auditoria usar fallback `system` quando nao houver autenticacao
+**Cenarios minimos do smoke E2E (RestAssured)**
+- POST /api/v1/usuarios cria admin (201)
+- POST /api/v1/usuarios cria cliente (201)
+- POST /api/v1/auth/login com admin retorna token (200)
+- GET /api/v1/auth/me com token do admin retorna o admin (200)
+- GET /api/v1/usuarios como admin lista (200)
+- GET /api/v1/usuarios como cliente retorna 403
+- PATCH /api/v1/usuarios/{id}/senha do proprio usuario altera senha (204)
+- PATCH /api/v1/usuarios/{id}/senha em id alheio retorna 403
+
+**Auditoria de cenarios obrigatorios do PRD §24** — todos ja cobertos pelos testes distribuidos das Sprints 1-3:
+- criar usuario com e-mail valido (Sprint 2 - UsuarioControllerTest)
+- rejeitar e-mail invalido (Sprint 2)
+- rejeitar e-mail duplicado (Sprint 2)
+- rejeitar senha com tamanho diferente de 6 (Sprint 2)
+- autenticar com credenciais validas (Sprint 3 - AuthControllerTest)
+- falhar autenticacao com senha invalida (Sprint 3)
+- admin consultar qualquer usuario (Sprint 3 - UsuarioControllerSecurityTest)
+- cliente consultar apenas o proprio usuario (Sprint 3)
+- cliente nao listar usuarios `403` (Sprint 3)
+- admin listar usuarios (Sprint 3)
+- usuario alterar a propria senha (Sprint 3 - UsuarioControllerSenhaTest)
+- usuario nao alterar senha de terceiro `403` (Sprint 3)
+- auditoria preencher criacao e modificacao (Sprint 1 + Sprint 2)
+- migrations subirem corretamente no boot da aplicacao (Sprint 1 - SmokeBootTest)
+- healthcheck responder com sucesso (Sprint 1 - SmokeBootTest)
+- respostas de erro seguirem payload padronizado (Sprint 1 + Sprint 4 - ApiExceptionHandlerTest)
+- token expirado/invalido rejeitado (Sprint 3 - JwtAuthenticationFilterTest)
+- claims `sub`, `email`, `roles` presentes no JWT (Sprint 3 - JwtTokenProviderTest)
+- auditoria usar UUID do usuario autenticado / fallback `system` (Sprint 3 - AuditorAwareImpl + Sprint 1 - AuditorAwareImplTest)
 
 **Criterios de verificacao**
-- `./gradlew test` executa todos os testes com sucesso
-- cenarios criticos do PRD cobertos
-- testes rodam em isolamento usando banco de teste adequado (ex.: Testcontainers ou banco `dev` descartavel)
+- `./gradlew test jacocoTestReport jacocoTestCoverageVerification` passa todos
+- cobertura JaCoCo >= 70% por modulo
+- smoke E2E roda contra Testcontainers e cobre todo o golden path
+- CI bloqueia merge se cobertura < 70%
 
 **Pre-requisitos**
-- regras de seguranca estabilizadas
-- payloads de request e response consolidados
+- todas as Sprints 1-3 com testes verdes
+- Task 4.1 com handler completo (smoke E2E exercita os erros)
 
 **Dependencias**
-- depende da Task 3.1
-- depende da Task 3.2
-- depende da Task 3.3
-- depende parcialmente da Task 4.1
+- depende de Tasks 4.1, 4.2
+
+**Responsavel sugerido**
+- Dev Senior
+
+---
+
+### Task 4.4 - Webhook Receiver Pattern (preparacao para Pix)
+
+**Descricao**
+Introduzir o padrao de receptor de webhooks generico em `shared.web.controller.WebhookController`, com idempotencia via `Idempotency-Key`, validacao de assinatura HMAC por provider e Outbox stub para garantir processamento posterior. Esta infra sera consumida pela Epic 15 (Pix) com webhooks Celcoin (`proposta_aprovada`, `pagamento_recebido`, `transferencia_liquidada`, etc.).
+
+**Arquivos esperados**
+- `shared/web/controller/WebhookController.java`
+- `shared/web/dto/WebhookEnvelopeDto.java` (record)
+- `shared/application/usecase/RegistrarWebhookEventUseCase.java`
+- `shared/domain/model/WebhookEventLog.java` (entidade JPA com `idempotencyKey` unique)
+- `shared/infrastructure/persistence/WebhookEventLogRepository.java`
+- `shared/application/port/out/WebhookSignatureValidator.java` (interface)
+- `shared/infrastructure/adapter/HmacSignatureValidator.java`
+- `src/main/resources/db/migration/V<n>__criar_webhook_event_log.sql`
+- testes obrigatorios:
+  - `WebhookControllerTest` (5 cenarios: idempotencia, assinatura valida, assinatura invalida, evento duplicado, evento novo)
+  - `RegistrarWebhookEventUseCaseTest`
+  - `HmacSignatureValidatorTest`
+
+**Contrato do endpoint**
+- `POST /api/v1/webhooks/{provider}/{event}` recebe payload generico (JSON)
+- header obrigatorio: `Idempotency-Key`
+- header de assinatura: `X-Webhook-Signature` (HMAC-SHA256 do body com secret por provider)
+- response: `202 Accepted` se evento aceito (mesmo se duplicado idempotente)
+- response: `401` se assinatura invalida; `400` se headers ausentes
+
+**Outbox stub**
+- evento e gravado em `webhook_event_log` com status `PENDENTE`
+- processamento real fica para a Epic correspondente (Pix, etc.) via `@Async` ou polling
+- nesta sprint, apenas o stub esta presente (registro + log)
+
+**Criterios de verificacao**
+- chamada com mesma `Idempotency-Key` duas vezes retorna `202` ambas, mas grava 1 registro
+- assinatura HMAC invalida retorna `401`
+- evento e persistido com `status = PENDENTE`
+- testes passam com Testcontainers
+
+**Pre-requisitos**
+- Tasks 4.1, 4.2 concluidas (handler e docs prontos)
+
+**Dependencias**
+- depende de Tasks 4.1, 4.2
 
 **Responsavel sugerido**
 - Dev Senior
@@ -202,24 +274,29 @@ Cobrir com testes automatizados os cenarios criticos listados no PRD para autent
 ## Grafo de dependencias entre as tasks
 
 ```
-Task 4.1  --+
-            |
-Task 4.2  --+---> Task 4.3
+Task 4.1 (evolucao ApiExceptionHandler) --+
+                                          |
+Task 4.2 (Springdoc + Swagger UI)      --+---+--> Task 4.3 (cobertura + smoke E2E)
+                                              +--> Task 4.4 (Webhook Receiver)
 ```
 
-- Task 4.1 e Task 4.2 podem evoluir em paralelo.
-- Task 4.3 consome os formatos finalizados de erro e a documentacao para validar contratos.
+- Tasks 4.1 e 4.2 podem evoluir em paralelo.
+- Tasks 4.3 e 4.4 dependem de 4.1 e 4.2 estarem completas.
+- Tasks 4.3 e 4.4 podem rodar em paralelo entre si.
 
 ## Definicao de pronto (Sprint 4)
 
-- `ApiExceptionHandler` cobrindo validacao, autenticacao, autorizacao, conflito e fallback generico
-- `ErrorResponseDto` padronizado em todas as respostas de erro
+- `ApiExceptionHandler` evoluido cobrindo validacao, autenticacao, autorizacao, conflito, recurso nao encontrado e fallback generico
+- `ErrorResponseDto` padronizado em todas as respostas de erro, com `traceId` populado a partir do MDC
 - stacktrace jamais exposta em response
 - Swagger UI acessivel em `dev`, com `security scheme` JWT
-- todos os DTOs e endpoints documentados em OpenAPI
+- todos os DTOs (records) e endpoints documentados em OpenAPI
 - exemplos e schemas coerentes com o PRD
-- suite de testes automatizados cobrindo os cenarios obrigatorios
-- `./gradlew test` verde localmente
+- cobertura JaCoCo >= 70% por modulo, validada em CI
+- smoke E2E passa com Testcontainers cobrindo o golden path
+- `Webhook Receiver Pattern` em `shared` com idempotencia, assinatura HMAC e Outbox stub
+- `./gradlew test jacocoTestReport jacocoTestCoverageVerification` verde
+- CI bloqueia PRs com cobertura < 70%
 
 ## Cenarios de verificacao manual complementar
 
@@ -239,18 +316,21 @@ Task 4.2  --+---> Task 4.3
   - o padrao de documentacao
   - a base de testes
   - a infra de seguranca
-- a infraestrutura futura (Epic 14) ira reutilizar:
+- a infraestrutura futura (Epic 16 - AWS) ira reutilizar:
   - o endpoint de healthcheck
+  - as metricas Prometheus
   - as migrations versionadas
   - o padrao de configuracao por ambiente
+- a Epic 15 (Pix) plugara o `PixProvider` Celcoin no `Webhook Receiver Pattern` desta sprint
+- as Epics 5-11 reusarao o `ApiExceptionHandler` evoluido, o padrao de documentacao e a base de testes
 
 ## Restricoes e regras de execucao
 
-- sem CI/CD nesta fase (testes rodam localmente)
+- CI minimo (build + test + Spotless + JaCoCo) ja entregue na Sprint 0
+- deploy remoto e observabilidade avancada ficam para a Epic 16
 - commits podem ser feitos pelo agente de IA quando solicitado
 - push e PR permanecem manuais
 - ao final de cada task, parar para teste local manual
-- GitHub Actions, deploy e observabilidade avancada ficam para o Epic 14
 
 ## Referencias
 

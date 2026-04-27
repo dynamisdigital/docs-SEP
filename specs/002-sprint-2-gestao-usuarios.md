@@ -17,100 +17,118 @@ Entregar a base de dominio da API: modelagem da entidade `Usuario`, contratos de
 ## Escopo
 
 ### Em escopo
-- entidade JPA `Usuario` com `UUID` v6, auditoria JPA e repositorio Spring Data
-- configuracao do Spring JPA Auditing com `AuditorAware` priorizando o UUID do usuario autenticado e fallback `system`
-- DTOs obrigatorios: `UsuarioCreateDto`, `UsuarioResponseDto`, `UsuarioSenhaUpdateDto`
-- `UsuarioMapper` via ModelMapper
+- entidade JPA `Usuario` estendendo `EntidadeAuditavel` (criada na Sprint 1) com `UUID` v6 e repositorio Spring Data
+- DTOs obrigatorios como `record`: `UsuarioCreateDto`, `UsuarioResponseDto`, `UsuarioSenhaUpdateDto`
+- `UsuarioMapper` via **MapStruct** (substituiu ModelMapper)
 - endpoint publico `POST /api/v1/usuarios` para criacao de admin e cliente
-- validacao declarativa dos DTOs (`@Email`, `@Size(min=6, max=6)`, `@NotNull`, `role in {ADMIN, CLIENTE}`)
+- validacao declarativa dos DTOs com Jakarta Bean Validation (`@Email`, `@Size(min=6, max=6)`, `@NotNull`, `role in {ADMIN, CLIENTE}`)
 - persistencia de senha com hash `BCrypt`
 - garantia de que a senha nunca aparece em respostas da API
+- testes da Sprint 2 distribuidos por task (TDD), incluindo unit tests do service e tests de slice (`@WebMvcTest` para controller, `@DataJpaTest` para repository)
 
 ### Fora de escopo nesta spec
 - login, emissao de JWT e filtros de seguranca (Sprint 3)
 - consulta de usuario por id com autorizacao por ownership (Sprint 3)
 - listagem de usuarios restrita a admin (Sprint 3)
 - alteracao da propria senha autenticada (Sprint 3)
-- `ApiExceptionHandler` e payload padrao de erro (Sprint 4)
+- evolucao do `ApiExceptionHandler` (stub ja existe da Sprint 1, evolui na Sprint 4)
 - Swagger UI detalhada (Sprint 4)
-- testes automatizados (Sprint 4)
 
 ## Pre-requisitos globais
 
 - Spec 001 concluida e validada
-- migration inicial aplicada e `flyway_schema_history` populado
+- migrations V1 (schema base) e V2 (escrow) aplicadas e `flyway_schema_history` populado
 - banco PostgreSQL local funcional via Docker Compose
-- dependencias de JPA, validacao, ModelMapper e UUID ja declaradas no `build.gradle`
+- `EntidadeAuditavel` + `AuditorAware` funcionais (criados na Sprint 1)
+- `ApiExceptionHandler` stub funcional (criado na Sprint 1) — usuario de validacao deve passar pelo handler
+- dependencias de JPA, validacao, MapStruct e UUID ja declaradas no `build.gradle` da Sprint 1
 
 ## Tasks
 
-### Task 2.1 - Entidade Usuario com UUID v6, auditoria e repositorio
+### Task 2.1 - Entidade Usuario e repositorio (estende EntidadeAuditavel)
 
 **Descricao**
-Modelar a entidade JPA `Usuario`, habilitar auditoria JPA via `AuditingEntityListener` e criar o repositorio Spring Data com as assinaturas minimas necessarias para as tasks desta sprint e das sprints seguintes.
+Modelar a entidade JPA `Usuario` no modulo `usuarios.domain.model`, **estendendo `EntidadeAuditavel`** (criada na Sprint 1) para herdar os 4 campos de auditoria automaticamente. Criar o repositorio Spring Data e a migration V3.
 
 **Arquivos esperados**
-- `model/Usuario.java`
-- `repository/UsuarioRepository.java`
-- `config/SpringJpaAuditingConfig.java`
+- `usuarios/domain/model/Usuario.java`
+- `usuarios/domain/model/Role.java` (enum nesta Sprint; futura migracao para sealed type fica como follow-up)
+- `usuarios/infrastructure/persistence/UsuarioRepository.java`
+- `src/main/resources/db/migration/V3__criar_tabela_usuario.sql`
+- `src/test/java/com/dynamis/broker_app/usuarios/infrastructure/persistence/UsuarioRepositoryTest.java` (`@DataJpaTest` com Testcontainers)
 
 **Detalhes de implementacao**
-- entidade anotada com `@Entity`, `@Table(name = "usuario")`, `@EntityListeners(AuditingEntityListener.class)`
+- entidade anotada com `@Entity`, `@Table(name = "usuario")`
+- estende `EntidadeAuditavel` (auditoria herdada — sem reconfiguracao)
 - `id` do tipo `java.util.UUID`, mapeado para coluna `uuid` nativa do PostgreSQL
+- geracao do UUID v6 em construtor estatico ou factory usando `com.fasterxml.uuid:java-uuid-generator`
 - `username` (e-mail) unico e obrigatorio
 - `password` obrigatorio (armazenado como hash BCrypt na Task 2.3)
 - `role` do tipo enum `Role` persistido como `String`, valores `ADMIN` e `CLIENTE`
-- campos de auditoria: `dataCriacao`, `dataModificacao`, `criadoPor`, `modificadoPor`
-- `SpringJpaAuditingConfig` habilita `@EnableJpaAuditing` e expoe um `AuditorAware<String>` que retorna o UUID do usuario autenticado ou `system` quando nao houver autenticacao no contexto
-- geracao do UUID v6 usando a biblioteca `com.fasterxml.uuid:java-uuid-generator` (ja declarada na Sprint 1)
+- repositorio expoe ao menos: `findByUsername(String)`, `existsByUsername(String)`, `findById(UUID)`
+
+**Testes obrigatorios (Task 2.1)**
+- `UsuarioRepositoryTest`:
+  - persiste e recupera `Usuario`
+  - `findByUsername` retorna `Optional` com usuario existente
+  - `existsByUsername` retorna `true`/`false` corretamente
+  - audit fields sao preenchidos automaticamente apos persist
 
 **Criterios de verificacao**
-- criacao de usuario persiste `id` como `uuid` nativo no PostgreSQL
-- campos de auditoria sao preenchidos automaticamente no insert e no update
-- `AuditorAware` aplica corretamente o fallback `system` quando nao ha autenticacao (necessario para a criacao publica desta sprint)
+- migration V3 aplica tabela `usuario` com tipo `uuid` nativo
+- entidade compila e roda no Testcontainer
+- audit fields preenchidos sem configuracao adicional (ja vem do `EntidadeAuditavel`)
 
 **Pre-requisitos**
-- Spec 001 concluida
-- migration inicial funcionando
+- Spec 001 concluida (em particular Tasks 1.4, 1.6 e 1.9)
 
 **Dependencias**
-- depende da Task 1.4
+- depende das Tasks 1.4 (Flyway) e 1.6 (auditoria base)
 
 **Responsavel sugerido**
 - Dev Senior
 
 ---
 
-### Task 2.2 - DTOs e Mapper de usuario
+### Task 2.2 - DTOs (records) e Mapper MapStruct
 
 **Descricao**
-Definir os contratos de entrada e saida da API para usuario e configurar o `UsuarioMapper` via ModelMapper, garantindo que a senha jamais seja exposta em respostas.
+Definir os contratos de entrada e saida da API para usuario como **records Java 21**, e configurar o `UsuarioMapper` via **MapStruct** (geracao de codigo, type-safe, substitui ModelMapper). Garantir que a senha jamais seja exposta em respostas.
 
 **Arquivos esperados**
-- `web/dto/UsuarioCreateDto.java`
-- `web/dto/UsuarioResponseDto.java`
-- `web/dto/UsuarioSenhaUpdateDto.java`
-- `web/dto/mapper/UsuarioMapper.java`
+- `usuarios/web/dto/UsuarioCreateDto.java` (`record`)
+- `usuarios/web/dto/UsuarioResponseDto.java` (`record`)
+- `usuarios/web/dto/UsuarioSenhaUpdateDto.java` (`record`)
+- `usuarios/web/mapper/UsuarioMapper.java` (interface anotada com `@Mapper(componentModel = "spring")`)
+- `src/test/java/com/dynamis/broker_app/usuarios/web/mapper/UsuarioMapperTest.java`
 
-**Regras de validacao declarativa**
+**Regras de validacao declarativa (Jakarta Bean Validation)**
 - `UsuarioCreateDto.username`: `@NotBlank`, `@Email`
 - `UsuarioCreateDto.password`: `@NotBlank`, `@Size(min = 6, max = 6)`
 - `UsuarioCreateDto.role`: `@NotNull`, valores aceitos apenas `ADMIN` e `CLIENTE`
 - `UsuarioSenhaUpdateDto.passwordAtual`: `@NotBlank`
 - `UsuarioSenhaUpdateDto.novaSenha`: `@NotBlank`, `@Size(min = 6, max = 6)`
 
-**Regras do mapper**
-- `Usuario -> UsuarioResponseDto` nunca deve expor o campo `password`
-- datas serializadas em ISO-8601 com offset (ex.: `2026-04-24T18:30:00-03:00`)
-- `criadoPor` e `modificadoPor` retornam o UUID do auditor ou `system`
+**Regras do mapper MapStruct**
+- `Usuario -> UsuarioResponseDto`: NUNCA mapeia o campo `password` (use `@Mapping(target = "password", ignore = true)` ou simplesmente nao declare o campo no record de resposta)
+- `UsuarioCreateDto -> Usuario`: ignora `id` (gerado), `password` precisa ser hashada antes de chamar o mapper
+- datas serializadas em ISO-8601 com offset via configuracao Jackson global
+
+**Testes obrigatorios (Task 2.2)**
+- `UsuarioMapperTest`:
+  - mapper converte `Usuario` para `UsuarioResponseDto` sem expor senha
+  - record tem todos os campos esperados (id, username, role, dataCriacao, dataModificacao, criadoPor, modificadoPor)
+  - mapper aceita `UsuarioCreateDto` para `Usuario` parcial (sem id e password)
 
 **Criterios de verificacao**
-- `UsuarioResponseDto` nao expoe o campo `password` em nenhum cenario
+- `UsuarioResponseDto` (record) nao tem campo `password`
 - datas retornadas respeitam ISO-8601 com offset
-- `UsuarioMapper` converte entidade para DTO e DTO de criacao para entidade corretamente
+- annotation processor MapStruct gera classe `UsuarioMapperImpl` em `build/generated/`
+- testes do mapper passam
 
 **Pre-requisitos**
 - modelo da entidade `Usuario` estabilizado (Task 2.1)
+- MapStruct annotation processor declarado no `build.gradle` (Task 1.1b)
 
 **Dependencias**
 - depende parcialmente da Task 2.1
@@ -120,36 +138,81 @@ Definir os contratos de entrada e saida da API para usuario e configurar o `Usua
 
 ---
 
-### Task 2.3 - Criacao publica de usuario
+### Task 2.3a - CriarUsuarioUseCase com BCrypt
 
 **Descricao**
-Expor `POST /api/v1/usuarios` como endpoint publico de criacao de usuario, com validacao declarativa dos DTOs, hash da senha via `BCryptPasswordEncoder`, persistencia com auditoria preenchida via fallback `system` e retorno de `UsuarioResponseDto` com status `201 Created`.
+Implementar o caso de uso `CriarUsuarioUseCase` no modulo `usuarios.application.usecase`, que recebe `UsuarioCreateDto`, valida o hash de senha via `BCryptPasswordEncoder` e delega ao repositorio.
 
 **Arquivos esperados**
-- `service/UsuarioService.java`
-- `web/controller/UsuarioController.java`
+- `usuarios/application/usecase/CriarUsuarioUseCase.java`
+- `usuarios/application/exception/UsernameJaExisteException.java` (estende `DomainException` da Sprint 1)
+- `src/test/java/com/dynamis/broker_app/usuarios/application/usecase/CriarUsuarioUseCaseTest.java` (`@MockitoExtension`, sem Spring)
+
+**Contrato do use case**
+- recebe `UsuarioCreateDto`, retorna `Usuario` persistido
+- verifica `existsByUsername` antes do insert; se existir, lanca `UsernameJaExisteException` (mapeada para 409 pelo `ApiExceptionHandler`)
+- aplica `BCryptPasswordEncoder.encode()` na senha antes de persistir
+- transacional (`@Transactional`)
+
+**Testes obrigatorios (Task 2.3a)**
+- `CriarUsuarioUseCaseTest`:
+  - cria `ADMIN` valido
+  - cria `CLIENTE` valido
+  - lanca `UsernameJaExisteException` quando username ja existe
+  - senha persistida com hash BCrypt (verifica que `passwordEncoder.encode()` foi chamado)
+  - chama `repository.save()` apenas uma vez
+
+**Criterios de verificacao**
+- testes passam isoladamente sem Spring context
+- `UsernameJaExisteException` herda de `DomainException`
+- senha nunca persiste em texto claro
+
+**Pre-requisitos**
+- Tasks 2.1, 2.2 concluidas
+
+**Dependencias**
+- depende de Tasks 2.1 e 2.2
+
+**Responsavel sugerido**
+- Dev Senior
+
+---
+
+### Task 2.3b - UsuarioController POST + SecurityConfig publico
+
+**Descricao**
+Expor `POST /api/v1/usuarios` como endpoint publico no `UsuarioController`, delegando ao `CriarUsuarioUseCase`. Liberar a rota no `SecurityConfig`.
+
+**Arquivos esperados**
+- `usuarios/web/controller/UsuarioController.java`
+- update em `shared/config/SecurityConfig.java` (ou `identity/infrastructure/config/SecurityConfig.java` se ja existir) liberando `POST /api/v1/usuarios`
+- `src/test/java/com/dynamis/broker_app/usuarios/web/controller/UsuarioControllerTest.java` (`@WebMvcTest` com `MockMvc`)
 
 **Contrato do endpoint**
 - request: `UsuarioCreateDto`
 - response: `UsuarioResponseDto` com status `201 Created`
-- senha persistida com hash BCrypt antes do insert
-- conflito de `username` ja existente deve ser detectado e tratado (formalizacao do payload padrao de erro fica na Sprint 4; por ora e aceitavel lancar excecao de conflito)
-- endpoint liberado no `SecurityConfig` para acesso publico nesta fase
+- header `Location: /api/v1/usuarios/{id}`
+- conflito de `username` retorna `409` com `ErrorResponseDto` (handler ja existente desde Sprint 1)
+- validacao falhada retorna `400` com `ErrorResponseDto`
+
+**Testes obrigatorios (Task 2.3b)**
+- `UsuarioControllerTest`:
+  - `POST` valido retorna `201` e body `UsuarioResponseDto` sem `password`
+  - `POST` com username invalido retorna `400`
+  - `POST` com senha de tamanho diferente de 6 retorna `400`
+  - `POST` com role nao aceito retorna `400`
+  - conflito de username retorna `409`
 
 **Criterios de verificacao**
-- `POST /api/v1/usuarios` cria corretamente usuarios `ADMIN` e `CLIENTE`
-- validacoes de e-mail e senha rejeitam payloads invalidos
-- senha e armazenada com hash BCrypt e nunca em texto claro
-- resposta nunca contem o campo `password`
-- campos de auditoria preenchidos com `criadoPor = system` e `modificadoPor = system` (por ser criacao publica sem autenticacao)
+- `MockMvc` verifica os 5 cenarios
+- response body confere com `UsuarioResponseDto` (sem campo `password`)
+- header `Location` presente em sucesso
 
 **Pre-requisitos**
-- Task 2.1 concluida
-- Task 2.2 concluida
+- Task 2.3a concluida
 
 **Dependencias**
-- depende da Task 2.1
-- depende da Task 2.2
+- depende de Task 2.3a
 
 **Responsavel sugerido**
 - Dev Senior
@@ -157,26 +220,33 @@ Expor `POST /api/v1/usuarios` como endpoint publico de criacao de usuario, com v
 ## Grafo de dependencias entre as tasks
 
 ```
-Task 2.1
+Task 2.1 (entidade + repository + V3 + tests)
   |
-  +---> Task 2.2
+  +---> Task 2.2 (records + MapStruct + tests)
   |       |
-  +-------+--> Task 2.3
+  +-------+--> Task 2.3a (CriarUsuarioUseCase + tests)
+                |
+                v
+            Task 2.3b (Controller + SecurityConfig + tests)
 ```
 
-- Task 2.1 (entidade e repositorio) e a raiz.
-- Task 2.2 (DTOs e mapper) depende parcialmente da entidade estabilizada.
-- Task 2.3 (endpoint de criacao) depende de 2.1 e 2.2.
+- Task 2.1 e a raiz.
+- Task 2.2 depende parcialmente da entidade estabilizada — pode comecar em paralelo apos 2.1 ter o esqueleto.
+- Task 2.3a depende de 2.1 e 2.2.
+- Task 2.3b depende de 2.3a.
 
 ## Definicao de pronto (Sprint 2)
 
-- entidade `Usuario` persistida com `UUID` nativo
+- entidade `Usuario` persistida com `UUID` nativo, estendendo `EntidadeAuditavel`
 - auditoria preenchida automaticamente, inclusive com fallback `system`
-- DTOs validados por `spring-boot-starter-validation`
-- `UsuarioMapper` configurado e testado manualmente
-- `POST /api/v1/usuarios` funcional, criando `ADMIN` e `CLIENTE`
-- senha nunca exposta em resposta
+- DTOs (records) validados por Jakarta Bean Validation
+- `UsuarioMapper` (MapStruct) gera codigo, sem usar ModelMapper
+- `POST /api/v1/usuarios` funcional, criando `ADMIN` e `CLIENTE`, com header `Location`
+- senha nunca exposta em resposta (record `UsuarioResponseDto` nao tem campo `password`)
 - senha persistida com hash BCrypt
+- conflito de username retorna `409` com `ErrorResponseDto` (via `ApiExceptionHandler` da Sprint 1)
+- ao menos 8 testes automatizados passando: `UsuarioRepositoryTest`, `UsuarioMapperTest`, `CriarUsuarioUseCaseTest` (5 cenarios), `UsuarioControllerTest` (5 cenarios)
+- JaCoCo nao regride (target 70% por modulo)
 
 ## Cenarios de verificacao manual
 
@@ -192,15 +262,15 @@ Task 2.1
 
 ## Impacto nas sprints seguintes
 
-- **Sprint 3** consome a entidade `Usuario`, os DTOs e o `UsuarioService` para implementar login, JWT, filtros de seguranca e autorizacao por perfil e ownership.
-- **Sprint 4** formaliza o `ApiExceptionHandler` com payload padrao e a documentacao Swagger, consumindo os contratos definidos nesta sprint.
+- **Sprint 3** consome a entidade `Usuario`, os records DTO e o `CriarUsuarioUseCase` para implementar login, JWT, filtros de seguranca e autorizacao por perfil e ownership. O `AuditorAware` (ja preparado na Sprint 1) ganha comportamento real com `Authentication` na Sprint 3.
+- **Sprint 4** evolui o `ApiExceptionHandler` (stub da Sprint 1) com payload padrao completo, completa documentacao Swagger e introduz `Webhook Receiver Pattern`.
 
 ## Restricoes e regras de execucao
 
 - commits podem ser feitos pelo agente de IA quando solicitado
 - push e PR permanecem manuais
 - ao final de cada task, a execucao deve parar para teste local manual
-- testes automatizados desta sprint ficam concentrados na Sprint 4
+- TDD distribuido: cada task tem testes obrigatorios entregues junto com o codigo
 
 ## Referencias
 

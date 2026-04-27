@@ -37,9 +37,8 @@ Entregar o mecanismo completo de autenticacao e autorizacao da API: login com em
 ### Fora de escopo nesta spec
 - refresh token (explicitamente fora nesta fase)
 - blacklist de token ou logout server-side (logout tratado no cliente)
-- `ApiExceptionHandler` formal (Sprint 4)
+- evolucao do `ApiExceptionHandler` para mapeamento completo (Sprint 4 — stub ja existe da Sprint 1)
 - Swagger UI detalhada (Sprint 4)
-- testes automatizados (Sprint 4)
 - qualquer regra de dominio alem das definidas na Sprint 2
 
 ## Pre-requisitos globais
@@ -54,16 +53,23 @@ Entregar o mecanismo completo de autenticacao e autorizacao da API: login com em
 ### Task 3.1 - Seguranca JWT, BCrypt e login
 
 **Descricao**
-Implementar o provider, o filtro, o `UserDetailsService`, o servico de autenticacao e o controller de autenticacao, habilitando login com JWT e consulta do usuario autenticado em `/auth/me`.
+Implementar no modulo `identity` o provider, o filtro, o `UserDetailsService`, o caso de uso de autenticacao e o controller de autenticacao, habilitando login com JWT e consulta do usuario autenticado em `/auth/me`. Ativar a propagacao de `correlationId` via `CorrelationIdFilter` (criado na Sprint 1).
 
 **Arquivos esperados**
-- `security/JwtTokenProvider.java`
-- `security/JwtAuthenticationFilter.java`
-- `security/CustomUserDetailsService.java`
-- `service/AuthService.java`
-- `web/controller/AuthController.java`
-- `web/dto/LoginRequestDto.java`
-- `web/dto/TokenResponseDto.java`
+- `identity/infrastructure/security/JwtTokenProvider.java`
+- `identity/infrastructure/security/JwtAuthenticationFilter.java`
+- `identity/infrastructure/security/CustomUserDetailsService.java`
+- `identity/application/usecase/AutenticarUsuarioUseCase.java`
+- `identity/web/controller/AuthController.java`
+- `identity/web/dto/LoginRequestDto.java` (`record`)
+- `identity/web/dto/TokenResponseDto.java` (`record`)
+- update em `shared/config/SecurityConfig.java` registrando o `JwtAuthenticationFilter` e mantendo o `CorrelationIdFilter`
+- update em `shared/audit/AuditorAwareImpl.java` para extrair UUID do `Authentication` quando presente
+- testes obrigatorios:
+  - `JwtTokenProviderTest` (gera token, valida, extrai claims)
+  - `JwtAuthenticationFilterTest` (`@WebMvcTest` com filter)
+  - `AutenticarUsuarioUseCaseTest` (`@MockitoExtension`)
+  - `AuthControllerTest` (`@WebMvcTest`)
 
 **Regras de validacao dos DTOs de autenticacao**
 - `LoginRequestDto.username`: `@NotBlank`, `@Email`
@@ -72,10 +78,12 @@ Implementar o provider, o filtro, o `UserDetailsService`, o servico de autentica
 
 **Detalhes de implementacao**
 - `JwtTokenProvider`:
-  - emite token com claims `sub` (UUID como string), `email`, `roles`, `iat`, `exp`
-  - assinatura HS256 com secret configurado por `app.jwt.secret`
+  - emite token com claims `sub` (**UUID v6 do usuario, serializado como string canonica `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`**), `email`, `roles`, `iat`, `exp`
+  - assinatura HS256 com secret configurado por `app.jwt.secret` (decodificado da prop como Base64-encoded bytes; minimo 256 bits)
   - expiracao configuravel por `app.jwt.expiration-seconds`
+  - usa **JJWT 0.12.x** API (`Jwts.builder()`, `Jwts.parser().verifyWith(key)`)
   - metodos de emissao, validacao e extracao do `Authentication`
+  - propaga `correlationId` extraido do MDC para os logs de emissao/validacao
 - `JwtAuthenticationFilter`:
   - extende `OncePerRequestFilter`
   - le o header `Authorization: Bearer <token>`
@@ -116,12 +124,18 @@ Implementar o provider, o filtro, o `UserDetailsService`, o servico de autentica
 ### Task 3.2 - Autorizacao por perfil e ownership
 
 **Descricao**
-Proteger os endpoints de usuario com regras de perfil e ownership. Aplicar as restricoes diretamente no `SecurityConfig` e reforca-las no service quando necessario, evitando que a regra viva apenas na borda HTTP.
+Proteger os endpoints de usuario com regras de perfil e ownership. Aplicar as restricoes via `@PreAuthorize` (Spring Security 6) no controller e reforca-las no use case quando ownership exige logica de comparacao com `principal.sub`.
+
+Esta task pode comecar **em paralelo** com a Task 3.1 apos os contratos de DTO de auth (Task 3.1 parcial: `LoginRequestDto`, `TokenResponseDto`) estarem definidos. So fica bloqueada na finalizacao quando o `SecurityFilterChain` da Task 3.1 estiver pronto.
 
 **Arquivos esperados**
-- `config/SecurityConfig.java`
-- `service/UsuarioService.java`
-- `web/controller/UsuarioController.java`
+- update em `shared/config/SecurityConfig.java` (com `@EnableMethodSecurity(prePostEnabled = true)`)
+- `usuarios/application/usecase/ConsultarUsuarioUseCase.java` (regra ownership)
+- `usuarios/application/usecase/ListarUsuariosUseCase.java`
+- update em `usuarios/web/controller/UsuarioController.java` (adiciona `GET /{id}` e `GET /`)
+- testes obrigatorios:
+  - `ConsultarUsuarioUseCaseTest` (admin acessa qualquer; cliente acessa proprio)
+  - `UsuarioControllerSecurityTest` (`@WebMvcTest` com `@WithMockUser` testando perfil e ownership)
 
 **Regras de autorizacao**
 - `POST /api/v1/usuarios`: publico (mantem regra da Sprint 2)
@@ -158,8 +172,12 @@ Proteger os endpoints de usuario com regras de perfil e ownership. Aplicar as re
 Expor `PATCH /api/v1/usuarios/{id}/senha` permitindo que o proprio usuario autenticado altere sua senha. A operacao exige a senha atual e aplica o hash BCrypt na nova.
 
 **Arquivos esperados**
-- `service/UsuarioService.java`
-- `web/controller/UsuarioController.java`
+- `usuarios/application/usecase/AlterarSenhaUseCase.java`
+- update em `usuarios/web/controller/UsuarioController.java`
+- `usuarios/application/exception/SenhaAtualIncorretaException.java` (estende `DomainException`)
+- testes obrigatorios:
+  - `AlterarSenhaUseCaseTest` (5 cenarios: sucesso, senha atual errada, ownership, hash novo, modificadoPor preenchido)
+  - `UsuarioControllerSenhaTest` (`@WebMvcTest`)
 
 **Regras**
 - request: `UsuarioSenhaUpdateDto` com `passwordAtual` e `novaSenha`
@@ -190,27 +208,30 @@ Expor `PATCH /api/v1/usuarios/{id}/senha` permitindo que o proprio usuario auten
 ## Grafo de dependencias entre as tasks
 
 ```
-Task 3.1
+Task 3.1 (JWT + login + AuthController + auditoria autenticada)
   |
-  +---> Task 3.2
-  |       |
-  +-------+--> Task 3.3
+  +---> Task 3.2 (autorizacao perfil + ownership) [pode comecar em paralelo apos contratos DTO de auth]
+  |        |
+  +--------+--> Task 3.3 (alterar senha)
 ```
 
-- Task 3.1 habilita autenticacao e e raiz das demais.
-- Task 3.2 precisa da autenticacao funcional para aplicar perfil e ownership.
+- Task 3.1 habilita autenticacao e e raiz da Task 3.3.
+- Task 3.2 pode ser iniciada em paralelo apos os contratos DTO da Task 3.1, finalizando-se quando o `SecurityFilterChain` estiver pronto.
 - Task 3.3 precisa do ownership da Task 3.2 e do fluxo JWT da Task 3.1.
 
 ## Definicao de pronto (Sprint 3)
 
-- login funcional em `POST /api/v1/auth/login` emitindo JWT com as claims obrigatorias
+- login funcional em `POST /api/v1/auth/login` emitindo JWT com as claims obrigatorias (`sub` UUID v6, `email`, `roles`, `iat`, `exp`)
 - `GET /api/v1/auth/me` retorna o usuario autenticado
 - `GET /api/v1/usuarios/{id}` respeita perfil e ownership
 - `GET /api/v1/usuarios` permitido apenas para admin
 - `PATCH /api/v1/usuarios/{id}/senha` permitido apenas ao proprio usuario
 - senha validada e atualizada via BCrypt
-- auditoria persiste o UUID do usuario autenticado
+- `AuditorAware` agora extrai UUID do `Authentication`; auditoria persiste o UUID do usuario autenticado em operacoes autenticadas e mantem `system` em operacoes publicas
+- `correlationId` propagado via MDC em logs de autenticacao
 - logout tratado apenas no cliente (sem endpoint dedicado)
+- ao menos 12 testes automatizados passando: `JwtTokenProviderTest`, `JwtAuthenticationFilterTest`, `AutenticarUsuarioUseCaseTest`, `AuthControllerTest`, `ConsultarUsuarioUseCaseTest`, `UsuarioControllerSecurityTest`, `AlterarSenhaUseCaseTest`, `UsuarioControllerSenhaTest`
+- JaCoCo nao regride (target 70% por modulo)
 
 ## Cenarios de verificacao manual
 
@@ -232,9 +253,10 @@ Task 3.1
 
 ## Impacto nas sprints seguintes
 
-- **Sprint 4** formaliza o `ApiExceptionHandler` que padroniza as respostas de erro de autenticacao (401), autorizacao (403), validacao (400) e conflito (409). Consome os cenarios desta sprint para ajustar mensagens e mapeamentos.
+- **Sprint 4** **evolui** o `ApiExceptionHandler` (stub da Sprint 1) para mapeamento completo, padronizando as respostas de erro de autenticacao (401), autorizacao (403), validacao (400), conflito (409), recurso nao encontrado (404) e erro generico (500).
 - **Sprint 4** documenta em Swagger os schemas de `TokenResponseDto`, `LoginRequestDto`, `UsuarioResponseDto` e os codigos de resposta consolidados aqui.
-- **Sprint 4** cobre com testes automatizados os cenarios de autenticacao e autorizacao implementados nesta sprint.
+- **Sprint 4** complementa cobertura JaCoCo no target 70% para garantir que todos os caminhos cobertos manualmente nesta Sprint estejam tambem cobertos automaticamente.
+- **Sprint 4** introduz o `Webhook Receiver Pattern` que consumira o filtro de autenticacao desta Sprint para validar webhooks que exigem token (futuras integracoes).
 
 ## Restricoes e regras de execucao
 

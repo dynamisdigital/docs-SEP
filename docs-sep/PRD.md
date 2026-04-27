@@ -51,6 +51,20 @@ Para o frontend e o mobile, ja existem dois design systems definidos como base o
 
 Esses dois design systems substituem qualquer referencia anterior a templates administrativos prontos. A decisao foi tomada porque um template pronto deixaria o projeto pouco flexivel a mudancas; os design systems definem tokens, tipografia, componentes e regras de uso, mantendo liberdade de implementacao e coerencia visual entre as superficies.
 
+### 3.1 Marco regulatorio
+
+O produto SEP opera sob a **Resolucao CMN nº 4.656/2018**, que disciplina as Sociedades de Emprestimo entre Pessoas no Brasil. Esse marco impoe ao produto, desde a primeira linha de codigo, requisitos nao-negociaveis:
+
+- **KYC/KYB obrigatorio por lei** para qualquer parte que assuma posicao de tomadora ou credora — nao e capacidade opcional, e pre-condicao de cadastro
+- **Segregacao patrimonial** dos recursos: fundos de investidores (credores) e tomadores devem ficar em **conta escrow** distinta da conta operacional da plataforma
+- **Prevencao a Lavagem de Dinheiro (PLD)**: consultas obrigatorias a bases COAF, OFAC, INTERPOL e MTE durante onboarding
+- **Auditoria reforcada** das operacoes financeiras e dos acessos administrativos
+- **Conformidade BACEN** continua, com possibilidade de reportes periodicos
+
+Esses requisitos justificam decisoes que parecem antecipadas no roadmap mas sao incontornaveis: a entidade `ContaEscrow` modelada desde a Sprint 1, o `Provider Pattern` para integracoes externas (especialmente Celcoin que oferece KYC/KYB e escrow como servico), e a politica de auditoria desde a fundacao.
+
+A integracao com o ecossistema **Celcoin** (BaaS) e a estrategia escolhida para materializar essas obrigacoes regulatorias de forma economicamente viavel: Celcoin oferece KYC/KYB end-to-end (OCR, FaceMatch, Background Check), abertura de contas escrow (`POST /escrow/accounts`), conta operacional, Pix de desembolso e recebimento, conciliacao via webhooks, e Open Finance via Finansystech. Os documentos de aprendizado em `docs-sep/Aprendizado Celcoin e SEP/` consolidam o entendimento da plataforma.
+
 ## 4. Objetivos
 
 ### Objetivos de negocio
@@ -174,7 +188,7 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 
 ### RNF-03 Qualidade tecnica
 - A API deve usar DTOs.
-- A API deve usar ModelMapper.
+- A API deve usar `MapStruct` (substituiu ModelMapper — ver ADR 0006).
 - A API deve possuir `ApiExceptionHandler`.
 - A API deve seguir versionamento em `/api/v1`.
 - A API deve usar `Flyway` para migrations versionadas desde o inicio.
@@ -238,28 +252,95 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 
 ## 11. Arquitetura e Tecnologia
 
-### Stack principal
-- Java 21
-- Spring Boot
-- Gradle
-- Spring Security
+### Stack principal (versoes pinadas)
+
+**Linguagem e build**
+- Java `21` LTS (Standalone Components, Signals, Records, Sealed types, Pattern matching, Virtual threads habilitados)
+- Gradle `8.x` com Wrapper
+
+**Framework e persistencia**
+- Spring Boot `3.5.x` (pinar minor explicitamente)
+- Hibernate `6.x` (vem com Spring Boot 3.5)
 - Spring Data JPA
-- Flyway
-- JWT
-- ModelMapper
-- PostgreSQL
-- Docker Compose
-- Springdoc OpenAPI / Swagger
+- PostgreSQL `16`
+- Flyway (migrations)
+
+**Seguranca**
+- Spring Security `6` (vem com Spring Boot 3.5)
+- JJWT `0.12.x` (autenticacao JWT, sem refresh token nesta fase)
+- BCrypt para hash de senha
+- mTLS preparado para integracoes financeiras (Celcoin)
+
+**Mapeamento e validacao**
+- **MapStruct** (geracao de codigo, type-safe) — substitui ModelMapper
+- Jakarta Bean Validation (`spring-boot-starter-validation`)
+
+**HTTP client e resiliencia**
+- **RestClient** (Spring 6, sincrono) para integracoes Celcoin REST
+- WebClient reservado para streams reativos (uso futuro)
+- **Resilience4j** para circuit breaker, retry, timeout em chamadas externas
+
+**Documentacao e observabilidade**
+- Springdoc OpenAPI (Swagger UI) `2.x`
 - Spring Boot Actuator
+- **Micrometer + Prometheus** (metricas) — preparacao para observabilidade remota
+- Logs estruturados via Logback (com MDC para `correlationId` e `traceId`)
+
+**Testes**
+- JUnit 5 + AssertJ
+- Test slices: `@WebMvcTest`, `@DataJpaTest`, `@JsonTest`
+- **Testcontainers** com PostgreSQL real (sem H2)
+- Mockito para isolamento de provider externo
+- RestAssured (opcional para testes de contrato)
+
+**Containers**
+- Docker Compose para desenvolvimento local (PostgreSQL)
+- Dockerfile multi-stage para o app (preparado para AWS futura)
 
 ### Diretriz arquitetural do backend
 - o backend sera um unico deploy Spring Boot nesta fase
-- a arquitetura sera um `monolito modular orientado a DDD`
+- a arquitetura sera um `monolito modular orientado a DDD`, com `Hexagonal/Ports & Adapters` aplicado dentro de cada modulo
 - nao serao criados microservicos na fase inicial
 - o backend deve ser organizado por modulos de dominio, nao por camadas globais como `model`, `repository`, `service` e `controller`
 - o banco sera unico nesta fase, com PostgreSQL e migrations Flyway em um unico backend
 - frontend web e mobile devem consumir a mesma API publica, sem backends separados neste momento
 - microservicos so devem ser reavaliados se houver necessidade real de escala independente, deploy independente, isolamento regulatorio, banco separado ou ownership por equipe
+
+### Padrao de Provider Externo (obrigatorio para integracoes)
+
+Toda integracao com sistema externo (Celcoin BaaS, futuras pasarelas de pagamento, servicos de KYC, gateways de assinatura digital) **deve** seguir este padrao para isolar a logica de dominio das dependencias de infraestrutura:
+
+- **Interface (port)** declarada em `<modulo>.application.port.out.<X>Provider` — descreve a capacidade em termos de dominio (ex.: `KycProvider.validar(documento)`, `PixProvider.iniciarDesembolso(...)`)
+- **Implementacao (adapter)** em `<modulo>.infrastructure.adapter.<X>.Celcoin<X>Provider` — traduz a chamada para a API externa (Celcoin), trata erros tecnicos, aplica idempotencia, retry e circuit breaker via Resilience4j
+- **Stub/fake** em `<modulo>.infrastructure.adapter.<X>.Fake<X>Provider` para testes e ambiente local sem credenciais reais
+- A escolha do adapter por ambiente acontece via `@ConditionalOnProperty` ou Profile do Spring
+
+Beneficios:
+- Trocar provedor (ex.: Celcoin → outro BaaS) afeta so a camada de adapter
+- Testes de dominio nao dependem de rede ou credenciais
+- Versionamento da API externa fica encapsulado no adapter
+- Permite rodar local sem Celcoin (com `Fake<X>Provider`)
+
+Modulos que nascem com Provider Pattern previsto:
+- `onboarding` → `KycProvider`, `KybProvider`, `BackgroundCheckProvider`
+- `credito` → `OpenFinanceProvider` (Celcoin Finansystech), `CreditoBureauProvider` (futuro)
+- `contratos` → `AssinaturaDigitalProvider`, `CcbProvider`
+- `escrow` → `EscrowProvider` (Celcoin escrow accounts)
+- `pix` → `PixProvider` (desembolso, recebimento, webhooks)
+- `cobranca` → `BoletoProvider` (futuro)
+
+ADR de referencia: [`adr/0004-provider-pattern-para-integracoes-externas.md`](../adr/0004-provider-pattern-para-integracoes-externas.md).
+
+### Modulo escrow (obrigatorio por marco regulatorio)
+
+A Resolucao CMN 4.656/2018 obriga segregacao patrimonial entre fundos de tomadores, credores e a operacao da plataforma. O modulo `escrow` materializa essa obrigacao no dominio:
+
+- Entidades centrais: `ContaEscrow`, `Wallet` (sub-conta por proposta/operacao), `MovimentacaoEscrow`
+- Capacidade transversal usada por `credito`, `contratos`, `cobranca` e `pix`
+- Implementacao concreta apoia-se na API Celcoin de escrow (`POST /escrow/accounts`, `POST /escrow/wallets`, `GET /escrow/accounts/balance`, `GET /escrow/accounts/statement`) via `EscrowProvider`
+- A entidade `ContaEscrow` deve ser modelada na **Sprint 1** (mesmo sem integracao Celcoin ainda), evitando retrabalho arquitetural quando o provider for plugado
+
+ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../adr/0005-segregacao-patrimonial-via-conta-escrow.md).
 
 ### Base definida para o frontend futuro
 - Angular na versao `20.x` (baseline atual: Standalone Components, Signals e Zoneless estaveis, com ecossistema alinhado), pareada com Ionic `8.4+` e Capacitor `6` para o mobile; na fase de implementacao mobile, avaliar upgrade para Angular `21` apenas se houver release oficial do Ionic com suporte explicito a `21` e os plugins Capacitor relevantes ja estiverem alinhados; caso contrario, manter `20`
@@ -299,7 +380,7 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 
 ### Convencoes obrigatorias
 - uso de DTOs
-- uso de ModelMapper
+- uso de MapStruct (substituiu ModelMapper — ver ADR 0006)
 - criacao de `ApiExceptionHandler`
 - auditoria com JPA Auditing
 - gerenciamento de build e dependencias com Gradle
@@ -463,33 +544,86 @@ Mesmo nesta fase inicial, a API deve nascer preparada para operacao futura com:
 
 ## 18. Decisoes Tecnicas Consolidadas
 
-- Build e dependencias com `Gradle`
-- IDs com `UUID`
-- geracao de UUID com `com.fasterxml.uuid:java-uuid-generator:5.1.0`
+### Backend - linguagem e framework
+- Build e dependencias com `Gradle 8.x` + Wrapper
+- Java `21` LTS, com Records para DTOs, Sealed types para Roles/eventos, Pattern matching e Virtual threads habilitados
+- Spring Boot `3.5.x` (versao minor pinada explicitamente)
+- Hibernate `6.x` (vem com Spring Boot 3.5)
+- PostgreSQL `16` (sem H2 mesmo em testes)
+- Flyway para migrations versionadas
+
+### Backend - mapeamento, validacao e seguranca
+- **MapStruct** (geracao de codigo, type-safe) — substitui ModelMapper em todo o projeto
+- Jakarta Bean Validation (`spring-boot-starter-validation`)
+- Spring Security `6` + JJWT `0.12.x`
+- BCrypt para hash de senha (politica de 6 caracteres revisada antes de producao)
+- mTLS preparado para integracoes financeiras (Celcoin)
+
+### Backend - identificadores e dominio
+- IDs com `UUID`, geracao via `com.fasterxml.uuid:java-uuid-generator:5.1.0`
 - preferencia por `UUID v6`
 - UUID persistido como tipo nativo `uuid` no PostgreSQL
 - UUID modelado como `java.util.UUID` no backend
-- migrations com `Flyway`
-- hash de senha com `BCrypt`
-- documentacao com `Springdoc OpenAPI`
-- validacao com `spring-boot-starter-validation`
+- tabelas e colunas em portugues
+- sem soft delete nesta fase
+- datas serializadas em ISO-8601 com offset
+- arquitetura: monolito modular DDD com `Hexagonal/Ports & Adapters` por modulo
+- modulo `escrow` obrigatorio desde Sprint 1 (Resolucao CMN 4.656/2018)
+
+### Backend - integracoes externas
+- **Provider Pattern** obrigatorio: porta de saida em `application.port.out`, adapter em `infrastructure.adapter`
+- **RestClient** (Spring 6, sincrono) como HTTP client default; `WebClient` reservado para streams
+- **Resilience4j** para circuit breaker, retry e timeout em chamadas externas
+- idempotencia por `Idempotency-Key` em operacoes financeiras
+- `correlationId`/`traceId` propagados via MDC
+
+### Backend - JWT e auditoria
 - JWT como mecanismo de autenticacao
 - sem refresh token nesta fase
 - `sub` do JWT com `UUID` do usuario
 - claims minimas: `sub`, `email`, `roles`
 - auditoria persistindo preferencialmente o `UUID` do usuario
+- logout tratado no cliente nesta fase
+
+### Backend - documentacao e observabilidade
+- documentacao com `Springdoc OpenAPI 2.x`
 - `CORS` ja previsto para integracao com Angular
 - `Actuator` para healthcheck
-- tabelas e colunas em portugues
-- sem soft delete nesta fase
-- datas serializadas em ISO-8601 com offset
-- logout tratado no cliente nesta fase
+- **Micrometer + Prometheus** para metricas
+- logs estruturados via Logback com MDC
+
+### Backend - testes
+- JUnit 5 + AssertJ
+- Test slices: `@WebMvcTest`, `@DataJpaTest`, `@JsonTest`
+- **Testcontainers** com PostgreSQL real (sem H2)
+- TDD desde Sprint 1: cada Sprint entrega testes correspondentes ao escopo
+- JaCoCo target 70% por modulo (validado em CI)
+
+### Backend - qualidade e tooling (Sprint 0)
+- Spotless + Palantir Java Format
+- JaCoCo + verification rule
+- Pre-commit hook bloqueando codigo desformatado
+- GitHub Actions CI: build + test + Spotless + JaCoCo
+- Conventional Commits
+
+### Frontend e mobile
 - SCSS puro como camada de estilizacao do frontend e do mobile
 - design systems oficiais: [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas; [`DESIGN-notion.md`](./DESIGN-notion.md) para superficies autenticadas e para todo o mobile
 - sem framework CSS de terceiros (Bootstrap, Tailwind, Material e similares estao explicitamente fora) nem template administrativo pronto
 - stack frontend: `Angular 20.x` + SCSS puro + Standalone Components + Signals
 - stack mobile baseline: `Angular 20.x + Ionic 8.4+ + Capacitor 6`, com avaliacao opcional de upgrade para `Angular 21` na fase de implementacao mobile, condicionada a haver release oficial do Ionic e dos plugins Capacitor com suporte explicito
 - sem clausula de downgrade do Angular abaixo de `20`
+- frontend tooling: ESLint + Prettier + Stylelint, Vitest (unit), Playwright (E2E), Husky + lint-staged
+
+### Decisoes registradas em ADR
+ADRs vivem em [`adr/`](../adr/) e devem ser atualizados quando uma decisao tecnica mudar. ADRs iniciais:
+- `0001-monolito-modular-orientado-a-ddd.md`
+- `0002-design-systems-apple-e-notion-com-scss-puro.md`
+- `0003-stack-angular-20-ionic-8-capacitor-6.md`
+- `0004-provider-pattern-para-integracoes-externas.md`
+- `0005-segregacao-patrimonial-via-conta-escrow.md`
+- `0006-mapstruct-substitui-modelmapper.md`
+- `0007-ddd-com-hexagonal-ports-and-adapters-por-modulo.md`
 
 ## 19. Estrutura Inicial de Pacotes
 
@@ -503,6 +637,7 @@ O backend deve nascer como monolito modular orientado a DDD. A separacao princip
 - `com.dynamis.broker_app.credito`
 - `com.dynamis.broker_app.contratos`
 - `com.dynamis.broker_app.cobranca`
+- `com.dynamis.broker_app.escrow`
 - `com.dynamis.broker_app.backoffice`
 - `com.dynamis.broker_app.financeiro`
 - `com.dynamis.broker_app.credores`
@@ -512,21 +647,28 @@ O backend deve nascer como monolito modular orientado a DDD. A separacao princip
 ### Responsabilidade dos modulos
 - `identity`: autenticacao, JWT, senha, roles, permissoes e usuario autenticado
 - `usuarios`: cadastro de usuario, perfil inicial, ownership e dados basicos
-- `onboarding`: KYC/KYB, documentos e validacoes cadastrais
-- `credito`: proposta, analise de credito, parecer e decisao
-- `contratos`: formalizacao, aceite, assinatura e status contratual
-- `cobranca`: parcelas, vencimentos, cobranca e inadimplencia
+- `onboarding`: KYC/KYB, documentos e validacoes cadastrais (consome `KycProvider`/`KybProvider`)
+- `credito`: proposta, analise de credito, parecer e decisao (pode consumir `OpenFinanceProvider`)
+- `contratos`: formalizacao, aceite, assinatura e status contratual (consome `AssinaturaDigitalProvider`)
+- `cobranca`: parcelas, vencimentos, cobranca e inadimplencia (consome `escrow` para registrar recebimentos)
+- `escrow`: contas escrow, wallets por proposta/operacao, movimentacoes e segregacao patrimonial obrigatoria por Resolucao CMN 4.656/2018 (consome `EscrowProvider`)
 - `backoffice`: filas, pendencias, excecoes, comentarios e reprocessos
 - `financeiro`: conciliacao, controles internos e visao operacional financeira
-- `credores`: jornada da empresa credora, carteira, aportes e operacoes financiadas
-- `pix`: movimentacao Pix futura, webhooks, conciliacao e status
-- `shared`: excecoes, auditoria, configuracoes transversais, utilitarios e tipos comuns realmente compartilhados
+- `credores`: jornada da empresa credora, carteira, aportes e operacoes financiadas (consome `escrow` para acompanhar carteira)
+- `pix`: movimentacao Pix, webhooks, conciliacao e status (consome `PixProvider` e `escrow`)
+- `shared`: excecoes, auditoria, configuracoes transversais, `ApiExceptionHandler`, `ErrorResponseDto`, base de adapters HTTP (RestClient + Resilience4j), Webhook Receiver pattern, utilitarios e tipos comuns realmente compartilhados
 
-### Padrao interno de cada modulo
-- `domain`: entidades, value objects, enums e regras centrais do dominio
-- `application`: casos de uso e servicos de aplicacao
-- `infrastructure`: repositories, integracoes externas e persistencia
-- `web`: controllers, DTOs e mappers daquele modulo
+### Padrao interno de cada modulo (Hexagonal / Ports & Adapters)
+- `domain`: entidades, value objects, enums, sealed types, eventos de dominio e regras centrais (puro, sem dependencia de framework)
+- `application`: casos de uso, servicos de aplicacao, **portas de saida** (`port.out.<X>Provider`) que descrevem dependencias externas em termos de dominio
+- `infrastructure`: repositories JPA, **adapters** que implementam as portas de saida (ex.: `Celcoin<X>Provider`, `Fake<X>Provider` para testes), integracoes externas e persistencia
+- `web`: controllers REST, DTOs (preferencialmente `record`), MapStruct mappers daquele modulo
+
+Estrutura de pacotes detalhada por modulo:
+- `<modulo>.domain.{model,event,exception,vo}`
+- `<modulo>.application.{usecase,port.out,service}`
+- `<modulo>.infrastructure.{persistence,adapter.<provider>,config}`
+- `<modulo>.web.{controller,dto,mapper}`
 
 Exemplo conceitual:
 - `com.dynamis.broker_app.identity.domain`
@@ -803,27 +945,83 @@ Exemplo:
   - revisar usabilidade tecnica dos endpoints junto ao Dev Senior
 
 ### Dependencias entre sprints
+- Sprint 0 (Hygiene & Foundation):
+  - depende da aprovacao do PRD e do CLAUDE.md criado
+  - estabelece tooling (Spotless, JaCoCo, pre-commit, CI minimo, ADRs iniciais, conventional commits)
+  - pode rodar em paralelo aos primeiros dias da Sprint 1, com a condicao de Spotless e CI estarem prontos antes do primeiro PR de codigo
+  - spec: [`specs/000-sprint-0-hygiene-foundation.md`](../specs/000-sprint-0-hygiene-foundation.md)
 - Sprint 1:
   - depende da aprovacao do PRD
   - depende de ambiente local com Java 21 e Docker
+  - depende de Sprint 0 ter Spotless e CI prontos antes do primeiro PR
   - deve criar a base do monolito modular e os pacotes raiz dos modulos DDD
+  - deve incluir `ApiExceptionHandler` stub, `ErrorResponseDto`, auditoria JPA base, estrutura de adapter para integracoes externas em `shared.integration`, modulo `escrow` modelado, e teste de boot
 - Sprint 2:
   - depende da conclusao da Sprint 1
   - depende do banco local, Flyway e auditoria base estarem funcionando
-  - deve implementar `identity` e `usuarios` como primeiros modulos reais do monolito modular
+  - deve implementar `identity` e `usuarios` como primeiros modulos reais do monolito modular usando Records para DTOs e MapStruct para mappers
+  - testes da Sprint 2: criacao, validacao, conflito de e-mail, hash BCrypt
 - Sprint 3:
   - depende da conclusao da Sprint 2
   - depende da entidade `Usuario`, DTOs e criacao publica de usuario estarem funcionais
   - deve consolidar autenticacao e autorizacao dentro de `identity`, sem transformar auth em microservico
+  - introduz `correlationId`/`traceId` via MDC e prepara mTLS para integracoes futuras
+  - testes da Sprint 3: login valido/invalido, JWT emissao/parse, autorizacao por perfil, ownership
 - Sprint 4:
   - depende da conclusao da Sprint 3
   - depende dos endpoints principais e das regras de seguranca estarem estabilizados
-  - deve validar documentacao e testes respeitando as fronteiras dos modulos
+  - **evolui** o `ApiExceptionHandler` ja criado na Sprint 1 (mapeamento completo de excecoes)
+  - completa documentacao OpenAPI, smoke tests E2E e cobertura JaCoCo no target 70%
+  - introduz `Webhook Receiver Pattern` (`/api/v1/webhooks/{provider}/{event}`) com idempotencia e Outbox stub, preparando Epic 15 (Pix)
+
+### Trilha paralela Frontend (Specs 1XX)
+
+Os 2 Devs Plenos Frontend tem trabalho concreto desde a Sprint 0, em paralelo ao backend. Sem isso, ficam ociosos durante as Sprints 1-4 que sao predominantemente backend.
+
+- Spec mestre: [`specs/100-frontend-foundation.md`](../specs/100-frontend-foundation.md)
+- F-Sprint 0: setup Angular 20.x (project scaffold, ESLint + Prettier + Stylelint, Husky + lint-staged, Vitest, Playwright)
+- F-Sprint 1: traducao dos tokens Apple+Notion para SCSS, design system showcase (Storybook ou rota `/design-system`)
+- F-Sprint 2: telas Apple (landing, login, register) com MSW (Mock Service Worker) consumindo mocks JSON dos contratos da Sprint 2 backend
+- F-Sprint 3: integracao com auth real, shell Notion, guards funcionais
+- F-Sprint 4: telas autenticadas (perfil, alterar senha, admin de usuarios) consumindo APIs reais
+
+Cada F-Sprint tem Definition of Done explicita na spec 100.
+
+### Definition of Done (DoD) por tipo de task
+
+- **Task de codigo backend**: codigo + testes unitarios + JavaDoc onde apropriado + Spotless verde + JaCoCo nao regride + PR com 1 review aprovado + CI verde
+- **Task de codigo frontend**: codigo + testes Vitest + ESLint/Prettier verde + componente documentado em Storybook se for compartilhado + PR com 1 review aprovado + CI verde
+- **Task de design (tokens, layout)**: SCSS extraido fielmente do design system + showcase atualizado + revisao do Dev Senior
+- **Task de documentacao**: arquivo gerado/atualizado + cross-refs validadas + revisao do Dev Senior
+
+### Sprint 0
+
+Objetivo de planejamento:
+- estabelecer o terreno tecnico minimo (tooling, repo settings, ADRs, CI minimo) para que as Sprints 1-4 e a trilha Frontend nao produzam divida tecnica desde o primeiro PR
+
+Tema:
+- Hygiene & Foundation
+
+Pre-requisitos de entrada:
+- PRD aprovado
+- CLAUDE.md criado
+- repositorio Git inicializado
+- acesso a GitHub para configurar branch protection
+
+Dependencias externas:
+- nenhuma
+
+Responsavel principal:
+- Dev Senior (com apoio dos Devs Plenos para tooling Frontend, executado na trilha 1XX)
+
+Detalhamento das tasks:
+- consultar: [`specs/000-sprint-0-hygiene-foundation.md`](../specs/000-sprint-0-hygiene-foundation.md)
+- entregaveis principais: `.gitignore`, `.editorconfig`, `.gitattributes`, Spotless + Palantir Format, JaCoCo target 70%, pre-commit hooks, GitHub branch protection + PR template, GitHub Actions CI minimo, Conventional Commits, ADRs iniciais (5-7 ADRs migrados do PRD)
 
 ### Sprint 1
 
 Objetivo de planejamento:
-- entregar a fundacao tecnica do backend SEP como monolito modular DDD (projeto Gradle, modulos raiz, PostgreSQL local, configuracao regional, CORS, Actuator e Flyway com migration inicial)
+- entregar a fundacao tecnica do backend SEP como monolito modular DDD com Hexagonal/Ports & Adapters por modulo: projeto Gradle, modulos raiz incluindo `escrow`, PostgreSQL local, configuracao regional, CORS, Actuator, Flyway com migration inicial, **`ApiExceptionHandler` stub e `ErrorResponseDto`**, **auditoria JPA base (`EntidadeAuditavel` + `AuditorAware` com fallback `system`)**, **estrutura de adapter para integracoes externas em `shared.integration`**, e teste de boot
 
 Tema:
 - Fundacao Tecnica
@@ -831,9 +1029,10 @@ Tema:
 Pre-requisitos de entrada:
 - PRD aprovado
 - ambiente local com Java 21 e Docker funcionais
+- Sprint 0 com Spotless e CI prontos antes do primeiro PR
 
 Dependencias externas:
-- nenhuma task anterior no projeto
+- depende da Sprint 0 (tooling)
 
 Responsavel principal:
 - Dev Senior
@@ -890,10 +1089,10 @@ Detalhamento das tasks:
 ### Sprint 4
 
 Objetivo de planejamento:
-- consolidar a qualidade da API fechando tres frentes: tratamento centralizado de erros com payload padronizado, documentacao OpenAPI com Swagger UI, e cobertura minima de testes automatizados para os cenarios criticos de autenticacao e autorizacao
+- consolidar a qualidade da API fechando quatro frentes: **evolucao** do `ApiExceptionHandler` ja criado na Sprint 1 (mapeamento completo de excecoes), documentacao OpenAPI com Swagger UI, cobertura JaCoCo no target 70% para cenarios criticos, e introducao do **Webhook Receiver Pattern** (`/api/v1/webhooks/{provider}/{event}`) com idempotencia via `Idempotency-Key` e Outbox stub, preparando Epic 15 (Pix)
 
 Tema:
-- Tratamento de Erros, Documentacao e Testes
+- Estabilizacao, Documentacao, Cobertura e Webhook Receiver
 
 Pre-requisitos de entrada:
 - Sprint 3 concluida
@@ -1018,6 +1217,7 @@ Esta fase sera considerada bem-sucedida quando:
 - permitir acompanhamento de atraso e inadimplencia
 - preparar reprocessos operacionais e a futura integracao com meios de cobranca
 - dar suporte ao financeiro na conciliacao pos-contratacao
+- consumir o modulo `escrow` para registrar recebimentos e movimentacoes na conta segregada (segregacao patrimonial obrigatoria por Resolucao CMN 4.656/2018)
 
 ### Epic 9 - Backoffice operacional
 - estruturar fila operacional para propostas, pendencias e excecoes
@@ -1089,7 +1289,9 @@ Esta fase sera considerada bem-sucedida quando:
 - posicionar Pix depois de onboarding, analise de credito, formalizacao contratual e cobranca inicial
 - iniciar pelo recorte de `desembolso + recebimento`, evitando comecar por automacao ampla
 - operar inicialmente em modo assistido pelo financeiro interno
-- usar `conta operacional/escrow` como base conceitual da movimentacao
+- consumir o modulo `escrow` (modelado desde Sprint 1) para registrar todas as movimentacoes na conta segregada
+- usar `PixProvider` (Provider Pattern definido em §11), com implementacao via Celcoin
+- depende do `Webhook Receiver Pattern` introduzido na Sprint 4 (eventos `proposta_aprovada`, `pagamento_recebido`, `transferencia_liquidada`, etc.)
 
 #### Blocos funcionais futuros
 - `Pix de desembolso`
@@ -1175,6 +1377,13 @@ Esta fase sera considerada bem-sucedida quando:
 - `Cobranca e inadimplencia`
   - responsavel pela regra de negocio de parcelas, atraso e recuperacao
   - nao substitui o meio de pagamento ou liquidacao
+  - consome o modulo `escrow` para registrar recebimentos
+- `escrow` (modulo transversal, sem epic propria)
+  - responsavel pela segregacao patrimonial obrigatoria por Resolucao CMN 4.656/2018
+  - modela `ContaEscrow`, `Wallet`, `MovimentacaoEscrow`
+  - modelado desde a Sprint 1 (entidades), implementacao concreta via `EscrowProvider` (Celcoin) na Epic 15
+  - usado por `cobranca`, `credores`, `pix` e `financeiro`
+  - nao e jornada de negocio nem capacidade financeira; e infraestrutura de dominio
 - `Backoffice operacional`
   - responsavel por fila, pendencias, excecoes, comentarios e reprocessos
   - nao substitui os modulos de dominio como onboarding, credito ou cobranca
