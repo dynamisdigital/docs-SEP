@@ -98,10 +98,11 @@ Essa ordem foi refinada depois para refletir melhor a jornada de contratacao do 
 9. Backoffice operacional
 10. Jornada da empresa credora
 11. Administracao e governanca
-12. Frontend SEP
-13. Mobile SEP
-14. Movimentacao Pix
-15. Infraestrutura futura
+12. Fundacao Frontend
+13. Frontend de Jornadas
+14. Mobile SEP
+15. Movimentacao Pix
+16. Infraestrutura AWS futura
 
 Foi decidido explicitamente que `Analise de credito` e mais urgente que `Pix`, e que os topicos que impactam diretamente a contratacao devem vir antes dos topicos financeiros expandidos.
 
@@ -118,18 +119,22 @@ Tambem foi adicionada ao PRD uma secao de `Fronteiras entre epicos`, para reduzi
 As seguintes decisoes foram tomadas:
 
 ### Frontend
-- Angular com versao ajustavel conforme compatibilidade do template adotado
+- Angular na versao `20.x` como baseline (Standalone Components, Signals e Zoneless estaveis, ecossistema alinhado), com opcao de upgrade para `21` na fase de implementacao mobile caso Ionic e plugins Capacitor confirmem suporte explicito; sem o template antigo (que limitava o projeto a Angular `17`), o upgrade para versoes modernas foi liberado e nao ha mais previsao de downgrade abaixo de `20`
 - Standalone Components
 - Signals
-- Bootstrap
-- existe um prototipo visual em Angular + Bootstrap que deve ser reaproveitado como base
-- foi explicitamente aceito que pode haver downgrade de versao do Angular se isso facilitar a absorcao do template
+- SCSS puro como camada de estilizacao, sem frameworks CSS de terceiros (Bootstrap, Tailwind, Material e similares estao explicitamente fora)
+- a base visual vem de dois design systems oficiais:
+  - [`DESIGN-apple.md`](./DESIGN-apple.md) - superficies publicas (landing, login, cadastro)
+  - [`DESIGN-notion.md`](./DESIGN-notion.md) - superficies autenticadas (dashboard e demais telas com JWT)
+- a fronteira entre os dois design systems e o estado de autenticacao: ate o login, Apple; a partir de `/auth/me`, Notion
+- componentes devem ser implementados como Angular standalone components proprios, com tokens (cores, tipografia, raios, espacamento, sombras) extraidos diretamente dos design systems para variaveis SCSS
+- a decisao de abandonar o template administrativo pronto foi tomada para preservar flexibilidade do projeto a mudancas de produto ao longo do tempo
 
 ### Mobile
 - o projeto tera um marco futuro chamado `Mobile SEP`
 - stack recomendada: `Ionic v8 + Angular + Capacitor`
-- a versao Angular do mobile deve acompanhar a versao final escolhida para o frontend web
-- se o frontend web sofrer downgrade para Angular abaixo da versao `16`, a decisao por Ionic v8 deve ser reavaliada
+- stack mobile baseline: `Angular 20.x + Ionic 8.4+ + Capacitor 6` (combinacao com integracao validada e ecossistema alinhado); na fase de implementacao mobile, avaliar upgrade para Angular `21` apenas se Ionic e plugins Capacitor confirmarem suporte explicito; caso contrario, manter `20.x`. Sem previsao de downgrade do Angular abaixo de `20`
+- todo o mobile (visitante e autenticado) segue o design system [`DESIGN-notion.md`](./DESIGN-notion.md), adaptado para toque, tabs inferiores e navegacao em pilha; a estilizacao deve ser feita em SCSS puro, com componentes Ionic customizados via CSS variables/SCSS para respeitar os tokens
 - o mobile sera iniciado junto com a fundacao do frontend, como trilha paralela dependente dos mesmos contratos da API
 - o primeiro recorte mobile cobre somente tomador de emprestimo e empresa credora
 - o mobile nao tera visao do financeiro interno, backoffice operacional, administracao completa, governanca, cadastros mestres ou telas de auditoria nesta fase
@@ -332,8 +337,8 @@ No estado atual:
 - o contexto consolidado desta conversa esta neste arquivo
 - o projeto ainda esta em fase de definicao documental e organizacao
 - a implementacao completa ainda nao comecou
-- o template visual do frontend ja foi identificado e incorporado como referencia de produto
-- ficou registrado que a versao do Angular do frontend pode ser reduzida, se necessario, para aderir ao template com menor risco
+- o uso de template administrativo pronto foi descartado em favor de dois design systems oficiais: Apple para superficies publicas (landing, login, cadastro) e Notion para superficies autenticadas (dashboard frontend e todo o mobile), com SCSS puro como camada de estilizacao
+- ficou registrado que a versao do Angular do frontend e do mobile esta definida em `20.x` como baseline, com opcao de upgrade para `21` condicionada a checagem de compatibilidade Ionic + plugins Capacitor na fase de implementacao mobile; a clausula anterior de downgrade foi removida junto com a saida do template, e a stack mobile baseline ficou consolidada como `Angular 20.x + Ionic 8.4+ + Capacitor 6`
 - a revisao tecnica do backend ja consolidou Flyway, BCrypt, Springdoc, Actuator, CORS e UUID como padroes da implementacao
 - a revisao tecnica tambem consolidou o padrao inicial de JWT, auditoria e convencoes de persistencia
 - a fase futura de `Movimentacao Pix` foi aprovada conceitualmente e incorporada ao PRD como epic posterior

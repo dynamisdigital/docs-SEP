@@ -626,7 +626,7 @@
 
     <div class="feature-item later">
       <h4>Aplicação web (frontend) <span class="phase-tag later">Expansão</span></h4>
-      <p>A interface visual da plataforma, feita sobre um template profissional já aprovado, adaptada a cada uma das quatro jornadas de usuário.</p>
+      <p>A interface visual da plataforma, construída em Angular 20 sobre dois design systems próprios — um para as telas públicas (landing, login, cadastro) e outro para todas as telas autenticadas (dashboard e demais jornadas) —, adaptada a cada uma das quatro jornadas de usuário.</p>
     </div>
   </div>
 
@@ -854,44 +854,52 @@
       <p>Tratamento padronizado de erros, documentação interativa da API e testes automatizados dos fluxos críticos.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 5 · Infraestrutura Futura</h4>
-      <p>Planejamento de ambientes, deploy, seeds e estrutura para escalar a operação.</p>
-    </div>
-    <div class="feature-item">
-      <h4>Epic 6 · Onboarding KYC/KYB</h4>
+      <h4>Epic 5 · Onboarding KYC/KYB</h4>
       <p>Envio e validação de documentos, verificação de identidade e trilha de aprovação para empresas tomadoras.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 7 · Análise de Crédito</h4>
+      <h4>Epic 6 · Análise de Crédito</h4>
       <p>Esteira de análise, score, decisão fundamentada e integração ao fluxo de propostas.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 8 · Formalização Contratual</h4>
+      <h4>Epic 7 · Formalização Contratual</h4>
       <p>Geração, aceite e assinatura de contratos, bloqueio de desembolso e integração futura com assinatura eletrônica.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 9 · Cobrança e Inadimplência</h4>
+      <h4>Epic 8 · Cobrança e Inadimplência</h4>
       <p>Gestão de parcelas, status, histórico, acompanhamento de atrasos e suporte ao financeiro.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 10 · Backoffice Operacional</h4>
+      <h4>Epic 9 · Backoffice Operacional</h4>
       <p>Fila operacional, visibilidade consolidada, tratamento manual de exceções e organização da operação assistida.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 11 · Jornada da Empresa Credora</h4>
+      <h4>Epic 10 · Jornada da Empresa Credora</h4>
       <p>Onboarding, governança, aportes, visão de carteira e acompanhamento das operações financiadas.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 12 · Administração e Governança</h4>
+      <h4>Epic 11 · Administração e Governança</h4>
       <p>Controles avançados, perfis internos, parametrizações, auditoria administrativa e cadastros mestres.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 13 · Frontend SEP</h4>
-      <p>Adaptação do template Angular, componentes visuais e implementação das jornadas no frontend.</p>
+      <h4>Epic 12 · Fundação Frontend</h4>
+      <p>Setup do projeto Angular 20, tokens SCSS dos dois design systems, telas públicas (Apple), shell autenticado (Notion), biblioteca de componentes e telas iniciais que consomem as APIs das Sprints 1-4 (perfil, alterar senha, admin de usuários, dashboard inicial). Entrega o "Frontend MVP" navegável e independente das jornadas de negócio.</p>
     </div>
     <div class="feature-item">
-      <h4>Epic 14 · Movimentação Pix</h4>
+      <h4>Epic 13 · Frontend de Jornadas</h4>
+      <p>Implementação das telas funcionais de cada jornada (tomador, empresa credora, financeiro interno, backoffice e governança avançada) sobre a Fundação Frontend, consumindo as APIs publicadas pelas Epics 5-11.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 14 · Mobile SEP</h4>
+      <p>App mobile em Angular 20 + Ionic 8.4+ + Capacitor 6, seguindo o design system Notion. Cobre apenas as jornadas externas (tomador e empresa credora); financeiro, backoffice e administração permanecem no web.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 15 · Movimentação Pix</h4>
       <p>Desembolso, recebimento, conciliação, rastreabilidade e integração operacional do Pix.</p>
+    </div>
+    <div class="feature-item">
+      <h4>Epic 16 · Infraestrutura AWS Futura</h4>
+      <p>Planejamento de ambientes remotos (EC2 + RDS), deploy, seeds e estrutura para escalar a operação. Trilha técnica habilitadora; só inicia após a conclusão do login, autenticação e autorização.</p>
     </div>
   </div>
 </section>
@@ -1024,7 +1032,7 @@
 
   <div class="faq-item">
     <h4>O que é o "frontend" mencionado na Fase 3?</h4>
-    <p>É a <strong>aplicação web</strong> — a interface visual pela qual os usuários realmente vão acessar a plataforma (tela de login, dashboards, formulários). Ela será construída sobre um template profissional já aprovado, adaptado para a identidade da SEP e para cada um dos quatro perfis de usuário.</p>
+    <p>É a <strong>aplicação web</strong> — a interface visual pela qual os usuários realmente vão acessar a plataforma (tela de login, dashboards, formulários). Ela será construída em Angular 20 sobre <strong>dois design systems próprios da SEP</strong>: um para as telas públicas (landing, login, cadastro) e outro para todas as telas autenticadas. A escolha por design systems próprios, em vez de um template de mercado, foi feita para preservar a flexibilidade do produto a mudanças ao longo do tempo.</p>
   </div>
 
   <div class="faq-item">

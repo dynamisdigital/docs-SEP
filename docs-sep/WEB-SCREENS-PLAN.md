@@ -14,7 +14,12 @@ Este documento nao substitui o PRD. Ele detalha a camada de experiencia web e de
 - O web deve consumir a mesma API publica usada pelo mobile, sem backend separado nesta fase.
 - O web nao deve conter regra de negocio de dominio; decisoes, status e permissoes devem vir da API.
 - As telas devem ser planejadas por modulo funcional, alinhadas ao monolito modular DDD do backend.
-- O template Datta Able Angular sera a base visual inicial do app web.
+- A base visual do app web vem de dois design systems oficiais, sem template administrativo pronto e sem framework CSS de terceiros:
+  - [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas (sem autenticacao): landing, login e cadastro
+  - [`DESIGN-notion.md`](./DESIGN-notion.md) para todas as superficies autenticadas (dashboard, perfil, alteracao de senha, administracao de usuarios e demais jornadas)
+- A fronteira entre Apple e Notion e o estado de autenticacao: ate o login, Apple; a partir de `/auth/me`, Notion.
+- A estilizacao deve ser feita em SCSS puro com tokens extraidos diretamente dos design systems (cores, tipografia, espacamento, raios, sombras); Bootstrap, Tailwind, Material e similares estao explicitamente fora.
+- Componentes devem ser implementados como Angular standalone components proprios.
 - As telas devem prever estados de carregamento, erro, vazio, sucesso e acesso negado.
 
 ## 3. Perfis de Acesso
@@ -182,7 +187,7 @@ Comportamentos:
 - permitir navegacao sem autenticacao
 - direcionar para login
 - direcionar para cadastro publico, se habilitado
-- manter estrutura visual alinhada ao template/base de marca do projeto
+- seguir o design system [`DESIGN-apple.md`](./DESIGN-apple.md): tipografia, paleta, raios, espacamento e regras de uso
 
 Dependencia:
 - base do web criada
@@ -276,7 +281,7 @@ Dependencia:
 - Sprint 3 concluida
 
 Observacoes:
-- Deve reaproveitar shell, navegacao e componentes do template Datta Able Angular.
+- Deve seguir o design system [`DESIGN-notion.md`](./DESIGN-notion.md) por se tratar de superficie autenticada: shell, navegacao, header, menu lateral e componentes compartilhados implementados em Angular standalone + SCSS puro, com tokens extraidos do Notion.
 
 ### 5.5 Dashboard Administrativa Inicial (Casca)
 
@@ -706,10 +711,10 @@ Observacoes:
 
 ## 8. Ordem Recomendada de Implementacao Web
 
-1. Estrutura base do web, pacotes, rotas e absorcao inicial do template Datta Able
-2. Landing page publica
-3. Login
-4. Cadastro de usuario / register
+1. Estrutura base do web, pacotes, rotas e camada de tokens SCSS extraida dos dois design systems oficiais (Apple para superficies publicas, Notion para superficies autenticadas)
+2. Landing page publica (segue Apple)
+3. Login (segue Apple)
+4. Cadastro de usuario / register (segue Apple)
 5. Guardas de rota e carregamento de `/auth/me`
 6. Dashboard administrativa inicial (casca)
 7. Shell autenticado completo
@@ -768,7 +773,7 @@ Antes de implementar uma tela funcional, deve existir:
 
 - Definir se o cadastro publico podera criar `ADMIN` ou apenas `CLIENTE` antes de ambiente remoto.
 - Definir estrategia final de armazenamento do JWT no frontend.
-- Definir padrao de rotas Angular conforme versao final adotada.
+- Definir padrao de rotas Angular para a versao `20.x` baseline (Standalone Components + Signals + Functional Guards), preparado para upgrade para `21` se a checagem de compatibilidade mobile passar.
 - Definir se o app web tera um unico projeto Angular ou workspace com apps separados no futuro.
 - Revisar specs antigas para alinhar estrutura backend DDD antes de iniciar implementacao.
 - Criar contratos futuros de onboarding, credito, contratos e cobranca antes de telas funcionais dessas jornadas.

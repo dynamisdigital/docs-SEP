@@ -45,10 +45,11 @@ Embora a primeira entrega seja tecnica, o direcionamento do produto foi refinado
 
 Capacidades financeiras expandidas, como Pix, devem entrar apenas depois da estabilizacao desses blocos.
 
-Para o frontend, ja existe uma base visual definida, localizada em:
-`C:\Users\Mauricio\Documents\datta-able-free-angular-admin-template-master\datta-able-free-angular-admin-template-master`
+Para o frontend e o mobile, ja existem dois design systems definidos como base oficial, localizados em:
+- [`DESIGN-apple.md`](./DESIGN-apple.md) - usado nas superficies publicas (sem autenticacao) do frontend: landing, login e cadastro
+- [`DESIGN-notion.md`](./DESIGN-notion.md) - usado em todas as superficies autenticadas (dashboard do frontend) e em todo o mobile
 
-Essa base devera ser usada como referencia oficial de layout e componentes na fase de implementacao do frontend.
+Esses dois design systems substituem qualquer referencia anterior a templates administrativos prontos. A decisao foi tomada porque um template pronto deixaria o projeto pouco flexivel a mudancas; os design systems definem tokens, tipografia, componentes e regras de uso, mantendo liberdade de implementacao e coerencia visual entre as superficies.
 
 ## 4. Objetivos
 
@@ -71,7 +72,8 @@ Essa base devera ser usada como referencia oficial de layout e componentes na fa
 - implementar auditoria automatica de criacao e alteracao
 - criar tratamento consistente de erros
 - garantir testes para autenticacao e autorizacao
-- reaproveitar o template Angular existente como base visual do produto, evitando redesenho desnecessario
+- adotar dois design systems oficiais como base visual: Apple para superficies publicas (landing, login, cadastro) e Notion para superficies autenticadas (dashboard frontend e todo o mobile)
+- usar SCSS puro como camada de estilizacao do frontend e do mobile, sem frameworks CSS prontos
 - definir padroes tecnicos obrigatorios para persistencia, seguranca, documentacao e observabilidade
 
 ## 5. Escopo
@@ -260,32 +262,36 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 - microservicos so devem ser reavaliados se houver necessidade real de escala independente, deploy independente, isolamento regulatorio, banco separado ou ownership por equipe
 
 ### Base definida para o frontend futuro
-- Angular com versao alinhada ao template adotado
-- Bootstrap 5
-- template visual de referencia: `C:\Users\Mauricio\Documents\datta-able-free-angular-admin-template-master\datta-able-free-angular-admin-template-master`
-- template local identificado com:
-  - dependencias Angular `20.0.x` no `package.json`
-  - estrutura principal em `src/app/theme`, `src/app/demo` e `src/assets`
-  - componentes de layout e compartilhados reaproveitaveis em `theme/layout` e `theme/shared`
+- Angular na versao `20.x` (baseline atual: Standalone Components, Signals e Zoneless estaveis, com ecossistema alinhado), pareada com Ionic `8.4+` e Capacitor `6` para o mobile; na fase de implementacao mobile, avaliar upgrade para Angular `21` apenas se houver release oficial do Ionic com suporte explicito a `21` e os plugins Capacitor relevantes ja estiverem alinhados; caso contrario, manter `20`
+- Standalone Components
+- Signals
+- SCSS puro como camada de estilizacao, sem frameworks CSS prontos (Bootstrap, Tailwind, Material e similares estao explicitamente fora)
+- design systems oficiais do produto:
+  - [`DESIGN-apple.md`](./DESIGN-apple.md) - aplica-se as superficies publicas: landing, login e cadastro
+  - [`DESIGN-notion.md`](./DESIGN-notion.md) - aplica-se ao dashboard e a todas as telas autenticadas
+- a fronteira entre os dois design systems e o estado de autenticacao: tudo que e acessivel sem JWT segue Apple; tudo a partir de `/auth/me` em diante segue Notion
+- tokens, tipografia, escala de espacamento, raios e componentes devem ser implementados em SCSS a partir das definicoes desses arquivos, sem depender de bibliotecas de UI prontas
 - plano oficial de telas web:
   - [`WEB-SCREENS-PLAN.md`](./WEB-SCREENS-PLAN.md)
   - este artefato define ordem de implementacao visual, telas por perfil, matriz tela x endpoint e lacunas antes da implementacao completa do web
 
-### Diretriz de reaproveitamento do frontend
-- o template existente sera a base visual inicial do sistema
-- componentes de layout, navegacao, shell administrativo e assets devem ser reaproveitados sempre que fizer sentido
-- paginas de demonstracao devem servir como referencia, nao como copia cega
-- a implementacao do frontend deve adaptar o template ao dominio SEP, em vez de redesenhar a interface do zero
-- a versao do Angular do frontend pode ser ajustada para coincidir com a versao suportada pelo template, incluindo downgrade se isso reduzir risco de integracao
-- a decisao de versao final do frontend deve priorizar compatibilidade com o template e velocidade de adocao na fase inicial
+### Diretriz de adocao dos design systems
+- o frontend nao deve adotar templates administrativos prontos; toda a base visual vem dos design systems oficiais
+- superficies publicas (landing, login, cadastro) devem seguir [`DESIGN-apple.md`](./DESIGN-apple.md) literalmente: tokens de cor, tipografia, raios, espacamento, regras de uso e do/dont
+- superficies autenticadas (dashboard e demais telas com JWT) devem seguir [`DESIGN-notion.md`](./DESIGN-notion.md) literalmente, com a mesma fidelidade
+- a transicao visual entre os dois design systems acontece exatamente no login: ate o login, Apple; apos o login, Notion
+- componentes devem ser implementados como componentes Angular standalone proprios, em SCSS, com tokens extraidos dos design systems
+- nao devem ser introduzidos frameworks CSS de terceiros (Bootstrap, Tailwind, Material, etc.) como camada de estilizacao
+- bibliotecas externas que nao envolvem chrome visual (datepickers, mascaras, formularios reativos, utilidades) podem ser usadas, desde que estilizadas em SCSS para respeitar os tokens
+- a versao do Angular esta definida em `20.x` como baseline; o upgrade para `21` pode ser avaliado na fase de implementacao mobile, condicionado a haver release oficial do Ionic e dos plugins Capacitor com suporte explicito a Angular `21`; nao ha previsao de downgrade abaixo de `20`
 
 ### Base definida para o mobile futuro
 - o projeto mobile deve ser planejado como `Mobile SEP`
 - stack recomendada: `Ionic v8 + Angular + Capacitor`
-- a versao Angular do mobile deve acompanhar a versao final escolhida para o frontend web
-- se o frontend web sofrer downgrade para Angular abaixo da versao `16`, a decisao por Ionic v8 deve ser reavaliada antes da implementacao
+- a versao Angular do mobile acompanha a do frontend web (`20.x` baseline; opcionalmente `21` se a checagem de compatibilidade Ionic + plugins Capacitor passar na fase de implementacao)
 - o mobile deve reutilizar contratos, DTOs, autenticacao JWT, guards e padroes de integracao HTTP definidos para o frontend web
-- o template administrativo Datta Able nao deve ser reaproveitado diretamente no mobile; devem ser reaproveitados apenas identidade visual, tokens de cor, padroes de marca e conceitos de componentes
+- todo o mobile (visitante e autenticado) segue o design system [`DESIGN-notion.md`](./DESIGN-notion.md), adaptado as restricoes de viewport e ergonomia mobile (toque, tabs inferiores, navegacao em pilha)
+- a estilizacao deve ser feita em SCSS puro, sem frameworks CSS adicionais; quando componentes Ionic forem usados, devem ser customizados via CSS variables/SCSS para respeitar os tokens do Notion design system
 - Flutter e React Native nao sao recomendados nesta fase por adicionarem nova stack, curva de aprendizado e duplicacao tecnica para uma equipe ja orientada a Angular
 - plano oficial de telas mobile:
   - [`MOBILE-SCREENS-PLAN.md`](./MOBILE-SCREENS-PLAN.md)
@@ -478,6 +484,12 @@ Mesmo nesta fase inicial, a API deve nascer preparada para operacao futura com:
 - sem soft delete nesta fase
 - datas serializadas em ISO-8601 com offset
 - logout tratado no cliente nesta fase
+- SCSS puro como camada de estilizacao do frontend e do mobile
+- design systems oficiais: [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas; [`DESIGN-notion.md`](./DESIGN-notion.md) para superficies autenticadas e para todo o mobile
+- sem framework CSS de terceiros (Bootstrap, Tailwind, Material e similares estao explicitamente fora) nem template administrativo pronto
+- stack frontend: `Angular 20.x` + SCSS puro + Standalone Components + Signals
+- stack mobile baseline: `Angular 20.x + Ionic 8.4+ + Capacitor 6`, com avaliacao opcional de upgrade para `Angular 21` na fase de implementacao mobile, condicionada a haver release oficial do Ionic e dos plugins Capacitor com suporte explicito
+- sem clausula de downgrade do Angular abaixo de `20`
 
 ## 19. Estrutura Inicial de Pacotes
 
@@ -772,8 +784,8 @@ Exemplo:
   - seguranca, persistencia, auditoria, migrations e documentacao tecnica
   - suporte de integracao para o frontend
 - Dev Pleno Frontend 1:
-  - estudo e futura adaptacao do template Angular
-  - shell, layout, navegacao, componentes compartilhados
+  - estudo dos dois design systems oficiais (`DESIGN-apple.md` e `DESIGN-notion.md`) e definicao da camada de tokens SCSS
+  - shell autenticado, layout, navegacao e componentes compartilhados implementados em Angular standalone + SCSS, seguindo Notion
   - revisao dos contratos expostos no Swagger
 - Dev Pleno Frontend 2:
   - futura integracao HTTP com a API
@@ -782,9 +794,9 @@ Exemplo:
 
 ### Entregaveis paralelos sugeridos para os devs frontend nesta fase
 - Dev Pleno Frontend 1:
-  - mapear componentes reaproveitaveis do template
-  - identificar shell, menu lateral, header, breadcrumbs e layout base
-  - preparar documento tecnico curto de reaproveitamento do frontend
+  - traduzir os tokens (cores, tipografia, espacamento, raios, sombras) dos dois design systems para variaveis SCSS reutilizaveis
+  - desenhar shell, menu lateral, header, breadcrumbs e layout base do dashboard a partir do Notion design system
+  - preparar documento tecnico curto descrevendo a fronteira Apple/Notion e a estrutura de tokens SCSS adotada
 - Dev Pleno Frontend 2:
   - revisar contratos da API e exemplos de payload
   - preparar mocks de consumo para login, `/auth/me` e usuarios
@@ -979,76 +991,80 @@ Esta fase sera considerada bem-sucedida quando:
 - documentar todos os endpoints e schemas dos DTOs com exemplos coerentes com o PRD
 - cobrir com testes automatizados os cenarios criticos de autenticacao, autorizacao, validacao e auditoria
 
-### Epic 5 - Infraestrutura futura
-- manter apenas como planejamento nesta fase
-- iniciar somente apos a conclusao completa do sistema de login, autenticacao e autorizacao
-- usar PostgreSQL local via Docker Compose como banco oficial ate esse marco
-- preferencialmente iniciar apos a Sprint 4, caso a equipe queira levar documentacao, tratamento de erros e testes criticos ja estabilizados para o ambiente remoto
-- usar AWS como plataforma de infraestrutura remota
-- usar Amazon EC2 para servidores de aplicacao
-- usar Amazon RDS for PostgreSQL para banco gerenciado fora da EC2
-- planejar develop e homologacao em EC2 compartilhada, com bancos RDS separados
-- planejar producao com EC2 e RDS proprios
-- considerar `sa-east-1` como regiao recomendada
-
-### Epic 6 - Onboarding KYC/KYB
+### Epic 5 - Onboarding KYC/KYB
 - implementar onboarding documental de pessoa e empresa
 - preparar coleta e validacao de documentos obrigatorios
 - estruturar verificacoes de identidade e dados cadastrais
 - preparar o sistema para integracoes futuras de OCR, biometria e background check
 - registrar trilha operacional de aprovacao, rejeicao e pendencias cadastrais
 
-### Epic 7 - Analise de credito
+### Epic 6 - Analise de credito
 - implementar esteira inicial de analise de credito para o tomador
 - modelar parecer operacional, score interno e decisao de aprovacao ou rejeicao
 - permitir analise assistida pelo time interno
 - registrar fundamentos da decisao e historico de alteracoes
 - integrar a analise ao fluxo da proposta e da elegibilidade para contratacao
 
-### Epic 8 - Formalizacao contratual
+### Epic 7 - Formalizacao contratual
 - preparar geracao de contrato e artefatos formais da operacao
 - modelar etapa de aceite e assinatura
 - registrar status de formalizacao da proposta
 - bloquear desembolso sem formalizacao concluida
 - preparar integracao futura com assinatura eletronica e CCB
 
-### Epic 9 - Cobranca e inadimplencia
+### Epic 8 - Cobranca e inadimplencia
 - estruturar cobranca basica das parcelas apos contratacao
 - registrar agenda, status e historico de recebimentos
 - permitir acompanhamento de atraso e inadimplencia
 - preparar reprocessos operacionais e a futura integracao com meios de cobranca
 - dar suporte ao financeiro na conciliacao pos-contratacao
 
-### Epic 10 - Backoffice operacional
+### Epic 9 - Backoffice operacional
 - estruturar fila operacional para propostas, pendencias e excecoes
 - dar visibilidade consolidada para o financeiro interno acompanhar onboarding, analise, formalizacao e cobranca
 - permitir tratamento manual de inconsistencias, reprocessos e bloqueios operacionais
 - registrar comentarios, justificativas e trilha operacional das decisoes internas
 - organizar a operacao assistida da SEP antes da automacao ampla
 
-### Epic 11 - Jornada da empresa credora
+### Epic 10 - Jornada da empresa credora
 - estruturar a jornada futura da empresa que aporta recursos na SEP
 - preparar onboarding, elegibilidade e governanca da empresa credora
 - modelar aportes, alocacoes e visao de carteira em fases futuras
 - permitir acompanhamento das operacoes financiadas e seu status
 - manter a entrada desta jornada posterior ao nucleo de contratacao do emprestimo
 
-### Epic 12 - Administracao e governanca
+### Epic 11 - Administracao e governanca
 - expandir a administracao de usuarios para governanca operacional mais ampla
 - preparar RBAC evoluido, perfis internos e parametrizacoes futuras
 - registrar auditoria administrativa e controles de acesso mais detalhados
 - permitir cadastros mestres e configuracoes operacionais do produto
 - sustentar seguranca e segregacao de responsabilidades conforme o produto crescer
 
-### Epic futura - Frontend SEP
-- reaproveitar o template Datta Able Angular como base visual
-- importar layout, shell, navegacao e assets necessarios
-- adaptar componentes existentes para as jornadas de tomador, credor, financeiro e administrador
-- alinhar a versao do Angular do projeto com a versao mais adequada para absorver o template com menor retrabalho
+### Epic 12 - Fundacao Frontend
+- montar projeto Angular `20.x` com Standalone Components, Signals e SCSS puro
+- traduzir os tokens dos dois design systems oficiais ([`DESIGN-apple.md`](./DESIGN-apple.md) e [`DESIGN-notion.md`](./DESIGN-notion.md)) para variaveis SCSS reutilizaveis
+- implementar telas publicas seguindo Apple: landing, login e cadastro
+- implementar shell autenticado seguindo Notion: header, menu lateral, breadcrumbs e area de conteudo
+- implementar biblioteca interna de componentes Notion: botoes, inputs, formularios, cards, tabelas, modais, toasts e loaders
+- implementar telas autenticadas iniciais consumindo apenas APIs das Sprints 1-4: meu perfil, alterar senha, administracao de usuarios, detalhe de usuario e dashboard administrativa inicial (casca)
+- implementar guards de rota, controle de sessao, integracao HTTP com a API e tratamento padronizado de erros 401, 403, 404 e 409
+- entregar o "Frontend MVP" navegavel, validado e independente de qualquer jornada de negocio
+- escopo: tudo que depende apenas das APIs entregues nas Sprints 1-4 (auth, usuarios e admin de usuarios)
 
-### Epic futura - Mobile SEP
+### Epic 13 - Frontend de Jornadas
+- implementar telas funcionais das jornadas, todas no design system Notion, consumindo APIs das Epics 5-11
+- jornada do tomador: onboarding, solicitar emprestimo, acompanhar proposta, status da analise, formalizacao, parcelas e historico
+- jornada da empresa credora: dashboard, perfil, KYB, oportunidades, operacoes financiadas, carteira e detalhe da operacao
+- jornada do financeiro interno: dashboard financeiro, fila operacional, conciliacao, pendencias e visao de recebimentos/desembolsos
+- jornada do backoffice: fila de propostas, mesa de credito, painel de formalizacao, painel de cobranca, comentarios internos, reprocessos e excecoes
+- governanca avancada: gestao avancada de usuarios, perfis e permissoes, parametros, cadastros mestres e auditoria administrativa
+- depende: Epic 12 (Fundacao Frontend) entregue e validado, mais APIs das Epics 5-11 publicadas e estaveis
+
+### Epic 14 - Mobile SEP
 - iniciar junto com a fundacao do frontend, como trilha paralela dependente dos mesmos contratos da API
-- usar `Ionic v8 + Angular + Capacitor`, desde que a versao Angular final permaneca compativel com Ionic v8
+- stack mobile: `Angular 20.x + Ionic 8.4+ + Capacitor 6` como baseline; opcionalmente `Angular 21 + Ionic correspondente` se a checagem de compatibilidade na fase de implementacao mobile passar
+- adotar o design system [`DESIGN-notion.md`](./DESIGN-notion.md) em todo o mobile (visitante e autenticado), adaptado para toque, tabs inferiores e navegacao em pilha
+- estilizar em SCSS puro, customizando componentes Ionic via CSS variables/SCSS para respeitar os tokens do Notion; sem frameworks CSS adicionais
 - validar primeiro em PWA/browser e evoluir para Android/iOS via Capacitor em fase posterior
 - incluir apenas as jornadas mobile do tomador de emprestimo e da empresa credora
 - excluir a visao do financeiro interno, backoffice operacional, administracao, governanca, cadastros mestres e telas de auditoria
@@ -1068,7 +1084,7 @@ Esta fase sera considerada bem-sucedida quando:
 - visao simplificada de oportunidades, operacoes financiadas e status
 - acompanhamento de carteira em fases futuras
 
-### Epic futura - Movimentacao Pix
+### Epic 15 - Movimentacao Pix
 - tratar Pix como fase posterior a fundacao atual da API e a estabilizacao das jornadas que impactam a contratacao
 - posicionar Pix depois de onboarding, analise de credito, formalizacao contratual e cobranca inicial
 - iniciar pelo recorte de `desembolso + recebimento`, evitando comecar por automacao ampla
@@ -1116,6 +1132,18 @@ Esta fase sera considerada bem-sucedida quando:
 - `Pix automatico`
 - automacao ampla com minima intervencao humana
 
+### Epic 16 - Infraestrutura AWS futura
+- manter apenas como planejamento nesta fase
+- iniciar somente apos a conclusao completa do sistema de login, autenticacao e autorizacao
+- usar PostgreSQL local via Docker Compose como banco oficial ate esse marco
+- preferencialmente iniciar apos a Sprint 4, caso a equipe queira levar documentacao, tratamento de erros e testes criticos ja estabilizados para o ambiente remoto
+- usar AWS como plataforma de infraestrutura remota
+- usar Amazon EC2 para servidores de aplicacao
+- usar Amazon RDS for PostgreSQL para banco gerenciado fora da EC2
+- planejar develop e homologacao em EC2 compartilhada, com bancos RDS separados
+- planejar producao com EC2 e RDS proprios
+- considerar `sa-east-1` como regiao recomendada
+
 ### Ordem de prioridade funcional consolidada
 1. Fundacao da API
 2. Gestao de usuarios
@@ -1128,10 +1156,11 @@ Esta fase sera considerada bem-sucedida quando:
 9. Backoffice operacional
 10. Jornada da empresa credora
 11. Administracao e governanca
-12. Frontend SEP
-13. Mobile SEP
-14. Movimentacao Pix
-15. Infraestrutura AWS futura
+12. Fundacao Frontend
+13. Frontend de Jornadas
+14. Mobile SEP
+15. Movimentacao Pix
+16. Infraestrutura AWS futura
 
 ### Fronteiras entre epicos
 - `Onboarding KYC/KYB`
@@ -1155,9 +1184,16 @@ Esta fase sera considerada bem-sucedida quando:
 - `Administracao e governanca`
   - responsavel por RBAC evoluido, parametros, cadastros mestres e controles administrativos
   - nao substitui a gestao operacional do backoffice
-- `Frontend SEP`
-  - camada de experiencia e interface
+- `Fundacao Frontend`
+  - camada de fundacao tecnica e visual do web (Angular 20.x + SCSS + tokens dos design systems)
+  - cobre telas publicas (Apple) e a base autenticada (Notion: shell, navegacao, componentes compartilhados, perfil, alterar senha, admin de usuarios e dashboard inicial)
   - nao deve concentrar regra de negocio de dominio
+  - precondicao para Frontend de Jornadas
+- `Frontend de Jornadas`
+  - camada de experiencia das jornadas funcionais (tomador, credora, financeiro, backoffice e governanca avancada)
+  - reutiliza shell, tokens e componentes da Fundacao Frontend
+  - nao deve concentrar regra de negocio de dominio
+  - depende de APIs publicadas pelas Epics 5-11
 - `Mobile SEP`
   - camada de experiencia mobile para tomador e empresa credora
   - nao substitui o frontend web/backoffice nem deve incluir financeiro interno ou administracao completa nesta fase
@@ -1206,6 +1242,7 @@ Esta fase sera considerada bem-sucedida quando:
 - o backend continuara sendo um unico Spring Boot na fase inicial
 - o banco continuara unico ate decisao futura explicita
 - DDD sera usado primeiro como organizacao modular e linguagem de dominio, nao como pretexto para distribuir o sistema cedo demais
-- este arquivo representa apenas o PRD inicial
-- specs, plans e demais artefatos derivados ainda nao serao gerados
-- o frontend consumira esta API a partir de um template Angular reaproveitado
+- este PRD e um documento vivo: as specs das Sprints 1 a 4 ja existem em `../specs/` e devem evoluir junto com o produto
+- o frontend consumira esta API a partir de uma base Angular standalone + SCSS, implementada diretamente sobre os dois design systems oficiais (Apple para superficies publicas e Notion para superficies autenticadas), sem reaproveitar templates administrativos prontos nem frameworks CSS de terceiros
+- a versao do Angular esta travada em `20.x` como baseline para o frontend e o mobile; o upgrade para `21` so pode ser avaliado na fase de implementacao mobile e depende de release oficial do Ionic e dos plugins Capacitor com suporte explicito
+- nao ha previsao de downgrade do Angular abaixo de `20`; a clausula anterior de downgrade (motivada pelo template administrativo descartado) foi removida

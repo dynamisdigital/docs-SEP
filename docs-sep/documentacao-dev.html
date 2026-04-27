@@ -1015,63 +1015,75 @@ dependencies {
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 5 · Infraestrutura Futura</h4>
-      <ul class="list-sep">
-        <li>Planejamento de ambientes, VPS, seeds, deploy por branch e ambiente.</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h4>Epic 6 · Onboarding KYC/KYB</h4>
+      <h4>Epic 5 · Onboarding KYC/KYB</h4>
       <ul class="list-sep">
         <li>Onboarding documental, coleta e validação de documentos, verificações de identidade, trilha operacional de aprovação e pendências.</li>
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 7 · Análise de Crédito</h4>
+      <h4>Epic 6 · Análise de Crédito</h4>
       <ul class="list-sep">
         <li>Esteira de análise, parecer operacional, score, decisão, fundamentos e integração ao fluxo de proposta.</li>
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 8 · Formalização Contratual</h4>
+      <h4>Epic 7 · Formalização Contratual</h4>
       <ul class="list-sep">
         <li>Geração de contrato, aceite, assinatura, status de formalização, bloqueio de desembolso e integração futura com assinatura eletrônica.</li>
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 9 · Cobrança e Inadimplência</h4>
+      <h4>Epic 8 · Cobrança e Inadimplência</h4>
       <ul class="list-sep">
         <li>Cobrança de parcelas, agenda, status, histórico, acompanhamento de atraso, reprocessos e suporte ao financeiro.</li>
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 10 · Backoffice Operacional</h4>
+      <h4>Epic 9 · Backoffice Operacional</h4>
       <ul class="list-sep">
         <li>Fila operacional, visibilidade consolidada, tratamento manual de inconsistências, comentários e organização da operação assistida.</li>
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 11 · Jornada da Empresa Credora</h4>
+      <h4>Epic 10 · Jornada da Empresa Credora</h4>
       <ul class="list-sep">
         <li>Onboarding, elegibilidade, governança, aportes, alocações, visão de carteira e acompanhamento das operações financiadas.</li>
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 12 · Administração e Governança</h4>
+      <h4>Epic 11 · Administração e Governança</h4>
       <ul class="list-sep">
         <li>RBAC evoluído, perfis internos, parametrizações, auditoria administrativa, cadastros mestres e controles operacionais.</li>
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 13 · Frontend SEP</h4>
+      <h4>Epic 12 · Fundação Frontend</h4>
       <ul class="list-sep">
-        <li>Reaproveitamento do template Angular, adaptação de componentes, alinhamento de versão e implementação das jornadas no frontend.</li>
+        <li>Setup do projeto Angular 20 (Standalone Components + Signals + SCSS puro), tradução dos tokens dos dois design systems para variáveis SCSS reutilizáveis, telas públicas seguindo Apple (landing, login, cadastro), shell autenticado seguindo Notion (header, menu lateral, breadcrumbs), biblioteca interna de componentes Notion (botões, inputs, cards, tabelas, modais, toasts, loaders), telas autenticadas iniciais consumindo as APIs das Sprints 1-4 (perfil, alterar senha, admin de usuários, dashboard inicial), guards de rota, controle de sessão, integração HTTP e tratamento padronizado de erros 401/403/404/409. Entrega o "Frontend MVP" navegável e independente das jornadas de negócio.</li>
       </ul>
     </div>
     <div class="card">
-      <h4>Epic 14 · Movimentação Pix</h4>
+      <h4>Epic 13 · Frontend de Jornadas</h4>
+      <ul class="list-sep">
+        <li>Implementação das telas funcionais das jornadas (tomador, empresa credora, financeiro interno, backoffice e governança avançada) sobre a Fundação Frontend, todas no design system Notion, consumindo as APIs publicadas pelas Epics 5-11. Depende: Epic 12 entregue + APIs das Epics 5-11 publicadas e estáveis.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 14 · Mobile SEP</h4>
+      <ul class="list-sep">
+        <li>App mobile com baseline <code>Angular 20.x + Ionic 8.4+ + Capacitor 6</code> (avaliação opcional de upgrade para Angular 21 na fase de implementação se Ionic e plugins Capacitor confirmarem compatibilidade), seguindo o design system Notion adaptado para toque, tabs inferiores e navegação em pilha. Cobre apenas tomador e empresa credora; financeiro, backoffice e administração permanecem no web.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 15 · Movimentação Pix</h4>
       <ul class="list-sep">
         <li>Desembolso, recebimento, conciliação, webhooks, rastreabilidade, idempotência, auditoria e integração operacional do Pix.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Epic 16 · Infraestrutura AWS Futura</h4>
+      <ul class="list-sep">
+        <li>Planejamento e implementação de ambientes remotos na AWS (EC2 + RDS PostgreSQL), seeds por ambiente, deploy por branch/ambiente, secrets separados, migrations versionadas. Trilha técnica habilitadora; só inicia após a conclusão completa do login, autenticação e autorização.</li>
       </ul>
     </div>
   </div>

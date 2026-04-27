@@ -9,8 +9,8 @@ O mobile deve apoiar a validacao e o acompanhamento das jornadas de contratacao 
 ## 2. Diretrizes Gerais
 
 - Stack recomendada: `Ionic v8 + Angular + Capacitor`.
-- A versao Angular do mobile deve acompanhar a versao final escolhida para o frontend web.
-- Se o frontend web usar Angular abaixo de `16`, a escolha por Ionic v8 deve ser reavaliada antes da implementacao.
+- Stack mobile baseline: `Angular 20.x + Ionic 8.4+ + Capacitor 6` (combinacao com integracao validada e ecossistema alinhado).
+- Na fase de implementacao mobile, avaliar upgrade para Angular `21` apenas se Ionic e plugins Capacitor confirmarem suporte explicito a `21`; caso contrario, manter `20.x`. Nao ha previsao de downgrade abaixo de `20`.
 - A primeira validacao mobile pode ser PWA/browser.
 - Android/iOS via Capacitor entram depois, quando a jornada estiver mais madura.
 - O mobile deve consumir a mesma API publica do web.
@@ -18,7 +18,9 @@ O mobile deve apoiar a validacao e o acompanhamento das jornadas de contratacao 
 - O mobile nao deve conter regra de negocio de dominio.
 - Decisoes de credito, status, permissoes, bloqueios e elegibilidade devem vir da API.
 - O mobile deve reutilizar contratos, DTOs, autenticacao JWT, guards e padroes HTTP definidos com o frontend web.
-- O template Datta Able nao deve ser copiado diretamente para o mobile; devem ser aproveitados apenas identidade visual, tokens de cor, padroes de marca e conceitos de componentes.
+- Todo o mobile (visitante e autenticado) deve seguir o design system [`DESIGN-notion.md`](./DESIGN-notion.md), adaptado as restricoes de viewport, ergonomia de toque, tabs inferiores e navegacao em pilha.
+- A estilizacao deve ser feita em SCSS puro com tokens extraidos do Notion design system (cores, tipografia, espacamento, raios, sombras); Bootstrap, Tailwind, Material e similares estao explicitamente fora.
+- Componentes Ionic, quando usados, devem ser customizados via CSS variables/SCSS para respeitar os tokens do Notion.
 
 ## 3. Escopo Mobile
 
@@ -250,7 +252,7 @@ Dependencia:
 Observacoes:
 - Esta sera a primeira tela visual implementada apos a base tecnica do mobile.
 - Deve validar linguagem, identidade visual mobile e fluxo publico antes de login/register.
-- Nao deve copiar o template administrativo web; deve apenas reaproveitar identidade visual e tokens de marca.
+- Deve seguir o design system [`DESIGN-notion.md`](./DESIGN-notion.md) adaptado para mobile, sem copiar layouts especificos de dashboard administrativo do web.
 
 ### 6.3 Login
 
@@ -728,7 +730,7 @@ Rotas secundarias:
 
 ## 10. Ordem Recomendada de Implementacao Mobile
 
-1. Definir versao Angular/Ionic compativel com o frontend web
+1. Confirmar a stack mobile baseline `Angular 20.x + Ionic 8.4+ + Capacitor 6` no momento da implementacao; opcionalmente avaliar upgrade para Angular `21` se Ionic e plugins Capacitor ja tiverem release com suporte explicito
 2. Criar estrutura base mobile, pacotes, rotas e shell Ionic minimo
 3. Criar boas-vindas / landing mobile
 4. Criar login
@@ -807,7 +809,7 @@ Antes de considerar uma tela mobile pronta, deve existir:
 
 ## 14. Lacunas a Resolver Antes da Implementacao Mobile Completa
 
-- Definir versao final do Angular do frontend web para confirmar compatibilidade com Ionic v8.
+- Reconfirmar a stack baseline `Angular 20.x + Ionic 8.4+ + Capacitor 6` no inicio da implementacao mobile; se houver release oficial do Ionic com suporte explicito a Angular `21`, avaliar o upgrade; caso contrario, seguir com `20.x`.
 - Definir estrategia segura de armazenamento do JWT no mobile/PWA/Capacitor.
 - Definir se o cadastro mobile podera criar apenas usuarios tomadores/clientes.
 - Definir nomenclatura futura de perfis para diferenciar tomador e empresa credora, pois hoje a base inicial possui apenas `ROLE_ADMIN` e `ROLE_CLIENTE`.
