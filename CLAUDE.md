@@ -32,6 +32,7 @@ A entrega tecnica atual e a fundacao backend da API.
 - **Resilience4j** para circuit breaker/retry/timeout em integracoes externas
 - **Micrometer + Prometheus** para metricas
 - **Testcontainers** para testes de integracao com PostgreSQL real
+- **WireMock 3.x** para integration tests dos adapters HTTP do Celcoin (ver ADR 0008)
 - Test slices: `@WebMvcTest`, `@DataJpaTest`, `@JsonTest`
 - Records para DTOs, Sealed types para Roles/eventos, Pattern matching, Virtual threads
 
@@ -46,6 +47,9 @@ A entrega tecnica atual e a fundacao backend da API.
 ### Mobile
 - Baseline: `Angular 20.x + Ionic 8.4+ + Capacitor 6`
 - Avaliar upgrade para Angular 21 na fase de implementacao mobile, condicionado a release oficial Ionic + plugins
+- Storage de token via `Capacitor Preferences` (PWA + Android/iOS)
+- Validacao em PWA primeiro; build Android/iOS via Capacitor entra em fase posterior
+- Trilha de execucao: M-Sprints 0-4 em `specs/200-204`, conduzida por Dev Mobile dedicado
 
 ### Design Systems
 - [`docs-sep/DESIGN-apple.md`](docs-sep/DESIGN-apple.md) — superficies publicas (landing, login, cadastro)
@@ -78,7 +82,7 @@ Modulos previstos: `identity`, `usuarios`, `onboarding`, `credito`, `contratos`,
 - **Sprint 3** — Seguranca/Auth (JWT, login, autorizacao por perfil/ownership, mTLS prep, correlationId)
 - **Sprint 4** — Erros, Documentacao, Testes, Webhook Receiver (Pix prep)
 
-Specs em `specs/000` a `specs/004` para backend; `specs/100+` para frontend.
+Specs em `specs/000` a `specs/004` para backend; `specs/100` a `specs/104` para frontend web (1 arquivo por F-Sprint); `specs/200` a `specs/204` para mobile (1 arquivo por M-Sprint).
 
 ## Roadmap (16 Epics)
 

@@ -290,8 +290,9 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 - JUnit 5 + AssertJ
 - Test slices: `@WebMvcTest`, `@DataJpaTest`, `@JsonTest`
 - **Testcontainers** com PostgreSQL real (sem H2)
-- Mockito para isolamento de provider externo
-- RestAssured (opcional para testes de contrato)
+- Mockito para isolamento de provider externo na camada `application`
+- **WireMock 3.x** para testes de integracao dos adapters HTTP do Celcoin (testa o `Celcoin<X>Provider` sem precisar do Celcoin real); ver [ADR 0008](../adr/0008-wiremock-para-testes-integracao-celcoin.md)
+- RestAssured (opcional para testes de contrato e smoke E2E)
 
 **Containers**
 - Docker Compose para desenvolvimento local (PostgreSQL)
@@ -312,8 +313,9 @@ Toda integracao com sistema externo (Celcoin BaaS, futuras pasarelas de pagament
 
 - **Interface (port)** declarada em `<modulo>.application.port.out.<X>Provider` — descreve a capacidade em termos de dominio (ex.: `KycProvider.validar(documento)`, `PixProvider.iniciarDesembolso(...)`)
 - **Implementacao (adapter)** em `<modulo>.infrastructure.adapter.<X>.Celcoin<X>Provider` — traduz a chamada para a API externa (Celcoin), trata erros tecnicos, aplica idempotencia, retry e circuit breaker via Resilience4j
-- **Stub/fake** em `<modulo>.infrastructure.adapter.<X>.Fake<X>Provider` para testes e ambiente local sem credenciais reais
-- A escolha do adapter por ambiente acontece via `@ConditionalOnProperty` ou Profile do Spring
+- **Stub/fake** em `<modulo>.infrastructure.adapter.<X>.Fake<X>Provider` para testes da camada `application` e ambiente local sem credenciais reais
+- **Integration test do adapter HTTP** em `<modulo>.infrastructure.adapter.<X>.Celcoin<X>ProviderIT.java` usando **WireMock 3.x** (`@WireMockTest`) — testa o wiring HTTP real (URL, headers OAuth, `Idempotency-Key`, parsing de respostas, retry/circuit breaker) sem precisar do Celcoin real. Ver [ADR 0008](../adr/0008-wiremock-para-testes-integracao-celcoin.md).
+- A escolha do adapter por ambiente acontece via `@ConditionalOnProperty` ou Profile do Spring (incluindo profile `local-wiremock` para dev sem credenciais Celcoin)
 
 Beneficios:
 - Trocar provedor (ex.: Celcoin → outro BaaS) afeta so a camada de adapter
@@ -596,6 +598,8 @@ Mesmo nesta fase inicial, a API deve nascer preparada para operacao futura com:
 - JUnit 5 + AssertJ
 - Test slices: `@WebMvcTest`, `@DataJpaTest`, `@JsonTest`
 - **Testcontainers** com PostgreSQL real (sem H2)
+- Mockito para unit tests da camada `application` (com `Fake<X>Provider` injetado)
+- **WireMock 3.x** para integration tests dos adapters HTTP de Celcoin (`Celcoin<X>ProviderIT`) — ver ADR 0008
 - TDD desde Sprint 1: cada Sprint entrega testes correspondentes ao escopo
 - JaCoCo target 70% por modulo (validado em CI)
 
@@ -624,6 +628,7 @@ ADRs vivem em [`adr/`](../adr/) e devem ser atualizados quando uma decisao tecni
 - `0005-segregacao-patrimonial-via-conta-escrow.md`
 - `0006-mapstruct-substitui-modelmapper.md`
 - `0007-ddd-com-hexagonal-ports-and-adapters-por-modulo.md`
+- `0008-wiremock-para-testes-integracao-celcoin.md`
 
 ## 19. Estrutura Inicial de Pacotes
 
@@ -917,14 +922,16 @@ Exemplo:
 
 ### Composicao da equipe
 - 1 dev senior com atuacao em backend e frontend
-- 2 devs plenos com foco em frontend
+- 2 devs plenos com foco em frontend (web)
+- 1 dev mobile dedicado (Ionic + Angular + Capacitor)
 
 ### Distribuicao inicial sugerida
 - Dev Senior:
   - ownership do backend
   - definicao de contratos da API
   - seguranca, persistencia, auditoria, migrations e documentacao tecnica
-  - suporte de integracao para o frontend
+  - suporte de integracao para o frontend e mobile
+  - revisao de PRs cruzados (backend, frontend, mobile) onde houver impacto em contrato
 - Dev Pleno Frontend 1:
   - estudo dos dois design systems oficiais (`DESIGN-apple.md` e `DESIGN-notion.md`) e definicao da camada de tokens SCSS
   - shell autenticado, layout, navegacao e componentes compartilhados implementados em Angular standalone + SCSS, seguindo Notion
@@ -933,6 +940,12 @@ Exemplo:
   - futura integracao HTTP com a API
   - preparacao das telas funcionais
   - validacao de usabilidade dos contratos de auth e usuario
+- Dev Mobile:
+  - ownership do projeto Mobile SEP (Ionic 8.4+ + Angular 20.x + Capacitor 6)
+  - adaptacao do design system Notion para mobile (touch targets, tabs inferiores, navegacao em pilha)
+  - implementacao das M-Sprints 0-4 (trilha mobile foundation paralela a backend e frontend web)
+  - reuso de contratos da API publicados pelo backend (sem reinventar DTOs)
+  - validacao em PWA primeiro; build Android/iOS via Capacitor entra em fase posterior
 
 ### Entregaveis paralelos sugeridos para os devs frontend nesta fase
 - Dev Pleno Frontend 1:
@@ -978,14 +991,33 @@ Exemplo:
 
 Os 2 Devs Plenos Frontend tem trabalho concreto desde a Sprint 0, em paralelo ao backend. Sem isso, ficam ociosos durante as Sprints 1-4 que sao predominantemente backend.
 
-- Spec mestre: [`specs/100-frontend-foundation.md`](../specs/100-frontend-foundation.md)
-- F-Sprint 0: setup Angular 20.x (project scaffold, ESLint + Prettier + Stylelint, Husky + lint-staged, Vitest, Playwright)
-- F-Sprint 1: traducao dos tokens Apple+Notion para SCSS, design system showcase (Storybook ou rota `/design-system`)
-- F-Sprint 2: telas Apple (landing, login, register) com MSW (Mock Service Worker) consumindo mocks JSON dos contratos da Sprint 2 backend
-- F-Sprint 3: integracao com auth real, shell Notion, guards funcionais
-- F-Sprint 4: telas autenticadas (perfil, alterar senha, admin de usuarios) consumindo APIs reais
+Cada F-Sprint tem seu proprio spec (1 arquivo por F-Sprint, paralelo ao padrao do backend `000-004`):
+- F-Sprint 0: [`specs/100-fsprint-0-setup-angular.md`](../specs/100-fsprint-0-setup-angular.md) — setup Angular 20.x (project scaffold, ESLint + Prettier + Stylelint, Husky + lint-staged, Vitest, Playwright, MSW, Frontend CI)
+- F-Sprint 1: [`specs/101-fsprint-1-design-tokens-showcase.md`](../specs/101-fsprint-1-design-tokens-showcase.md) — traducao dos tokens Apple+Notion para SCSS, design system showcase em rota `/design-system`
+- F-Sprint 2: [`specs/102-fsprint-2-telas-apple-publicas.md`](../specs/102-fsprint-2-telas-apple-publicas.md) — telas Apple (landing, login, register) com MSW (Mock Service Worker) consumindo mocks JSON dos contratos da Sprint 2 backend
+- F-Sprint 3: [`specs/103-fsprint-3-shell-notion-auth.md`](../specs/103-fsprint-3-shell-notion-auth.md) — integracao com auth real, shell Notion, guards funcionais, interceptors HTTP
+- F-Sprint 4: [`specs/104-fsprint-4-telas-autenticadas.md`](../specs/104-fsprint-4-telas-autenticadas.md) — telas autenticadas (perfil, alterar senha, admin de usuarios, dashboard casca) + smoke E2E Playwright
 
-Cada F-Sprint tem Definition of Done explicita na spec 100.
+Cada F-Sprint tem Definition of Done explicita no seu spec correspondente.
+
+### Trilha paralela Mobile (Specs 2XX)
+
+O Dev Mobile dedicado tem trabalho concreto desde a Sprint 0, em paralelo ao backend e ao frontend web. Cada M-Sprint tem seu proprio spec (1 arquivo por M-Sprint, paralelo aos padroes 0XX backend e 1XX frontend):
+
+- M-Sprint 0: [`specs/200-msprint-0-setup-ionic.md`](../specs/200-msprint-0-setup-ionic.md) — setup Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling completo (lint, test, hooks, MSW, Mobile CI)
+- M-Sprint 1: [`specs/201-msprint-1-tokens-notion-mobile.md`](../specs/201-msprint-1-tokens-notion-mobile.md) — adaptacao dos tokens Notion para mobile (touch, tabs inferiores), customizacao de componentes Ionic, design system showcase
+- M-Sprint 2: [`specs/202-msprint-2-telas-publicas-mobile.md`](../specs/202-msprint-2-telas-publicas-mobile.md) — splash, boas-vindas, login, register com MSW; token storage via Capacitor Preferences
+- M-Sprint 3: [`specs/203-msprint-3-shell-mobile-auth.md`](../specs/203-msprint-3-shell-mobile-auth.md) — auth real, shell mobile (tabs inferiores), guards funcionais, interceptors HTTP
+- M-Sprint 4: [`specs/204-msprint-4-telas-autenticadas-mobile.md`](../specs/204-msprint-4-telas-autenticadas-mobile.md) — perfil, alterar senha, casca tomador, casca empresa credora + smoke E2E PWA
+
+Cada M-Sprint tem Definition of Done explicita no seu spec correspondente.
+
+**Diferencas vs trilha frontend web (1XX):**
+- Mobile **so usa Notion** (nao Apple) — fronteira diferente: ja na primeira tela publica (boas-vindas) seguimos Notion adaptado
+- Storage de token via **Capacitor Preferences** (mais seguro que localStorage e funciona em PWA + Android/iOS)
+- Validacao em **PWA primeiro** (browser); Android/iOS via Capacitor entra na Epic 14 Fase Mobile 2+
+- Escopo reduzido: **apenas tomador e empresa credora**, sem financeiro interno, backoffice ou administracao completa
+- Nao recria contratos: reusa DTOs e endpoints definidos pelo backend e validados pelo frontend web
 
 ### Definition of Done (DoD) por tipo de task
 
@@ -1272,6 +1304,18 @@ Esta fase sera considerada bem-sucedida quando:
 - iniciar funcionalmente apos autenticacao documentada e estavel, preferencialmente apos Sprint 4
 - nao antecipar telas funcionais alem de login antes de existirem APIs minimas de onboarding, analise de credito e formalizacao
 - manter o mobile antes de Pix e automacoes financeiras expandidas, pois ajuda a validar a jornada de contratacao com usuarios reais
+
+#### Trilha Mobile Foundation (M-Sprints 0-4, paralelas a Sprints 0-4 backend)
+
+A primeira fase da Epic 14 e detalhada em 5 specs (1 arquivo por M-Sprint, paralelo aos padroes 0XX backend e 1XX frontend), conduzida pelo Dev Mobile dedicado:
+
+- M-Sprint 0: [`specs/200-msprint-0-setup-ionic.md`](../specs/200-msprint-0-setup-ionic.md) — Setup Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling
+- M-Sprint 1: [`specs/201-msprint-1-tokens-notion-mobile.md`](../specs/201-msprint-1-tokens-notion-mobile.md) — Tokens Notion adaptados (touch, tabs inferiores) + Showcase
+- M-Sprint 2: [`specs/202-msprint-2-telas-publicas-mobile.md`](../specs/202-msprint-2-telas-publicas-mobile.md) — Splash, Boas-vindas, Login, Register com MSW + Capacitor Preferences
+- M-Sprint 3: [`specs/203-msprint-3-shell-mobile-auth.md`](../specs/203-msprint-3-shell-mobile-auth.md) — Auth real, Shell mobile (tabs inferiores), Guards, Interceptors
+- M-Sprint 4: [`specs/204-msprint-4-telas-autenticadas-mobile.md`](../specs/204-msprint-4-telas-autenticadas-mobile.md) — Perfil, Alterar senha, Casca tomador, Casca credora + Smoke E2E PWA
+
+Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornadas funcionais do tomador, da empresa credora e Pix visivel ao usuario), que dependem das APIs das Epics 5-11.
 
 #### Escopo mobile do tomador
 - cadastro e login

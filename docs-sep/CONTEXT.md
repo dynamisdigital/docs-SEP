@@ -179,6 +179,8 @@ As seguintes decisoes foram tomadas:
 - HTTP client `RestClient` (Spring 6) para integracoes Celcoin; `WebClient` reservado para streams
 - resiliencia com `Resilience4j` (circuit breaker, retry, timeout)
 - testes com `JUnit 5 + AssertJ + Testcontainers` (PostgreSQL real, sem H2) e test slices `@WebMvcTest`/`@DataJpaTest`/`@JsonTest`
+- `Mockito` para unit tests da camada `application` (com `Fake<X>Provider` injetado)
+- `WireMock 3.x` para integration tests dos adapters HTTP do Celcoin (`Celcoin<X>ProviderIT`) — testa wiring HTTP real sem precisar do Celcoin; ver ADR 0008
 - qualidade com `Spotless + Palantir Java Format`, `JaCoCo target 70%`, pre-commit hooks
 - arquitetura: monolito modular DDD com `Hexagonal/Ports & Adapters` por modulo
 - `Provider Pattern` obrigatorio para integracoes externas (Celcoin)

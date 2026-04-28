@@ -136,12 +136,17 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.20.x'
     testImplementation 'org.testcontainers:postgresql:1.20.x'
     testImplementation 'io.rest-assured:rest-assured:5.5.x'
+
+    // WireMock para integration tests dos adapters HTTP de Celcoin (ADR 0008)
+    testImplementation 'org.wiremock:wiremock-standalone:3.9.2'
+    testImplementation 'org.wiremock.integrations:wiremock-spring-boot:3.1.0'
 }
 ```
 
 **Decisoes ja consolidadas (ver PRD §18)**
 - **MapStruct** substitui ModelMapper (type-safe, gera codigo)
 - **Testcontainers** com PostgreSQL real, sem H2
+- **WireMock 3.x** para integration tests dos adapters HTTP de Celcoin (ADR 0008)
 - **Resilience4j** para circuit breaker/retry/timeout (preparacao Celcoin)
 - **Micrometer + Prometheus** para metricas
 - JWT pinado em `0.12.x` (API + Impl + Jackson)
@@ -372,6 +377,17 @@ Preparar a infraestrutura comum para o `Provider Pattern` definido no PRD §11: 
 - circuit breaker abre apos N falhas consecutivas configuravel
 - requests externas levam header `Idempotency-Key` quando configurado
 - logs de request/response incluem `correlationId` no MDC
+
+**Estrategia de teste (preparacao para Epic 5+)**
+
+A camada de adapter (`infrastructure.adapter.<X>`) sera testada com **WireMock 3.x** quando os primeiros `Celcoin<X>Provider` reais forem implementados (Epic 5 em diante). Padrao definido no [ADR 0008](../adr/0008-wiremock-para-testes-integracao-celcoin.md):
+
+- arquivo de teste: `<modulo>.infrastructure.adapter.<X>.Celcoin<X>ProviderIT.java`
+- anotacoes: `@SpringBootTest` + `@WireMockTest(httpPort = 8089)`
+- stubs: `src/test/resources/wiremock/<provider>/mappings/*.json`
+- cenarios obrigatorios por adapter: sucesso, erro 4xx, erro 5xx, retry em rate limit, timeout
+
+Nesta Sprint 1, apenas a dependencia esta declarada (Task 1.1b). O primeiro uso real fica para a Task 4.4 (Webhook Receiver) e depois Epic 5.
 
 **Pre-requisitos**
 - Task 1.1c concluida

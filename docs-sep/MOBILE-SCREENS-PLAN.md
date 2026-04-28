@@ -6,6 +6,15 @@ Planejar as telas do app mobile SEP a partir do PRD, dos endpoints previstos e d
 
 O mobile deve apoiar a validacao e o acompanhamento das jornadas de contratacao de emprestimo, sem substituir o backoffice web.
 
+A trilha de execucao do mobile e governada por 5 specs (uma por M-Sprint), em paralelo as Sprints 0-4 do backend e as F-Sprints 0-4 do frontend web:
+- [`specs/200-msprint-0-setup-ionic.md`](../specs/200-msprint-0-setup-ionic.md) (M-Sprint 0)
+- [`specs/201-msprint-1-tokens-notion-mobile.md`](../specs/201-msprint-1-tokens-notion-mobile.md) (M-Sprint 1)
+- [`specs/202-msprint-2-telas-publicas-mobile.md`](../specs/202-msprint-2-telas-publicas-mobile.md) (M-Sprint 2)
+- [`specs/203-msprint-3-shell-mobile-auth.md`](../specs/203-msprint-3-shell-mobile-auth.md) (M-Sprint 3)
+- [`specs/204-msprint-4-telas-autenticadas-mobile.md`](../specs/204-msprint-4-telas-autenticadas-mobile.md) (M-Sprint 4)
+
+As Fases Mobile 2-4 (jornadas funcionais) deste plano vao alem das M-Sprints 0-4 e sao detalhadas em fases posteriores quando as APIs das Epics 5-11 estiverem publicadas.
+
 ## 2. Diretrizes Gerais
 
 - Stack recomendada: `Ionic v8 + Angular + Capacitor`.

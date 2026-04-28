@@ -164,7 +164,7 @@ Configurar Git hooks (backend) e Husky + lint-staged (frontend, trilha 1XX) para
 **Arquivos esperados**
 - Backend: `.githooks/pre-commit` rodando `./gradlew spotlessCheck`
 - Backend: documentacao no README sobre `git config core.hooksPath .githooks`
-- Frontend: `package.json` com Husky + lint-staged (criado na trilha 1XX, Spec 100)
+- Frontend: `package.json` com Husky + lint-staged (criado na trilha 1XX, [`specs/100-fsprint-0-setup-angular.md`](./100-fsprint-0-setup-angular.md))
 
 **Criterios de verificacao**
 - Commit com codigo desformatado e bloqueado

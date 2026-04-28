@@ -48,7 +48,8 @@ Nao ha previsao de downgrade do Angular abaixo de `20`.
 - PRD §11 (Base frontend e mobile)
 - PRD §18 (Decisoes Consolidadas)
 - CONTEXT.md (Frontend, Mobile, Situacao atual)
-- Spec 100 - F-Sprint 0 cria projeto Angular `20.x`
+- Spec 100 ([`specs/100-fsprint-0-setup-angular.md`](../specs/100-fsprint-0-setup-angular.md)) — F-Sprint 0 cria projeto Angular `20.x` para o frontend web
+- Spec 200 ([`specs/200-msprint-0-setup-ionic.md`](../specs/200-msprint-0-setup-ionic.md)) — M-Sprint 0 cria projeto Mobile com Ionic `8.4+` + Angular `20.x` + Capacitor `6`
 
 ## Referencias
 

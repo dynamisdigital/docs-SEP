@@ -49,12 +49,12 @@ Como subproduto: Angular travado em `20.x` baseline (a clausula de downgrade foi
 
 - PRD §11 (Base frontend, Diretriz de adocao dos design systems, Base mobile)
 - PRD §18 (Decisoes Consolidadas)
-- Spec 100 (Trilha Frontend Foundation) — F-Sprint 1 traduz tokens
+- Spec 101 ([`specs/101-fsprint-1-design-tokens-showcase.md`](../specs/101-fsprint-1-design-tokens-showcase.md)) — F-Sprint 1 traduz tokens
 - WEB-SCREENS-PLAN.md e MOBILE-SCREENS-PLAN.md atualizados
 
 ## Referencias
 
 - PRD §11, §18, §27
 - DESIGN-apple.md, DESIGN-notion.md
-- Spec 100
+- Specs 100-104 (trilha Frontend Foundation, 1 arquivo por F-Sprint)
 - ADR 0003 (stack Angular 20)

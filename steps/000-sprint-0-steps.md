@@ -797,7 +797,7 @@ git commit -m "chore: adicionar pre-commit hook que roda Spotless"
 ```
 
 ### Observacoes
-- **Frontend**: Husky + lint-staged sera configurado na Spec 100 (F-Sprint 0). Os 2 hooks coexistem (Git hook backend + Husky frontend) sem conflito.
+- **Frontend**: Husky + lint-staged sera configurado em [`specs/100-fsprint-0-setup-angular.md`](../specs/100-fsprint-0-setup-angular.md). Os 2 hooks coexistem (Git hook backend + Husky frontend) sem conflito.
 - **Hook em CI**: o CI (Task 0.6) tambem roda `spotlessCheck`, garantindo que mesmo commits com `--no-verify` sejam barrados na PR.
 
 ---
@@ -990,7 +990,7 @@ adr/ @MAURICIO_GITHUB_USERNAME
      - [x] Require branches to be up to date before merging
      - Adicionar status checks (apos CI rodar pela primeira vez):
        - `build` (Task 0.6)
-       - `Frontend CI / build` (Spec 100)
+       - `Frontend CI / build` (Spec 100 — F-Sprint 0)
    - [x] Require conversation resolution before merging
    - [x] Require linear history
    - [ ] Require signed commits (opcional, recomendado)
@@ -1337,7 +1337,7 @@ Use o nome do modulo de dominio quando aplicavel:
 ```
 feat(usuarios): adicionar criacao publica de usuario
 fix(auth): rejeitar tokens com claim sub vazia
-docs(adr): adicionar ADR 0008 sobre observabilidade
+docs(adr): adicionar ADR 0009 sobre observabilidade
 chore: atualizar Spring Boot para 3.5.1
 refactor(escrow): extrair MovimentacaoFactory
 test(identity): cobrir cenario de token expirado
@@ -1419,7 +1419,7 @@ Mensagens de commit seguem [Conventional Commits](https://www.conventionalcommit
 ```
 feat(usuarios): adicionar criacao publica
 fix(auth): rejeitar token com sub vazia
-docs(adr): adicionar ADR 0008
+docs(adr): adicionar ADR 0009
 chore: atualizar Spring Boot 3.5.1
 ```
 ````
@@ -1481,7 +1481,7 @@ ls C:/workspace-sep/adr/
 - Quando adicionar um novo ADR durante o projeto, lembrar de:
   1. Numerar sequencialmente (proximo seria `0008`)
   2. Cross-ref no PRD §18 ("Decisoes registradas em ADR")
-  3. Citar no commit (`docs(adr): adicionar ADR 0008 sobre X`)
+  3. Citar no commit (`docs(adr): adicionar ADR 0009 sobre X`)
 
 ---
 
@@ -1724,7 +1724,7 @@ C:/workspace-sep/
 ## Proximos passos apos Sprint 0
 
 1. **Sprint 1** — comeca com [`specs/001-sprint-1-fundacao-tecnica.md`](../specs/001-sprint-1-fundacao-tecnica.md). Antes, gerar `steps/001-sprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
-2. **F-Sprint 0 Frontend** — em paralelo, comecar [`specs/100-frontend-foundation.md`](../specs/100-frontend-foundation.md) (escopo dos Devs Plenos Frontend).
+2. **F-Sprint 0 Frontend** — em paralelo, comecar [`specs/100-fsprint-0-setup-angular.md`](../specs/100-fsprint-0-setup-angular.md) (escopo dos Devs Plenos Frontend). As proximas F-Sprints estao em `specs/101` a `specs/104`.
 
 ## Referencias
 - [Spec 000](../specs/000-sprint-0-hygiene-foundation.md) — descricao alta das tasks

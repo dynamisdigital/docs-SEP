@@ -43,6 +43,7 @@ Provedores previstos por modulo:
 ### Positivas
 - modulos de dominio testaveis sem rede
 - possivel rodar local com `Fake<X>Provider` (sem Celcoin)
+- adapters HTTP testaveis em CI com WireMock (ver [ADR 0008](./0008-wiremock-para-testes-integracao-celcoin.md)) sem credenciais Celcoin
 - troca de provider afeta apenas a camada de adapter
 - versionamento da API externa fica encapsulado
 - novos providers (futuras integracoes) seguem padrao conhecido
@@ -70,3 +71,4 @@ Provedores previstos por modulo:
 - "Hexagonal Architecture" - Alistair Cockburn
 - "Ports and Adapters" / "Clean Architecture" - Uncle Bob
 - ADR 0001 (monolito modular DDD)
+- ADR 0008 (WireMock para testes de integracao com Celcoin) — complementa este ADR cobrindo a camada de teste do adapter HTTP
