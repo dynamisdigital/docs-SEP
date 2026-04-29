@@ -35,6 +35,7 @@ Permite codificacao manual ou assistida com fidelidade ao plano.
 | Sprint 2 - Gestao de Usuarios | `002-sprint-2-steps.md` | A criar antes da Sprint 2 |
 | Sprint 3 - Seguranca e Auth | `003-sprint-3-steps.md` | A criar antes da Sprint 3 |
 | Sprint 4 - Estabilizacao | `004-sprint-4-steps.md` | A criar antes da Sprint 4 |
+| Sprint 5 - Endurecimento de Seguranca | `005-sprint-5-steps.md` | A criar antes da Sprint 5 |
 | F-Sprint 0 Frontend - Setup Angular | `100-fsprint-0-steps.md` | A criar antes da F-Sprint 0 |
 | F-Sprint 1 Frontend - Tokens + Showcase | `101-fsprint-1-steps.md` | A criar antes da F-Sprint 1 |
 | F-Sprint 2 Frontend - Telas Apple | `102-fsprint-2-steps.md` | A criar antes da F-Sprint 2 |

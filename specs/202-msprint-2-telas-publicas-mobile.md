@@ -15,6 +15,10 @@
 
 Implementar as 4 primeiras telas publicas do mobile seguindo Notion mobile-adaptado: splash inicial, boas-vindas/landing mobile, login e register publico. Como o backend Sprint 3 ainda nao tem auth real, as chamadas HTTP sao interceptadas via **MSW** com handlers que simulam os contratos do PRD §21. Permite validar UX, fluxo, ergonomia mobile (toque, teclado virtual, navegacao em pilha) antes da integracao real (M-Sprint 3).
 
+> **Nota apos [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)**: o mobile e o **canal exclusivo do tomador** — apos a Sprint 5, o cadastro publico de tomador no web e desativado, e o app mobile vira o unico ponto de entrada de novos clientes externos. Esta M-Sprint 2 ja deve preparar terreno:
+> - Tela boas-vindas: 2 cards de jornada com mensagens distintas — "Sou tomador" segue na app; "Sou empresa credora" mostra mensagem "Cadastros de empresa credora sao feitos por convite no nosso painel web; consulte o time SEP"
+> - Tela register: foca em **tomador** (cadastro publico). A `role` enviada para o backend sera `CLIENTE` (futura `TOMADOR` apos Epic 11) — admin nao pode ser criado via mobile
+
 ## Escopo
 
 ### Em escopo

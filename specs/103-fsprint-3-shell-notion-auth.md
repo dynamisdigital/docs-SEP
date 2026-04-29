@@ -15,6 +15,8 @@
 
 Trocar a camada de MSW por **API real** entregue pela Sprint 3 backend (login + `/auth/me`), implementar o **shell autenticado** seguindo o design system Notion (header, sidenav, breadcrumbs), e introduzir **Functional Guards** + **HTTP interceptors** para proteger rotas e tratar 401/403 de forma centralizada. Esta e a primeira F-Sprint que depende efetivamente do backend pronto.
 
+> **Nota apos [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)**: o shell autenticado web foca em **usuarios internos** (admin, financeiro, backoffice) **+ empresa credora**. **Tomador nao tem versao web** — sua jornada e exclusivamente mobile. A F-Sprint 3 implementa shell e auth genericos; a separacao de menus/tabs por perfil (admin vs financeiro vs credora) sera refinada na Epic 11 (Administracao e Governanca).
+
 ## Escopo
 
 ### Em escopo

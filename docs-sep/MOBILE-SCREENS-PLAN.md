@@ -2,9 +2,13 @@
 
 ## 1. Objetivo
 
-Planejar as telas do app mobile SEP a partir do PRD, dos endpoints previstos e do plano de telas web, mantendo o escopo mobile menor e focado nas jornadas externas.
+Planejar as telas do app mobile SEP a partir do PRD, dos endpoints previstos e do plano de telas web.
 
-O mobile deve apoiar a validacao e o acompanhamento das jornadas de contratacao de emprestimo, sem substituir o backoffice web.
+**Apos [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)**: o mobile e o **canal exclusivo do tomador** (jornada nao tem versao web) e o **canal resumido da empresa credora** (notificacoes + status simplificado, sem KYB completo nem carteira detalhada). Internos (admin, financeiro, backoffice) **nao acessam mobile**.
+
+O mobile apoia:
+- **Tomador**: jornada completa de contratacao de emprestimo (cadastro, login, onboarding, solicitacao, acompanhamento, formalizacao, parcelas, pagamentos)
+- **Empresa Credora**: visao resumida (notificacoes de oportunidades, status de operacoes financiadas, perfil basico) — sem substituir o web onde KYB completo, carteira, dashboards densos e relatorios sao executados
 
 A trilha de execucao do mobile e governada por 5 specs (uma por M-Sprint), em paralelo as Sprints 0-4 do backend e as F-Sprints 0-4 do frontend web:
 - [`specs/200-msprint-0-setup-ionic.md`](../specs/200-msprint-0-setup-ionic.md) (M-Sprint 0)

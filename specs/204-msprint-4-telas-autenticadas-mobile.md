@@ -15,6 +15,12 @@
 
 Fechar a Fundacao Mobile (M-Sprints 0-4) entregando as telas autenticadas iniciais: meu perfil, alterar senha, casca de inicio do tomador e casca de inicio da empresa credora. Validar o golden path mobile com **smoke E2E Playwright em PWA** rodando contra backend real. Ao final, o "Mobile MVP" e demonstravel para stakeholders, e a Epic 14 Fase Mobile 2+ (jornadas funcionais) pode ser iniciada.
 
+> **Nota apos [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)**: a Fase Mobile 2+ (jornadas funcionais — Epic 14) tem escopos diferentes por perfil:
+> - **Tomador**: jornada completa (mobile e o canal exclusivo) — onboarding, solicitar emprestimo, acompanhar proposta, formalizacao, parcelas, comprovantes
+> - **Empresa Credora**: versao **resumida** — notificacoes de oportunidades, status de operacoes financiadas, perfil basico. KYB completo, carteira detalhada, comparacao de oportunidades, exportacao de relatorios ficam no **web** (Epic 13)
+>
+> A casca de tomador (Task M-4.3) e a casca da credora (Task M-4.4) refletem essa diferenca: tomador ganha mais cards/atalhos (jornada complexa); credora tem layout enxuto.
+
 ## Escopo
 
 ### Em escopo

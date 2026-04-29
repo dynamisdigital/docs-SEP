@@ -78,10 +78,14 @@ O produto alvo e uma plataforma SEP com foco em capital de giro PJ.
 O escopo do produto e maior do que a entrega inicial atualmente planejada. A fase atual continua sendo a fundacao tecnica da API, mas o direcionamento consolidado do produto ja prioriza a jornada de contratacao do emprestimo como proxima grande frente funcional.
 
 As quatro jornadas principais definidas pelo PO sao:
-- jornada da pessoa ou empresa que ira pedir emprestimo
-- jornada da empresa que ira emprestar recursos
-- jornada do financeiro interno
-- jornada do administrador do sistema
+- jornada da pessoa ou empresa que ira pedir emprestimo (**canal mobile exclusivo apos ADR 0009**)
+- jornada da empresa que ira emprestar recursos (**canal web principal + mobile resumido apos ADR 0009**)
+- jornada do financeiro interno (**canal web exclusivo apos ADR 0009**)
+- jornada do administrador do sistema (**canal web exclusivo apos ADR 0009**)
+
+A separacao de canal foi formalizada em [ADR 0009](../adr/0009-separacao-de-canal-por-perfil.md) por motivos de seguranca (biometria nativa, storage Keystore/Keychain, anti-phishing, certificate pinning) e UX (tarefas de credora exigem desktop).
+
+**Sprint 5 (Endurecimento de Seguranca)** foi adicionada entre a Sprint 4 e a Epic 5 (Onboarding KYC/KYB) como **gate para producao**. Implementa MFA via TOTP (web) + biometria nativa (mobile), refresh token com rotacao, rate limiting, account lockout, password policy nova (12+ chars OU passphrase + haveibeenpwned), step-up authentication para operacoes sensiveis, audit log de seguranca, e materializa a canalizacao por perfil (ADR 0009). Detalhada em [ADR 0010](../adr/0010-mfa-totp-com-biometria-mobile.md) e [Spec 005](../specs/005-sprint-5-endurecimento-seguranca.md).
 
 Essas jornadas devem existir formalmente na modelagem do produto, mas a execucao sera feita por ondas, em vez de tentar implementar tudo de uma vez.
 

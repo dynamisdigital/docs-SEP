@@ -56,6 +56,12 @@ A entrega tecnica atual e a fundacao backend da API.
 - [`docs-sep/DESIGN-notion.md`](docs-sep/DESIGN-notion.md) — superficies autenticadas e todo o mobile
 - Fronteira: estado de autenticacao (`/auth/me`)
 
+### Separacao de canal por perfil (ADR 0009)
+- **Tomador**: mobile-only (sem versao web apos Sprint 5 — biometria nativa, storage Keystore/Keychain)
+- **Empresa Credora**: web principal (KYB, carteira, oportunidades) + mobile resumido (notificacoes, status)
+- **Internos (admin, financeiro, backoffice)**: web-only
+- Cadastro publico generico desativado na Sprint 5; substituido por fluxos canalizados (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
+
 ### Qualidade e tooling
 - Spotless + Palantir Java Format
 - JaCoCo target 70% por modulo
@@ -81,8 +87,9 @@ Modulos previstos: `identity`, `usuarios`, `onboarding`, `credito`, `contratos`,
 - **Sprint 2** — Gestao de Usuarios (entidade Usuario com Records, MapStruct, criacao publica, BCrypt, testes)
 - **Sprint 3** — Seguranca/Auth (JWT, login, autorizacao por perfil/ownership, mTLS prep, correlationId)
 - **Sprint 4** — Erros, Documentacao, Testes, Webhook Receiver (Pix prep)
+- **Sprint 5** — Endurecimento de Seguranca (MFA TOTP + biometria mobile, refresh token rotativo, rate limit, lockout, password policy nova, step-up auth, audit log de seguranca, canalizacao por perfil) — **gate para producao e Epic 5**
 
-Specs em `specs/000` a `specs/004` para backend; `specs/100` a `specs/104` para frontend web (1 arquivo por F-Sprint); `specs/200` a `specs/204` para mobile (1 arquivo por M-Sprint).
+Specs em `specs/000` a `specs/005` para backend; `specs/100` a `specs/104` para frontend web (1 arquivo por F-Sprint); `specs/200` a `specs/204` para mobile (1 arquivo por M-Sprint).
 
 ## Roadmap (16 Epics)
 
@@ -116,7 +123,8 @@ SEPs sao reguladas pela **Resolucao CMN nº 4.656/2018**. Implicacoes:
 - UUID nativo no PostgreSQL, `java.util.UUID` no Java
 - Sem soft delete nesta fase
 - Datas serializadas em ISO-8601 com offset
-- Senhas: BCrypt; politica atual de 6 caracteres sera revisada antes de producao
+- Senhas: BCrypt; politica de 6 caracteres e valida apenas Sprints 1-4; Sprint 5 (Endurecimento) substitui por minimo 12 chars OU passphrase + haveibeenpwned (ADR 0010)
+- MFA obrigatorio a partir da Sprint 5: TOTP (web) + biometria nativa (mobile); refresh token rotativo; rate limit; account lockout; step-up auth — **gate para producao** (ADR 0010)
 - Locale `pt-BR`, timezone `America/Sao_Paulo`
 - Logout: tratado no cliente (sem refresh token nesta fase)
 

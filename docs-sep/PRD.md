@@ -131,22 +131,50 @@ Da mesma forma, onboarding, analise de credito, formalizacao contratual, cobranc
 
 Nesta fase inicial da API, os perfis detalhados sao apenas os necessarios para autenticacao, administracao e controle de acesso. No produto completo, as jornadas de tomador, credor e financeiro serao expandidas nas epics futuras ja previstas no roadmap.
 
+### Canalizacao por perfil (Opcao 3 — ADR 0009)
+
+A partir da Sprint 5 (Endurecimento de Seguranca), o produto adota **separacao de canal por perfil** para fortalecer a seguranca dos clientes externos:
+
+| Perfil | Canal principal | Canal secundario | Justificativa de seguranca |
+|--------|----------------|-------------------|----------------------------|
+| Visitante | Web (landing) + Mobile (boas-vindas) | — | Marketing publico em ambos |
+| Tomador (`ROLE_CLIENTE` atual; futura `ROLE_TOMADOR`) | **Mobile** | — (sem versao web) | Biometria nativa, storage Keystore/Keychain, anti-phishing, certificate pinning |
+| Empresa Credora (futura `ROLE_CREDORA`) | **Web** | Mobile (notificacoes + status simplificado) | KYB, carteira, dashboards densos exigem desktop |
+| Financeiro Interno (futura `ROLE_FINANCEIRO`) | **Web** | — | Ferramentas de analise exigem telas grandes |
+| Backoffice (futura `ROLE_BACKOFFICE`) | **Web** | — | Fila operacional, comentarios, reprocessos |
+| Administrador (`ROLE_ADMIN`) | **Web** | — | Governanca e gestao avancada |
+
+Detalhes em [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md).
+
 ### Visitante
-Pode criar usuario sem autenticacao e nao pode acessar recursos protegidos.
+Pode criar usuario sem autenticacao (apenas tomador via mobile, apos a Sprint 5; antes da Sprint 5, cadastro publico amplo continua valido) e nao pode acessar recursos protegidos.
 
-### Cliente
-Pode autenticar, consultar apenas o proprio usuario e alterar apenas a propria senha.
+### Cliente (atual `ROLE_CLIENTE` → futuro `ROLE_TOMADOR`)
+Pode autenticar, consultar apenas o proprio usuario e alterar apenas a propria senha. Acessa o produto **apenas via mobile** apos a Sprint 5.
 
-### Administrador
-Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
+### Empresa Credora (futura `ROLE_CREDORA` — Epic 11)
+Cadastro **por convite** emitido por administrador. Acessa o produto **principalmente via web** (KYB, carteira, oportunidades, operacoes financiadas), com **mobile resumido** para notificacoes e status.
+
+### Financeiro Interno (futura `ROLE_FINANCEIRO` — Epic 11)
+Usuario interno responsavel por operacao financeira. Acessa **apenas via web**.
+
+### Backoffice (futura `ROLE_BACKOFFICE` — Epic 11)
+Usuario interno responsavel por fila operacional, comentarios, reprocessos. Acessa **apenas via web**.
+
+### Administrador (`ROLE_ADMIN`)
+Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios. Cadastro **interno** (criado por outro administrador). Acessa **apenas via web**.
 
 ## 7. Requisitos Funcionais
 
 ### RF-01 Cadastro de usuario
-- O sistema deve permitir criar usuario sem autenticacao.
+- Nas Sprints 1-4, o sistema permite criar usuario sem autenticacao via `POST /api/v1/usuarios` (regra atual, valida ate Sprint 5).
+- A partir da Sprint 5 (Endurecimento de Seguranca, ADR 0010), o cadastro publico generico e **desativado** e substituido por fluxos canalizados por perfil (ADR 0009):
+  - **Tomador**: cadastro publico **apenas via mobile** (endpoint validara canal de origem)
+  - **Empresa Credora**: cadastro **por convite** (admin emite link/token; credora completa cadastro autenticando-se no web)
+  - **Admin/Financeiro/Backoffice**: cadastro **interno** (admin autenticado cria via endpoint dedicado)
 - O usuario deve possuir e-mail unico, usado como username.
-- O usuario deve possuir senha com exatamente `6 caracteres` nesta fase.
-- O usuario deve possuir perfil `ROLE_ADMIN` ou `ROLE_CLIENTE`.
+- O usuario deve possuir senha com exatamente `6 caracteres` nas Sprints 1-4; a partir da Sprint 5 a politica de senha e revisada para minimo 12 caracteres OU passphrase (ADR 0010).
+- Os papeis definidos sao: `ROLE_ADMIN`, `ROLE_CLIENTE` (Sprints 1-4); a Epic 11 (Administracao e Governanca) refina para `ROLE_TOMADOR`, `ROLE_CREDORA`, `ROLE_FINANCEIRO`, `ROLE_BACKOFFICE`, `ROLE_ADMIN`.
 
 ### RF-02 Consulta de usuario por id
 - O sistema deve permitir localizar usuario pelo identificador gerado.
@@ -160,9 +188,15 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 - O usuario autenticado deve poder alterar apenas a propria senha.
 
 ### RF-05 Autenticacao
-- O sistema deve implementar autenticacao via JWT.
-- O login deve autenticar por e-mail e senha.
-- O sistema deve expor recurso para obter os dados do usuario autenticado.
+- Nas Sprints 1-4, o sistema implementa autenticacao single-factor (JWT) via e-mail e senha.
+- A partir da Sprint 5 (Endurecimento de Seguranca, ADR 0010), o sistema implementa **MFA com 2 fatores adaptados por canal**:
+  - **Mobile (Tomador)**: senha + biometria nativa (Face ID/Touch ID via Capacitor); fallback TOTP
+  - **Web (Empresa Credora)**: senha + TOTP (Google Authenticator, Authy, Microsoft Authenticator); backup codes
+  - **Web (Admin/Financeiro/Backoffice)**: senha + TOTP **obrigatorio**; WebAuthn/Passkeys opcional para Admin
+- O login deve autenticar por e-mail e senha como primeiro fator, seguido do segundo fator conforme o canal.
+- O sistema deve expor recurso para obter os dados do usuario autenticado (`/auth/me`).
+- A partir da Sprint 5, JWT inclui access token (15 min) + refresh token rotativo (30 dias) com deteccao de reuso.
+- A partir da Sprint 5, operacoes sensiveis (alterar senha, desabilitar MFA, futuras transferencias Pix, futuras formalizacoes de contrato) exigem **step-up authentication**.
 
 ### RF-06 Auditoria
 - O sistema deve registrar data de criacao e ultima modificacao dos registros.
@@ -487,10 +521,22 @@ Campo opcional recomendado para evolucao futura:
 
 ## 14. Padrao de JWT
 
-### Estrategia inicial
+### Estrategia inicial (Sprints 1-4)
 - autenticacao baseada em `access token` JWT
-- sem `refresh token` nesta fase
-- expiracao curta e configuravel por propriedade
+- sem `refresh token` ate a Sprint 5
+- expiracao configuravel por propriedade (1h padrao Sprints 1-4)
+
+### Estrategia consolidada (a partir da Sprint 5 — ADR 0010)
+- autenticacao com **access token (15 min)** + **refresh token (30 dias) com rotacao** e deteccao de reuso
+- access token JWT (formato atual mantido)
+- refresh token: ID opaco (UUID) armazenado em tabela `refresh_token` com `family_id` para rotacao e reuse detection
+- rotacao: cada uso do refresh token emite novo access + novo refresh (mesma familia, novo ID); refresh anterior marcado como `usado`
+- reuse detection: se refresh token marcado como `usado` for re-apresentado, **toda a familia e revogada** + audit log + email de alerta
+- storage:
+  - **Mobile**: refresh token em Capacitor Preferences (Keystore/Keychain)
+  - **Web**: refresh token em cookie `httpOnly` + `sameSite=strict` + `secure`
+- claim adicional `channel` no access token (`web`, `mobile`) para reforcar canalizacao (ADR 0009)
+- step-up authentication: token efemero (5 min) emitido apos re-validacao TOTP/biometria; exigido em endpoints sensiveis via annotation `@RequireStepUp`
 
 ### Claims minimas obrigatorias
 - `sub`: identificador do usuario autenticado
@@ -581,11 +627,28 @@ Mesmo nesta fase inicial, a API deve nascer preparada para operacao futura com:
 
 ### Backend - JWT e auditoria
 - JWT como mecanismo de autenticacao
-- sem refresh token nesta fase
+- nas Sprints 1-4: sem refresh token; logout client-side
+- a partir da Sprint 5 (ADR 0010): access token (15 min) + refresh token (30 dias) com rotacao e reuse detection
 - `sub` do JWT com `UUID` do usuario
 - claims minimas: `sub`, `email`, `roles`
+- claim adicional `channel` (`web`, `mobile`) a partir da Sprint 5 para reforcar canalizacao por perfil (ADR 0009)
 - auditoria persistindo preferencialmente o `UUID` do usuario
-- logout tratado no cliente nesta fase
+- audit log de seguranca dedicado (separado de auditoria JPA) a partir da Sprint 5
+
+### Backend - MFA e Endurecimento (Sprint 5 — ADR 0009 e 0010)
+- **MFA com 2 fatores adaptados por canal**:
+  - Mobile (Tomador): senha + biometria nativa (Face ID/Touch ID via Capacitor BiometricAuth); fallback TOTP
+  - Web (Empresa Credora): senha + TOTP (Google Authenticator); backup codes
+  - Web (Admin/Financeiro/Backoffice): senha + TOTP **obrigatorio**; WebAuthn/Passkeys opcional
+- **TOTP** server-side via `com.warrenstrange:googleauth:1.5.0` (RFC 6238); secret encrypted-at-rest
+- **Backup codes**: 10 codigos de uso unico ao habilitar TOTP; armazenados como hash
+- **Rate limiting**: 5 tentativas/min/IP em `/auth/login`; 5 tentativas/min/usuario em `/auth/totp/verify` (Resilience4j)
+- **Account lockout**: 5 tentativas falhas em 15 min → 30 min de lockout; notificacao por email
+- **Password policy**: minimo 12 caracteres OU passphrase de 4+ palavras; sem requisitos artificiais (NIST SP 800-63B); verificacao haveibeenpwned (k-anonymity)
+- **Step-up authentication**: token efemero (5 min) para operacoes sensiveis (alterar senha, desabilitar MFA, transferencias Pix futuras, formalizacao de contrato futura)
+- **Separacao de canal por perfil** (ADR 0009): tomador mobile-only; credora web principal + mobile resumido; internos web-only
+- **Cadastro publico generico desativado** na Sprint 5; substituido por fluxos canalizados (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
+- **Migracao de usuarios existentes** (Sprint 5 Task 5.10): forca reset de senha + setup MFA
 
 ### Backend - documentacao e observabilidade
 - documentacao com `Springdoc OpenAPI 2.x`
@@ -629,6 +692,8 @@ ADRs vivem em [`adr/`](../adr/) e devem ser atualizados quando uma decisao tecni
 - `0006-mapstruct-substitui-modelmapper.md`
 - `0007-ddd-com-hexagonal-ports-and-adapters-por-modulo.md`
 - `0008-wiremock-para-testes-integracao-celcoin.md`
+- `0009-separacao-de-canal-por-perfil.md`
+- `0010-mfa-totp-com-biometria-mobile.md`
 
 ## 19. Estrutura Inicial de Pacotes
 
@@ -986,6 +1051,14 @@ Exemplo:
   - **evolui** o `ApiExceptionHandler` ja criado na Sprint 1 (mapeamento completo de excecoes)
   - completa documentacao OpenAPI, smoke tests E2E e cobertura JaCoCo no target 70%
   - introduz `Webhook Receiver Pattern` (`/api/v1/webhooks/{provider}/{event}`) com idempotencia e Outbox stub, preparando Epic 15 (Pix)
+- Sprint 5 (Endurecimento de Seguranca — ADRs 0009 e 0010):
+  - depende da conclusao da Sprint 4
+  - **gate** para qualquer ambiente de producao
+  - **gate** para integracao real com Celcoin sandbox
+  - **gate** para Epic 5 (Onboarding KYC/KYB) e Epic 14 Fase Mobile 2+
+  - implementa MFA via TOTP (web) + biometria nativa (mobile), refresh token com rotacao, rate limiting, account lockout, password policy nova (12+ chars OU passphrase + haveibeenpwned), step-up authentication, audit log de seguranca, separacao de canal por perfil (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
+  - migracao de usuarios existentes: forca reset de senha + setup MFA
+  - spec: [`specs/005-sprint-5-endurecimento-seguranca.md`](../specs/005-sprint-5-endurecimento-seguranca.md)
 
 ### Trilha paralela Frontend (Specs 1XX)
 
@@ -994,9 +1067,11 @@ Os 2 Devs Plenos Frontend tem trabalho concreto desde a Sprint 0, em paralelo ao
 Cada F-Sprint tem seu proprio spec (1 arquivo por F-Sprint, paralelo ao padrao do backend `000-004`):
 - F-Sprint 0: [`specs/100-fsprint-0-setup-angular.md`](../specs/100-fsprint-0-setup-angular.md) — setup Angular 20.x (project scaffold, ESLint + Prettier + Stylelint, Husky + lint-staged, Vitest, Playwright, MSW, Frontend CI)
 - F-Sprint 1: [`specs/101-fsprint-1-design-tokens-showcase.md`](../specs/101-fsprint-1-design-tokens-showcase.md) — traducao dos tokens Apple+Notion para SCSS, design system showcase em rota `/design-system`
-- F-Sprint 2: [`specs/102-fsprint-2-telas-apple-publicas.md`](../specs/102-fsprint-2-telas-apple-publicas.md) — telas Apple (landing, login, register) com MSW (Mock Service Worker) consumindo mocks JSON dos contratos da Sprint 2 backend
+- F-Sprint 2: [`specs/102-fsprint-2-telas-apple-publicas.md`](../specs/102-fsprint-2-telas-apple-publicas.md) — telas Apple (landing, login) consumindo MSW; tela de cadastro publico mantida temporariamente ate Sprint 5 desativar (ADR 0009)
 - F-Sprint 3: [`specs/103-fsprint-3-shell-notion-auth.md`](../specs/103-fsprint-3-shell-notion-auth.md) — integracao com auth real, shell Notion, guards funcionais, interceptors HTTP
-- F-Sprint 4: [`specs/104-fsprint-4-telas-autenticadas.md`](../specs/104-fsprint-4-telas-autenticadas.md) — telas autenticadas (perfil, alterar senha, admin de usuarios, dashboard casca) + smoke E2E Playwright
+- F-Sprint 4: [`specs/104-fsprint-4-telas-autenticadas.md`](../specs/104-fsprint-4-telas-autenticadas.md) — telas autenticadas internas (perfil, alterar senha, admin de usuarios, dashboard administrativa) + smoke E2E Playwright
+
+**Escopo do frontend web apos ADR 0009 (Separacao de Canal)**: focado em **usuarios internos** (admin, financeiro, backoffice) **+ empresa credora completa** (Epic 13 - Frontend de Jornadas cobrira KYB, carteira, oportunidades, operacoes financiadas). **Tomador nao tem versao web** — sua jornada e exclusivamente mobile.
 
 Cada F-Sprint tem Definition of Done explicita no seu spec correspondente.
 
@@ -1016,7 +1091,7 @@ Cada M-Sprint tem Definition of Done explicita no seu spec correspondente.
 - Mobile **so usa Notion** (nao Apple) — fronteira diferente: ja na primeira tela publica (boas-vindas) seguimos Notion adaptado
 - Storage de token via **Capacitor Preferences** (mais seguro que localStorage e funciona em PWA + Android/iOS)
 - Validacao em **PWA primeiro** (browser); Android/iOS via Capacitor entra na Epic 14 Fase Mobile 2+
-- Escopo reduzido: **apenas tomador e empresa credora**, sem financeiro interno, backoffice ou administracao completa
+- **Escopo apos ADR 0009**: foco principal e **tomador** (jornada completa, exclusiva do mobile); **empresa credora resumida** (notificacoes + status simplificado, sem KYB completo nem carteira detalhada — essas ficam no web)
 - Nao recria contratos: reusa DTOs e endpoints definidos pelo backend e validados pelo frontend web
 
 ### Definition of Done (DoD) por tipo de task
@@ -1140,6 +1215,29 @@ Detalhamento das tasks:
 - consultar: [`specs/004-sprint-4-erros-docs-testes.md`](../specs/004-sprint-4-erros-docs-testes.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
 
+### Sprint 5
+
+Objetivo de planejamento:
+- endurecer a camada de autenticacao do produto SEP antes de qualquer ambiente de producao ou integracao real com Celcoin: MFA via TOTP (web) + biometria nativa (mobile), refresh token com rotacao, rate limiting, account lockout, password policy nova, step-up authentication, audit log de seguranca, separacao de canal por perfil (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
+
+Tema:
+- Endurecimento de Seguranca (gate para producao e Epic 5)
+
+Pre-requisitos de entrada:
+- Sprint 4 concluida
+- ADRs 0009 (Separacao de Canal por Perfil) e 0010 (MFA TOTP + Biometria Mobile) aceitos
+- Smtp configurado para emails (lockout, reset de senha)
+
+Dependencias externas:
+- depende da conclusao da Sprint 4
+
+Responsavel principal:
+- Dev Senior (com apoio de Dev Pleno Frontend 2 nas telas web e Dev Mobile na biometria)
+
+Detalhamento das tasks:
+- consultar: [`specs/005-sprint-5-endurecimento-seguranca.md`](../specs/005-sprint-5-endurecimento-seguranca.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
 ## 23. Criterios de Sucesso
 
 Esta fase sera considerada bem-sucedida quando:
@@ -1213,14 +1311,30 @@ Esta fase sera considerada bem-sucedida quando:
 - consolidar `SecurityConfig` com CORS, filtro JWT e liberacao publica apenas do cadastro e do login
 - persistir na auditoria o UUID do usuario autenticado em operacoes autenticadas
 
-### Epic 4 - Tratamento de erros, documentacao e testes (escopo da Sprint 4)
-- criar `ApiExceptionHandler` com `@RestControllerAdvice`
+### Epic 4 - Tratamento de erros, documentacao, testes e endurecimento (escopo das Sprints 4 e 5)
+
+**Sprint 4 (Estabilizacao):**
+- evoluir `ApiExceptionHandler` com `@RestControllerAdvice` (stub criado na Sprint 1)
 - padronizar payload de erro via `ErrorResponseDto` (`timestamp`, `status`, `error`, `message`, `path`, `traceId`)
 - mapear validacao, conflito, autenticacao, autorizacao, excecoes de dominio e fallback generico
 - configurar `Springdoc OpenAPI` com `SecurityScheme` HTTP Bearer para JWT
 - expor Swagger UI no profile `dev`
 - documentar todos os endpoints e schemas dos DTOs com exemplos coerentes com o PRD
 - cobrir com testes automatizados os cenarios criticos de autenticacao, autorizacao, validacao e auditoria
+- introduzir `Webhook Receiver Pattern` com idempotencia e Outbox stub
+
+**Sprint 5 (Endurecimento de Seguranca — gate para producao e Epic 5):**
+- implementar **MFA com 2 fatores adaptados por canal**: TOTP web (Google Authenticator/Authy) + biometria nativa mobile (Face ID/Touch ID via Capacitor)
+- backup codes (10 codigos de uso unico)
+- **refresh token com rotacao** (15min access + 30dias refresh + reuse detection)
+- **rate limiting** em endpoints de autenticacao (Resilience4j)
+- **account lockout** (5 tentativas/15min → 30min de lockout + email)
+- **password policy revisada** (minimo 12 chars OU passphrase + haveibeenpwned)
+- **step-up authentication** para operacoes sensiveis (alterar senha, desabilitar MFA, futuras transferencias Pix, futuras formalizacoes de contrato)
+- **audit log de seguranca** dedicado (separado de auditoria JPA)
+- **separacao de canal por perfil** (ADR 0009): tomador mobile-only; credora web principal + mobile resumido; internos web-only
+- desativacao do cadastro publico generico; novos endpoints canalizados (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
+- migracao de usuarios existentes: forca reset de senha + setup MFA
 
 ### Epic 5 - Onboarding KYC/KYB
 - implementar onboarding documental de pessoa e empresa
@@ -1275,21 +1389,21 @@ Esta fase sera considerada bem-sucedida quando:
 ### Epic 12 - Fundacao Frontend
 - montar projeto Angular `20.x` com Standalone Components, Signals e SCSS puro
 - traduzir os tokens dos dois design systems oficiais ([`DESIGN-apple.md`](./DESIGN-apple.md) e [`DESIGN-notion.md`](./DESIGN-notion.md)) para variaveis SCSS reutilizaveis
-- implementar telas publicas seguindo Apple: landing, login e cadastro
+- implementar telas publicas seguindo Apple: landing e login (cadastro publico mantido temporariamente ate a Sprint 5 desativar — ADR 0009)
 - implementar shell autenticado seguindo Notion: header, menu lateral, breadcrumbs e area de conteudo
 - implementar biblioteca interna de componentes Notion: botoes, inputs, formularios, cards, tabelas, modais, toasts e loaders
-- implementar telas autenticadas iniciais consumindo apenas APIs das Sprints 1-4: meu perfil, alterar senha, administracao de usuarios, detalhe de usuario e dashboard administrativa inicial (casca)
+- implementar telas autenticadas iniciais consumindo apenas APIs das Sprints 1-4: meu perfil, alterar senha, administracao de usuarios, detalhe de usuario e dashboard administrativa inicial
 - implementar guards de rota, controle de sessao, integracao HTTP com a API e tratamento padronizado de erros 401, 403, 404 e 409
 - entregar o "Frontend MVP" navegavel, validado e independente de qualquer jornada de negocio
-- escopo: tudo que depende apenas das APIs entregues nas Sprints 1-4 (auth, usuarios e admin de usuarios)
+- escopo: foco em **usuarios internos** (admin, financeiro, backoffice). Tomador nao tem versao web (ADR 0009)
 
 ### Epic 13 - Frontend de Jornadas
-- implementar telas funcionais das jornadas, todas no design system Notion, consumindo APIs das Epics 5-11
-- jornada do tomador: onboarding, solicitar emprestimo, acompanhar proposta, status da analise, formalizacao, parcelas e historico
-- jornada da empresa credora: dashboard, perfil, KYB, oportunidades, operacoes financiadas, carteira e detalhe da operacao
+- implementar telas funcionais das jornadas internas e da empresa credora, todas no design system Notion, consumindo APIs das Epics 5-11
+- jornada da empresa credora (foco principal do web externo apos ADR 0009): dashboard, perfil, KYB, oportunidades, operacoes financiadas, carteira e detalhe da operacao
 - jornada do financeiro interno: dashboard financeiro, fila operacional, conciliacao, pendencias e visao de recebimentos/desembolsos
 - jornada do backoffice: fila de propostas, mesa de credito, painel de formalizacao, painel de cobranca, comentarios internos, reprocessos e excecoes
-- governanca avancada: gestao avancada de usuarios, perfis e permissoes, parametros, cadastros mestres e auditoria administrativa
+- governanca avancada: gestao avancada de usuarios, perfis e permissoes, parametros, cadastros mestres e auditoria administrativa, fluxo de **convite de empresa credora**
+- escopo apos ADR 0009: **nao inclui telas funcionais de tomador no web** — essas vivem apenas no mobile (Epic 14)
 - depende: Epic 12 (Fundacao Frontend) entregue e validado, mais APIs das Epics 5-11 publicadas e estaveis
 
 ### Epic 14 - Mobile SEP
@@ -1298,7 +1412,7 @@ Esta fase sera considerada bem-sucedida quando:
 - adotar o design system [`DESIGN-notion.md`](./DESIGN-notion.md) em todo o mobile (visitante e autenticado), adaptado para toque, tabs inferiores e navegacao em pilha
 - estilizar em SCSS puro, customizando componentes Ionic via CSS variables/SCSS para respeitar os tokens do Notion; sem frameworks CSS adicionais
 - validar primeiro em PWA/browser e evoluir para Android/iOS via Capacitor em fase posterior
-- incluir apenas as jornadas mobile do tomador de emprestimo e da empresa credora
+- foco principal apos ADR 0009: **jornada completa do tomador** (mobile-only — nao tem versao web). Empresa credora tem versao **resumida** no mobile (notificacoes, status simplificado), mas KYB completo, carteira detalhada e gestao de oportunidades ficam no web (Epic 13)
 - excluir a visao do financeiro interno, backoffice operacional, administracao, governanca, cadastros mestres e telas de auditoria
 - nao criar regra de negocio propria no app; decisoes de credito, status, permissoes e dados operacionais devem vir da API
 - iniciar funcionalmente apos autenticacao documentada e estavel, preferencialmente apos Sprint 4
@@ -1317,16 +1431,21 @@ A primeira fase da Epic 14 e detalhada em 5 specs (1 arquivo por M-Sprint, paral
 
 Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornadas funcionais do tomador, da empresa credora e Pix visivel ao usuario), que dependem das APIs das Epics 5-11.
 
-#### Escopo mobile do tomador
-- cadastro e login
+#### Escopo mobile do tomador (canal exclusivo apos ADR 0009)
+- cadastro publico (apenas no mobile — biometria + Capacitor Preferences)
+- login com biometria como segundo fator (Sprint 5+)
 - acompanhamento de perfil
 - solicitacao e acompanhamento de emprestimo quando a API existir
-- status de analise, formalizacao, cobranca e pagamentos em fases futuras
+- status de analise, formalizacao, cobranca e pagamentos
+- recebimento de comprovantes Pix em fases futuras
+- notificacoes push (futura) sobre status de proposta, cobranca, formalizacao
 
-#### Escopo mobile da empresa credora
-- login
-- visao simplificada de oportunidades, operacoes financiadas e status
-- acompanhamento de carteira em fases futuras
+#### Escopo mobile da empresa credora (resumido apos ADR 0009)
+- login (cadastro completo de credora ocorre no web, por convite)
+- inicio resumido com status agregado (sem dashboards densos — esses ficam no web)
+- notificacoes sobre oportunidades, status de operacoes
+- visao simplificada de operacoes financiadas (lista + status; detalhamento e analise ficam no web)
+- **NAO inclui**: KYB completo, carteira detalhada, comparacao de oportunidades, exportacao de relatorios — essas vao para o web (Epic 13)
 
 ### Epic 15 - Movimentacao Pix
 - tratar Pix como fase posterior a fundacao atual da API e a estabilizacao das jornadas que impactam a contratacao
@@ -1443,12 +1562,14 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
   - nao deve concentrar regra de negocio de dominio
   - precondicao para Frontend de Jornadas
 - `Frontend de Jornadas`
-  - camada de experiencia das jornadas funcionais (tomador, credora, financeiro, backoffice e governanca avancada)
+  - camada de experiencia das jornadas funcionais para **publico web** apos ADR 0009: empresa credora completa, financeiro interno, backoffice e governanca avancada
+  - **nao inclui jornada do tomador** (essa vive exclusivamente no mobile — Epic 14)
   - reutiliza shell, tokens e componentes da Fundacao Frontend
   - nao deve concentrar regra de negocio de dominio
   - depende de APIs publicadas pelas Epics 5-11
 - `Mobile SEP`
-  - camada de experiencia mobile para tomador e empresa credora
+  - canal **exclusivo** do tomador (apos ADR 0009 — jornada nao tem versao web)
+  - canal **resumido** da empresa credora (notificacoes + status simplificado; KYB completo e carteira detalhada vivem no web)
   - nao substitui o frontend web/backoffice nem deve incluir financeiro interno ou administracao completa nesta fase
   - deve compartilhar contratos e padroes de autenticacao com o frontend web
 - `Movimentacao Pix`
@@ -1489,8 +1610,9 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 ## 27. Premissas
 
 - esta API sera a primeira entrega do projeto antes da integracao completa com Angular
-- a politica de senha de 6 caracteres sera seguida exatamente como solicitado nesta fase
-- o cadastro publico de usuarios e valido apenas para a etapa inicial
+- a politica de senha de 6 caracteres e valida apenas nas Sprints 1-4; a Sprint 5 (Endurecimento de Seguranca, ADR 0010) substitui por minimo 12 caracteres OU passphrase, com integracao haveibeenpwned e migracao forcada de usuarios existentes
+- o cadastro publico generico de usuarios e valido apenas nas Sprints 1-4; a Sprint 5 desativa esse fluxo e introduz canalizacao por perfil (ADR 0009): cadastro de tomador no mobile, convite de empresa credora pelo admin, criacao interna de admin/financeiro/backoffice
+- nenhum ambiente de producao ou integracao real com Celcoin pode ocorrer antes da Sprint 5 concluida (gate)
 - antes da fase AWS, o banco oficial sera PostgreSQL local em Docker Compose
 - o backend continuara sendo um unico Spring Boot na fase inicial
 - o banco continuara unico ate decisao futura explicita

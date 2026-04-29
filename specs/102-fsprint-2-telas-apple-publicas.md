@@ -15,6 +15,13 @@
 
 Implementar as 3 telas publicas (sem autenticacao) seguindo o design system Apple literalmente: landing institucional, login e cadastro publico. Como o backend ainda nao tem autenticacao real (Sprint 3 em paralelo), as chamadas HTTP sao interceptadas via **MSW (Mock Service Worker)** com handlers que simulam os contratos do PRD §21. Permite o time validar UX, fluxo e fidelidade visual antes da integracao real (que vem na F-Sprint 3).
 
+> **Nota apos [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)**: a tela de **cadastro publico generico** desta F-Sprint **e temporaria**. A partir da Sprint 5 (Endurecimento de Seguranca, ADR 0010), o cadastro publico no web e desativado:
+> - Tomadores serao direcionados para o app mobile (canal exclusivo)
+> - Empresas credoras serao cadastradas por convite emitido por administrador
+> - Admin/Financeiro/Backoffice serao criados internamente por administrador autenticado
+>
+> A F-Sprint 2 ainda implementa a tela de cadastro publico, mas inclui aviso visual ("Para criar conta como tomador, baixe o app SEP") preparando a transicao da Sprint 5.
+
 ## Escopo
 
 ### Em escopo
