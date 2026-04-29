@@ -382,28 +382,22 @@ A Resolucao CMN 4.656/2018 obriga segregacao patrimonial entre fundos de tomador
 ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../adr/0005-segregacao-patrimonial-via-conta-escrow.md).
 
 ### Base definida para o frontend futuro
-- Angular na versao `20.x` (baseline atual: Standalone Components, Signals e Zoneless estaveis, com ecossistema alinhado), pareada com Ionic `8.4+` e Capacitor `6` para o mobile; na fase de implementacao mobile, avaliar upgrade para Angular `21` apenas se houver release oficial do Ionic com suporte explicito a `21` e os plugins Capacitor relevantes ja estiverem alinhados; caso contrario, manter `20`
-- Standalone Components
-- Signals
-- SCSS puro como camada de estilizacao, sem frameworks CSS prontos (Bootstrap, Tailwind, Material e similares estao explicitamente fora)
-- design systems oficiais do produto:
-  - [`DESIGN-apple.md`](./DESIGN-apple.md) - aplica-se as superficies publicas: landing, login e cadastro
-  - [`DESIGN-notion.md`](./DESIGN-notion.md) - aplica-se ao dashboard e a todas as telas autenticadas
-- a fronteira entre os dois design systems e o estado de autenticacao: tudo que e acessivel sem JWT segue Apple; tudo a partir de `/auth/me` em diante segue Notion
-- tokens, tipografia, escala de espacamento, raios e componentes devem ser implementados em SCSS a partir das definicoes desses arquivos, sem depender de bibliotecas de UI prontas
-- plano oficial de telas web:
-  - [`WEB-SCREENS-PLAN.md`](./WEB-SCREENS-PLAN.md)
-  - este artefato define ordem de implementacao visual, telas por perfil, matriz tela x endpoint e lacunas antes da implementacao completa do web
 
-### Diretriz de adocao dos design systems
-- o frontend nao deve adotar templates administrativos prontos; toda a base visual vem dos design systems oficiais
-- superficies publicas (landing, login, cadastro) devem seguir [`DESIGN-apple.md`](./DESIGN-apple.md) literalmente: tokens de cor, tipografia, raios, espacamento, regras de uso e do/dont
-- superficies autenticadas (dashboard e demais telas com JWT) devem seguir [`DESIGN-notion.md`](./DESIGN-notion.md) literalmente, com a mesma fidelidade
-- a transicao visual entre os dois design systems acontece exatamente no login: ate o login, Apple; apos o login, Notion
-- componentes devem ser implementados como componentes Angular standalone proprios, em SCSS, com tokens extraidos dos design systems
-- nao devem ser introduzidos frameworks CSS de terceiros (Bootstrap, Tailwind, Material, etc.) como camada de estilizacao
-- bibliotecas externas que nao envolvem chrome visual (datepickers, mascaras, formularios reativos, utilidades) podem ser usadas, desde que estilizadas em SCSS para respeitar os tokens
-- a versao do Angular esta definida em `20.x` como baseline; o upgrade para `21` pode ser avaliado na fase de implementacao mobile, condicionado a haver release oficial do Ionic e dos plugins Capacitor com suporte explicito a Angular `21`; nao ha previsao de downgrade abaixo de `20`
+**Stack e versao**
+- Angular `20.x` baseline (Standalone Components, Signals, Zoneless estaveis), pareado com Ionic `8.4+` e Capacitor `6` para o mobile
+- Upgrade para Angular `21` so na fase de implementacao mobile e somente se houver release oficial do Ionic e dos plugins Capacitor com suporte explicito; sem clausula de downgrade abaixo de `20`
+
+**Estilizacao e design systems** (ADR 0002)
+- SCSS puro como camada de estilizacao; **sem frameworks CSS de terceiros** (Bootstrap, Tailwind, Material e similares estao explicitamente fora) e **sem template administrativo pronto** — toda a base visual vem dos design systems oficiais:
+  - [`DESIGN-apple.md`](./DESIGN-apple.md) — superficies **publicas** (landing, login, cadastro). Seguir literalmente: tokens de cor, tipografia, raios, espacamento, regras do/dont
+  - [`DESIGN-notion.md`](./DESIGN-notion.md) — dashboard e demais telas **autenticadas**. Mesma fidelidade
+- Fronteira entre os dois design systems: estado de autenticacao (transicao visual no login — ate `/auth/me`, Apple; apos, Notion)
+- Componentes implementados como **Angular standalone proprios**, em SCSS, com tokens (cores, tipografia, espacamento, raios, sombras) extraidos dos design systems para variaveis SCSS reutilizaveis
+- Bibliotecas externas que nao envolvem chrome visual (datepickers, mascaras, formularios reativos, utilidades) sao permitidas, desde que estilizadas em SCSS para respeitar os tokens
+
+**Plano de execucao**
+- Plano oficial de telas web: [`WEB-SCREENS-PLAN.md`](./WEB-SCREENS-PLAN.md) — ordem de implementacao visual, telas por perfil, matriz tela x endpoint e lacunas
+- Trilha Frontend Foundation (F-Sprints 0-4) detalhada em `specs/100-104` (paralelas a Sprints 0-4 backend)
 
 ### Base definida para o mobile futuro
 - o projeto mobile deve ser planejado como `Mobile SEP`
@@ -417,29 +411,24 @@ ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../ad
   - [`MOBILE-SCREENS-PLAN.md`](./MOBILE-SCREENS-PLAN.md)
   - este artefato define ordem de implementacao visual mobile, telas por jornada, matriz tela x endpoint, escopo reduzido do app e lacunas antes da implementacao completa do mobile
 
-### Convencoes obrigatorias
-- uso de DTOs
-- uso de MapStruct (substituiu ModelMapper — ver ADR 0006)
-- criacao de `ApiExceptionHandler`
-- auditoria com JPA Auditing
-- gerenciamento de build e dependencias com Gradle
-- armazenamento de senha com `BCryptPasswordEncoder`
-- migrations versionadas com `Flyway`
-- endpoint de healthcheck com Actuator
+### Convencoes e padroes obrigatorios
 
-### Padroes tecnicos obrigatorios
-- o identificador principal das entidades deve ser `UUID`
-- o backend deve usar `BCrypt` para persistencia de senha
-- a documentacao da API deve usar `Springdoc OpenAPI`
-- a persistencia deve ser evoluida apenas por migrations `Flyway`
-- a resposta de erro deve seguir formato padronizado
-- o backend deve possuir configuracao explicita de `CORS`
-- o backend deve possuir ao menos um endpoint de saude para monitoramento
-- o padrao de auditoria deve priorizar o `UUID` do usuario autenticado, com fallback seguro
-- a persistencia deve seguir convencoes consistentes de nomes de tabelas e colunas
-- cada modulo de dominio deve encapsular suas entidades, repositories, DTOs, mappers, casos de uso e controllers
-- regras de negocio devem permanecer no backend e dentro do modulo dono da regra
-- soft delete nao sera adotado nesta fase inicial
+**Estrutura e organizacao**
+- DTOs em todas as bordas; mappers via MapStruct (ADR 0006)
+- Cada modulo de dominio encapsula suas entidades, repositories, DTOs, mappers, casos de uso e controllers; regra de negocio fica no modulo dono (estrutura detalhada em §19)
+
+**Persistencia**
+- Identificador principal: UUID v6 (Java `java.util.UUID`, PostgreSQL tipo nativo `uuid`); convencoes em §16
+- Tabelas e colunas em portugues; sem soft delete nesta fase
+- Persistencia evoluida apenas por migrations Flyway versionadas
+
+**Seguranca**
+- Senha com hash `BCryptPasswordEncoder`
+- Auditoria via JPA Auditing priorizando UUID do usuario autenticado com fallback `system` (regras em §15)
+
+**API e operacao**
+- Resposta de erro padronizada via `ApiExceptionHandler` (formato em §13)
+- Documentacao Springdoc OpenAPI; `CORS` explicito; endpoint de saude via Actuator
 
 ### Dependencias tecnicas ja definidas
 - geracao de UUID:
@@ -594,100 +583,49 @@ Mesmo nesta fase inicial, a API deve nascer preparada para operacao futura com:
 - endpoint de healthcheck
 - logs suficientes para diagnostico de autenticacao, autorizacao e erros de aplicacao
 
-## 18. Decisoes Tecnicas Consolidadas
+## 18. Decisoes Tecnicas Consolidadas (Indice)
 
-### Backend - linguagem e framework
-- Build e dependencias com `Gradle 8.x` + Wrapper
-- Java `21` LTS, com Records para DTOs, Sealed types para Roles/eventos, Pattern matching e Virtual threads habilitados
-- Spring Boot `3.5.x` (versao minor pinada explicitamente)
-- Hibernate `6.x` (vem com Spring Boot 3.5)
-- PostgreSQL `16` (sem H2 mesmo em testes)
-- Flyway para migrations versionadas
+Esta secao agrega as decisoes tecnicas do projeto. Cada decisao tem uma secao canonica com detalhes; as referencias abaixo apontam para essas secoes e para os ADRs correspondentes. **Nao duplicar conteudo aqui** — atualizar a secao canonica e este indice automaticamente reflete a mudanca.
 
-### Backend - mapeamento, validacao e seguranca
-- **MapStruct** (geracao de codigo, type-safe) — substitui ModelMapper em todo o projeto
-- Jakarta Bean Validation (`spring-boot-starter-validation`)
-- Spring Security `6` + JJWT `0.12.x`
-- BCrypt para hash de senha (politica de 6 caracteres revisada antes de producao)
-- mTLS preparado para integracoes financeiras (Celcoin)
+### Stack e arquitetura
+- Stack principal (versoes pinadas: Java 21, Spring Boot 3.5.x, Hibernate 6.x, PostgreSQL 16, Gradle 8.x) → §11.Stack principal
+- Monolito modular DDD com Hexagonal/Ports & Adapters por modulo → §11.Diretriz arquitetural; §19; ADRs 0001, 0007
+- Provider Pattern obrigatorio para integracoes externas → §11.Padrao de Provider Externo; ADR 0004
+- Modulo `escrow` obrigatorio desde Sprint 1 (Resolucao CMN 4.656/2018) → §3.1, §11.Modulo escrow; ADR 0005
+- MapStruct substitui ModelMapper → §11.Stack principal; ADR 0006
+- HTTP client `RestClient`; resiliencia via Resilience4j; idempotencia via `Idempotency-Key`; `correlationId`/`traceId` no MDC → §11.Stack principal e §11.Padrao de Provider Externo
 
-### Backend - identificadores e dominio
-- IDs com `UUID`, geracao via `com.fasterxml.uuid:java-uuid-generator:5.1.0`
-- preferencia por `UUID v6`
-- UUID persistido como tipo nativo `uuid` no PostgreSQL
-- UUID modelado como `java.util.UUID` no backend
-- tabelas e colunas em portugues
-- sem soft delete nesta fase
-- datas serializadas em ISO-8601 com offset
-- arquitetura: monolito modular DDD com `Hexagonal/Ports & Adapters` por modulo
-- modulo `escrow` obrigatorio desde Sprint 1 (Resolucao CMN 4.656/2018)
+### Identificadores e persistencia
+- IDs UUID v6 (Java `java.util.UUID`, PostgreSQL tipo nativo `uuid`) → §16
+- Tabelas e colunas em portugues; sem soft delete; datas em ISO-8601 com offset → §16
 
-### Backend - integracoes externas
-- **Provider Pattern** obrigatorio: porta de saida em `application.port.out`, adapter em `infrastructure.adapter`
-- **RestClient** (Spring 6, sincrono) como HTTP client default; `WebClient` reservado para streams
-- **Resilience4j** para circuit breaker, retry e timeout em chamadas externas
-- idempotencia por `Idempotency-Key` em operacoes financeiras
-- `correlationId`/`traceId` propagados via MDC
+### Autenticacao e seguranca
+- Padrao JWT (claims, refresh token, step-up) → §14
+- Padrao de erros (`ApiExceptionHandler` + `ErrorResponseDto`) → §13
+- Auditoria JPA com fallback `system` → §15
+- MFA + canalizacao por perfil + endurecimento (Sprint 5 — gate para producao) → §6 (canalizacao), §7 RF-01/RF-05; ADRs 0009, 0010
 
-### Backend - JWT e auditoria
-- JWT como mecanismo de autenticacao
-- nas Sprints 1-4: sem refresh token; logout client-side
-- a partir da Sprint 5 (ADR 0010): access token (15 min) + refresh token (30 dias) com rotacao e reuse detection
-- `sub` do JWT com `UUID` do usuario
-- claims minimas: `sub`, `email`, `roles`
-- claim adicional `channel` (`web`, `mobile`) a partir da Sprint 5 para reforcar canalizacao por perfil (ADR 0009)
-- auditoria persistindo preferencialmente o `UUID` do usuario
-- audit log de seguranca dedicado (separado de auditoria JPA) a partir da Sprint 5
-
-### Backend - MFA e Endurecimento (Sprint 5 — ADR 0009 e 0010)
-- **MFA com 2 fatores adaptados por canal**:
-  - Mobile (Tomador): senha + biometria nativa (Face ID/Touch ID via Capacitor BiometricAuth); fallback TOTP
-  - Web (Empresa Credora): senha + TOTP (Google Authenticator); backup codes
-  - Web (Admin/Financeiro/Backoffice): senha + TOTP **obrigatorio**; WebAuthn/Passkeys opcional
-- **TOTP** server-side via `com.warrenstrange:googleauth:1.5.0` (RFC 6238); secret encrypted-at-rest
-- **Backup codes**: 10 codigos de uso unico ao habilitar TOTP; armazenados como hash
-- **Rate limiting**: 5 tentativas/min/IP em `/auth/login`; 5 tentativas/min/usuario em `/auth/totp/verify` (Resilience4j)
-- **Account lockout**: 5 tentativas falhas em 15 min → 30 min de lockout; notificacao por email
-- **Password policy**: minimo 12 caracteres OU passphrase de 4+ palavras; sem requisitos artificiais (NIST SP 800-63B); verificacao haveibeenpwned (k-anonymity)
-- **Step-up authentication**: token efemero (5 min) para operacoes sensiveis (alterar senha, desabilitar MFA, transferencias Pix futuras, formalizacao de contrato futura)
-- **Separacao de canal por perfil** (ADR 0009): tomador mobile-only; credora web principal + mobile resumido; internos web-only
-- **Cadastro publico generico desativado** na Sprint 5; substituido por fluxos canalizados (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
-- **Migracao de usuarios existentes** (Sprint 5 Task 5.10): forca reset de senha + setup MFA
-
-### Backend - documentacao e observabilidade
-- documentacao com `Springdoc OpenAPI 2.x`
-- `CORS` ja previsto para integracao com Angular
-- `Actuator` para healthcheck
-- **Micrometer + Prometheus** para metricas
-- logs estruturados via Logback com MDC
-
-### Backend - testes
-- JUnit 5 + AssertJ
-- Test slices: `@WebMvcTest`, `@DataJpaTest`, `@JsonTest`
-- **Testcontainers** com PostgreSQL real (sem H2)
-- Mockito para unit tests da camada `application` (com `Fake<X>Provider` injetado)
-- **WireMock 3.x** para integration tests dos adapters HTTP de Celcoin (`Celcoin<X>ProviderIT`) — ver ADR 0008
-- TDD desde Sprint 1: cada Sprint entrega testes correspondentes ao escopo
-- JaCoCo target 70% por modulo (validado em CI)
-
-### Backend - qualidade e tooling (Sprint 0)
-- Spotless + Palantir Java Format
-- JaCoCo + verification rule
-- Pre-commit hook bloqueando codigo desformatado
-- GitHub Actions CI: build + test + Spotless + JaCoCo
-- Conventional Commits
+### Testes e qualidade
+- TDD distribuido desde Sprint 1; JaCoCo target 70% por modulo → §22, specs 001-005
+- WireMock 3.x para integration tests dos adapters HTTP de Celcoin → §11.Padrao de Provider Externo; ADR 0008
+- Testcontainers com PostgreSQL real (sem H2); test slices `@WebMvcTest`/`@DataJpaTest`/`@JsonTest` → §11.Stack principal
+- Spotless + Palantir Format, pre-commit hooks, Conventional Commits → spec 000
 
 ### Frontend e mobile
-- SCSS puro como camada de estilizacao do frontend e do mobile
-- design systems oficiais: [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas; [`DESIGN-notion.md`](./DESIGN-notion.md) para superficies autenticadas e para todo o mobile
-- sem framework CSS de terceiros (Bootstrap, Tailwind, Material e similares estao explicitamente fora) nem template administrativo pronto
-- stack frontend: `Angular 20.x` + SCSS puro + Standalone Components + Signals
-- stack mobile baseline: `Angular 20.x + Ionic 8.4+ + Capacitor 6`, com avaliacao opcional de upgrade para `Angular 21` na fase de implementacao mobile, condicionada a haver release oficial do Ionic e dos plugins Capacitor com suporte explicito
-- sem clausula de downgrade do Angular abaixo de `20`
-- frontend tooling: ESLint + Prettier + Stylelint, Vitest (unit), Playwright (E2E), Husky + lint-staged
+- Design systems Apple (publico) + Notion (autenticado e mobile) com SCSS puro → §3, §11.Base frontend; ADR 0002
+- Stack frontend `Angular 20.x` (Standalone, Signals); stack mobile `Angular 20.x + Ionic 8.4+ + Capacitor 6` → §11.Base frontend, §11.Base mobile; ADRs 0003, 0011
+- Sem framework CSS de terceiros nem template administrativo (guard rails) → §11.Base frontend
+- Frontend tooling: ESLint + Prettier + Stylelint, Vitest, Playwright, Husky + lint-staged → spec 100
+
+### CI/CD e infraestrutura
+- CI de validacao separado de CD/deploy; workflows ativos por trilha (`backend`, `frontend web`, `mobile PWA`) sem secrets produtivos → §12, §26; `docs-sep/ci-pipelines/README.md`
+- Templates futuros (Android/iOS/AWS) versionados em `docs-sep/ci-pipelines/templates/` ate promocao explicita → §12, §26
+- AWS futura (EC2 + RDS) com gate Sprint 3/Epic 3 → §12
 
 ### Decisoes registradas em ADR
-ADRs vivem em [`adr/`](../adr/) e devem ser atualizados quando uma decisao tecnica mudar. ADRs iniciais:
+
+ADRs vivem em [`adr/`](../adr/) e sao a fonte canonica de cada decisao arquitetural. Sao imutaveis apos aceitos: para mudar, criar novo ADR que substitua o anterior.
+
 - `0001-monolito-modular-orientado-a-ddd.md`
 - `0002-design-systems-apple-e-notion-com-scss-puro.md`
 - `0003-stack-angular-20-ionic-8-capacitor-6.md`
