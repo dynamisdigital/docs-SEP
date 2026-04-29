@@ -55,5 +55,6 @@ Nao ha previsao de downgrade do Angular abaixo de `20`.
 
 - PRD §11, §18
 - ADR 0002 (design systems)
+- ADR 0011 (Reavaliacao da Stack Frontend e Mobile — confirmou esta decisao apos comparacao formal com React+RN+Expo) — ver [`0011-reavaliacao-stack-frontend-mobile-angular-ionic.md`](./0011-reavaliacao-stack-frontend-mobile-angular-ionic.md)
 - Ionic 8 release notes
 - Angular release notes

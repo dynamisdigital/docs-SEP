@@ -267,6 +267,15 @@ Tambem foi definido que, na fase de infraestrutura:
 
 Por enquanto, tudo isso permanece apenas como planejamento, nao implementacao.
 
+Atualizacao sobre CI/CD evolutivo:
+- foi adotada uma separacao entre **CI de validacao** e **CD/deploy**
+- CI de validacao pode existir desde Sprint 0 como higiene tecnica, sem deploy e sem secrets produtivos
+- foram criados workflows ativos em `.github/workflows/` para `backend`, `frontend web` e `mobile PWA`
+- esses workflows possuem guardas de prontidao e nao devem quebrar enquanto `gradlew`, `apps/sep-frontend` ou `apps/sep-mobile` ainda nao existirem
+- as fases futuras de Android, iOS e AWS ficam como templates versionados em `docs-sep/ci-pipelines/templates/`, fora de `.github/workflows`, para nao executarem no GitHub Actions antes da hora
+- o guia da estrategia fica em `docs-sep/ci-pipelines/README.md`
+- Android/iOS nativo e deploy AWS continuam dependentes dos gates do PRD, com producao exigindo estrategia explicita de secrets, rollback, backup, migrations, controle de acesso, logs e monitoramento
+
 ## Escopo da primeira grande entrega
 
 Foi definido que a primeira entrega concreta do projeto sera a API base, antes da integracao completa com o frontend.
@@ -359,7 +368,8 @@ Algumas regras importantes foram definidas durante a conversa:
 - commits podem ser feitos pelo agente quando solicitado
 - push e PR serao manuais
 - testes locais devem acontecer ao final de cada task quando a implementacao comecar
-- CI/CD, GitHub Actions, AWS, EC2, RDS e deploy remoto serao tratados em uma fase separada de infraestrutura
+- GitHub Actions de validacao (`backend`, `frontend web`, `mobile PWA`) podem existir desde Sprint 0 como higiene tecnica, sem deploy e sem secrets produtivos
+- CI/CD de deploy, AWS, EC2, RDS, Android/iOS nativo e deploy remoto serao tratados em fases separadas, usando templates versionados ate promocao explicita
 - a fase de infraestrutura AWS so podera iniciar, no minimo, apos a conclusao completa do login, autenticacao e autorizacao
 
 ## Situacao atual
@@ -372,6 +382,13 @@ No estado atual:
 - a implementacao completa ainda nao comecou
 - o uso de template administrativo pronto foi descartado em favor de dois design systems oficiais: Apple para superficies publicas (landing, login, cadastro) e Notion para superficies autenticadas (dashboard frontend e todo o mobile), com SCSS puro como camada de estilizacao
 - ficou registrado que a versao do Angular do frontend e do mobile esta definida em `20.x` como baseline, com opcao de upgrade para `21` condicionada a checagem de compatibilidade Ionic + plugins Capacitor na fase de implementacao mobile; a clausula anterior de downgrade foi removida junto com a saida do template, e a stack mobile baseline ficou consolidada como `Angular 20.x + Ionic 8.4+ + Capacitor 6`
+- foi implementada a estrutura inicial de CI/CD evolutivo:
+  - `.github/workflows/backend-ci.yml`
+  - `.github/workflows/frontend-ci.yml`
+  - `.github/workflows/mobile-pwa-ci.yml`
+  - `docs-sep/ci-pipelines/README.md`
+  - templates futuros em `docs-sep/ci-pipelines/templates/`
+- os workflows ativos sao apenas de validacao e possuem guardas de prontidao; deploy remoto, Android/iOS nativo, AWS, homologacao e producao continuam aguardando gates futuros
 - a revisao tecnica do backend ja consolidou Flyway, BCrypt, Springdoc, Actuator, CORS e UUID como padroes da implementacao
 - a revisao tecnica tambem consolidou o padrao inicial de JWT, auditoria e convencoes de persistencia
 - a fase futura de `Movimentacao Pix` foi aprovada conceitualmente e incorporada ao PRD como epic posterior

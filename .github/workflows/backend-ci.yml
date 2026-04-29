@@ -1,0 +1,93 @@
+name: Backend CI
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "gradle/**"
+      - "build.gradle"
+      - "build.gradle.kts"
+      - "settings.gradle"
+      - "settings.gradle.kts"
+      - "gradlew"
+      - "gradlew.bat"
+      - "docker-compose*.yml"
+      - ".github/workflows/backend-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "gradle/**"
+      - "build.gradle"
+      - "build.gradle.kts"
+      - "settings.gradle"
+      - "settings.gradle.kts"
+      - "gradlew"
+      - "gradlew.bat"
+      - "docker-compose*.yml"
+      - ".github/workflows/backend-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate backend
+    runs-on: ubuntu-24.04
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sep
+          POSTGRES_PASSWORD: sep
+          POSTGRES_DB: sep_test
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check backend readiness
+        id: backend
+        run: |
+          if [ -f "./gradlew" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Backend Gradle Wrapper not found. Skipping backend validation until Sprint 0/1 creates it."
+          fi
+
+      - name: Setup Java
+        if: steps.backend.outputs.ready == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Gradle
+        if: steps.backend.outputs.ready == 'true'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate
+        if: steps.backend.outputs.ready == 'true'
+        run: |
+          chmod +x ./gradlew
+          ./gradlew spotlessCheck build jacocoTestReport
+
+      - name: Upload JaCoCo report
+        if: always() && steps.backend.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jacoco-report
+          path: build/reports/jacoco/
+          if-no-files-found: ignore
+

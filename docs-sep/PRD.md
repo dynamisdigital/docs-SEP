@@ -118,10 +118,13 @@ A integracao com o ecossistema **Celcoin** (BaaS) e a estrategia escolhida para 
 - portal completo da empresa credora nesta etapa inicial
 - automacao financeira avancada nesta etapa inicial
 - deploy remoto
-- GitHub Actions
 - Amazon EC2
 - homologacao e producao
-- pipelines CI/CD
+- pipelines de CD/deploy remoto
+
+Observacao sobre CI/CD:
+- GitHub Actions de **validacao** fazem parte da higiene tecnica do repositorio e podem existir desde a Sprint 0, sem deploy e sem secrets produtivos.
+- GitHub Actions de **deploy**, distribuicao mobile nativa, AWS, homologacao e producao permanecem fora do escopo da entrega inicial e so devem ser promovidos quando os gates definidos neste PRD forem cumpridos.
 
 Observacao:
 Embora a implementacao do frontend esteja fora de escopo desta fase, o projeto ja possui uma base de design definida e aprovada, que deve orientar as proximas etapas.
@@ -488,6 +491,7 @@ ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../ad
 - a execucao AWS pode ser antecipada antes de Pix e das capacidades financeiras expandidas se o time precisar de ambiente remoto para validacao, homologacao ou integracao
 - CI/CD com GitHub Actions nao e pre-requisito obrigatorio para o primeiro ambiente AWS, mas deve ser planejado na mesma fase de infraestrutura
 - enquanto CI/CD nao estiver pronto, qualquer deploy remoto inicial deve ser manual, documentado e restrito a ambiente nao produtivo
+- a estrategia de CI/CD evolutiva fica documentada em [`ci-pipelines/README.md`](./ci-pipelines/README.md), com workflows ativos apenas para validacao e templates futuros nao executaveis fora de `.github/workflows`
 
 ### Arquitetura remota por ambiente
 - `aws-develop`
@@ -694,6 +698,7 @@ ADRs vivem em [`adr/`](../adr/) e devem ser atualizados quando uma decisao tecni
 - `0008-wiremock-para-testes-integracao-celcoin.md`
 - `0009-separacao-de-canal-por-perfil.md`
 - `0010-mfa-totp-com-biometria-mobile.md`
+- `0011-reavaliacao-stack-frontend-mobile-angular-ionic.md`
 
 ## 19. Estrutura Inicial de Pacotes
 
@@ -1124,6 +1129,7 @@ Responsavel principal:
 Detalhamento das tasks:
 - consultar: [`specs/000-sprint-0-hygiene-foundation.md`](../specs/000-sprint-0-hygiene-foundation.md)
 - entregaveis principais: `.gitignore`, `.editorconfig`, `.gitattributes`, Spotless + Palantir Format, JaCoCo target 70%, pre-commit hooks, GitHub branch protection + PR template, GitHub Actions CI minimo, Conventional Commits, ADRs iniciais (5-7 ADRs migrados do PRD)
+- workflows de validacao ativos esperados: `.github/workflows/backend-ci.yml`, `.github/workflows/frontend-ci.yml` e `.github/workflows/mobile-pwa-ci.yml`, com guardas de prontidao para nao quebrar enquanto cada trilha ainda nao existir
 
 ### Sprint 1
 
@@ -1508,6 +1514,8 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - planejar develop e homologacao em EC2 compartilhada, com bancos RDS separados
 - planejar producao com EC2 e RDS proprios
 - considerar `sa-east-1` como regiao recomendada
+- templates futuros de deploy AWS devem permanecer versionados em `docs-sep/ci-pipelines/templates/` ate promocao explicita para `.github/workflows`
+- nenhum workflow de producao deve ser promovido sem estrategia aprovada de secrets, rollback, backup, migrations, controle de acesso, logs e monitoramento
 
 ### Ordem de prioridade funcional consolidada
 1. Fundacao da API
@@ -1600,8 +1608,9 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - ao final de cada task concluida, a execucao deve parar para testes locais manuais
 - commits podem ser feitos pelo agente de IA
 - push e PR serao manuais
-- testes, build e deploy no GitHub Actions ficarao para fase separada
-- AWS, EC2, RDS, CI/CD e deploy remoto serao tratados em fase separada de infraestrutura
+- testes e build no GitHub Actions podem existir como CI de validacao desde Sprint 0, separados por trilha (`backend`, `frontend web`, `mobile PWA`) e sem secrets produtivos
+- templates futuros de Android, iOS e AWS devem ficar versionados fora de `.github/workflows`, em `docs-sep/ci-pipelines/templates/`, ate que cada fase esteja pronta
+- AWS, EC2, RDS, CD e deploy remoto serao tratados em fase separada de infraestrutura
 - a fase de infraestrutura AWS so podera iniciar, no minimo, apos a conclusao completa da Sprint 3 / Epic 3 de login, autenticacao e autorizacao
 - a primeira fase AWS pode usar deploy manual documentado em ambiente nao produtivo enquanto GitHub Actions ainda nao estiver implementado
 - deploy remoto de producao deve depender de estrategia explicita de secrets, rollback, backup, migrations e controle de acesso
@@ -1616,6 +1625,8 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - antes da fase AWS, o banco oficial sera PostgreSQL local em Docker Compose
 - o backend continuara sendo um unico Spring Boot na fase inicial
 - o banco continuara unico ate decisao futura explicita
+- CI de validacao nao implica deploy remoto, homologacao, producao nem integracao real com Celcoin
+- workflows futuros de Android/iOS/AWS sao templates de planejamento ate promocao manual e revisao dos gates correspondentes
 - DDD sera usado primeiro como organizacao modular e linguagem de dominio, nao como pretexto para distribuir o sistema cedo demais
 - este PRD e um documento vivo: as specs das Sprints 1 a 4 ja existem em `../specs/` e devem evoluir junto com o produto
 - o frontend consumira esta API a partir de uma base Angular standalone + SCSS, implementada diretamente sobre os dois design systems oficiais (Apple para superficies publicas e Notion para superficies autenticadas), sem reaproveitar templates administrativos prontos nem frameworks CSS de terceiros

@@ -1,0 +1,31 @@
+# Template futuro: copiar para .github/workflows/aws-deploy-develop.yml somente apos o gate minimo da Sprint 3.
+name: AWS Deploy Develop
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy aws-develop
+    runs-on: ubuntu-24.04
+    environment: aws-develop
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION || 'sa-east-1' }}
+
+      - name: Deploy application
+        run: |
+          echo "::notice::Implement aws-develop deploy after EC2/RDS topology and rollback are documented."
+          exit 1
+

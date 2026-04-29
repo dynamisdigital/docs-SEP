@@ -1038,9 +1038,9 @@ git commit -m "chore: adicionar templates de PR/issue e CODEOWNERS"
 
 ---
 
-## Task 0.6 — GitHub Actions CI Minimo
+## Task 0.6 — GitHub Actions CI de Validacao Evolutivo
 
-**Objetivo**: pipeline CI que roda em cada PR e push, executando build + test + Spotless + JaCoCo.
+**Objetivo**: pipelines de validacao que rodam em PR e push para `main`, separados por trilha (`backend`, `frontend web`, `mobile PWA`), sem deploy remoto e sem secrets produtivos.
 
 **Pre-requisito**: Tasks 0.2 e 0.3 concluidas.
 
@@ -1053,133 +1053,127 @@ cd C:/workspace-sep
 mkdir -p .github/workflows
 ```
 
-### Step 0.6.2 — Criar workflow `ci.yml`
+### Step 0.6.2 — Criar workflow `backend-ci.yml`
 
-**Arquivo**: `C:/workspace-sep/.github/workflows/ci.yml`
+**Arquivo**: `C:/workspace-sep/.github/workflows/backend-ci.yml`
 
-**Conteudo:**
+**Comportamento esperado:**
+- roda em PR e push para `main`
+- filtra alteracoes de backend, Gradle, Docker Compose e do proprio workflow
+- usa Java 21, Gradle e Postgres 16 como service container
+- executa `./gradlew spotlessCheck build jacocoTestReport`
+- publica relatorio JaCoCo como artifact
+- possui guarda de prontidao: se `gradlew` ainda nao existir, emite aviso e nao quebra a pipeline
+- nao faz deploy e nao consome secrets produtivos
+
+**Trecho-base:**
 ```yaml
-name: CI
-
-on:
-  pull_request:
-  push:
-    branches: [main]
-
-# Cancela runs antigos do mesmo PR/branch quando novos chegam
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  build:
-    name: Build, Test, Spotless, JaCoCo
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: sep
-          POSTGRES_PASSWORD: sep
-          POSTGRES_DB: sep_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-
-      - name: Spotless check
-        run: ./gradlew spotlessCheck
-
-      - name: Build
-        run: ./gradlew build -x test --no-daemon
-
-      - name: Test (com Testcontainers)
-        run: ./gradlew test --no-daemon
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/sep_test
-          SPRING_DATASOURCE_USERNAME: sep
-          SPRING_DATASOURCE_PASSWORD: sep
-
-      - name: JaCoCo report
-        if: always()
-        run: ./gradlew jacocoTestReport --no-daemon
-
-      - name: Upload JaCoCo report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: build/reports/jacoco/
-          retention-days: 14
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: build/reports/tests/
-          retention-days: 14
-
-      # Quando ativar verificacao na Sprint 4, descomentar:
-      # - name: JaCoCo verification (>= 70%)
-      #   run: ./gradlew jacocoTestCoverageVerification --no-daemon
-```
-
-### Step 0.6.3 — Criar workflow opcional para validacao de Markdown
-
-**Arquivo**: `C:/workspace-sep/.github/workflows/docs.yml` (opcional)
-
-**Conteudo:**
-```yaml
-name: Docs Validation
+name: Backend CI
 
 on:
   pull_request:
     paths:
-      - 'docs-sep/**'
-      - 'specs/**'
-      - 'adr/**'
-      - '*.md'
+      - "src/**"
+      - "gradle/**"
+      - "build.gradle"
+      - "build.gradle.kts"
+      - "settings.gradle"
+      - "settings.gradle.kts"
+      - "gradlew"
+      - "gradlew.bat"
+      - "docker-compose*.yml"
+      - ".github/workflows/backend-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "gradle/**"
+      - "build.gradle"
+      - "build.gradle.kts"
+      - "settings.gradle"
+      - "settings.gradle.kts"
+      - "gradlew"
+      - "gradlew.bat"
+      - "docker-compose*.yml"
+      - ".github/workflows/backend-ci.yml"
+  workflow_dispatch:
 
 jobs:
-  lint-markdown:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+  validate:
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Markdown lint
-        uses: DavidAnson/markdownlint-cli2-action@v16
-        with:
-          globs: |
-            docs-sep/**/*.md
-            specs/**/*.md
-            adr/**/*.md
-            *.md
-        continue-on-error: true  # nao bloqueia inicialmente; ativar depois
+      - name: Check backend readiness
+        id: backend
+        run: |
+          if [ -f "./gradlew" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Backend Gradle Wrapper not found. Skipping backend validation until Sprint 0/1 creates it."
+          fi
+
+      # Quando ready=true: setup Java 21, setup Gradle e ./gradlew spotlessCheck build jacocoTestReport
 ```
 
-### Step 0.6.4 — Documentar CI no README
+### Step 0.6.3 — Criar workflow `frontend-ci.yml`
+
+**Arquivo**: `C:/workspace-sep/.github/workflows/frontend-ci.yml`
+
+**Comportamento esperado:**
+- roda em PR e push para `main`
+- filtra `apps/sep-frontend/**` e o proprio workflow
+- usa Node 20
+- executa `npm ci`, `npm run lint`, `npm run test -- --coverage`, `npm run build`
+- possui guarda de prontidao: se `apps/sep-frontend/package-lock.json` ainda nao existir, emite aviso e nao quebra a pipeline
+- nao faz deploy
+
+### Step 0.6.4 — Criar workflow `mobile-pwa-ci.yml`
+
+**Arquivo**: `C:/workspace-sep/.github/workflows/mobile-pwa-ci.yml`
+
+**Comportamento esperado:**
+- roda em PR e push para `main`
+- filtra `apps/sep-mobile/**` e o proprio workflow
+- usa Node 20
+- executa `npm ci`, `npm run lint`, `npm run test -- --coverage`, `npm run build`
+- valida que `www/` foi gerado
+- publica `apps/sep-mobile/www/` como artifact de validacao
+- possui guarda de prontidao: se `apps/sep-mobile/package-lock.json` ainda nao existir, emite aviso e nao quebra a pipeline
+- nao faz deploy, nao gera Android/iOS nativo e nao consome secrets produtivos
+
+### Step 0.6.5 — Criar templates futuros fora de `.github/workflows`
+
+**Pasta**: `C:/workspace-sep/docs-sep/ci-pipelines/templates/`
+
+**Arquivos esperados:**
+- `mobile-android-validation.yml`
+- `mobile-android-distribution.yml`
+- `mobile-ios-validation.yml`
+- `mobile-ios-testflight.yml`
+- `aws-deploy-develop.yml`
+- `aws-deploy-homologacao.yml`
+- `aws-deploy-producao.yml`
+
+**Regra importante**: estes arquivos sao templates versionados. Nao devem ser colocados em `.github/workflows/` ate a fase correspondente ser formalmente iniciada e os gates do PRD estarem cumpridos.
+
+### Step 0.6.6 — Documentar estrategia de CI/CD evolutiva
+
+**Arquivo**: `C:/workspace-sep/docs-sep/ci-pipelines/README.md`
+
+**Conteudo esperado:**
+- diferenca entre CI de validacao e CD/deploy
+- workflows ativos
+- templates futuros
+- gates de promocao
+- secrets previstos por ambiente
+- processo de promocao de template
+- criterios de rollback
+
+### Step 0.6.7 — Documentar CI no README
 
 **Arquivo**: `C:/workspace-sep/README.md`
 
@@ -1187,13 +1181,12 @@ jobs:
 ````markdown
 ## Continuous Integration
 
-PRs e push para `main` rodam:
-- **Spotless check** — formato de codigo
-- **Build** — compilacao com Gradle
-- **Test** — JUnit 5 + Testcontainers (Postgres real)
-- **JaCoCo** — relatorio de cobertura (verificacao 70% ativa apos Sprint 4)
+PRs e push para `main` rodam CI de validacao por trilha:
+- `backend-ci.yml` — Java 21 + Gradle + Spotless + build + JaCoCo
+- `frontend-ci.yml` — Angular web: lint + test + build
+- `mobile-pwa-ci.yml` — Ionic PWA: lint + test + build + artifact `www/`
 
-Resultados ficam em **Actions** no GitHub. Relatorios JaCoCo ficam disponiveis como artifact por 14 dias.
+Os workflows possuem guardas de prontidao para nao falhar enquanto cada app ainda nao existir. Deploy remoto, Android/iOS nativo e AWS ficam em templates futuros dentro de `docs-sep/ci-pipelines/templates/`.
 
 ### Branch protection
 - `main` exige PR review + CI verde
@@ -1201,14 +1194,14 @@ Resultados ficam em **Actions** no GitHub. Relatorios JaCoCo ficam disponiveis c
 - Branches deletadas automaticamente apos merge
 ````
 
-### Step 0.6.5 — Teste end-to-end do CI (apos publicar no GitHub)
+### Step 0.6.8 — Teste end-to-end do CI (apos publicar no GitHub)
 
 **Acao:**
 
 ```bash
-# 1. Push do workflow
-git add .github/workflows/
-git commit -m "ci: adicionar pipeline CI minimo (build + test + spotless + jacoco)"
+# 1. Push dos workflows e documentacao
+git add .github/workflows/ docs-sep/ci-pipelines/ README.md
+git commit -m "ci: adicionar CI de validacao evolutivo"
 git push
 
 # 2. Abrir PR de teste
@@ -1223,28 +1216,32 @@ git push -u origin test/ci
 ```
 
 ### Definicao de pronto da Task 0.6
-- [ ] `.github/workflows/ci.yml` criado
-- [ ] CI roda em PR e push para `main`
-- [ ] Job `build` faz: checkout, Java 21, Gradle, Postgres service, Spotless, Build, Test, JaCoCo report
-- [ ] Artifacts (JaCoCo, test results) sao publicados
-- [ ] Concurrency cancel ativo
-- [ ] Comentario lembrando "ATIVAR jacocoTestCoverageVerification na Sprint 4"
-- [ ] Workflow opcional de docs criado (continue-on-error inicial)
+- [ ] `.github/workflows/backend-ci.yml` criado
+- [ ] `.github/workflows/frontend-ci.yml` criado
+- [ ] `.github/workflows/mobile-pwa-ci.yml` criado
+- [ ] workflows ativos rodam em PR e push para `main`
+- [ ] workflows ativos possuem filtros de path e guardas de prontidao
+- [ ] Backend CI faz: checkout, Java 21, Gradle, Postgres service, Spotless, Build, Test, JaCoCo report
+- [ ] Frontend CI faz: npm ci, lint, test com coverage, build
+- [ ] Mobile PWA CI faz: npm ci, lint, test com coverage, build, validacao de `www/`
+- [ ] Artifacts (JaCoCo e `www/` mobile) sao publicados quando existirem
+- [ ] Templates futuros ficam em `docs-sep/ci-pipelines/templates/`, fora de `.github/workflows`
+- [ ] `docs-sep/ci-pipelines/README.md` criado
 - [ ] README atualizado
 - [ ] PR de teste passou no CI
 
 ### Commit Task 0.6
 ```bash
-git add .github/workflows/ README.md
-git commit -m "ci: adicionar pipeline CI minimo (build + test + spotless + jacoco)"
+git add .github/workflows/ docs-sep/ci-pipelines/ README.md
+git commit -m "ci: adicionar CI de validacao evolutivo"
 ```
 
 ### Observacoes
 - **Custo**: GitHub Actions e gratis para repos publicos e tem cota generosa para privados (2000 min/mes em conta free, 3000 em Pro)
 - **Postgres em CI**: usa service container `postgres:16`. Testcontainers tambem funciona dentro da Action.
-- **Cache do Gradle**: `gradle/actions/setup-gradle@v3` cuida automaticamente.
+- **Cache do Gradle**: `gradle/actions/setup-gradle@v4` cuida automaticamente.
 - **Failures comuns**: Java version mismatch entre local e CI; sempre fixar Java 21 em ambos.
-- **Deploy**: NAO incluso. Deploy fica para Epic 16 (Infraestrutura AWS).
+- **Deploy**: NAO incluso. Deploy fica para Epic 16 (Infraestrutura AWS) e deve ser promovido a partir dos templates apenas quando os gates do PRD forem cumpridos.
 
 ---
 
@@ -1681,7 +1678,7 @@ A Sprint 0 esta concluida quando todas as 9 tasks estiverem com checklist comple
 - [ ] **Task 0.3** — JaCoCo configurado (verificacao desligada ate Sprint 4)
 - [ ] **Task 0.4** — pre-commit hook bloqueando codigo desformatado
 - [ ] **Task 0.5** — repo GitHub configurado (branch protection + templates)
-- [ ] **Task 0.6** — CI verde rodando build + test + Spotless + JaCoCo
+- [ ] **Task 0.6** — CI de validacao evolutivo criado para backend, frontend web e mobile PWA, sem deploy
 - [ ] **Task 0.7** — Conventional Commits documentado em CONTRIBUTING.md
 - [x] **Task 0.8** — ADRs iniciais (ja concluida — 7 ADRs em `adr/`)
 - [ ] **Task 0.9** — estrutura de pacotes DDD com 48 `package-info.java`
@@ -1702,8 +1699,9 @@ C:/workspace-sep/
 │   │   ├── bug_report.md
 │   │   └── feature_request.md
 │   └── workflows/
-│       ├── ci.yml
-│       └── docs.yml
+│       ├── backend-ci.yml
+│       ├── frontend-ci.yml
+│       └── mobile-pwa-ci.yml
 ├── adr/                                  # ja existe
 │   ├── 0000-template.md
 │   └── 0001-...md ate 0007-...md
@@ -1712,6 +1710,16 @@ C:/workspace-sep/
 ├── gradle/wrapper/                       # criado em Sprint 1 Task 1.1a
 ├── gradlew, gradlew.bat                  # criado em Sprint 1 Task 1.1a
 ├── docs-sep/                             # ja existe
+│   └── ci-pipelines/
+│       ├── README.md
+│       └── templates/
+│           ├── aws-deploy-develop.yml
+│           ├── aws-deploy-homologacao.yml
+│           ├── aws-deploy-producao.yml
+│           ├── mobile-android-distribution.yml
+│           ├── mobile-android-validation.yml
+│           ├── mobile-ios-testflight.yml
+│           └── mobile-ios-validation.yml
 ├── specs/                                # ja existe
 ├── src/main/java/com/dynamis/broker_app/ # 48 package-info.java
 ├── CLAUDE.md                             # ja existe
@@ -1729,6 +1737,7 @@ C:/workspace-sep/
 ## Referencias
 - [Spec 000](../specs/000-sprint-0-hygiene-foundation.md) — descricao alta das tasks
 - [PRD §11, §18, §22](../docs-sep/PRD.md) — stack, decisoes consolidadas, backlog
+- [CI/CD evolutivo](../docs-sep/ci-pipelines/README.md) — workflows ativos, templates futuros, gates e rollback
 - [CLAUDE.md](../CLAUDE.md) — orientacao para agentes
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — Conventional Commits e workflow
 - ADRs [0001](../adr/0001-monolito-modular-orientado-a-ddd.md) a [0007](../adr/0007-ddd-com-hexagonal-ports-and-adapters-por-modulo.md)

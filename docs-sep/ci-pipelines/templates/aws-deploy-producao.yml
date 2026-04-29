@@ -1,0 +1,31 @@
+# Template futuro: copiar para .github/workflows/aws-deploy-producao.yml somente apos aprovacao explicita de producao.
+name: AWS Deploy Producao
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy producao
+    runs-on: ubuntu-24.04
+    environment: producao
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION || 'sa-east-1' }}
+
+      - name: Block until production readiness is documented
+        run: |
+          echo "::error::Production deploy requires approved secrets, rollback, backup, migrations, access control, logs and monitoring strategy."
+          exit 1
+

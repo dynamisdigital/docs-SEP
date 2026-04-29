@@ -1,0 +1,52 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/sep-frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/sep-frontend/**"
+      - ".github/workflows/frontend-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate frontend web
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check frontend readiness
+        id: frontend
+        run: |
+          if [ -f "apps/sep-frontend/package-lock.json" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::apps/sep-frontend/package-lock.json not found. Skipping frontend validation until F-Sprint 0 creates the app."
+          fi
+
+      - name: Setup Node
+        if: steps.frontend.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate
+        if: steps.frontend.outputs.ready == 'true'
+        working-directory: apps/sep-frontend
+        run: |
+          npm ci
+          npm run lint
+          npm run test -- --coverage
+          npm run build
+

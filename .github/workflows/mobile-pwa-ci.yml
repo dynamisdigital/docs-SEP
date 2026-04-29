@@ -1,0 +1,61 @@
+name: Mobile PWA CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/sep-mobile/**"
+      - ".github/workflows/mobile-pwa-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/sep-mobile/**"
+      - ".github/workflows/mobile-pwa-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate mobile PWA
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check mobile readiness
+        id: mobile
+        run: |
+          if [ -f "apps/sep-mobile/package-lock.json" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::apps/sep-mobile/package-lock.json not found. Skipping mobile PWA validation until M-Sprint 0 creates the app."
+          fi
+
+      - name: Setup Node
+        if: steps.mobile.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate
+        if: steps.mobile.outputs.ready == 'true'
+        working-directory: apps/sep-mobile
+        run: |
+          npm ci
+          npm run lint
+          npm run test -- --coverage
+          npm run build
+          test -d www
+
+      - name: Upload PWA artifact
+        if: steps.mobile.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-pwa-www
+          path: apps/sep-mobile/www/
+          if-no-files-found: error
+
