@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SEP - Trilha de Tasks Frontend Web</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-muted: #f1f4f9;
+      --text: #18212f;
+      --text-muted: #576174;
+      --border: #d9e0ea;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --success: #0f766e;
+      --success-soft: #ccfbf1;
+      --warning: #b45309;
+      --warning-soft: #fef3c7;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --max: 1240px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      width: min(100% - 32px, var(--max));
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+      color: #fff;
+      padding: 48px 0 36px;
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 920px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 1rem;
+    }
+
+    .badges, .mini-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.92rem;
+    }
+
+    main { padding: 28px 0 56px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel.pad { padding: 20px; }
+
+    .sidebar {
+      position: sticky;
+      top: 20px;
+    }
+
+    .sidebar h2, .content h2 {
+      margin: 0 0 14px;
+      font-size: 1.05rem;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: var(--text);
+      background: var(--surface-muted);
+      border: 1px solid transparent;
+    }
+
+    .nav a:hover {
+      background: #eef4ff;
+      border-color: #bfdbfe;
+      text-decoration: none;
+    }
+
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .kpi {
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .kpi strong {
+      display: block;
+      font-size: 1.6rem;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .muted { color: var(--text-muted); }
+
+    .callout {
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .callout.warning {
+      background: var(--warning-soft);
+      border-color: #fcd34d;
+    }
+
+    .callout.success {
+      background: var(--success-soft);
+      border-color: #99f6e4;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background: #eef4ff;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #234;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .task-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    details.task {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    details.task[open] {
+      border-color: #bfd3ff;
+    }
+
+    details.task summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 20px;
+    }
+
+    details.task summary::-webkit-details-marker { display: none; }
+
+    .task-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: #1d4ed8;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .pill.neutral {
+      background: #eef2f7;
+      color: #314155;
+      font-weight: 600;
+    }
+
+    .pill.success {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .task-title {
+      margin: 0;
+      font-size: 1.08rem;
+    }
+
+    .task-body {
+      padding: 0 20px 20px;
+      border-top: 1px solid var(--border);
+      background: #fcfdff;
+    }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .box h4 {
+      margin: 0 0 8px;
+      font-size: 0.92rem;
+    }
+
+    ul {
+      margin: 8px 0 0 18px;
+      padding: 0;
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    code {
+      background: #eef2ff;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 1024px) {
+      .grid, .task-grid, .kpis {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <h1>Trilha de Tasks Frontend Web</h1>
+      <p>
+        Guia consolidado para os desenvolvedores frontend do projeto SEP, contendo somente a trilha
+        <strong>web</strong>. As tasks abaixo estao em ordem de execucao, com objetivo, entregaveis,
+        pre-requisitos, dependencias, criterios de verificacao e sprint de origem.
+      </p>
+      <div class="badges">
+        <span class="badge">Escopo: frontend web</span>
+        <span class="badge">Fonte: specs 100-104 + WEB-SCREENS-PLAN</span>
+        <span class="badge">Sem tasks de backend</span>
+        <span class="badge">Sem tasks de mobile</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="kpis">
+        <div class="kpi">
+          <strong>18</strong>
+          <span class="muted">tasks frontend web mapeadas</span>
+        </div>
+        <div class="kpi">
+          <strong>5</strong>
+          <span class="muted">F-Sprints consolidadas</span>
+        </div>
+        <div class="kpi">
+          <strong>4</strong>
+          <span class="muted">macro etapas: setup, design system, publico, autenticado</span>
+        </div>
+        <div class="kpi">
+          <strong>1</strong>
+          <span class="muted">arquivo unico para consulta operacional da squad web</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <aside class="sidebar">
+          <div class="panel pad">
+            <h2>Navegacao</h2>
+            <nav class="nav">
+              <a href="#como-usar">Como usar</a>
+              <a href="#resumo-ordem">Ordem recomendada</a>
+              <a href="#matriz">Matriz resumida</a>
+              <a href="#fsprint-0">F-Sprint 0</a>
+              <a href="#fsprint-1">F-Sprint 1</a>
+              <a href="#fsprint-2">F-Sprint 2</a>
+              <a href="#fsprint-3">F-Sprint 3</a>
+              <a href="#fsprint-4">F-Sprint 4</a>
+              <a href="#gates">Gates externos</a>
+            </nav>
+          </div>
+        </aside>
+
+        <section class="content">
+          <section id="como-usar" class="section">
+            <div class="callout success">
+              <strong>Como usar este arquivo.</strong> Leia primeiro a visao geral e a matriz resumida. Depois execute
+              as tasks na ordem indicada. Quando houver paralelismo seguro, ele esta explicitado nas dependencias.
+            </div>
+            <div class="callout warning">
+              <strong>Importante:</strong> este arquivo nao lista tasks de backend nem mobile. Ainda assim, algumas tasks
+              frontend dependem de <em>gates externos</em> do backend, como disponibilidade dos endpoints de auth e usuarios.
+            </div>
+          </section>
+
+          <section id="resumo-ordem" class="section">
+            <div class="section-header">
+              <h2>Ordem recomendada de implementacao web</h2>
+            </div>
+            <div class="panel pad">
+              <ol>
+                <li>Base web: scaffold, tooling, testes e CI.</li>
+                <li>Tokens e showcase dos design systems.</li>
+                <li>Landing, login e cadastro com mocks aprovados.</li>
+                <li>Auth real, shell autenticado, guards e interceptors.</li>
+                <li>Perfil, alterar senha, administracao de usuarios, dashboard e smoke E2E.</li>
+              </ol>
+              <p class="muted">
+                Isso segue a sequencia dos specs <code>100</code> a <code>104</code> e a ordem do
+                <code>WEB-SCREENS-PLAN.md</code>.
+              </p>
+            </div>
+          </section>
+
+          <section id="matriz" class="section">
+            <div class="section-header">
+              <h2>Matriz resumida das tasks</h2>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Ordem</th>
+                  <th>Task</th>
+                  <th>F-Sprint</th>
+                  <th>Pertence a</th>
+                  <th>Dependencias diretas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>F-0.1</td><td>F-Sprint 0</td><td>Base do projeto Angular</td><td>Nenhuma</td></tr>
+                <tr><td>2</td><td>F-0.2</td><td>F-Sprint 0</td><td>Tooling e hooks</td><td>F-0.1</td></tr>
+                <tr><td>3</td><td>F-0.3</td><td>F-Sprint 0</td><td>Testes e mocks</td><td>F-0.1, F-0.2</td></tr>
+                <tr><td>4</td><td>F-0.4</td><td>F-Sprint 0</td><td>CI frontend</td><td>F-0.1, F-0.2, F-0.3</td></tr>
+                <tr><td>5</td><td>F-1.1</td><td>F-Sprint 1</td><td>Tokens Apple</td><td>F-Sprint 0</td></tr>
+                <tr><td>6</td><td>F-1.2</td><td>F-Sprint 1</td><td>Tokens Notion</td><td>F-Sprint 0</td></tr>
+                <tr><td>7</td><td>F-1.3</td><td>F-Sprint 1</td><td>Showcase design system</td><td>F-1.1, F-1.2</td></tr>
+                <tr><td>8</td><td>F-2.1</td><td>F-Sprint 2</td><td>Landing publica</td><td>F-Sprint 1</td></tr>
+                <tr><td>9</td><td>F-2.2</td><td>F-Sprint 2</td><td>Login com MSW</td><td>F-Sprint 1</td></tr>
+                <tr><td>10</td><td>F-2.3</td><td>F-Sprint 2</td><td>Register com MSW</td><td>F-Sprint 1</td></tr>
+                <tr><td>11</td><td>F-3.1</td><td>F-Sprint 3</td><td>Auth real</td><td>Gate externo de backend</td></tr>
+                <tr><td>12</td><td>F-3.2</td><td>F-Sprint 3</td><td>Shell autenticado</td><td>F-3.1</td></tr>
+                <tr><td>13</td><td>F-3.3</td><td>F-Sprint 3</td><td>Guards e interceptors</td><td>F-3.1, F-3.2</td></tr>
+                <tr><td>14</td><td>F-4.1</td><td>F-Sprint 4</td><td>Tela Meu Perfil</td><td>F-Sprint 3</td></tr>
+                <tr><td>15</td><td>F-4.2</td><td>F-Sprint 4</td><td>Tela Alterar Senha</td><td>F-4.1 + gate externo</td></tr>
+                <tr><td>16</td><td>F-4.3</td><td>F-Sprint 4</td><td>Admin de usuarios</td><td>F-Sprint 3 + gate externo</td></tr>
+                <tr><td>17</td><td>F-4.4</td><td>F-Sprint 4</td><td>Dashboard casca</td><td>F-Sprint 3</td></tr>
+                <tr><td>18</td><td>F-4.5</td><td>F-Sprint 4</td><td>Smoke E2E</td><td>F-4.1, F-4.2, F-4.3, F-4.4 + gate externo</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section id="fsprint-0" class="section">
+            <div class="section-header">
+              <h2>F-Sprint 0 - Setup Angular</h2>
+              <span class="pill neutral">Objetivo: fundacao tecnica do frontend web</span>
+            </div>
+            <div class="task-list">
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-0.1</span>
+                    <span class="pill neutral">F-Sprint 0</span>
+                    <span class="pill success">Base Angular</span>
+                  </div>
+                  <h3 class="task-title">Scaffold Angular 20.x</h3>
+                  <div class="muted">Inicializar o projeto Angular com Standalone Components, Signals, SCSS e estrutura modular por feature.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar o projeto em <code>apps/sep-frontend/</code>.</li>
+                        <li>Ativar strict mode.</li>
+                        <li>Separar <code>core</code>, <code>shared</code>, <code>layout</code> e <code>features</code>.</li>
+                        <li>Preparar <code>features/public</code> e <code>features/authenticated</code>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Node.js LTS &gt;= 20.x.</li>
+                        <li>Sem dependencia interna anterior.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Estrutura inicial do app Angular.</li>
+                        <li>Pasta de estilos com base SCSS.</li>
+                        <li>Projeto subindo em <code>localhost:4200</code>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>App sobe localmente.</li>
+                        <li>Sem <code>NgModule</code>.</li>
+                        <li>Estrutura de pastas criada.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-0.2</span>
+                    <span class="pill neutral">F-Sprint 0</span>
+                    <span class="pill success">Qualidade</span>
+                  </div>
+                  <h3 class="task-title">Tooling: ESLint + Prettier + Stylelint + Husky + lint-staged</h3>
+                  <div class="muted">Configurar qualidade de codigo, formatacao e pre-commit hooks do frontend.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Configurar <code>eslint.config.js</code> em flat config.</li>
+                        <li>Adicionar Prettier e Stylelint.</li>
+                        <li>Plugar Husky + lint-staged no pre-commit.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de <strong>F-0.1</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Lint e format padronizados.</li>
+                        <li>Hook de pre-commit funcional.</li>
+                        <li>Config de lint-staged no <code>package.json</code>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li><code>npm run lint</code> sem erros em codigo valido.</li>
+                        <li>Pre-commit bloqueia codigo mal formatado.</li>
+                        <li>Auto-fix para ajustes triviais.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-0.3</span>
+                    <span class="pill neutral">F-Sprint 0</span>
+                    <span class="pill success">Testes</span>
+                  </div>
+                  <h3 class="task-title">Vitest + Playwright + MSW</h3>
+                  <div class="muted">Preparar testes unitarios, E2E e mocks de API para desenvolvimento e execucao local.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Configurar Vitest.</li>
+                        <li>Configurar Playwright com smoke placeholder.</li>
+                        <li>Criar estrutura <code>src/mocks/</code> com MSW.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de <strong>F-0.1</strong> e <strong>F-0.2</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li><code>vitest.config.ts</code></li>
+                        <li><code>playwright.config.ts</code></li>
+                        <li>Handlers MSW iniciais</li>
+                        <li><code>e2e/smoke.spec.ts</code></li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li><code>npm run test</code> executa.</li>
+                        <li><code>npm run e2e</code> executa.</li>
+                        <li>MSW intercepta chamadas em dev.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-0.4</span>
+                    <span class="pill neutral">F-Sprint 0</span>
+                    <span class="pill success">CI</span>
+                  </div>
+                  <h3 class="task-title">GitHub Actions CI Frontend</h3>
+                  <div class="muted">Subir pipeline minima de lint, test e build para validar PRs do frontend.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar <code>.github/workflows/frontend-ci.yml</code>.</li>
+                        <li>Executar <code>npm ci</code>, lint, test e build.</li>
+                        <li>Restringir paths para <code>apps/sep-frontend/**</code>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de <strong>F-0.1</strong>, <strong>F-0.2</strong> e <strong>F-0.3</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Workflow de CI do frontend.</li>
+                        <li>PR testavel com status checks.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>PR quebra quando lint, teste ou build falham.</li>
+                        <li>Pipeline idealmente abaixo de 5 minutos.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </section>
+
+          <section id="fsprint-1" class="section">
+            <div class="section-header">
+              <h2>F-Sprint 1 - Tokens e Showcase</h2>
+              <span class="pill neutral">Objetivo: consolidar a base visual Apple + Notion</span>
+            </div>
+            <div class="task-list">
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-1.1</span>
+                    <span class="pill neutral">F-Sprint 1</span>
+                    <span class="pill success">Design system Apple</span>
+                  </div>
+                  <h3 class="task-title">Tokens SCSS Apple (publico)</h3>
+                  <div class="muted">Extrair o design system Apple para SCSS e preparar a camada visual das superficies publicas.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Mapear cores, tipografia, espacamentos, raios e sombras.</li>
+                        <li>Criar mixins de componentes reutilizaveis.</li>
+                        <li>Documentar o uso com comentarios curtos.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>F-Sprint 0 concluida.</li>
+                        <li>Sem dependencia interna na F-Sprint 1.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li><code>_apple-tokens.scss</code></li>
+                        <li><code>_apple-typography.scss</code></li>
+                        <li><code>_apple-components.scss</code></li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Tokens do <code>DESIGN-apple.md</code> mapeados.</li>
+                        <li>SCSS validado no Stylelint.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-1.2</span>
+                    <span class="pill neutral">F-Sprint 1</span>
+                    <span class="pill success">Design system Notion</span>
+                  </div>
+                  <h3 class="task-title">Tokens SCSS Notion (autenticado)</h3>
+                  <div class="muted">Extrair o design system Notion para SCSS e preparar a camada visual das superficies autenticadas.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Mapear paleta warm, tipografia, sombras e componentes base.</li>
+                        <li>Organizar a base para header, sidenav, breadcrumbs e cards.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>F-Sprint 0 concluida.</li>
+                        <li>Pode rodar em paralelo com <strong>F-1.1</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li><code>_notion-tokens.scss</code></li>
+                        <li><code>_notion-typography.scss</code></li>
+                        <li><code>_notion-components.scss</code></li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Tokens do <code>DESIGN-notion.md</code> mapeados.</li>
+                        <li>SCSS validado no Stylelint.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-1.3</span>
+                    <span class="pill neutral">F-Sprint 1</span>
+                    <span class="pill success">Referencial visual</span>
+                  </div>
+                  <h3 class="task-title">Design System Showcase (rota <code>/design-system</code>)</h3>
+                  <div class="muted">Criar uma referencia navegavel de tokens, tipografia e componentes para aprovacao visual e reuso.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar rota dev-only <code>/design-system</code>.</li>
+                        <li>Exibir Apple e Notion lado a lado.</li>
+                        <li>Mostrar paleta, tipografia e componentes principais.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de <strong>F-1.1</strong> e <strong>F-1.2</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Feature <code>design-system</code>.</li>
+                        <li>Subrotas Apple e Notion.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Rota abre localmente.</li>
+                        <li>Serve como base para PO e stakeholders aprovarem identidade visual.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </section>
+
+          <section id="fsprint-2" class="section">
+            <div class="section-header">
+              <h2>F-Sprint 2 - Telas publicas Apple</h2>
+              <span class="pill neutral">Objetivo: entregar landing, login e cadastro com mocks aprovados</span>
+            </div>
+            <div class="task-list">
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-2.1</span>
+                    <span class="pill neutral">F-Sprint 2</span>
+                    <span class="pill success">Tela publica</span>
+                  </div>
+                  <h3 class="task-title">Tela Landing (Apple)</h3>
+                  <div class="muted">Implementar a landing page publica fiel ao design Apple.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar landing responsiva.</li>
+                        <li>Usar hero typography, CTAs pill e tiles light/dark.</li>
+                        <li>Adicionar imagens placeholder em <code>src/assets/landing/</code>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>F-Sprint 1 concluida.</li>
+                        <li>Independente de login e cadastro.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Componente da landing.</li>
+                        <li>SCSS e assets associados.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Fidelidade visual ao spec Apple.</li>
+                        <li>Responsivo.</li>
+                        <li>Sem <code>console.error</code>.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-2.2</span>
+                    <span class="pill neutral">F-Sprint 2</span>
+                    <span class="pill success">Auth mockada</span>
+                  </div>
+                  <h3 class="task-title">Tela Login + MSW</h3>
+                  <div class="muted">Construir login Apple-style usando MSW para simular <code>POST /api/v1/auth/login</code>.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar tela de login com validacao de email e senha.</li>
+                        <li>Introduzir <code>auth.service.ts</code> com Signals.</li>
+                        <li>Adicionar handler MSW para login.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>F-Sprint 1 concluida.</li>
+                        <li>Pode rodar em paralelo com <strong>F-2.1</strong> e <strong>F-2.3</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Tela <code>/login</code>.</li>
+                        <li><code>auth.service.ts</code>.</li>
+                        <li>Mock MSW do login.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Sucesso e falha cobertos em testes.</li>
+                        <li>Feedback de erro visivel.</li>
+                        <li>Token armazenado localmente nesta fase.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-2.3</span>
+                    <span class="pill neutral">F-Sprint 2</span>
+                    <span class="pill success">Cadastro mockado</span>
+                  </div>
+                  <h3 class="task-title">Tela Register + MSW</h3>
+                  <div class="muted">Construir cadastro publico Apple-style usando MSW para simular <code>POST /api/v1/usuarios</code>.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar tela <code>/register</code>.</li>
+                        <li>Validar email, senha de 6 caracteres e role.</li>
+                        <li>Mockar retorno de sucesso e conflito 409.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>F-Sprint 1 concluida.</li>
+                        <li>Pode rodar em paralelo com <strong>F-2.1</strong> e <strong>F-2.2</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Tela de cadastro.</li>
+                        <li>Handler MSW de criacao de usuario.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Redireciona para login em sucesso.</li>
+                        <li>Mostra erro amigavel em duplicidade.</li>
+                        <li>Testes cobrem cenarios criticos.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </section>
+
+          <section id="fsprint-3" class="section">
+            <div class="section-header">
+              <h2>F-Sprint 3 - Auth real e shell autenticado</h2>
+              <span class="pill neutral">Objetivo: sair do mock e conectar o frontend ao backend real</span>
+            </div>
+            <div class="task-list">
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-3.1</span>
+                    <span class="pill neutral">F-Sprint 3</span>
+                    <span class="pill success">Integracao real</span>
+                  </div>
+                  <h3 class="task-title">Substituir MSW por API real (login + <code>/me</code>)</h3>
+                  <div class="muted">Apontar auth para o backend local real, mantendo fallback offline opcional.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Tornar URL do backend configuravel por environment.</li>
+                        <li>Atualizar <code>auth.service.ts</code> para consumir backend real.</li>
+                        <li>Manter MSW via flag <code>dev-offline</code>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de gate externo: backend com <code>/auth/login</code> e <code>/auth/me</code>.</li>
+                        <li>Backend rodando localmente.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li><code>environment.ts</code> e variao offline.</li>
+                        <li>MSW condicional.</li>
+                        <li>Auth real operacional.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Login real funciona.</li>
+                        <li>JWT enviado em <code>Authorization: Bearer</code>.</li>
+                        <li>Fallback offline disponivel.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-3.2</span>
+                    <span class="pill neutral">F-Sprint 3</span>
+                    <span class="pill success">Superficie autenticada</span>
+                  </div>
+                  <h3 class="task-title">Shell Autenticado Notion</h3>
+                  <div class="muted">Implementar header, sidenav, breadcrumbs e area de conteudo com visual Notion.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar shell autenticado completo.</li>
+                        <li>Montar header com user menu.</li>
+                        <li>Criar sidenav colapsavel e breadcrumbs.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de <strong>F-3.1</strong>.</li>
+                        <li>Requer tokens Notion da F-Sprint 1.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li><code>shell.component</code></li>
+                        <li><code>header.component</code></li>
+                        <li><code>sidenav.component</code></li>
+                        <li><code>breadcrumbs.component</code></li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Visual fiel ao Notion.</li>
+                        <li>Responsivo.</li>
+                        <li>User menu populado via <code>/auth/me</code>.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-3.3</span>
+                    <span class="pill neutral">F-Sprint 3</span>
+                    <span class="pill success">Seguranca de rotas</span>
+                  </div>
+                  <h3 class="task-title">Guards funcionais + interceptors</h3>
+                  <div class="muted">Proteger rotas, anexar token nas requests e tratar 401/403.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar <code>auth.guard</code> e <code>role.guard</code>.</li>
+                        <li>Criar interceptors de auth e erro.</li>
+                        <li>Adicionar pagina de acesso negado.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de <strong>F-3.1</strong> e <strong>F-3.2</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Guards funcionais Angular 20.</li>
+                        <li>Interceptors HTTP.</li>
+                        <li>Pagina <code>/access-denied</code>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Rota protegida sem token redireciona para login.</li>
+                        <li>401 limpa sessao.</li>
+                        <li>403 mostra acesso negado.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </section>
+
+          <section id="fsprint-4" class="section">
+            <div class="section-header">
+              <h2>F-Sprint 4 - Telas autenticadas e fechamento da fundacao web</h2>
+              <span class="pill neutral">Objetivo: entregar o frontend MVP demonstravel</span>
+            </div>
+            <div class="task-list">
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-4.1</span>
+                    <span class="pill neutral">F-Sprint 4</span>
+                    <span class="pill success">Perfil</span>
+                  </div>
+                  <h3 class="task-title">Tela Meu Perfil</h3>
+                  <div class="muted">Exibir dados do usuario autenticado via <code>/auth/me</code> com estilo Notion.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Mostrar id, email, role e auditoria.</li>
+                        <li>Adicionar link para alterar senha.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>F-Sprint 3 concluida.</li>
+                        <li>Sem dependencia interna nesta sprint.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Feature de perfil autenticado.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Consome <code>/auth/me</code>.</li>
+                        <li>Responsivo.</li>
+                        <li>Link para alterar senha funcional.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-4.2</span>
+                    <span class="pill neutral">F-Sprint 4</span>
+                    <span class="pill success">Senha</span>
+                  </div>
+                  <h3 class="task-title">Tela Alterar Senha</h3>
+                  <div class="muted">Consumir <code>PATCH /api/v1/usuarios/{id}/senha</code> com fluxo de validacao e feedback.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar formulario de senha atual, nova senha e confirmacao.</li>
+                        <li>Exibir feedback de erro e sucesso.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de <strong>F-4.1</strong>.</li>
+                        <li>Gate externo: endpoint de alteracao de senha disponivel.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Tela de alterar senha.</li>
+                        <li>Validacoes e mensagens de retorno.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Valida nova senha com 6 caracteres.</li>
+                        <li>Mantem sessao autenticada apos sucesso.</li>
+                        <li>Testes cobrem sucesso e falha.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-4.3</span>
+                    <span class="pill neutral">F-Sprint 4</span>
+                    <span class="pill success">Admin</span>
+                  </div>
+                  <h3 class="task-title">Administracao de Usuarios (apenas ADMIN)</h3>
+                  <div class="muted">Construir lista e detalhe de usuarios protegidos por role guard.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar lista consumindo <code>GET /api/v1/usuarios</code>.</li>
+                        <li>Criar detalhe consumindo <code>GET /api/v1/usuarios/{id}</code>.</li>
+                        <li>Proteger rotas com <code>roleGuard(['ROLE_ADMIN'])</code>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>F-Sprint 3 concluida.</li>
+                        <li>Gate externo: endpoints admin e autorizacao funcionando.</li>
+                        <li>Pode rodar em paralelo com <strong>F-4.1</strong> e <strong>F-4.4</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Lista de usuarios.</li>
+                        <li>Detalhe de usuario.</li>
+                        <li>Rotas protegidas por role.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Cliente sem permissao vai para acesso negado.</li>
+                        <li>Visual Notion coerente com tabelas e detalhes.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-4.4</span>
+                    <span class="pill neutral">F-Sprint 4</span>
+                    <span class="pill success">Dashboard</span>
+                  </div>
+                  <h3 class="task-title">Dashboard Administrativa (Casca)</h3>
+                  <div class="muted">Criar a primeira tela autenticada com cards placeholder e atalhos do MVP.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar dashboard base apos login.</li>
+                        <li>Adicionar cards placeholder e atalhos para perfil, senha e admin.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>F-Sprint 3 concluida.</li>
+                        <li>Pode rodar em paralelo com <strong>F-4.1</strong> e <strong>F-4.3</strong>.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Dashboard casca.</li>
+                        <li>Atalhos navegaveis para o MVP.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>Rota inicial autenticada renderiza corretamente.</li>
+                        <li>Visual Notion consistente.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="task">
+                <summary>
+                  <div class="task-top">
+                    <span class="pill">F-4.5</span>
+                    <span class="pill neutral">F-Sprint 4</span>
+                    <span class="pill success">E2E</span>
+                  </div>
+                  <h3 class="task-title">Smoke E2E Playwright</h3>
+                  <div class="muted">Cobrir o golden path do frontend MVP: register, login, shell, perfil, senha e admin.</div>
+                </summary>
+                <div class="task-body">
+                  <div class="task-grid">
+                    <div class="box">
+                      <h4>O que fazer</h4>
+                      <ul>
+                        <li>Criar <code>golden-path.spec.ts</code>.</li>
+                        <li>Criar <code>admin-flow.spec.ts</code>.</li>
+                        <li>Preparar fixtures de usuarios.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Pre-requisitos e dependencias</h4>
+                      <ul>
+                        <li>Depende de <strong>F-4.1</strong>, <strong>F-4.2</strong>, <strong>F-4.3</strong> e <strong>F-4.4</strong>.</li>
+                        <li>Gate externo: backend completo e estavel para smoke.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Entregaveis</h4>
+                      <ul>
+                        <li>Suite E2E Playwright do frontend MVP.</li>
+                        <li>Fixtures de teste.</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Criterios de verificacao</h4>
+                      <ul>
+                        <li>E2E roda contra backend local.</li>
+                        <li>Screenshots de falha disponiveis.</li>
+                        <li>Tempo alvo abaixo de 3 minutos.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </section>
+
+          <section id="gates" class="section">
+            <div class="section-header">
+              <h2>Gates externos relevantes para o frontend web</h2>
+            </div>
+            <div class="panel pad">
+              <ul>
+                <li><strong>F-3.1</strong> depende de backend com <code>POST /api/v1/auth/login</code> e <code>GET /api/v1/auth/me</code>.</li>
+                <li><strong>F-4.2</strong> depende de backend com <code>PATCH /api/v1/usuarios/{id}/senha</code>.</li>
+                <li><strong>F-4.3</strong> depende de backend com <code>GET /api/v1/usuarios</code> e <code>GET /api/v1/usuarios/{id}</code>, alem de autorizacao por perfil.</li>
+                <li><strong>F-4.5</strong> depende do backend local rodando de forma estavel para execucao de smoke E2E.</li>
+              </ul>
+              <p class="footer-note">
+                Esses gates aparecem aqui apenas como condicionantes operacionais da trilha web. Eles nao transformam este documento em um plano de backend.
+              </p>
+            </div>
+          </section>
+
+          <p class="footer-note">
+            Documento consolidado a partir de <code>specs/100-fsprint-0-setup-angular.md</code>,
+            <code>101-fsprint-1-design-tokens-showcase.md</code>,
+            <code>102-fsprint-2-telas-apple-publicas.md</code>,
+            <code>103-fsprint-3-shell-notion-auth.md</code>,
+            <code>104-fsprint-4-telas-autenticadas.md</code> e <code>docs-sep/WEB-SCREENS-PLAN.md</code>.
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

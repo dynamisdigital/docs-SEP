@@ -276,6 +276,8 @@
 <nav class="nav">
   <a href="#visao">Visão</a>
   <a href="#jornadas">4 Jornadas</a>
+  <a href="#regulatorio">Marco Regulatório</a>
+  <a href="#perfis">Usuários e Perfis</a>
   <a href="#epicos">Épicos</a>
   <a href="#historias">Histórias</a>
   <a href="#roadmap">Roadmap</a>
@@ -293,17 +295,20 @@
   <h2>1. Visão do Produto</h2>
   <div class="subtitle">Plataforma SEP com foco em capital de giro PJ, apoiada em infraestrutura Banking as a Service.</div>
 
-  <div class="stats">
-    <div class="stat"><div class="num-big">14</div><div class="label">Épicos no Roadmap</div></div>
+  <div class="stats" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="stat"><div class="num-big">16</div><div class="label">Épicos no Roadmap</div></div>
     <div class="stat"><div class="num-big">4</div><div class="label">Jornadas de Negócio</div></div>
-    <div class="stat"><div class="num-big">4</div><div class="label">Sprints (Fase 1)</div></div>
-    <div class="stat"><div class="num-big">6</div><div class="label">Endpoints Iniciais</div></div>
+    <div class="stat"><div class="num-big">5</div><div class="label">Sprints para cada Stack</div></div>
   </div>
 
   <p>O produto SEP é uma plataforma que conecta empresas tomadoras de empréstimo a empresas credoras, com operação assistida por um time financeiro interno e governança do administrador do sistema. A fase atual entrega a <strong>fundação técnica da API</strong>, preparando o terreno para as próximas ondas funcionais: onboarding, análise de crédito, formalização contratual e cobrança.</p>
 
   <div class="alert">
     <strong>Importante:</strong> esta fase não entrega o produto completo. Ela constrói a base segura, auditável e documentada sobre a qual as jornadas de negócio serão construídas em ondas.
+  </div>
+
+  <div class="alert" style="background: #eff6ff; border-left-color: #3b82f6;">
+    <strong>Artefatos de apoio agora disponíveis:</strong> além do <em>PRD</em> e do <em>CONTEXT</em>, o planejamento da execução já conta com trilhas documentais específicas para web e mobile, incluindo <code>WEB-SCREENS-PLAN.md</code>, <code>MOBILE-SCREENS-PLAN.md</code> e o guia operacional <code>FRONTEND-TASKS.html</code> para a squad frontend web.
   </div>
 </section>
 
@@ -377,8 +382,102 @@
   </div>
 </section>
 
+<section id="regulatorio">
+  <h2>3. Marco Regulatório</h2>
+  <div class="subtitle">A SEP opera sob a <strong>Resolução CMN nº 4.656/2018</strong>, que disciplina as Sociedades de Empréstimo entre Pessoas no Brasil. Esse marco impõe ao produto, desde a primeira linha de código, requisitos não-negociáveis que afetam diretamente o roadmap.</div>
+
+  <div class="alert" style="background: #fef2f2; border-left-color: #dc2626;">
+    <strong>Por que isso importa para o PO:</strong> os 4 requisitos abaixo são <em>condições de operação</em>, não funcionalidades opcionais. Eles explicam por que o módulo <code>escrow</code> é modelado desde a Sprint 1, por que onboarding KYC/KYB é a primeira épica funcional após a fundação técnica, e por que Celcoin entra como BaaS estratégico (oferece KYC/KYB end-to-end, escrow e Pix como serviço).
+  </div>
+
+  <div class="grid grid-2" style="margin-top: 24px;">
+    <div class="card">
+      <h4>🪪 KYC/KYB obrigatório por lei</h4>
+      <p style="font-size: 14px; color: var(--muted);">Toda parte que assuma posição de tomadora ou credora precisa passar por verificação de identidade (KYC) ou cadastral de empresa (KYB). Não é capacidade opcional — é pré-condição de cadastro.</p>
+      <div class="tag">Epic 5 · Onboarding</div>
+    </div>
+    <div class="card">
+      <h4>🏦 Segregação patrimonial via escrow</h4>
+      <p style="font-size: 14px; color: var(--muted);">Recursos de tomadores e credores devem ficar em conta escrow distinta da conta operacional da plataforma. Por isso o módulo <code>escrow</code> é modelado já na Sprint 1, mesmo antes da integração concreta com Celcoin.</p>
+      <div class="tag">Sprint 1 · Módulo transversal</div>
+    </div>
+    <div class="card">
+      <h4>🛡️ Prevenção à Lavagem de Dinheiro (PLD)</h4>
+      <p style="font-size: 14px; color: var(--muted);">Consultas obrigatórias durante onboarding às bases <strong>COAF</strong>, <strong>OFAC</strong>, <strong>INTERPOL</strong> e <strong>MTE</strong>, para detectar pessoas e empresas com restrições legais.</p>
+      <div class="tag">Epic 5 · Onboarding</div>
+    </div>
+    <div class="card">
+      <h4>📜 Auditoria reforçada e BACEN</h4>
+      <p style="font-size: 14px; color: var(--muted);">Operações financeiras e acessos administrativos exigem trilha de auditoria detalhada. Conformidade BACEN contínua, com possibilidade de reportes periódicos.</p>
+      <div class="tag">Sprint 1 · Auditoria JPA</div>
+    </div>
+  </div>
+
+  <div class="alert" style="margin-top: 28px;">
+    <strong>Estratégia escolhida:</strong> integrar com <strong>Celcoin BaaS</strong> via <em>Provider Pattern</em> para materializar essas obrigações de forma economicamente viável. Celcoin oferece KYC/KYB end-to-end (OCR, FaceMatch, Background Check), abertura de contas escrow, conta operacional, Pix de desembolso e recebimento, conciliação via webhooks e Open Finance via Finansystech.
+  </div>
+</section>
+
+<section id="perfis">
+  <h2>4. Usuários e Perfis</h2>
+  <div class="subtitle">Modelo inicial de permissões da Fase 1. Define o que cada perfil pode fazer na API e, por consequência, no Frontend Web e no Mobile. Será expandido com perfis operacionais (financeiro interno, backoffice, governança) nas épicas posteriores.</div>
+
+  <div class="grid grid-3" style="margin-top: 24px;">
+    <div class="card" style="border-top: 4px solid #94a3b8;">
+      <h4>👤 Visitante</h4>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Pessoa não autenticada, navegando nas superfícies públicas (landing, login, cadastro).</p>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px; margin-bottom: 12px;">
+        <li>criar usuário sem autenticação (cadastro público)</li>
+      </ul>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Não pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>acessar nenhum recurso protegido</li>
+      </ul>
+      <div class="tag later">Sem JWT</div>
+    </div>
+    <div class="card" style="border-top: 4px solid #3b82f6;">
+      <h4>🧑 Cliente <code>(ROLE_CLIENTE)</code></h4>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Usuário autenticado padrão. Futuramente representa tomador, empresa credora ou pessoa física com acesso à plataforma.</p>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px; margin-bottom: 12px;">
+        <li>autenticar via login + senha</li>
+        <li>consultar apenas os <strong>próprios</strong> dados de usuário</li>
+        <li>alterar apenas a <strong>própria</strong> senha</li>
+      </ul>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Não pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>listar outros usuários</li>
+        <li>consultar usuário de terceiros</li>
+        <li>alterar senha de terceiros</li>
+      </ul>
+      <div class="tag">Ownership obrigatório</div>
+    </div>
+    <div class="card" style="border-top: 4px solid #f59e0b;">
+      <h4>🛠️ Administrador <code>(ROLE_ADMIN)</code></h4>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Operação assistida da plataforma. Visão completa sobre cadastros de usuários da Fase 1.</p>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px; margin-bottom: 12px;">
+        <li>autenticar via login + senha</li>
+        <li>consultar <strong>qualquer</strong> usuário por ID</li>
+        <li>listar <strong>todos</strong> os usuários</li>
+        <li>alterar a própria senha</li>
+      </ul>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Não pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>alterar senha de outros usuários (decisão de Fase 1; será revisado quando entrar gestão administrativa de usuários na Epic 11)</li>
+      </ul>
+      <div class="tag next">RBAC inicial</div>
+    </div>
+  </div>
+
+  <div class="alert" style="margin-top: 28px;">
+    <strong>Evolução prevista:</strong> os perfis operacionais — <em>Financeiro Interno</em>, <em>Backoffice</em>, <em>Governança</em> — entram nas Epics 9, 10 e 11. O perfil de <em>Empresa Credora</em> pode reusar <code>ROLE_CLIENTE</code> ou ganhar role própria conforme a Epic 10 (Jornada da Empresa Credora) for detalhada. A política inicial de senha de <strong>6 caracteres</strong> será revisada antes de produção.
+  </div>
+</section>
+
 <section id="epicos">
-  <h2>3. Épicos do Roadmap</h2>
+  <h2>5. Épicos do Roadmap</h2>
   <div class="subtitle">Dezesseis épicos mapeados, com priorização funcional consolidada.</div>
 
   <div class="diagram-wrapper">
@@ -507,7 +606,7 @@
 </section>
 
 <section id="historias">
-  <h2>4. Épicos → Histórias</h2>
+  <h2>6. Épicos → Histórias</h2>
   <div class="subtitle">Decomposição dos épicos ativos em histórias de usuário organizadas por valor de negócio.</div>
 
   <div class="grid grid-2">
@@ -619,7 +718,7 @@
 </section>
 
 <section id="roadmap">
-  <h2>5. Roadmap Visual</h2>
+  <h2>7. Roadmap Visual</h2>
   <div class="subtitle">Timeline das ondas de entrega e posicionamento relativo dos épicos.</div>
 
   <div class="diagram-wrapper">
@@ -675,83 +774,305 @@
 </section>
 
 <section id="sprints">
-  <h2>6. Sprints da Fase Atual</h2>
-  <div class="subtitle">Organização das sprints da fundação técnica (visão alto nível).</div>
+  <h2>8. Sprints do Projeto</h2>
+  <div class="subtitle">Organização das sprints da fundação técnica, separadas pelas três trilhas paralelas: <strong>Backend</strong>, <strong>Web</strong> e <strong>Mobile</strong>. Cada trilha tem seus próprios specs e steps, e roda em paralelo às demais sob ownership distinto.</div>
+
+  <h3>Trilha Backend (Sprints 0-4)</h3>
+  <div class="subtitle" style="margin-bottom: 24px;">Conduzida pelo Dev Senior. Stack: Java 21 + Spring Boot 3.5.x + PostgreSQL 16 + Spring Security + JWT. A Sprint 0 é a fase de <em>Hygiene &amp; Foundation</em>: estabelece tooling, branch protection, CI mínimo e ADRs iniciais antes de qualquer código de aplicação. Specs: <code>specs/000</code> a <code>specs/004</code>; steps em <code>steps/backend/</code>.</div>
 
   <div class="diagram-wrapper">
-    <svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="spr" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#3b82f6"/>
         </linearGradient>
       </defs>
 
+      <!-- Sprint 0 -->
+      <rect x="20" y="50" width="165" height="300" rx="10" fill="url(#spr)"/>
+      <text x="102" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">Sprint 0</text>
+      <text x="102" y="104" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Hygiene &amp; Foundation</text>
+      <line x1="35" y1="118" x2="170" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="35" y="142" fill="white" font-size="11">• .gitignore + editorconfig</text>
+      <text x="35" y="162" fill="white" font-size="11">• Spotless + Palantir Format</text>
+      <text x="35" y="182" fill="white" font-size="11">• JaCoCo target 70%</text>
+      <text x="35" y="202" fill="white" font-size="11">• Pre-commit hooks (Git)</text>
+      <text x="35" y="222" fill="white" font-size="11">• Branch protection + PR</text>
+      <text x="35" y="242" fill="white" font-size="11">• GitHub Actions CI mínimo</text>
+      <text x="35" y="262" fill="white" font-size="11">• Conventional Commits</text>
+      <text x="35" y="282" fill="white" font-size="11">• Estrutura DDD (12 módulos)</text>
+      <text x="35" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="35" y="328" fill="white" font-size="10" opacity="0.85">Aprovação do PRD</text>
+
       <!-- Sprint 1 -->
-      <rect x="30" y="50" width="200" height="280" rx="10" fill="url(#spr)"/>
-      <text x="130" y="82" text-anchor="middle" fill="white" font-size="16" font-weight="700">Sprint 1</text>
-      <text x="130" y="104" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Fundação técnica</text>
-      <line x1="50" y1="118" x2="210" y2="118" stroke="white" stroke-opacity="0.3"/>
-      <text x="50" y="145" fill="white" font-size="12">• Projeto Gradle base</text>
-      <text x="50" y="168" fill="white" font-size="12">• PostgreSQL + Docker</text>
-      <text x="50" y="191" fill="white" font-size="12">• Locale, Timezone, CORS</text>
-      <text x="50" y="214" fill="white" font-size="12">• Actuator healthcheck</text>
-      <text x="50" y="237" fill="white" font-size="12">• Flyway + migration inicial</text>
-      <text x="50" y="295" text-anchor="start" fill="#fbbf24" font-size="11" font-weight="600">Depende de:</text>
-      <text x="50" y="312" fill="white" font-size="11" opacity="0.85">Aprovação do PRD</text>
+      <rect x="195" y="50" width="165" height="300" rx="10" fill="url(#spr)"/>
+      <text x="277" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">Sprint 1</text>
+      <text x="277" y="104" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Fundação Técnica</text>
+      <line x1="210" y1="118" x2="345" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="210" y="142" fill="white" font-size="11">• Projeto Gradle base</text>
+      <text x="210" y="162" fill="white" font-size="11">• PostgreSQL + Docker</text>
+      <text x="210" y="182" fill="white" font-size="11">• Locale, Timezone, CORS</text>
+      <text x="210" y="202" fill="white" font-size="11">• Actuator healthcheck</text>
+      <text x="210" y="222" fill="white" font-size="11">• Flyway + migration inicial</text>
+      <text x="210" y="242" fill="white" font-size="11">• ApiExceptionHandler stub</text>
+      <text x="210" y="262" fill="white" font-size="11">• Auditoria JPA base</text>
+      <text x="210" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="210" y="328" fill="white" font-size="10" opacity="0.85">Sprint 0 (tooling)</text>
 
       <!-- Sprint 2 -->
-      <rect x="250" y="50" width="200" height="280" rx="10" fill="url(#spr)"/>
-      <text x="350" y="82" text-anchor="middle" fill="white" font-size="16" font-weight="700">Sprint 2</text>
-      <text x="350" y="104" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Gestão de Usuários</text>
-      <line x1="270" y1="118" x2="430" y2="118" stroke="white" stroke-opacity="0.3"/>
-      <text x="270" y="145" fill="white" font-size="12">• Entidade Usuario (UUID)</text>
-      <text x="270" y="168" fill="white" font-size="12">• Repositório e auditoria</text>
-      <text x="270" y="191" fill="white" font-size="12">• DTOs e Mapper</text>
-      <text x="270" y="214" fill="white" font-size="12">• Criação pública de usuário</text>
-      <text x="270" y="237" fill="white" font-size="12">• Validações de email e senha</text>
-      <text x="270" y="295" text-anchor="start" fill="#fbbf24" font-size="11" font-weight="600">Depende de:</text>
-      <text x="270" y="312" fill="white" font-size="11" opacity="0.85">Sprint 1 concluída</text>
+      <rect x="370" y="50" width="165" height="300" rx="10" fill="url(#spr)"/>
+      <text x="452" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">Sprint 2</text>
+      <text x="452" y="104" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Gestão de Usuários</text>
+      <line x1="385" y1="118" x2="520" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="385" y="142" fill="white" font-size="11">• Entidade Usuario (UUID v6)</text>
+      <text x="385" y="162" fill="white" font-size="11">• Repositório e auditoria</text>
+      <text x="385" y="182" fill="white" font-size="11">• DTOs (Records) e Mapper</text>
+      <text x="385" y="202" fill="white" font-size="11">  (MapStruct)</text>
+      <text x="385" y="222" fill="white" font-size="11">• Criação pública de usuário</text>
+      <text x="385" y="242" fill="white" font-size="11">• Hash BCrypt</text>
+      <text x="385" y="262" fill="white" font-size="11">• Validações de email/senha</text>
+      <text x="385" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="385" y="328" fill="white" font-size="10" opacity="0.85">Sprint 1 concluída</text>
 
       <!-- Sprint 3 -->
-      <rect x="470" y="50" width="200" height="280" rx="10" fill="url(#spr)"/>
-      <text x="570" y="82" text-anchor="middle" fill="white" font-size="16" font-weight="700">Sprint 3</text>
-      <text x="570" y="104" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Segurança e Auth</text>
-      <line x1="490" y1="118" x2="650" y2="118" stroke="white" stroke-opacity="0.3"/>
-      <text x="490" y="145" fill="white" font-size="12">• JWT + BCrypt</text>
-      <text x="490" y="168" fill="white" font-size="12">• Login + /auth/me</text>
-      <text x="490" y="191" fill="white" font-size="12">• Autorização por perfil</text>
-      <text x="490" y="214" fill="white" font-size="12">• Controle de ownership</text>
-      <text x="490" y="237" fill="white" font-size="12">• Alteração da própria senha</text>
-      <text x="490" y="295" text-anchor="start" fill="#fbbf24" font-size="11" font-weight="600">Depende de:</text>
-      <text x="490" y="312" fill="white" font-size="11" opacity="0.85">Sprint 2 concluída</text>
+      <rect x="545" y="50" width="165" height="300" rx="10" fill="url(#spr)"/>
+      <text x="627" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">Sprint 3</text>
+      <text x="627" y="104" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Segurança e Auth</text>
+      <line x1="560" y1="118" x2="695" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="560" y="142" fill="white" font-size="11">• JWT + JJWT 0.12.x</text>
+      <text x="560" y="162" fill="white" font-size="11">• Login + /auth/me</text>
+      <text x="560" y="182" fill="white" font-size="11">• Autorização por perfil</text>
+      <text x="560" y="202" fill="white" font-size="11">• Controle de ownership</text>
+      <text x="560" y="222" fill="white" font-size="11">• Alteração da própria senha</text>
+      <text x="560" y="242" fill="white" font-size="11">• correlationId via MDC</text>
+      <text x="560" y="262" fill="white" font-size="11">• mTLS prep (Celcoin)</text>
+      <text x="560" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="560" y="328" fill="white" font-size="10" opacity="0.85">Sprint 2 concluída</text>
 
       <!-- Sprint 4 -->
-      <rect x="690" y="50" width="200" height="280" rx="10" fill="url(#spr)"/>
-      <text x="790" y="82" text-anchor="middle" fill="white" font-size="16" font-weight="700">Sprint 4</text>
-      <text x="790" y="104" text-anchor="middle" fill="#fbbf24" font-size="12" font-weight="600">Erros + Docs + Testes</text>
-      <line x1="710" y1="118" x2="870" y2="118" stroke="white" stroke-opacity="0.3"/>
-      <text x="710" y="145" fill="white" font-size="12">• ApiExceptionHandler</text>
-      <text x="710" y="168" fill="white" font-size="12">• Payload padrão de erro</text>
-      <text x="710" y="191" fill="white" font-size="12">• Springdoc OpenAPI</text>
-      <text x="710" y="214" fill="white" font-size="12">• Swagger UI</text>
-      <text x="710" y="237" fill="white" font-size="12">• Testes de auth/autorização</text>
-      <text x="710" y="295" text-anchor="start" fill="#fbbf24" font-size="11" font-weight="600">Depende de:</text>
-      <text x="710" y="312" fill="white" font-size="11" opacity="0.85">Sprint 3 concluída</text>
+      <rect x="720" y="50" width="165" height="300" rx="10" fill="url(#spr)"/>
+      <text x="802" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">Sprint 4</text>
+      <text x="802" y="104" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Erros + Docs + Testes</text>
+      <line x1="735" y1="118" x2="870" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="735" y="142" fill="white" font-size="11">• ApiExceptionHandler full</text>
+      <text x="735" y="162" fill="white" font-size="11">• Payload padrão de erro</text>
+      <text x="735" y="182" fill="white" font-size="11">• Springdoc OpenAPI</text>
+      <text x="735" y="202" fill="white" font-size="11">• Swagger UI</text>
+      <text x="735" y="222" fill="white" font-size="11">• JaCoCo 70% (verificado)</text>
+      <text x="735" y="242" fill="white" font-size="11">• Webhook Receiver Pattern</text>
+      <text x="735" y="262" fill="white" font-size="11">• Testes de auth/autorização</text>
+      <text x="735" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="735" y="328" fill="white" font-size="10" opacity="0.85">Sprint 3 concluída</text>
 
       <!-- Setas -->
-      <polygon points="230,190 248,190 248,185 254,195 248,205 248,200 230,200" fill="#f59e0b"/>
-      <polygon points="450,190 468,190 468,185 474,195 468,205 468,200 450,200" fill="#f59e0b"/>
-      <polygon points="670,190 688,190 688,185 694,195 688,205 688,200 670,200" fill="#f59e0b"/>
+      <polygon points="185,190 193,190 193,185 199,195 193,205 193,200 185,200" fill="#f59e0b"/>
+      <polygon points="360,190 368,190 368,185 374,195 368,205 368,200 360,200" fill="#f59e0b"/>
+      <polygon points="535,190 543,190 543,185 549,195 543,205 543,200 535,200" fill="#f59e0b"/>
+      <polygon points="710,190 718,190 718,185 724,195 718,205 718,200 710,200" fill="#f59e0b"/>
     </svg>
-    <div class="caption">Sequência das sprints da fase atual. Cada sprint depende da conclusão da anterior.</div>
+    <div class="caption">Sequência das sprints backend. A Sprint 0 (Hygiene &amp; Foundation) prepara o terreno técnico antes do primeiro código de aplicação; as Sprints 1-4 entregam a fundação funcional. Cada sprint depende da conclusão da anterior.</div>
   </div>
 
   <div class="alert" style="margin-top: 28px;">
-    <strong>Governança de execução:</strong> cada sprint desta fase possui um <em>spec</em> técnico próprio na pasta <code>specs/</code> do repositório, com detalhamento de tasks, arquivos esperados, critérios de verificação e dependências internas. O PRD mantém apenas o planejamento de alto nível; a execução é governada pelos specs <code>001-sprint-1-fundacao-tecnica.md</code>, <code>002-sprint-2-gestao-usuarios.md</code>, <code>003-sprint-3-seguranca-autenticacao.md</code> e <code>004-sprint-4-erros-docs-testes.md</code>.
+    <strong>Governança de execução:</strong> o PRD mantém o planejamento de alto nível, mas a execução detalhada já foi desdobrada em trilhas documentais específicas. O backend segue os specs <code>000-sprint-0-hygiene-foundation.md</code>, <code>001-sprint-1-fundacao-tecnica.md</code>, <code>002-sprint-2-gestao-usuarios.md</code>, <code>003-sprint-3-seguranca-autenticacao.md</code> e <code>004-sprint-4-erros-docs-testes.md</code>. Em paralelo, a frente web segue os specs <code>100-fsprint-0-setup-angular.md</code> a <code>104-fsprint-4-telas-autenticadas.md</code>, apoiados por <code>WEB-SCREENS-PLAN.md</code> e <code>FRONTEND-TASKS.html</code>. A trilha mobile segue os specs <code>200-msprint-0-setup-ionic.md</code> a <code>204-msprint-4-telas-autenticadas-mobile.md</code>, apoiados por <code>MOBILE-SCREENS-PLAN.md</code>.
+  </div>
+
+  <h3>Trilha Web (F-Sprints 0-4)</h3>
+  <div class="subtitle" style="margin-bottom: 24px;">Trilha paralela conduzida pelos dois Devs Plenos Frontend. Stack: Angular 20.x + SCSS puro + Standalone Components + Signals. A fronteira de design system é o estado de autenticação: <strong>Apple</strong> nas superfícies públicas (landing, login, cadastro) e <strong>Notion</strong> nas autenticadas (dashboard e demais telas). Specs: <code>specs/100</code> a <code>specs/104</code>; steps em <code>steps/web/</code>.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sprWeb" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#991b1b"/><stop offset="100%" stop-color="#dc2626"/>
+        </linearGradient>
+      </defs>
+
+      <!-- F-Sprint 0 -->
+      <rect x="20" y="50" width="165" height="300" rx="10" fill="url(#sprWeb)"/>
+      <text x="102" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">F-Sprint 0</text>
+      <text x="102" y="104" text-anchor="middle" fill="#fee2e2" font-size="11" font-weight="600">Setup Angular + Tooling</text>
+      <line x1="35" y1="118" x2="170" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="35" y="142" fill="white" font-size="11">• Angular 20 standalone</text>
+      <text x="35" y="162" fill="white" font-size="11">• SCSS + strict mode</text>
+      <text x="35" y="182" fill="white" font-size="11">• ESLint + Prettier</text>
+      <text x="35" y="202" fill="white" font-size="11">• Stylelint + Husky</text>
+      <text x="35" y="222" fill="white" font-size="11">• Vitest + Playwright</text>
+      <text x="35" y="242" fill="white" font-size="11">• MSW (mocks)</text>
+      <text x="35" y="262" fill="white" font-size="11">• GitHub Actions CI</text>
+      <text x="35" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Paralelo a:</text>
+      <text x="35" y="328" fill="white" font-size="10" opacity="0.85">Sprint 0 backend</text>
+
+      <!-- F-Sprint 1 -->
+      <rect x="195" y="50" width="165" height="300" rx="10" fill="url(#sprWeb)"/>
+      <text x="277" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">F-Sprint 1</text>
+      <text x="277" y="104" text-anchor="middle" fill="#fee2e2" font-size="11" font-weight="600">Tokens Apple + Notion</text>
+      <line x1="210" y1="118" x2="345" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="210" y="142" fill="white" font-size="11">• Tokens SCSS Apple</text>
+      <text x="210" y="162" fill="white" font-size="11">• Tokens SCSS Notion</text>
+      <text x="210" y="182" fill="white" font-size="11">• Tipografia, espaçamento</text>
+      <text x="210" y="202" fill="white" font-size="11">  raios e sombras</text>
+      <text x="210" y="222" fill="white" font-size="11">• Showcase em /design-</text>
+      <text x="210" y="242" fill="white" font-size="11">  system</text>
+      <text x="210" y="262" fill="white" font-size="11">• Sem framework CSS</text>
+      <text x="210" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="210" y="328" fill="white" font-size="10" opacity="0.85">F-Sprint 0 concluída</text>
+
+      <!-- F-Sprint 2 -->
+      <rect x="370" y="50" width="165" height="300" rx="10" fill="url(#sprWeb)"/>
+      <text x="452" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">F-Sprint 2</text>
+      <text x="452" y="104" text-anchor="middle" fill="#fee2e2" font-size="11" font-weight="600">Telas Apple Públicas</text>
+      <line x1="385" y1="118" x2="520" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="385" y="142" fill="white" font-size="11">• Landing</text>
+      <text x="385" y="162" fill="white" font-size="11">• Login</text>
+      <text x="385" y="182" fill="white" font-size="11">• Register</text>
+      <text x="385" y="202" fill="white" font-size="11">• Mocks via MSW</text>
+      <text x="385" y="222" fill="white" font-size="11">• Validações de email</text>
+      <text x="385" y="242" fill="white" font-size="11">  e senha (6 caracteres)</text>
+      <text x="385" y="262" fill="white" font-size="11">• Ainda sem auth real</text>
+      <text x="385" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="385" y="328" fill="white" font-size="10" opacity="0.85">F-Sprint 1 + Sprint 2</text>
+
+      <!-- F-Sprint 3 -->
+      <rect x="545" y="50" width="165" height="300" rx="10" fill="url(#sprWeb)"/>
+      <text x="627" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">F-Sprint 3</text>
+      <text x="627" y="104" text-anchor="middle" fill="#fee2e2" font-size="11" font-weight="600">Shell Notion + Auth</text>
+      <line x1="560" y1="118" x2="695" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="560" y="142" fill="white" font-size="11">• Auth real (JWT)</text>
+      <text x="560" y="162" fill="white" font-size="11">• Shell Notion (header,</text>
+      <text x="560" y="182" fill="white" font-size="11">  menu lateral, breadcrumbs)</text>
+      <text x="560" y="202" fill="white" font-size="11">• Guards funcionais</text>
+      <text x="560" y="222" fill="white" font-size="11">• Interceptors HTTP</text>
+      <text x="560" y="242" fill="white" font-size="11">• Tratamento 401/403/409</text>
+      <text x="560" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="560" y="328" fill="white" font-size="10" opacity="0.85">F-Sprint 2 + Sprint 3</text>
+
+      <!-- F-Sprint 4 -->
+      <rect x="720" y="50" width="165" height="300" rx="10" fill="url(#sprWeb)"/>
+      <text x="802" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">F-Sprint 4</text>
+      <text x="802" y="104" text-anchor="middle" fill="#fee2e2" font-size="11" font-weight="600">Telas Autenticadas</text>
+      <line x1="735" y1="118" x2="870" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="735" y="142" fill="white" font-size="11">• Meu perfil</text>
+      <text x="735" y="162" fill="white" font-size="11">• Alterar senha</text>
+      <text x="735" y="182" fill="white" font-size="11">• Admin de usuários</text>
+      <text x="735" y="202" fill="white" font-size="11">• Dashboard (casca)</text>
+      <text x="735" y="222" fill="white" font-size="11">• Smoke E2E Playwright</text>
+      <text x="735" y="242" fill="white" font-size="11">• Sem regra de negócio</text>
+      <text x="735" y="262" fill="white" font-size="11">  no frontend</text>
+      <text x="735" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="735" y="328" fill="white" font-size="10" opacity="0.85">F-Sprint 3 + Sprint 4</text>
+
+      <!-- Setas -->
+      <polygon points="185,190 193,190 193,185 199,195 193,205 193,200 185,200" fill="#1e3a8a"/>
+      <polygon points="360,190 368,190 368,185 374,195 368,205 368,200 360,200" fill="#1e3a8a"/>
+      <polygon points="535,190 543,190 543,185 549,195 543,205 543,200 535,200" fill="#1e3a8a"/>
+      <polygon points="710,190 718,190 718,185 724,195 718,205 718,200 710,200" fill="#1e3a8a"/>
+    </svg>
+    <div class="caption">Sequência das F-Sprints da fundação web. Cada F-Sprint roda em paralelo com a Sprint backend de mesmo número. As telas só consomem contratos reais a partir da F-Sprint 3, quando o login backend está estabilizado; até a F-Sprint 2, MSW é o backend mockado.</div>
+  </div>
+
+  <div class="alert" style="margin-top: 28px; background: #fef2f2; border-left-color: #dc2626;">
+    <strong>Escopo da fundação web (Epic 12):</strong> tudo que depende apenas das APIs entregues nas Sprints 1-4 (auth, usuários e admin de usuários). Inclui telas públicas (Apple), shell autenticado (Notion), biblioteca interna de componentes Notion, guards de rota, integração HTTP e tratamento padronizado de erros. Telas funcionais das jornadas (tomador, credora, financeiro, backoffice) ficam na <em>Epic 13 — Frontend de Jornadas</em>, posterior, e dependem das APIs das Epics 5-11.
+  </div>
+
+  <h3>Trilha Mobile (M-Sprints 0-4)</h3>
+  <div class="subtitle" style="margin-bottom: 24px;">Trilha paralela conduzida pelo Dev Mobile dedicado, em paralelo ao backend e à frente web. Stack: Angular 20.x + Ionic 8.4+ + Capacitor 6, com design system Notion adaptado para toque, tabs inferiores e navegação em pilha. Validação inicial em PWA; build Android/iOS via Capacitor entra em fase posterior.</div>
+
+  <div class="diagram-wrapper">
+    <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sprMobile" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#b45309"/><stop offset="100%" stop-color="#f59e0b"/>
+        </linearGradient>
+      </defs>
+
+      <!-- M-Sprint 0 -->
+      <rect x="20" y="50" width="165" height="300" rx="10" fill="url(#sprMobile)"/>
+      <text x="102" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">M-Sprint 0</text>
+      <text x="102" y="104" text-anchor="middle" fill="#fef3c7" font-size="11" font-weight="600">Setup Ionic + Tooling</text>
+      <line x1="35" y1="118" x2="170" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="35" y="142" fill="white" font-size="11">• Ionic 8.4 + Angular 20</text>
+      <text x="35" y="162" fill="white" font-size="11">• Capacitor 6 (PWA)</text>
+      <text x="35" y="182" fill="white" font-size="11">• ESLint + Prettier</text>
+      <text x="35" y="202" fill="white" font-size="11">• Stylelint + Husky</text>
+      <text x="35" y="222" fill="white" font-size="11">• Vitest + Playwright</text>
+      <text x="35" y="242" fill="white" font-size="11">• MSW (mocks)</text>
+      <text x="35" y="262" fill="white" font-size="11">• GitHub Actions CI</text>
+      <text x="35" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Paralelo a:</text>
+      <text x="35" y="328" fill="white" font-size="10" opacity="0.85">Sprint 0 backend</text>
+
+      <!-- M-Sprint 1 -->
+      <rect x="195" y="50" width="165" height="300" rx="10" fill="url(#sprMobile)"/>
+      <text x="277" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">M-Sprint 1</text>
+      <text x="277" y="104" text-anchor="middle" fill="#fef3c7" font-size="11" font-weight="600">Tokens Notion Mobile</text>
+      <line x1="210" y1="118" x2="345" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="210" y="142" fill="white" font-size="11">• Tokens SCSS adaptados</text>
+      <text x="210" y="162" fill="white" font-size="11">• Touch targets / tabs</text>
+      <text x="210" y="182" fill="white" font-size="11">• Componentes Ionic</text>
+      <text x="210" y="202" fill="white" font-size="11">  customizados via SCSS</text>
+      <text x="210" y="222" fill="white" font-size="11">• Showcase do DS</text>
+      <text x="210" y="242" fill="white" font-size="11">• Sem framework CSS</text>
+      <text x="210" y="262" fill="white" font-size="11">  de terceiros</text>
+      <text x="210" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="210" y="328" fill="white" font-size="10" opacity="0.85">M-Sprint 0 concluída</text>
+
+      <!-- M-Sprint 2 -->
+      <rect x="370" y="50" width="165" height="300" rx="10" fill="url(#sprMobile)"/>
+      <text x="452" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">M-Sprint 2</text>
+      <text x="452" y="104" text-anchor="middle" fill="#fef3c7" font-size="11" font-weight="600">Telas Públicas Mobile</text>
+      <line x1="385" y1="118" x2="520" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="385" y="142" fill="white" font-size="11">• Splash + Boas-vindas</text>
+      <text x="385" y="162" fill="white" font-size="11">• Login + Register</text>
+      <text x="385" y="182" fill="white" font-size="11">• Mocks via MSW</text>
+      <text x="385" y="202" fill="white" font-size="11">• Token storage via</text>
+      <text x="385" y="222" fill="white" font-size="11">  Capacitor Preferences</text>
+      <text x="385" y="242" fill="white" font-size="11">• Ainda sem auth real</text>
+      <text x="385" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="385" y="328" fill="white" font-size="10" opacity="0.85">M-Sprint 1 + Sprint 2</text>
+
+      <!-- M-Sprint 3 -->
+      <rect x="545" y="50" width="165" height="300" rx="10" fill="url(#sprMobile)"/>
+      <text x="627" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">M-Sprint 3</text>
+      <text x="627" y="104" text-anchor="middle" fill="#fef3c7" font-size="11" font-weight="600">Shell Mobile + Auth</text>
+      <line x1="560" y1="118" x2="695" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="560" y="142" fill="white" font-size="11">• Auth real (JWT)</text>
+      <text x="560" y="162" fill="white" font-size="11">• Shell com tabs</text>
+      <text x="560" y="182" fill="white" font-size="11">  inferiores</text>
+      <text x="560" y="202" fill="white" font-size="11">• Guards funcionais</text>
+      <text x="560" y="222" fill="white" font-size="11">• Interceptors HTTP</text>
+      <text x="560" y="242" fill="white" font-size="11">• Logout no cliente</text>
+      <text x="560" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="560" y="328" fill="white" font-size="10" opacity="0.85">M-Sprint 2 + Sprint 3</text>
+
+      <!-- M-Sprint 4 -->
+      <rect x="720" y="50" width="165" height="300" rx="10" fill="url(#sprMobile)"/>
+      <text x="802" y="82" text-anchor="middle" fill="white" font-size="15" font-weight="700">M-Sprint 4</text>
+      <text x="802" y="104" text-anchor="middle" fill="#fef3c7" font-size="11" font-weight="600">Telas Autenticadas</text>
+      <line x1="735" y1="118" x2="870" y2="118" stroke="white" stroke-opacity="0.3"/>
+      <text x="735" y="142" fill="white" font-size="11">• Perfil + Alterar senha</text>
+      <text x="735" y="162" fill="white" font-size="11">• Casca jornada Tomador</text>
+      <text x="735" y="182" fill="white" font-size="11">• Casca jornada Credora</text>
+      <text x="735" y="202" fill="white" font-size="11">• Smoke E2E PWA</text>
+      <text x="735" y="222" fill="white" font-size="11">• Sem regra de negócio</text>
+      <text x="735" y="242" fill="white" font-size="11">  dentro do app</text>
+      <text x="735" y="312" text-anchor="start" fill="#fbbf24" font-size="10" font-weight="600">Depende de:</text>
+      <text x="735" y="328" fill="white" font-size="10" opacity="0.85">M-Sprint 3 + Sprint 4</text>
+
+      <!-- Setas -->
+      <polygon points="185,190 193,190 193,185 199,195 193,205 193,200 185,200" fill="#1e3a8a"/>
+      <polygon points="360,190 368,190 368,185 374,195 368,205 368,200 360,200" fill="#1e3a8a"/>
+      <polygon points="535,190 543,190 543,185 549,195 543,205 543,200 535,200" fill="#1e3a8a"/>
+      <polygon points="710,190 718,190 718,185 724,195 718,205 718,200 710,200" fill="#1e3a8a"/>
+    </svg>
+    <div class="caption">Sequência das M-Sprints da fundação mobile. Cada M-Sprint roda em paralelo com a Sprint backend de mesmo número (M-Sprint 0 ↔ Sprint 0, M-Sprint 1 ↔ Sprint 1, e assim por diante), mas só consome contratos reais da API a partir da M-Sprint 3, quando o login backend já está estabilizado.</div>
+  </div>
+
+  <div class="alert" style="margin-top: 28px; background: #fffbeb; border-left-color: #f59e0b;">
+    <strong>Escopo da fundação mobile (Epic 14, fase inicial):</strong> apenas tomador e empresa credora. Financeiro interno, backoffice, administração completa, governança, cadastros mestres e telas de auditoria <em>não</em> entram no recorte mobile. O app reusa contratos, DTOs, autenticação JWT, guards e padrões de integração HTTP definidos para o frontend web — sem reinventar contratos. Validação inicial em PWA/browser; build Android/iOS via Capacitor entra na Fase Mobile 2+ da Epic 14, posterior à conclusão das M-Sprints 0-4.
   </div>
 
   <h3>Composição da Equipe</h3>
-  <div class="grid grid-3">
+  <div class="grid grid-4">
     <div class="card">
       <h4>Dev Senior</h4>
       <p style="font-size: 14px; color: var(--muted);">Ownership do backend, contratos da API, segurança, persistência, auditoria e migrations.</p>
@@ -762,20 +1083,27 @@
     </div>
     <div class="card">
       <h4>Dev Pleno Frontend 2</h4>
-      <p style="font-size: 14px; color: var(--muted);">Preparação de mocks de consumo, revisão de contratos e telas funcionais futuras.</p>
+      <p style="font-size: 14px; color: var(--muted);">Preparação de mocks de consumo, revisão de contratos, integrações HTTP e telas funcionais da fundação web.</p>
+    </div>
+    <div class="card">
+      <h4>Dev Mobile</h4>
+      <p style="font-size: 14px; color: var(--muted);">Ownership da trilha Mobile SEP com Ionic + Angular + Capacitor, adaptando o design system Notion para o app e evoluindo as M-Sprints 0-4 em paralelo.</p>
     </div>
   </div>
 </section>
 
 <section id="arquitetura">
-  <h2>7. Arquitetura em Alto Nível</h2>
+  <h2>9. Arquitetura em Alto Nível</h2>
   <div class="subtitle">Visão simplificada de como o produto se organiza.</div>
 
   <div class="diagram-wrapper">
-    <svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="lAngular" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#dc2626"/><stop offset="100%" stop-color="#991b1b"/>
+        </linearGradient>
+        <linearGradient id="lIonic" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#b45309"/>
         </linearGradient>
         <linearGradient id="lAPI" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#1e40af"/>
@@ -785,130 +1113,240 @@
         </linearGradient>
       </defs>
 
+      <!-- Legenda -->
+      <text x="450" y="35" text-anchor="middle" font-size="18" font-weight="700" fill="#0f1e4a">Visão de componentes do produto SEP</text>
+      <text x="450" y="58" text-anchor="middle" font-size="12" fill="#64748b">Frontend e Mobile consomem a mesma API SEP. Contornos tracejados representam componentes planejados mas ainda não implementados.</text>
+
       <!-- Usuários -->
       <g>
-        <circle cx="100" cy="220" r="36" fill="#64748b"/>
-        <text x="100" y="225" text-anchor="middle" fill="white" font-size="14" font-weight="700">👤</text>
-        <text x="100" y="278" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">Usuário</text>
-        <text x="100" y="296" text-anchor="middle" font-size="11" fill="#64748b">Tomador / Credora</text>
-        <text x="100" y="312" text-anchor="middle" font-size="11" fill="#64748b">Financeiro / Admin</text>
+        <circle cx="100" cy="280" r="36" fill="#64748b"/>
+        <text x="100" y="285" text-anchor="middle" fill="white" font-size="14" font-weight="700">👤</text>
+        <text x="100" y="338" text-anchor="middle" font-size="13" font-weight="600" fill="#1e293b">Usuário</text>
+        <text x="100" y="356" text-anchor="middle" font-size="11" fill="#64748b">Tomador / Credora</text>
+        <text x="100" y="372" text-anchor="middle" font-size="11" fill="#64748b">Financeiro / Admin</text>
       </g>
 
-      <!-- Frontend -->
-      <rect x="210" y="150" width="180" height="140" rx="12" fill="url(#lAngular)"/>
-      <text x="300" y="185" text-anchor="middle" fill="white" font-size="16" font-weight="700">Frontend</text>
-      <text x="300" y="210" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Angular 20 + SCSS puro</text>
-      <text x="300" y="232" text-anchor="middle" fill="#fef3c7" font-size="11">Design Systems Apple + Notion</text>
-      <text x="300" y="258" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Fase posterior ao backend</text>
+      <!-- Frontend Web -->
+      <rect x="210" y="120" width="180" height="130" rx="12" fill="url(#lAngular)"/>
+      <text x="300" y="152" text-anchor="middle" fill="white" font-size="16" font-weight="700">Frontend Web</text>
+      <text x="300" y="176" text-anchor="middle" fill="white" font-size="12" opacity="0.95">Angular 20 + SCSS puro</text>
+      <text x="300" y="196" text-anchor="middle" fill="#fef3c7" font-size="11">DS Apple (público)</text>
+      <text x="300" y="212" text-anchor="middle" fill="#fef3c7" font-size="11">DS Notion (autenticado)</text>
+      <text x="300" y="236" text-anchor="middle" fill="white" font-size="10" opacity="0.85">Standalone Components + Signals</text>
+
+      <!-- Mobile -->
+      <rect x="210" y="320" width="180" height="130" rx="12" fill="url(#lIonic)"/>
+      <text x="300" y="352" text-anchor="middle" fill="white" font-size="16" font-weight="700">Mobile</text>
+      <text x="300" y="376" text-anchor="middle" fill="white" font-size="12" opacity="0.95">Ionic 8.4 + Angular 20</text>
+      <text x="300" y="392" text-anchor="middle" fill="white" font-size="12" opacity="0.95">Capacitor 6 (PWA primeiro)</text>
+      <text x="300" y="412" text-anchor="middle" fill="#fef3c7" font-size="11">DS Notion adaptado (touch,</text>
+      <text x="300" y="426" text-anchor="middle" fill="#fef3c7" font-size="11">tabs inferiores, pilha)</text>
+      <text x="300" y="446" text-anchor="middle" fill="white" font-size="10" opacity="0.85">Tomador + Empresa Credora</text>
 
       <!-- API -->
-      <rect x="430" y="150" width="220" height="140" rx="12" fill="url(#lAPI)"/>
-      <text x="540" y="185" text-anchor="middle" fill="white" font-size="16" font-weight="700">API SEP</text>
-      <text x="540" y="210" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Spring Boot · Java 21</text>
-      <text x="540" y="232" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Monolito modular</text>
-      <text x="540" y="256" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Auth · Users · Auditoria</text>
-      <text x="540" y="272" text-anchor="middle" fill="white" font-size="11" opacity="0.85">JWT · Swagger · Actuator</text>
+      <rect x="430" y="220" width="220" height="140" rx="12" fill="url(#lAPI)"/>
+      <text x="540" y="255" text-anchor="middle" fill="white" font-size="16" font-weight="700">API SEP</text>
+      <text x="540" y="280" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Spring Boot · Java 21</text>
+      <text x="540" y="302" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Monolito modular DDD</text>
+      <text x="540" y="326" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Auth · Users · Auditoria</text>
+      <text x="540" y="342" text-anchor="middle" fill="white" font-size="11" opacity="0.85">JWT · Swagger · Actuator</text>
 
       <!-- Database -->
       <g>
-        <ellipse cx="780" cy="160" rx="60" ry="15" fill="url(#lDB)"/>
-        <rect x="720" y="160" width="120" height="100" fill="url(#lDB)"/>
-        <ellipse cx="780" cy="260" rx="60" ry="15" fill="#1e3a5c"/>
-        <ellipse cx="780" cy="200" rx="60" ry="15" fill="none" stroke="white" stroke-opacity="0.3"/>
-        <ellipse cx="780" cy="230" rx="60" ry="15" fill="none" stroke="white" stroke-opacity="0.3"/>
-        <text x="780" y="205" text-anchor="middle" fill="white" font-size="14" font-weight="700">PostgreSQL</text>
+        <ellipse cx="780" cy="230" rx="60" ry="15" fill="url(#lDB)"/>
+        <rect x="720" y="230" width="120" height="100" fill="url(#lDB)"/>
+        <ellipse cx="780" cy="330" rx="60" ry="15" fill="#1e3a5c"/>
+        <ellipse cx="780" cy="270" rx="60" ry="15" fill="none" stroke="white" stroke-opacity="0.3"/>
+        <ellipse cx="780" cy="300" rx="60" ry="15" fill="none" stroke="white" stroke-opacity="0.3"/>
+        <text x="780" y="275" text-anchor="middle" fill="white" font-size="14" font-weight="700">PostgreSQL</text>
       </g>
 
       <!-- Conexões -->
-      <line x1="140" y1="220" x2="206" y2="220" stroke="#64748b" stroke-width="2"/>
-      <polygon points="204,215 214,220 204,225" fill="#64748b"/>
-      <text x="170" y="212" text-anchor="middle" font-size="11" fill="#64748b">HTTP</text>
+      <!-- Usuário → Web -->
+      <line x1="140" y1="265" x2="206" y2="200" stroke="#64748b" stroke-width="2"/>
+      <polygon points="208,196 210,206 200,202" fill="#64748b"/>
+      <text x="160" y="225" text-anchor="middle" font-size="11" fill="#64748b">HTTP</text>
 
-      <line x1="390" y1="220" x2="426" y2="220" stroke="#64748b" stroke-width="2"/>
-      <polygon points="424,215 434,220 424,225" fill="#64748b"/>
-      <text x="408" y="212" text-anchor="middle" font-size="11" fill="#64748b">REST</text>
+      <!-- Usuário → Mobile -->
+      <line x1="140" y1="295" x2="206" y2="370" stroke="#64748b" stroke-width="2"/>
+      <polygon points="208,374 210,364 200,368" fill="#64748b"/>
+      <text x="160" y="345" text-anchor="middle" font-size="11" fill="#64748b">HTTP</text>
 
-      <line x1="650" y1="220" x2="716" y2="210" stroke="#64748b" stroke-width="2"/>
-      <polygon points="714,205 724,210 716,217" fill="#64748b"/>
-      <text x="680" y="202" text-anchor="middle" font-size="11" fill="#64748b">JPA</text>
+      <!-- Web → API -->
+      <line x1="390" y1="200" x2="430" y2="270" stroke="#64748b" stroke-width="2"/>
+      <polygon points="432,266 436,276 425,275" fill="#64748b"/>
+      <text x="408" y="222" text-anchor="middle" font-size="11" fill="#64748b">REST</text>
+
+      <!-- Mobile → API -->
+      <line x1="390" y1="370" x2="430" y2="310" stroke="#64748b" stroke-width="2"/>
+      <polygon points="432,314 436,304 425,305" fill="#64748b"/>
+      <text x="408" y="358" text-anchor="middle" font-size="11" fill="#64748b">REST</text>
+
+      <!-- API → DB -->
+      <line x1="650" y1="290" x2="716" y2="280" stroke="#64748b" stroke-width="2"/>
+      <polygon points="714,275 724,280 716,287" fill="#64748b"/>
+      <text x="680" y="272" text-anchor="middle" font-size="11" fill="#64748b">JPA</text>
 
       <!-- BaaS Future -->
-      <rect x="430" y="340" width="220" height="80" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="6,4" stroke-width="2"/>
-      <text x="540" y="370" text-anchor="middle" fill="#475569" font-size="14" font-weight="700">Celcoin BaaS</text>
-      <text x="540" y="392" text-anchor="middle" fill="#64748b" font-size="12">Pix · Conta escrow</text>
-      <text x="540" y="410" text-anchor="middle" fill="#94a3b8" font-size="11" font-style="italic">Fase futura (E13)</text>
+      <rect x="430" y="475" width="220" height="70" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="6,4" stroke-width="2"/>
+      <text x="540" y="502" text-anchor="middle" fill="#475569" font-size="14" font-weight="700">Celcoin BaaS</text>
+      <text x="540" y="522" text-anchor="middle" fill="#64748b" font-size="12">Pix · Conta escrow · KYC/KYB</text>
+      <text x="540" y="538" text-anchor="middle" fill="#94a3b8" font-size="11" font-style="italic">Fase futura (Epics 5+, 15)</text>
 
-      <line x1="540" y1="290" x2="540" y2="338" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
-
-      <!-- Legenda -->
-      <text x="450" y="50" text-anchor="middle" font-size="18" font-weight="700" fill="#0f1e4a">Visão de componentes do produto SEP</text>
-      <text x="450" y="72" text-anchor="middle" font-size="12" fill="#64748b">Contornos tracejados representam componentes planejados mas ainda não implementados</text>
+      <line x1="540" y1="360" x2="540" y2="473" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
     </svg>
-    <div class="caption">Frontend Angular consome a API SEP via REST. A API grava em PostgreSQL. A integração com Celcoin BaaS entra em fase posterior.</div>
+    <div class="caption">Frontend Web (Angular) e Mobile (Ionic + Angular + Capacitor) consomem a mesma API SEP via REST, sem backends separados. A API grava em PostgreSQL. Mobile reusa contratos, DTOs, autenticação JWT e padrões de integração HTTP do frontend web. A integração com Celcoin BaaS entra em fase posterior.</div>
   </div>
 
   <div class="alert">
     <strong>Arquitetura inicial:</strong> monolito modular. Microsserviços não fazem parte da fase inicial — essa decisão reduz risco e complexidade até a estabilização do fluxo de contratação.
   </div>
+
+  <h3 style="margin-top: 36px;">Endpoints entregues na Fase 1</h3>
+  <div class="subtitle" style="margin-bottom: 16px;">Seis endpoints REST cobrem todo o escopo das Sprints 1-4: cadastro de usuário, autenticação JWT, autorização por perfil/ownership e alteração da própria senha. Tudo documentado via <strong>Springdoc OpenAPI / Swagger UI</strong> a partir da Sprint 4.</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 90px;">Método</th>
+        <th>Endpoint</th>
+        <th>Quem pode usar</th>
+        <th>Finalidade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong style="color: var(--success);">POST</strong></td>
+        <td><code>/api/v1/usuarios</code></td>
+        <td>Visitante (público)</td>
+        <td>Cria usuário sem autenticação (cadastro público da Fase 1)</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--primary);">GET</strong></td>
+        <td><code>/api/v1/usuarios/{id}</code></td>
+        <td>Admin (qualquer) · Cliente (apenas o próprio)</td>
+        <td>Consulta dados de usuário por ID, com controle de ownership</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--primary);">GET</strong></td>
+        <td><code>/api/v1/usuarios</code></td>
+        <td>Apenas Admin</td>
+        <td>Lista todos os usuários cadastrados</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--accent);">PATCH</strong></td>
+        <td><code>/api/v1/usuarios/{id}/senha</code></td>
+        <td>Apenas o próprio usuário autenticado</td>
+        <td>Altera apenas a própria senha</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--success);">POST</strong></td>
+        <td><code>/api/v1/auth/login</code></td>
+        <td>Visitante (público)</td>
+        <td>Autentica por e-mail + senha e retorna JWT</td>
+      </tr>
+      <tr>
+        <td><strong style="color: var(--primary);">GET</strong></td>
+        <td><code>/api/v1/auth/me</code></td>
+        <td>Qualquer usuário autenticado</td>
+        <td>Retorna o usuário do token (fronteira visual entre Apple e Notion no frontend)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top: 36px;">Provider Pattern e Módulo Escrow</h3>
+  <div class="subtitle" style="margin-bottom: 16px;">Duas decisões arquiteturais que conectam o marco regulatório (§3) ao código entregue desde a Sprint 1, mesmo antes da integração concreta com Celcoin.</div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>🔌 Provider Pattern (Ports &amp; Adapters)</h4>
+      <p style="font-size: 14px; color: var(--muted);">Toda integração externa (Celcoin, KYC, Pix, escrow, assinatura digital) é isolada por uma <strong>porta</strong> no domínio (<code>application.port.out.&lt;X&gt;Provider</code>) e um <strong>adapter</strong> na infraestrutura (<code>infrastructure.adapter.&lt;X&gt;.Celcoin&lt;X&gt;Provider</code>).</p>
+      <p style="font-size: 14px; color: var(--muted); margin-top: 8px;"><strong>Benefício para o produto:</strong> trocar de provedor (ex.: Celcoin → outro BaaS) afeta apenas a camada de adapter; o domínio e as regras de negócio não mudam. Permite ainda rodar localmente com fakes (sem credenciais reais) e testar adapters HTTP com WireMock.</p>
+      <div class="tag">Obrigatório a partir da Epic 5</div>
+    </div>
+    <div class="card">
+      <h4>🏦 Módulo Escrow (transversal)</h4>
+      <p style="font-size: 14px; color: var(--muted);">Materializa a obrigação regulatória de segregação patrimonial (CMN 4.656/2018, ver §3). Modela <code>ContaEscrow</code>, <code>Wallet</code> (sub-conta por proposta/operação) e <code>MovimentacaoEscrow</code>.</p>
+      <p style="font-size: 14px; color: var(--muted); margin-top: 8px;"><strong>Por que desde a Sprint 1:</strong> as entidades são modeladas antes da integração concreta com Celcoin para evitar retrabalho arquitetural quando o <code>EscrowProvider</code> for plugado. O módulo é consumido por <code>credito</code>, <code>contratos</code>, <code>cobranca</code>, <code>credores</code> e <code>pix</code>.</p>
+      <div class="tag done">Modelado na Sprint 1</div>
+    </div>
+  </div>
 </section>
 
 <section id="stack">
-  <h2>8. Stack Tecnológica</h2>
+  <h2>10. Stack Tecnológica</h2>
   <div class="subtitle">Tecnologias escolhidas para apoiar a plataforma.</div>
 
   <div class="diagram-wrapper">
-    <svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg">
-      <text x="450" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0f1e4a">Pilares tecnológicos</text>
+    <svg viewBox="0 0 1180 420" xmlns="http://www.w3.org/2000/svg">
+      <text x="590" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#0f1e4a">Pilares tecnológicos</text>
 
       <!-- Backend -->
-      <rect x="30" y="60" width="270" height="330" rx="12" fill="#1e3a8a"/>
-      <text x="165" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">BACKEND</text>
-      <line x1="50" y1="102" x2="280" y2="102" stroke="#fbbf24"/>
-      <text x="165" y="130" text-anchor="middle" fill="white" font-size="14">☕ Java 21</text>
-      <text x="165" y="155" text-anchor="middle" fill="white" font-size="14">🌱 Spring Boot</text>
-      <text x="165" y="180" text-anchor="middle" fill="white" font-size="14">🐘 PostgreSQL</text>
-      <text x="165" y="205" text-anchor="middle" fill="white" font-size="14">🔐 Spring Security + JWT</text>
-      <text x="165" y="230" text-anchor="middle" fill="white" font-size="14">📦 Gradle</text>
-      <text x="165" y="255" text-anchor="middle" fill="white" font-size="14">🔄 Flyway (migrations)</text>
-      <text x="165" y="280" text-anchor="middle" fill="white" font-size="14">📝 Springdoc OpenAPI</text>
-      <text x="165" y="305" text-anchor="middle" fill="white" font-size="14">❤️ Actuator (saúde)</text>
-      <text x="165" y="330" text-anchor="middle" fill="white" font-size="14">🔑 BCrypt (senhas)</text>
-      <text x="165" y="355" text-anchor="middle" fill="white" font-size="14">🆔 UUID v6</text>
+      <rect x="20" y="60" width="270" height="330" rx="12" fill="#1e3a8a"/>
+      <text x="155" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">BACKEND</text>
+      <line x1="40" y1="102" x2="270" y2="102" stroke="#fbbf24"/>
+      <text x="155" y="130" text-anchor="middle" fill="white" font-size="14">☕ Java 21</text>
+      <text x="155" y="155" text-anchor="middle" fill="white" font-size="14">🌱 Spring Boot</text>
+      <text x="155" y="180" text-anchor="middle" fill="white" font-size="14">🐘 PostgreSQL</text>
+      <text x="155" y="205" text-anchor="middle" fill="white" font-size="14">🔐 Spring Security + JWT</text>
+      <text x="155" y="230" text-anchor="middle" fill="white" font-size="14">📦 Gradle</text>
+      <text x="155" y="255" text-anchor="middle" fill="white" font-size="14">🔄 Flyway (migrations)</text>
+      <text x="155" y="280" text-anchor="middle" fill="white" font-size="14">📝 Springdoc OpenAPI</text>
+      <text x="155" y="305" text-anchor="middle" fill="white" font-size="14">❤️ Actuator (saúde)</text>
+      <text x="155" y="330" text-anchor="middle" fill="white" font-size="14">🔑 BCrypt (senhas)</text>
+      <text x="155" y="355" text-anchor="middle" fill="white" font-size="14">🆔 UUID v6</text>
 
-      <!-- Frontend -->
-      <rect x="315" y="60" width="270" height="330" rx="12" fill="#dc2626"/>
-      <text x="450" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">FRONTEND</text>
-      <line x1="335" y1="102" x2="565" y2="102" stroke="#fbbf24"/>
-      <text x="450" y="130" text-anchor="middle" fill="white" font-size="14">🅰️ Angular 20</text>
-      <text x="450" y="155" text-anchor="middle" fill="white" font-size="14">🧩 Standalone Components</text>
-      <text x="450" y="180" text-anchor="middle" fill="white" font-size="14">⚡ Signals</text>
-      <text x="450" y="205" text-anchor="middle" fill="white" font-size="14">🎨 SCSS puro</text>
-      <text x="450" y="230" text-anchor="middle" fill="white" font-size="14">🖼️ DS Apple + Notion</text>
-      <text x="450" y="280" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">Apple no público (landing,</text>
-      <text x="450" y="298" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">login, cadastro)</text>
-      <text x="450" y="330" text-anchor="middle" fill="#fef3c7" font-size="12">Notion no autenticado</text>
-      <text x="450" y="348" text-anchor="middle" fill="#fef3c7" font-size="12">(dashboard e demais telas)</text>
+      <!-- Frontend Web -->
+      <rect x="305" y="60" width="270" height="330" rx="12" fill="#dc2626"/>
+      <text x="440" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">FRONTEND WEB</text>
+      <line x1="325" y1="102" x2="555" y2="102" stroke="#fbbf24"/>
+      <text x="440" y="130" text-anchor="middle" fill="white" font-size="14">🅰️ Angular 20</text>
+      <text x="440" y="155" text-anchor="middle" fill="white" font-size="14">🧩 Standalone Components</text>
+      <text x="440" y="180" text-anchor="middle" fill="white" font-size="14">⚡ Signals</text>
+      <text x="440" y="205" text-anchor="middle" fill="white" font-size="14">🎨 SCSS puro</text>
+      <text x="440" y="230" text-anchor="middle" fill="white" font-size="14">🖼️ DS Apple + Notion</text>
+      <text x="440" y="255" text-anchor="middle" fill="white" font-size="14">🧪 Vitest + Playwright</text>
+      <text x="440" y="295" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">Apple no público (landing,</text>
+      <text x="440" y="313" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">login, cadastro)</text>
+      <text x="440" y="345" text-anchor="middle" fill="#fef3c7" font-size="12">Notion no autenticado</text>
+      <text x="440" y="363" text-anchor="middle" fill="#fef3c7" font-size="12">(dashboard e demais telas)</text>
+
+      <!-- Mobile -->
+      <rect x="590" y="60" width="270" height="330" rx="12" fill="#b45309"/>
+      <text x="725" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">MOBILE</text>
+      <line x1="610" y1="102" x2="840" y2="102" stroke="#fbbf24"/>
+      <text x="725" y="130" text-anchor="middle" fill="white" font-size="14">🅰️ Angular 20</text>
+      <text x="725" y="155" text-anchor="middle" fill="white" font-size="14">📱 Ionic 8.4+</text>
+      <text x="725" y="180" text-anchor="middle" fill="white" font-size="14">⚓ Capacitor 6</text>
+      <text x="725" y="205" text-anchor="middle" fill="white" font-size="14">🎨 SCSS puro</text>
+      <text x="725" y="230" text-anchor="middle" fill="white" font-size="14">🔐 Capacitor Preferences</text>
+      <text x="725" y="255" text-anchor="middle" fill="white" font-size="14">🧪 Vitest + Playwright PWA</text>
+      <text x="725" y="295" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">DS Notion adaptado para</text>
+      <text x="725" y="313" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">touch e tabs inferiores</text>
+      <text x="725" y="345" text-anchor="middle" fill="#fef3c7" font-size="12">PWA primeiro; Android/iOS</text>
+      <text x="725" y="363" text-anchor="middle" fill="#fef3c7" font-size="12">via Capacitor em fase posterior</text>
 
       <!-- Infra -->
-      <rect x="600" y="60" width="270" height="330" rx="12" fill="#0f766e"/>
-      <text x="735" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">INFRA</text>
-      <line x1="620" y1="102" x2="850" y2="102" stroke="#fbbf24"/>
-      <text x="735" y="130" text-anchor="middle" fill="white" font-size="14">🐳 Docker</text>
-      <text x="735" y="155" text-anchor="middle" fill="white" font-size="14">🐙 Docker Compose</text>
-      <text x="735" y="180" text-anchor="middle" fill="white" font-size="14">🌎 Locale pt-BR</text>
-      <text x="735" y="205" text-anchor="middle" fill="white" font-size="14">⏰ America/Sao_Paulo</text>
-      <text x="735" y="230" text-anchor="middle" fill="white" font-size="14">🐙 GitHub (repositório)</text>
-      <text x="735" y="285" text-anchor="middle" fill="#a7f3d0" font-size="12" font-style="italic">Ambiente local develop</text>
-      <text x="735" y="303" text-anchor="middle" fill="#a7f3d0" font-size="12" font-style="italic">funcional desde a Sprint 1</text>
-      <text x="735" y="340" text-anchor="middle" fill="#a7f3d0" font-size="12">VPS e ambientes remotos</text>
-      <text x="735" y="358" text-anchor="middle" fill="#a7f3d0" font-size="12">ficam para fase posterior</text>
+      <rect x="875" y="60" width="285" height="330" rx="12" fill="#0f766e"/>
+      <text x="1018" y="90" text-anchor="middle" fill="white" font-size="18" font-weight="700">INFRA</text>
+      <line x1="895" y1="102" x2="1140" y2="102" stroke="#fbbf24"/>
+      <text x="1018" y="130" text-anchor="middle" fill="white" font-size="14">🐳 Docker</text>
+      <text x="1018" y="155" text-anchor="middle" fill="white" font-size="14">🐙 Docker Compose</text>
+      <text x="1018" y="180" text-anchor="middle" fill="white" font-size="14">🌎 Locale pt-BR</text>
+      <text x="1018" y="205" text-anchor="middle" fill="white" font-size="14">⏰ America/Sao_Paulo</text>
+      <text x="1018" y="230" text-anchor="middle" fill="white" font-size="14">🐙 GitHub (repositório)</text>
+      <text x="1018" y="255" text-anchor="middle" fill="white" font-size="14">⚙️ GitHub Actions CI</text>
+      <text x="1018" y="295" text-anchor="middle" fill="#a7f3d0" font-size="12" font-style="italic">Ambiente local develop</text>
+      <text x="1018" y="313" text-anchor="middle" fill="#a7f3d0" font-size="12" font-style="italic">funcional desde a Sprint 1</text>
+      <text x="1018" y="345" text-anchor="middle" fill="#a7f3d0" font-size="12">AWS (EC2 + RDS) entra após</text>
+      <text x="1018" y="363" text-anchor="middle" fill="#a7f3d0" font-size="12">a Sprint 3 / Epic 3</text>
     </svg>
-    <div class="caption">Três pilares tecnológicos que sustentam a plataforma SEP.</div>
+    <div class="caption">Quatro pilares tecnológicos que sustentam a plataforma SEP. Backend e Mobile são trilhas paralelas que consomem a mesma API; Mobile reusa contratos do frontend web sem reinventar DTOs.</div>
   </div>
 </section>
 
 <section id="infra">
-  <h2>9. Infraestrutura e Ambientes</h2>
+  <h2>11. Infraestrutura e Ambientes</h2>
   <div class="subtitle">Evolução planejada dos ambientes ao longo do tempo.</div>
 
   <div class="diagram-wrapper">
@@ -978,7 +1416,7 @@
 </section>
 
 <section id="pipeline">
-  <h2>10. Pipeline GitHub (Visão de Produto)</h2>
+  <h2>12. Pipeline GitHub (Visão de Produto)</h2>
   <div class="subtitle">Como o fluxo de entrega se conecta ao GitHub — visão alto nível.</div>
 
   <div class="diagram-wrapper">
@@ -1027,7 +1465,7 @@
       <!-- Automação futura -->
       <rect x="200" y="300" width="530" height="60" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="6,4"/>
       <text x="465" y="326" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">GitHub Actions · CI/CD · Deploy automatizado</text>
-      <text x="465" y="346" text-anchor="middle" font-size="11" fill="#94a3b8" font-style="italic">Fase posterior (E14) · deploy por branch, secrets por ambiente, seeds dedicados</text>
+      <text x="465" y="346" text-anchor="middle" font-size="11" fill="#94a3b8" font-style="italic">Fase posterior (E16) · deploy por branch, secrets por ambiente, seeds dedicados</text>
 
       <line x1="665" y1="240" x2="665" y2="298" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
 
@@ -1042,7 +1480,7 @@
 </section>
 
 <section id="sucesso">
-  <h2>11. Critérios de Sucesso da Fase Atual</h2>
+  <h2>13. Critérios de Sucesso da Fase Atual</h2>
   <div class="subtitle">O que precisa estar funcionando para considerarmos a fundação entregue.</div>
 
   <table>
@@ -1068,7 +1506,71 @@
     </tbody>
   </table>
 
-  <h3>Fronteiras entre Épicos</h3>
+  <h3 style="margin-top: 36px;">Cenários de Teste Obrigatórios (22 cenários)</h3>
+  <div class="subtitle" style="margin-bottom: 16px;">Conjunto de cenários que precisam estar verdes ao fim das Sprints 0-4 para considerar a fundação validada. Cobrem validação, autenticação, autorização, ownership, auditoria e infraestrutura.</div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h4>✅ Validação de Cadastro (4)</h4>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>Criar usuário com e-mail válido</li>
+        <li>Rejeitar e-mail inválido</li>
+        <li>Rejeitar e-mail duplicado</li>
+        <li>Rejeitar senha com tamanho diferente de 6</li>
+      </ul>
+      <div class="tag">Sprint 2</div>
+    </div>
+    <div class="card">
+      <h4>🔐 Autenticação JWT (5)</h4>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>Autenticar com credenciais válidas</li>
+        <li>Falhar autenticação com senha inválida</li>
+        <li>Token expirado ser rejeitado</li>
+        <li>Token inválido ser rejeitado</li>
+        <li>Claims <code>sub</code>, <code>email</code> e <code>roles</code> presentes no JWT</li>
+      </ul>
+      <div class="tag">Sprint 3</div>
+    </div>
+    <div class="card">
+      <h4>🛂 Autorização por Perfil (4)</h4>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>Admin consultar qualquer usuário</li>
+        <li>Cliente consultar apenas o próprio usuário</li>
+        <li>Cliente não listar usuários</li>
+        <li>Admin listar todos os usuários</li>
+      </ul>
+      <div class="tag">Sprint 3</div>
+    </div>
+    <div class="card">
+      <h4>🔑 Ownership e Senha (2)</h4>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>Usuário alterar a própria senha</li>
+        <li>Usuário não alterar senha de terceiro</li>
+      </ul>
+      <div class="tag">Sprint 3</div>
+    </div>
+    <div class="card">
+      <h4>📜 Auditoria (3)</h4>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>Auditoria preencher criação e modificação</li>
+        <li>Auditoria usar UUID do usuário autenticado</li>
+        <li>Auditoria usar fallback <code>system</code> quando não houver autenticação</li>
+      </ul>
+      <div class="tag">Sprints 1-3</div>
+    </div>
+    <div class="card">
+      <h4>⚙️ Infraestrutura e Contratos (4)</h4>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px;">
+        <li>Migrations Flyway subirem no boot</li>
+        <li>Healthcheck (Actuator) responder com sucesso</li>
+        <li>Documentação OpenAPI expor rotas de auth e usuários</li>
+        <li>Respostas de erro seguirem payload padronizado</li>
+      </ul>
+      <div class="tag">Sprints 1, 4</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top: 36px;">Fronteiras entre Épicos</h3>
   <p>Para evitar sobreposição de responsabilidades, as fronteiras entre épicos foram explicitadas no PRD: onboarding não substitui a jornada da credora; análise de crédito não substitui o backoffice; formalização não substitui a análise; cobrança não substitui o meio de pagamento; Pix não substitui cobrança, análise ou formalização; frontend não concentra regra de negócio de domínio.</p>
 </section>
 
@@ -1077,7 +1579,7 @@
 <footer>
   <div style="max-width: 1180px; margin: 0 auto;">
     <strong>Plataforma SEP</strong> · Documentação de Produto · Versão Product Owner<br>
-    Baseado no <em>PRD.md</em> e <em>CONTEXT.md</em> do projeto · Atualizado em 24/04/2026
+    Baseado no <em>PRD.md</em>, <em>CONTEXT.md</em> e nos artefatos derivados de execução · Atualizado em 03/05/2026
   </div>
 </footer>
 
