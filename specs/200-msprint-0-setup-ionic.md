@@ -38,7 +38,7 @@ Inicializar o projeto Mobile SEP com Ionic 8.4+ + Angular 20.x + Capacitor 6, e 
 ## Pre-requisitos globais
 
 - PRD aprovado, design system Notion definido (`docs-sep/DESIGN-notion.md`)
-- `CLAUDE.md` criado (orienta agentes futuros)
+- `AGENT.md` criado (orienta agentes futuros)
 - Sprint 0 backend tem GitHub repo + branch protection + Conventional Commits prontos (compartilhados)
 - Node.js LTS instalado (>= 20.x)
 - Java JDK 17 (apenas se for habilitar build Android no futuro — opcional nesta M-Sprint)

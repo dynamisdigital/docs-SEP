@@ -118,13 +118,10 @@ A integracao com o ecossistema **Celcoin** (BaaS) e a estrategia escolhida para 
 - portal completo da empresa credora nesta etapa inicial
 - automacao financeira avancada nesta etapa inicial
 - deploy remoto
+- GitHub Actions
 - Amazon EC2
 - homologacao e producao
-- pipelines de CD/deploy remoto
-
-Observacao sobre CI/CD:
-- GitHub Actions de **validacao** fazem parte da higiene tecnica do repositorio e podem existir desde a Sprint 0, sem deploy e sem secrets produtivos.
-- GitHub Actions de **deploy**, distribuicao mobile nativa, AWS, homologacao e producao permanecem fora do escopo da entrega inicial e so devem ser promovidos quando os gates definidos neste PRD forem cumpridos.
+- pipelines CI/CD
 
 Observacao:
 Embora a implementacao do frontend esteja fora de escopo desta fase, o projeto ja possui uma base de design definida e aprovada, que deve orientar as proximas etapas.
@@ -134,50 +131,22 @@ Da mesma forma, onboarding, analise de credito, formalizacao contratual, cobranc
 
 Nesta fase inicial da API, os perfis detalhados sao apenas os necessarios para autenticacao, administracao e controle de acesso. No produto completo, as jornadas de tomador, credor e financeiro serao expandidas nas epics futuras ja previstas no roadmap.
 
-### Canalizacao por perfil (Opcao 3 — ADR 0009)
-
-A partir da Sprint 5 (Endurecimento de Seguranca), o produto adota **separacao de canal por perfil** para fortalecer a seguranca dos clientes externos:
-
-| Perfil | Canal principal | Canal secundario | Justificativa de seguranca |
-|--------|----------------|-------------------|----------------------------|
-| Visitante | Web (landing) + Mobile (boas-vindas) | — | Marketing publico em ambos |
-| Tomador (`ROLE_CLIENTE` atual; futura `ROLE_TOMADOR`) | **Mobile** | — (sem versao web) | Biometria nativa, storage Keystore/Keychain, anti-phishing, certificate pinning |
-| Empresa Credora (futura `ROLE_CREDORA`) | **Web** | Mobile (notificacoes + status simplificado) | KYB, carteira, dashboards densos exigem desktop |
-| Financeiro Interno (futura `ROLE_FINANCEIRO`) | **Web** | — | Ferramentas de analise exigem telas grandes |
-| Backoffice (futura `ROLE_BACKOFFICE`) | **Web** | — | Fila operacional, comentarios, reprocessos |
-| Administrador (`ROLE_ADMIN`) | **Web** | — | Governanca e gestao avancada |
-
-Detalhes em [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md).
-
 ### Visitante
-Pode criar usuario sem autenticacao (apenas tomador via mobile, apos a Sprint 5; antes da Sprint 5, cadastro publico amplo continua valido) e nao pode acessar recursos protegidos.
+Pode criar usuario sem autenticacao e nao pode acessar recursos protegidos.
 
-### Cliente (atual `ROLE_CLIENTE` → futuro `ROLE_TOMADOR`)
-Pode autenticar, consultar apenas o proprio usuario e alterar apenas a propria senha. Acessa o produto **apenas via mobile** apos a Sprint 5.
+### Cliente
+Pode autenticar, consultar apenas o proprio usuario e alterar apenas a propria senha.
 
-### Empresa Credora (futura `ROLE_CREDORA` — Epic 11)
-Cadastro **por convite** emitido por administrador. Acessa o produto **principalmente via web** (KYB, carteira, oportunidades, operacoes financiadas), com **mobile resumido** para notificacoes e status.
-
-### Financeiro Interno (futura `ROLE_FINANCEIRO` — Epic 11)
-Usuario interno responsavel por operacao financeira. Acessa **apenas via web**.
-
-### Backoffice (futura `ROLE_BACKOFFICE` — Epic 11)
-Usuario interno responsavel por fila operacional, comentarios, reprocessos. Acessa **apenas via web**.
-
-### Administrador (`ROLE_ADMIN`)
-Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios. Cadastro **interno** (criado por outro administrador). Acessa **apenas via web**.
+### Administrador
+Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 
 ## 7. Requisitos Funcionais
 
 ### RF-01 Cadastro de usuario
-- Nas Sprints 1-4, o sistema permite criar usuario sem autenticacao via `POST /api/v1/usuarios` (regra atual, valida ate Sprint 5).
-- A partir da Sprint 5 (Endurecimento de Seguranca, ADR 0010), o cadastro publico generico e **desativado** e substituido por fluxos canalizados por perfil (ADR 0009):
-  - **Tomador**: cadastro publico **apenas via mobile** (endpoint validara canal de origem)
-  - **Empresa Credora**: cadastro **por convite** (admin emite link/token; credora completa cadastro autenticando-se no web)
-  - **Admin/Financeiro/Backoffice**: cadastro **interno** (admin autenticado cria via endpoint dedicado)
+- O sistema deve permitir criar usuario sem autenticacao.
 - O usuario deve possuir e-mail unico, usado como username.
-- O usuario deve possuir senha com exatamente `6 caracteres` nas Sprints 1-4; a partir da Sprint 5 a politica de senha e revisada para minimo 12 caracteres OU passphrase (ADR 0010).
-- Os papeis definidos sao: `ROLE_ADMIN`, `ROLE_CLIENTE` (Sprints 1-4); a Epic 11 (Administracao e Governanca) refina para `ROLE_TOMADOR`, `ROLE_CREDORA`, `ROLE_FINANCEIRO`, `ROLE_BACKOFFICE`, `ROLE_ADMIN`.
+- O usuario deve possuir senha com exatamente `6 caracteres` nesta fase.
+- O usuario deve possuir perfil `ROLE_ADMIN` ou `ROLE_CLIENTE`.
 
 ### RF-02 Consulta de usuario por id
 - O sistema deve permitir localizar usuario pelo identificador gerado.
@@ -191,15 +160,9 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios. C
 - O usuario autenticado deve poder alterar apenas a propria senha.
 
 ### RF-05 Autenticacao
-- Nas Sprints 1-4, o sistema implementa autenticacao single-factor (JWT) via e-mail e senha.
-- A partir da Sprint 5 (Endurecimento de Seguranca, ADR 0010), o sistema implementa **MFA com 2 fatores adaptados por canal**:
-  - **Mobile (Tomador)**: senha + biometria nativa (Face ID/Touch ID via Capacitor); fallback TOTP
-  - **Web (Empresa Credora)**: senha + TOTP (Google Authenticator, Authy, Microsoft Authenticator); backup codes
-  - **Web (Admin/Financeiro/Backoffice)**: senha + TOTP **obrigatorio**; WebAuthn/Passkeys opcional para Admin
-- O login deve autenticar por e-mail e senha como primeiro fator, seguido do segundo fator conforme o canal.
-- O sistema deve expor recurso para obter os dados do usuario autenticado (`/auth/me`).
-- A partir da Sprint 5, JWT inclui access token (15 min) + refresh token rotativo (30 dias) com deteccao de reuso.
-- A partir da Sprint 5, operacoes sensiveis (alterar senha, desabilitar MFA, futuras transferencias Pix, futuras formalizacoes de contrato) exigem **step-up authentication**.
+- O sistema deve implementar autenticacao via JWT.
+- O login deve autenticar por e-mail e senha.
+- O sistema deve expor recurso para obter os dados do usuario autenticado.
 
 ### RF-06 Auditoria
 - O sistema deve registrar data de criacao e ultima modificacao dos registros.
@@ -382,22 +345,28 @@ A Resolucao CMN 4.656/2018 obriga segregacao patrimonial entre fundos de tomador
 ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../adr/0005-segregacao-patrimonial-via-conta-escrow.md).
 
 ### Base definida para o frontend futuro
+- Angular na versao `20.x` (baseline atual: Standalone Components, Signals e Zoneless estaveis, com ecossistema alinhado), pareada com Ionic `8.4+` e Capacitor `6` para o mobile; na fase de implementacao mobile, avaliar upgrade para Angular `21` apenas se houver release oficial do Ionic com suporte explicito a `21` e os plugins Capacitor relevantes ja estiverem alinhados; caso contrario, manter `20`
+- Standalone Components
+- Signals
+- SCSS puro como camada de estilizacao, sem frameworks CSS prontos (Bootstrap, Tailwind, Material e similares estao explicitamente fora)
+- design systems oficiais do produto:
+  - [`DESIGN-apple.md`](./DESIGN-apple.md) - aplica-se as superficies publicas: landing, login e cadastro
+  - [`DESIGN-notion.md`](./DESIGN-notion.md) - aplica-se ao dashboard e a todas as telas autenticadas
+- a fronteira entre os dois design systems e o estado de autenticacao: tudo que e acessivel sem JWT segue Apple; tudo a partir de `/auth/me` em diante segue Notion
+- tokens, tipografia, escala de espacamento, raios e componentes devem ser implementados em SCSS a partir das definicoes desses arquivos, sem depender de bibliotecas de UI prontas
+- plano oficial de telas web:
+  - [`WEB-SCREENS-PLAN.md`](./WEB-SCREENS-PLAN.md)
+  - este artefato define ordem de implementacao visual, telas por perfil, matriz tela x endpoint e lacunas antes da implementacao completa do web
 
-**Stack e versao**
-- Angular `20.x` baseline (Standalone Components, Signals, Zoneless estaveis), pareado com Ionic `8.4+` e Capacitor `6` para o mobile
-- Upgrade para Angular `21` so na fase de implementacao mobile e somente se houver release oficial do Ionic e dos plugins Capacitor com suporte explicito; sem clausula de downgrade abaixo de `20`
-
-**Estilizacao e design systems** (ADR 0002)
-- SCSS puro como camada de estilizacao; **sem frameworks CSS de terceiros** (Bootstrap, Tailwind, Material e similares estao explicitamente fora) e **sem template administrativo pronto** — toda a base visual vem dos design systems oficiais:
-  - [`DESIGN-apple.md`](./DESIGN-apple.md) — superficies **publicas** (landing, login, cadastro). Seguir literalmente: tokens de cor, tipografia, raios, espacamento, regras do/dont
-  - [`DESIGN-notion.md`](./DESIGN-notion.md) — dashboard e demais telas **autenticadas**. Mesma fidelidade
-- Fronteira entre os dois design systems: estado de autenticacao (transicao visual no login — ate `/auth/me`, Apple; apos, Notion)
-- Componentes implementados como **Angular standalone proprios**, em SCSS, com tokens (cores, tipografia, espacamento, raios, sombras) extraidos dos design systems para variaveis SCSS reutilizaveis
-- Bibliotecas externas que nao envolvem chrome visual (datepickers, mascaras, formularios reativos, utilidades) sao permitidas, desde que estilizadas em SCSS para respeitar os tokens
-
-**Plano de execucao**
-- Plano oficial de telas web: [`WEB-SCREENS-PLAN.md`](./WEB-SCREENS-PLAN.md) — ordem de implementacao visual, telas por perfil, matriz tela x endpoint e lacunas
-- Trilha Frontend Foundation (F-Sprints 0-4) detalhada em `specs/100-104` (paralelas a Sprints 0-4 backend)
+### Diretriz de adocao dos design systems
+- o frontend nao deve adotar templates administrativos prontos; toda a base visual vem dos design systems oficiais
+- superficies publicas (landing, login, cadastro) devem seguir [`DESIGN-apple.md`](./DESIGN-apple.md) literalmente: tokens de cor, tipografia, raios, espacamento, regras de uso e do/dont
+- superficies autenticadas (dashboard e demais telas com JWT) devem seguir [`DESIGN-notion.md`](./DESIGN-notion.md) literalmente, com a mesma fidelidade
+- a transicao visual entre os dois design systems acontece exatamente no login: ate o login, Apple; apos o login, Notion
+- componentes devem ser implementados como componentes Angular standalone proprios, em SCSS, com tokens extraidos dos design systems
+- nao devem ser introduzidos frameworks CSS de terceiros (Bootstrap, Tailwind, Material, etc.) como camada de estilizacao
+- bibliotecas externas que nao envolvem chrome visual (datepickers, mascaras, formularios reativos, utilidades) podem ser usadas, desde que estilizadas em SCSS para respeitar os tokens
+- a versao do Angular esta definida em `20.x` como baseline; o upgrade para `21` pode ser avaliado na fase de implementacao mobile, condicionado a haver release oficial do Ionic e dos plugins Capacitor com suporte explicito a Angular `21`; nao ha previsao de downgrade abaixo de `20`
 
 ### Base definida para o mobile futuro
 - o projeto mobile deve ser planejado como `Mobile SEP`
@@ -411,24 +380,29 @@ ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../ad
   - [`MOBILE-SCREENS-PLAN.md`](./MOBILE-SCREENS-PLAN.md)
   - este artefato define ordem de implementacao visual mobile, telas por jornada, matriz tela x endpoint, escopo reduzido do app e lacunas antes da implementacao completa do mobile
 
-### Convencoes e padroes obrigatorios
+### Convencoes obrigatorias
+- uso de DTOs
+- uso de MapStruct (substituiu ModelMapper — ver ADR 0006)
+- criacao de `ApiExceptionHandler`
+- auditoria com JPA Auditing
+- gerenciamento de build e dependencias com Gradle
+- armazenamento de senha com `BCryptPasswordEncoder`
+- migrations versionadas com `Flyway`
+- endpoint de healthcheck com Actuator
 
-**Estrutura e organizacao**
-- DTOs em todas as bordas; mappers via MapStruct (ADR 0006)
-- Cada modulo de dominio encapsula suas entidades, repositories, DTOs, mappers, casos de uso e controllers; regra de negocio fica no modulo dono (estrutura detalhada em §19)
-
-**Persistencia**
-- Identificador principal: UUID v6 (Java `java.util.UUID`, PostgreSQL tipo nativo `uuid`); convencoes em §16
-- Tabelas e colunas em portugues; sem soft delete nesta fase
-- Persistencia evoluida apenas por migrations Flyway versionadas
-
-**Seguranca**
-- Senha com hash `BCryptPasswordEncoder`
-- Auditoria via JPA Auditing priorizando UUID do usuario autenticado com fallback `system` (regras em §15)
-
-**API e operacao**
-- Resposta de erro padronizada via `ApiExceptionHandler` (formato em §13)
-- Documentacao Springdoc OpenAPI; `CORS` explicito; endpoint de saude via Actuator
+### Padroes tecnicos obrigatorios
+- o identificador principal das entidades deve ser `UUID`
+- o backend deve usar `BCrypt` para persistencia de senha
+- a documentacao da API deve usar `Springdoc OpenAPI`
+- a persistencia deve ser evoluida apenas por migrations `Flyway`
+- a resposta de erro deve seguir formato padronizado
+- o backend deve possuir configuracao explicita de `CORS`
+- o backend deve possuir ao menos um endpoint de saude para monitoramento
+- o padrao de auditoria deve priorizar o `UUID` do usuario autenticado, com fallback seguro
+- a persistencia deve seguir convencoes consistentes de nomes de tabelas e colunas
+- cada modulo de dominio deve encapsular suas entidades, repositories, DTOs, mappers, casos de uso e controllers
+- regras de negocio devem permanecer no backend e dentro do modulo dono da regra
+- soft delete nao sera adotado nesta fase inicial
 
 ### Dependencias tecnicas ja definidas
 - geracao de UUID:
@@ -480,7 +454,6 @@ ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../ad
 - a execucao AWS pode ser antecipada antes de Pix e das capacidades financeiras expandidas se o time precisar de ambiente remoto para validacao, homologacao ou integracao
 - CI/CD com GitHub Actions nao e pre-requisito obrigatorio para o primeiro ambiente AWS, mas deve ser planejado na mesma fase de infraestrutura
 - enquanto CI/CD nao estiver pronto, qualquer deploy remoto inicial deve ser manual, documentado e restrito a ambiente nao produtivo
-- a estrategia de CI/CD evolutiva fica documentada em [`ci-pipelines/README.md`](./ci-pipelines/README.md), com workflows ativos apenas para validacao e templates futuros nao executaveis fora de `.github/workflows`
 
 ### Arquitetura remota por ambiente
 - `aws-develop`
@@ -514,22 +487,10 @@ Campo opcional recomendado para evolucao futura:
 
 ## 14. Padrao de JWT
 
-### Estrategia inicial (Sprints 1-4)
+### Estrategia inicial
 - autenticacao baseada em `access token` JWT
-- sem `refresh token` ate a Sprint 5
-- expiracao configuravel por propriedade (1h padrao Sprints 1-4)
-
-### Estrategia consolidada (a partir da Sprint 5 — ADR 0010)
-- autenticacao com **access token (15 min)** + **refresh token (30 dias) com rotacao** e deteccao de reuso
-- access token JWT (formato atual mantido)
-- refresh token: ID opaco (UUID) armazenado em tabela `refresh_token` com `family_id` para rotacao e reuse detection
-- rotacao: cada uso do refresh token emite novo access + novo refresh (mesma familia, novo ID); refresh anterior marcado como `usado`
-- reuse detection: se refresh token marcado como `usado` for re-apresentado, **toda a familia e revogada** + audit log + email de alerta
-- storage:
-  - **Mobile**: refresh token em Capacitor Preferences (Keystore/Keychain)
-  - **Web**: refresh token em cookie `httpOnly` + `sameSite=strict` + `secure`
-- claim adicional `channel` no access token (`web`, `mobile`) para reforcar canalizacao (ADR 0009)
-- step-up authentication: token efemero (5 min) emitido apos re-validacao TOTP/biometria; exigido em endpoints sensiveis via annotation `@RequireStepUp`
+- sem `refresh token` nesta fase
+- expiracao curta e configuravel por propriedade
 
 ### Claims minimas obrigatorias
 - `sub`: identificador do usuario autenticado
@@ -583,49 +544,83 @@ Mesmo nesta fase inicial, a API deve nascer preparada para operacao futura com:
 - endpoint de healthcheck
 - logs suficientes para diagnostico de autenticacao, autorizacao e erros de aplicacao
 
-## 18. Decisoes Tecnicas Consolidadas (Indice)
+## 18. Decisoes Tecnicas Consolidadas
 
-Esta secao agrega as decisoes tecnicas do projeto. Cada decisao tem uma secao canonica com detalhes; as referencias abaixo apontam para essas secoes e para os ADRs correspondentes. **Nao duplicar conteudo aqui** — atualizar a secao canonica e este indice automaticamente reflete a mudanca.
+### Backend - linguagem e framework
+- Build e dependencias com `Gradle 8.x` + Wrapper
+- Java `21` LTS, com Records para DTOs, Sealed types para Roles/eventos, Pattern matching e Virtual threads habilitados
+- Spring Boot `3.5.x` (versao minor pinada explicitamente)
+- Hibernate `6.x` (vem com Spring Boot 3.5)
+- PostgreSQL `16` (sem H2 mesmo em testes)
+- Flyway para migrations versionadas
 
-### Stack e arquitetura
-- Stack principal (versoes pinadas: Java 21, Spring Boot 3.5.x, Hibernate 6.x, PostgreSQL 16, Gradle 8.x) → §11.Stack principal
-- Monolito modular DDD com Hexagonal/Ports & Adapters por modulo → §11.Diretriz arquitetural; §19; ADRs 0001, 0007
-- Provider Pattern obrigatorio para integracoes externas → §11.Padrao de Provider Externo; ADR 0004
-- Modulo `escrow` obrigatorio desde Sprint 1 (Resolucao CMN 4.656/2018) → §3.1, §11.Modulo escrow; ADR 0005
-- MapStruct substitui ModelMapper → §11.Stack principal; ADR 0006
-- HTTP client `RestClient`; resiliencia via Resilience4j; idempotencia via `Idempotency-Key`; `correlationId`/`traceId` no MDC → §11.Stack principal e §11.Padrao de Provider Externo
+### Backend - mapeamento, validacao e seguranca
+- **MapStruct** (geracao de codigo, type-safe) — substitui ModelMapper em todo o projeto
+- Jakarta Bean Validation (`spring-boot-starter-validation`)
+- Spring Security `6` + JJWT `0.12.x`
+- BCrypt para hash de senha (politica de 6 caracteres revisada antes de producao)
+- mTLS preparado para integracoes financeiras (Celcoin)
 
-### Identificadores e persistencia
-- IDs UUID v6 (Java `java.util.UUID`, PostgreSQL tipo nativo `uuid`) → §16
-- Tabelas e colunas em portugues; sem soft delete; datas em ISO-8601 com offset → §16
+### Backend - identificadores e dominio
+- IDs com `UUID`, geracao via `com.fasterxml.uuid:java-uuid-generator:5.1.0`
+- preferencia por `UUID v6`
+- UUID persistido como tipo nativo `uuid` no PostgreSQL
+- UUID modelado como `java.util.UUID` no backend
+- tabelas e colunas em portugues
+- sem soft delete nesta fase
+- datas serializadas em ISO-8601 com offset
+- arquitetura: monolito modular DDD com `Hexagonal/Ports & Adapters` por modulo
+- modulo `escrow` obrigatorio desde Sprint 1 (Resolucao CMN 4.656/2018)
 
-### Autenticacao e seguranca
-- Padrao JWT (claims, refresh token, step-up) → §14
-- Padrao de erros (`ApiExceptionHandler` + `ErrorResponseDto`) → §13
-- Auditoria JPA com fallback `system` → §15
-- MFA + canalizacao por perfil + endurecimento (Sprint 5 — gate para producao) → §6 (canalizacao), §7 RF-01/RF-05; ADRs 0009, 0010
+### Backend - integracoes externas
+- **Provider Pattern** obrigatorio: porta de saida em `application.port.out`, adapter em `infrastructure.adapter`
+- **RestClient** (Spring 6, sincrono) como HTTP client default; `WebClient` reservado para streams
+- **Resilience4j** para circuit breaker, retry e timeout em chamadas externas
+- idempotencia por `Idempotency-Key` em operacoes financeiras
+- `correlationId`/`traceId` propagados via MDC
 
-### Testes e qualidade
-- TDD distribuido desde Sprint 1; JaCoCo target 70% por modulo → §22, specs 001-005
-- WireMock 3.x para integration tests dos adapters HTTP de Celcoin → §11.Padrao de Provider Externo; ADR 0008
-- Testcontainers com PostgreSQL real (sem H2); test slices `@WebMvcTest`/`@DataJpaTest`/`@JsonTest` → §11.Stack principal
-- Spotless + Palantir Format, pre-commit hooks, Conventional Commits → spec 000
+### Backend - JWT e auditoria
+- JWT como mecanismo de autenticacao
+- sem refresh token nesta fase
+- `sub` do JWT com `UUID` do usuario
+- claims minimas: `sub`, `email`, `roles`
+- auditoria persistindo preferencialmente o `UUID` do usuario
+- logout tratado no cliente nesta fase
+
+### Backend - documentacao e observabilidade
+- documentacao com `Springdoc OpenAPI 2.x`
+- `CORS` ja previsto para integracao com Angular
+- `Actuator` para healthcheck
+- **Micrometer + Prometheus** para metricas
+- logs estruturados via Logback com MDC
+
+### Backend - testes
+- JUnit 5 + AssertJ
+- Test slices: `@WebMvcTest`, `@DataJpaTest`, `@JsonTest`
+- **Testcontainers** com PostgreSQL real (sem H2)
+- Mockito para unit tests da camada `application` (com `Fake<X>Provider` injetado)
+- **WireMock 3.x** para integration tests dos adapters HTTP de Celcoin (`Celcoin<X>ProviderIT`) — ver ADR 0008
+- TDD desde Sprint 1: cada Sprint entrega testes correspondentes ao escopo
+- JaCoCo target 70% por modulo (validado em CI)
+
+### Backend - qualidade e tooling (Sprint 0)
+- Spotless + Palantir Java Format
+- JaCoCo + verification rule
+- Pre-commit hook bloqueando codigo desformatado
+- GitHub Actions CI: build + test + Spotless + JaCoCo
+- Conventional Commits
 
 ### Frontend e mobile
-- Design systems Apple (publico) + Notion (autenticado e mobile) com SCSS puro → §3, §11.Base frontend; ADR 0002
-- Stack frontend `Angular 20.x` (Standalone, Signals); stack mobile `Angular 20.x + Ionic 8.4+ + Capacitor 6` → §11.Base frontend, §11.Base mobile; ADRs 0003, 0011
-- Sem framework CSS de terceiros nem template administrativo (guard rails) → §11.Base frontend
-- Frontend tooling: ESLint + Prettier + Stylelint, Vitest, Playwright, Husky + lint-staged → spec 100
-
-### CI/CD e infraestrutura
-- CI de validacao separado de CD/deploy; workflows ativos por trilha (`backend`, `frontend web`, `mobile PWA`) sem secrets produtivos → §12, §26; `docs-sep/ci-pipelines/README.md`
-- Templates futuros (Android/iOS/AWS) versionados em `docs-sep/ci-pipelines/templates/` ate promocao explicita → §12, §26
-- AWS futura (EC2 + RDS) com gate Sprint 3/Epic 3 → §12
+- SCSS puro como camada de estilizacao do frontend e do mobile
+- design systems oficiais: [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas; [`DESIGN-notion.md`](./DESIGN-notion.md) para superficies autenticadas e para todo o mobile
+- sem framework CSS de terceiros (Bootstrap, Tailwind, Material e similares estao explicitamente fora) nem template administrativo pronto
+- stack frontend: `Angular 20.x` + SCSS puro + Standalone Components + Signals
+- stack mobile baseline: `Angular 20.x + Ionic 8.4+ + Capacitor 6`, com avaliacao opcional de upgrade para `Angular 21` na fase de implementacao mobile, condicionada a haver release oficial do Ionic e dos plugins Capacitor com suporte explicito
+- sem clausula de downgrade do Angular abaixo de `20`
+- frontend tooling: ESLint + Prettier + Stylelint, Vitest (unit), Playwright (E2E), Husky + lint-staged
 
 ### Decisoes registradas em ADR
-
-ADRs vivem em [`adr/`](../adr/) e sao a fonte canonica de cada decisao arquitetural. Sao imutaveis apos aceitos: para mudar, criar novo ADR que substitua o anterior.
-
+ADRs vivem em [`adr/`](../adr/) e devem ser atualizados quando uma decisao tecnica mudar. ADRs iniciais:
 - `0001-monolito-modular-orientado-a-ddd.md`
 - `0002-design-systems-apple-e-notion-com-scss-puro.md`
 - `0003-stack-angular-20-ionic-8-capacitor-6.md`
@@ -634,9 +629,6 @@ ADRs vivem em [`adr/`](../adr/) e sao a fonte canonica de cada decisao arquitetu
 - `0006-mapstruct-substitui-modelmapper.md`
 - `0007-ddd-com-hexagonal-ports-and-adapters-por-modulo.md`
 - `0008-wiremock-para-testes-integracao-celcoin.md`
-- `0009-separacao-de-canal-por-perfil.md`
-- `0010-mfa-totp-com-biometria-mobile.md`
-- `0011-reavaliacao-stack-frontend-mobile-angular-ionic.md`
 
 ## 19. Estrutura Inicial de Pacotes
 
@@ -967,7 +959,7 @@ Exemplo:
 
 ### Dependencias entre sprints
 - Sprint 0 (Hygiene & Foundation):
-  - depende da aprovacao do PRD e do CLAUDE.md criado
+  - depende da aprovacao do PRD e do AGENT.md criado
   - estabelece tooling (Spotless, JaCoCo, pre-commit, CI minimo, ADRs iniciais, conventional commits)
   - pode rodar em paralelo aos primeiros dias da Sprint 1, com a condicao de Spotless e CI estarem prontos antes do primeiro PR de codigo
   - spec: [`specs/000-sprint-0-hygiene-foundation.md`](../specs/000-sprint-0-hygiene-foundation.md)
@@ -994,14 +986,6 @@ Exemplo:
   - **evolui** o `ApiExceptionHandler` ja criado na Sprint 1 (mapeamento completo de excecoes)
   - completa documentacao OpenAPI, smoke tests E2E e cobertura JaCoCo no target 70%
   - introduz `Webhook Receiver Pattern` (`/api/v1/webhooks/{provider}/{event}`) com idempotencia e Outbox stub, preparando Epic 15 (Pix)
-- Sprint 5 (Endurecimento de Seguranca — ADRs 0009 e 0010):
-  - depende da conclusao da Sprint 4
-  - **gate** para qualquer ambiente de producao
-  - **gate** para integracao real com Celcoin sandbox
-  - **gate** para Epic 5 (Onboarding KYC/KYB) e Epic 14 Fase Mobile 2+
-  - implementa MFA via TOTP (web) + biometria nativa (mobile), refresh token com rotacao, rate limiting, account lockout, password policy nova (12+ chars OU passphrase + haveibeenpwned), step-up authentication, audit log de seguranca, separacao de canal por perfil (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
-  - migracao de usuarios existentes: forca reset de senha + setup MFA
-  - spec: [`specs/005-sprint-5-endurecimento-seguranca.md`](../specs/005-sprint-5-endurecimento-seguranca.md)
 
 ### Trilha paralela Frontend (Specs 1XX)
 
@@ -1010,11 +994,9 @@ Os 2 Devs Plenos Frontend tem trabalho concreto desde a Sprint 0, em paralelo ao
 Cada F-Sprint tem seu proprio spec (1 arquivo por F-Sprint, paralelo ao padrao do backend `000-004`):
 - F-Sprint 0: [`specs/100-fsprint-0-setup-angular.md`](../specs/100-fsprint-0-setup-angular.md) — setup Angular 20.x (project scaffold, ESLint + Prettier + Stylelint, Husky + lint-staged, Vitest, Playwright, MSW, Frontend CI)
 - F-Sprint 1: [`specs/101-fsprint-1-design-tokens-showcase.md`](../specs/101-fsprint-1-design-tokens-showcase.md) — traducao dos tokens Apple+Notion para SCSS, design system showcase em rota `/design-system`
-- F-Sprint 2: [`specs/102-fsprint-2-telas-apple-publicas.md`](../specs/102-fsprint-2-telas-apple-publicas.md) — telas Apple (landing, login) consumindo MSW; tela de cadastro publico mantida temporariamente ate Sprint 5 desativar (ADR 0009)
+- F-Sprint 2: [`specs/102-fsprint-2-telas-apple-publicas.md`](../specs/102-fsprint-2-telas-apple-publicas.md) — telas Apple (landing, login, register) com MSW (Mock Service Worker) consumindo mocks JSON dos contratos da Sprint 2 backend
 - F-Sprint 3: [`specs/103-fsprint-3-shell-notion-auth.md`](../specs/103-fsprint-3-shell-notion-auth.md) — integracao com auth real, shell Notion, guards funcionais, interceptors HTTP
-- F-Sprint 4: [`specs/104-fsprint-4-telas-autenticadas.md`](../specs/104-fsprint-4-telas-autenticadas.md) — telas autenticadas internas (perfil, alterar senha, admin de usuarios, dashboard administrativa) + smoke E2E Playwright
-
-**Escopo do frontend web apos ADR 0009 (Separacao de Canal)**: focado em **usuarios internos** (admin, financeiro, backoffice) **+ empresa credora completa** (Epic 13 - Frontend de Jornadas cobrira KYB, carteira, oportunidades, operacoes financiadas). **Tomador nao tem versao web** — sua jornada e exclusivamente mobile.
+- F-Sprint 4: [`specs/104-fsprint-4-telas-autenticadas.md`](../specs/104-fsprint-4-telas-autenticadas.md) — telas autenticadas (perfil, alterar senha, admin de usuarios, dashboard casca) + smoke E2E Playwright
 
 Cada F-Sprint tem Definition of Done explicita no seu spec correspondente.
 
@@ -1034,8 +1016,42 @@ Cada M-Sprint tem Definition of Done explicita no seu spec correspondente.
 - Mobile **so usa Notion** (nao Apple) — fronteira diferente: ja na primeira tela publica (boas-vindas) seguimos Notion adaptado
 - Storage de token via **Capacitor Preferences** (mais seguro que localStorage e funciona em PWA + Android/iOS)
 - Validacao em **PWA primeiro** (browser); Android/iOS via Capacitor entra na Epic 14 Fase Mobile 2+
-- **Escopo apos ADR 0009**: foco principal e **tomador** (jornada completa, exclusiva do mobile); **empresa credora resumida** (notificacoes + status simplificado, sem KYB completo nem carteira detalhada — essas ficam no web)
+- Escopo reduzido: **apenas tomador e empresa credora**, sem financeiro interno, backoffice ou administracao completa
 - Nao recria contratos: reusa DTOs e endpoints definidos pelo backend e validados pelo frontend web
+
+### Organizacao da pasta `steps/`
+
+Os steps (detalhamento granular por task, criados just-in-time antes de cada sprint) sao organizados em tres subpastas, espelhando as tres trilhas de execucao:
+
+```
+steps/
+├── backend/   # Sprints 0XX (specs/000-004)
+├── web/       # F-Sprints 1XX (specs/100-104)
+└── mobile/    # M-Sprints 2XX (specs/200-204)
+```
+
+- `steps/backend/` recebe `000-sprint-0-steps.md` ate `004-sprint-4-steps.md`
+- `steps/web/` recebe `100-fsprint-0-steps.md` ate `104-fsprint-4-steps.md`
+- `steps/mobile/` recebe `200-msprint-0-steps.md` ate `204-msprint-4-steps.md`
+- O indice consolidado das tres trilhas vive em [`steps/README.md`](../steps/README.md)
+
+Esta separacao isola o trabalho dos tres papeis (Dev Senior backend, Devs Plenos Frontend, Dev Mobile) e mantem a fronteira de cada trilha visivel desde a estrutura de arquivos.
+
+#### Estado das Sprint 0 das tres trilhas
+
+As tres Sprint 0 ja tem steps detalhados, revisados e coesos entre si:
+
+- [`steps/backend/000-sprint-0-steps.md`](../steps/backend/000-sprint-0-steps.md) — Hygiene & Foundation backend
+- [`steps/web/100-fsprint-0-steps.md`](../steps/web/100-fsprint-0-steps.md) — Setup Angular 20.x + tooling
+- [`steps/mobile/200-msprint-0-steps.md`](../steps/mobile/200-msprint-0-steps.md) — Setup Ionic 8.4+ + Capacitor 6 + tooling
+
+Pontos de coesao entre as tres Sprint 0 (decisoes ja alinhadas no detalhamento):
+
+- **Pre-commit unico via agregador `.githooks/pre-commit`** com tres blocos condicionais (Spotless backend, lint-staged frontend, lint-staged mobile), todos disparados pelo mesmo `core.hooksPath=.githooks` configurado uma unica vez por dev. Husky entra apenas como dependencia de dev no web e mobile, sem usar `husky init` para nao sobrescrever o agregador.
+- **Vitest com `@analogjs/vite-plugin-angular` + `@analogjs/vitest-angular`** nas duas trilhas Angular (web e mobile), pois Vitest puro nao compila templates Angular.
+- **MSW alinhado ao PRD §21** em web e mobile (`POST /auth/login`, `GET /auth/me`), com payloads ISO-8601 e UUID v6 do exemplo do PRD; web cobre perfil `ADMIN` (escopo de gestao de usuarios), mobile cobre `CLIENTE` (escopo tomador/credora).
+- **Localizacao dos apps**: `apps/sep-frontend/` e `apps/sep-mobile/` na raiz do workspace, deixando o backend Gradle no root.
+- **GitHub Actions com path-filter** por trilha (`apps/sep-frontend/**`, `apps/sep-mobile/**`), Node 20 + cache npm, Conventional Commits.
 
 ### Definition of Done (DoD) por tipo de task
 
@@ -1054,7 +1070,7 @@ Tema:
 
 Pre-requisitos de entrada:
 - PRD aprovado
-- CLAUDE.md criado
+- AGENT.md criado
 - repositorio Git inicializado
 - acesso a GitHub para configurar branch protection
 
@@ -1067,7 +1083,6 @@ Responsavel principal:
 Detalhamento das tasks:
 - consultar: [`specs/000-sprint-0-hygiene-foundation.md`](../specs/000-sprint-0-hygiene-foundation.md)
 - entregaveis principais: `.gitignore`, `.editorconfig`, `.gitattributes`, Spotless + Palantir Format, JaCoCo target 70%, pre-commit hooks, GitHub branch protection + PR template, GitHub Actions CI minimo, Conventional Commits, ADRs iniciais (5-7 ADRs migrados do PRD)
-- workflows de validacao ativos esperados: `.github/workflows/backend-ci.yml`, `.github/workflows/frontend-ci.yml` e `.github/workflows/mobile-pwa-ci.yml`, com guardas de prontidao para nao quebrar enquanto cada trilha ainda nao existir
 
 ### Sprint 1
 
@@ -1159,29 +1174,6 @@ Detalhamento das tasks:
 - consultar: [`specs/004-sprint-4-erros-docs-testes.md`](../specs/004-sprint-4-erros-docs-testes.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
 
-### Sprint 5
-
-Objetivo de planejamento:
-- endurecer a camada de autenticacao do produto SEP antes de qualquer ambiente de producao ou integracao real com Celcoin: MFA via TOTP (web) + biometria nativa (mobile), refresh token com rotacao, rate limiting, account lockout, password policy nova, step-up authentication, audit log de seguranca, separacao de canal por perfil (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
-
-Tema:
-- Endurecimento de Seguranca (gate para producao e Epic 5)
-
-Pre-requisitos de entrada:
-- Sprint 4 concluida
-- ADRs 0009 (Separacao de Canal por Perfil) e 0010 (MFA TOTP + Biometria Mobile) aceitos
-- Smtp configurado para emails (lockout, reset de senha)
-
-Dependencias externas:
-- depende da conclusao da Sprint 4
-
-Responsavel principal:
-- Dev Senior (com apoio de Dev Pleno Frontend 2 nas telas web e Dev Mobile na biometria)
-
-Detalhamento das tasks:
-- consultar: [`specs/005-sprint-5-endurecimento-seguranca.md`](../specs/005-sprint-5-endurecimento-seguranca.md)
-- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
-
 ## 23. Criterios de Sucesso
 
 Esta fase sera considerada bem-sucedida quando:
@@ -1255,30 +1247,14 @@ Esta fase sera considerada bem-sucedida quando:
 - consolidar `SecurityConfig` com CORS, filtro JWT e liberacao publica apenas do cadastro e do login
 - persistir na auditoria o UUID do usuario autenticado em operacoes autenticadas
 
-### Epic 4 - Tratamento de erros, documentacao, testes e endurecimento (escopo das Sprints 4 e 5)
-
-**Sprint 4 (Estabilizacao):**
-- evoluir `ApiExceptionHandler` com `@RestControllerAdvice` (stub criado na Sprint 1)
+### Epic 4 - Tratamento de erros, documentacao e testes (escopo da Sprint 4)
+- criar `ApiExceptionHandler` com `@RestControllerAdvice`
 - padronizar payload de erro via `ErrorResponseDto` (`timestamp`, `status`, `error`, `message`, `path`, `traceId`)
 - mapear validacao, conflito, autenticacao, autorizacao, excecoes de dominio e fallback generico
 - configurar `Springdoc OpenAPI` com `SecurityScheme` HTTP Bearer para JWT
 - expor Swagger UI no profile `dev`
 - documentar todos os endpoints e schemas dos DTOs com exemplos coerentes com o PRD
 - cobrir com testes automatizados os cenarios criticos de autenticacao, autorizacao, validacao e auditoria
-- introduzir `Webhook Receiver Pattern` com idempotencia e Outbox stub
-
-**Sprint 5 (Endurecimento de Seguranca — gate para producao e Epic 5):**
-- implementar **MFA com 2 fatores adaptados por canal**: TOTP web (Google Authenticator/Authy) + biometria nativa mobile (Face ID/Touch ID via Capacitor)
-- backup codes (10 codigos de uso unico)
-- **refresh token com rotacao** (15min access + 30dias refresh + reuse detection)
-- **rate limiting** em endpoints de autenticacao (Resilience4j)
-- **account lockout** (5 tentativas/15min → 30min de lockout + email)
-- **password policy revisada** (minimo 12 chars OU passphrase + haveibeenpwned)
-- **step-up authentication** para operacoes sensiveis (alterar senha, desabilitar MFA, futuras transferencias Pix, futuras formalizacoes de contrato)
-- **audit log de seguranca** dedicado (separado de auditoria JPA)
-- **separacao de canal por perfil** (ADR 0009): tomador mobile-only; credora web principal + mobile resumido; internos web-only
-- desativacao do cadastro publico generico; novos endpoints canalizados (cadastro de tomador no mobile, convite de credora pelo admin, criacao interna de admin/financeiro/backoffice)
-- migracao de usuarios existentes: forca reset de senha + setup MFA
 
 ### Epic 5 - Onboarding KYC/KYB
 - implementar onboarding documental de pessoa e empresa
@@ -1333,21 +1309,21 @@ Esta fase sera considerada bem-sucedida quando:
 ### Epic 12 - Fundacao Frontend
 - montar projeto Angular `20.x` com Standalone Components, Signals e SCSS puro
 - traduzir os tokens dos dois design systems oficiais ([`DESIGN-apple.md`](./DESIGN-apple.md) e [`DESIGN-notion.md`](./DESIGN-notion.md)) para variaveis SCSS reutilizaveis
-- implementar telas publicas seguindo Apple: landing e login (cadastro publico mantido temporariamente ate a Sprint 5 desativar — ADR 0009)
+- implementar telas publicas seguindo Apple: landing, login e cadastro
 - implementar shell autenticado seguindo Notion: header, menu lateral, breadcrumbs e area de conteudo
 - implementar biblioteca interna de componentes Notion: botoes, inputs, formularios, cards, tabelas, modais, toasts e loaders
-- implementar telas autenticadas iniciais consumindo apenas APIs das Sprints 1-4: meu perfil, alterar senha, administracao de usuarios, detalhe de usuario e dashboard administrativa inicial
+- implementar telas autenticadas iniciais consumindo apenas APIs das Sprints 1-4: meu perfil, alterar senha, administracao de usuarios, detalhe de usuario e dashboard administrativa inicial (casca)
 - implementar guards de rota, controle de sessao, integracao HTTP com a API e tratamento padronizado de erros 401, 403, 404 e 409
 - entregar o "Frontend MVP" navegavel, validado e independente de qualquer jornada de negocio
-- escopo: foco em **usuarios internos** (admin, financeiro, backoffice). Tomador nao tem versao web (ADR 0009)
+- escopo: tudo que depende apenas das APIs entregues nas Sprints 1-4 (auth, usuarios e admin de usuarios)
 
 ### Epic 13 - Frontend de Jornadas
-- implementar telas funcionais das jornadas internas e da empresa credora, todas no design system Notion, consumindo APIs das Epics 5-11
-- jornada da empresa credora (foco principal do web externo apos ADR 0009): dashboard, perfil, KYB, oportunidades, operacoes financiadas, carteira e detalhe da operacao
+- implementar telas funcionais das jornadas, todas no design system Notion, consumindo APIs das Epics 5-11
+- jornada do tomador: onboarding, solicitar emprestimo, acompanhar proposta, status da analise, formalizacao, parcelas e historico
+- jornada da empresa credora: dashboard, perfil, KYB, oportunidades, operacoes financiadas, carteira e detalhe da operacao
 - jornada do financeiro interno: dashboard financeiro, fila operacional, conciliacao, pendencias e visao de recebimentos/desembolsos
 - jornada do backoffice: fila de propostas, mesa de credito, painel de formalizacao, painel de cobranca, comentarios internos, reprocessos e excecoes
-- governanca avancada: gestao avancada de usuarios, perfis e permissoes, parametros, cadastros mestres e auditoria administrativa, fluxo de **convite de empresa credora**
-- escopo apos ADR 0009: **nao inclui telas funcionais de tomador no web** — essas vivem apenas no mobile (Epic 14)
+- governanca avancada: gestao avancada de usuarios, perfis e permissoes, parametros, cadastros mestres e auditoria administrativa
 - depende: Epic 12 (Fundacao Frontend) entregue e validado, mais APIs das Epics 5-11 publicadas e estaveis
 
 ### Epic 14 - Mobile SEP
@@ -1356,7 +1332,7 @@ Esta fase sera considerada bem-sucedida quando:
 - adotar o design system [`DESIGN-notion.md`](./DESIGN-notion.md) em todo o mobile (visitante e autenticado), adaptado para toque, tabs inferiores e navegacao em pilha
 - estilizar em SCSS puro, customizando componentes Ionic via CSS variables/SCSS para respeitar os tokens do Notion; sem frameworks CSS adicionais
 - validar primeiro em PWA/browser e evoluir para Android/iOS via Capacitor em fase posterior
-- foco principal apos ADR 0009: **jornada completa do tomador** (mobile-only — nao tem versao web). Empresa credora tem versao **resumida** no mobile (notificacoes, status simplificado), mas KYB completo, carteira detalhada e gestao de oportunidades ficam no web (Epic 13)
+- incluir apenas as jornadas mobile do tomador de emprestimo e da empresa credora
 - excluir a visao do financeiro interno, backoffice operacional, administracao, governanca, cadastros mestres e telas de auditoria
 - nao criar regra de negocio propria no app; decisoes de credito, status, permissoes e dados operacionais devem vir da API
 - iniciar funcionalmente apos autenticacao documentada e estavel, preferencialmente apos Sprint 4
@@ -1375,21 +1351,16 @@ A primeira fase da Epic 14 e detalhada em 5 specs (1 arquivo por M-Sprint, paral
 
 Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornadas funcionais do tomador, da empresa credora e Pix visivel ao usuario), que dependem das APIs das Epics 5-11.
 
-#### Escopo mobile do tomador (canal exclusivo apos ADR 0009)
-- cadastro publico (apenas no mobile — biometria + Capacitor Preferences)
-- login com biometria como segundo fator (Sprint 5+)
+#### Escopo mobile do tomador
+- cadastro e login
 - acompanhamento de perfil
 - solicitacao e acompanhamento de emprestimo quando a API existir
-- status de analise, formalizacao, cobranca e pagamentos
-- recebimento de comprovantes Pix em fases futuras
-- notificacoes push (futura) sobre status de proposta, cobranca, formalizacao
+- status de analise, formalizacao, cobranca e pagamentos em fases futuras
 
-#### Escopo mobile da empresa credora (resumido apos ADR 0009)
-- login (cadastro completo de credora ocorre no web, por convite)
-- inicio resumido com status agregado (sem dashboards densos — esses ficam no web)
-- notificacoes sobre oportunidades, status de operacoes
-- visao simplificada de operacoes financiadas (lista + status; detalhamento e analise ficam no web)
-- **NAO inclui**: KYB completo, carteira detalhada, comparacao de oportunidades, exportacao de relatorios — essas vao para o web (Epic 13)
+#### Escopo mobile da empresa credora
+- login
+- visao simplificada de oportunidades, operacoes financiadas e status
+- acompanhamento de carteira em fases futuras
 
 ### Epic 15 - Movimentacao Pix
 - tratar Pix como fase posterior a fundacao atual da API e a estabilizacao das jornadas que impactam a contratacao
@@ -1452,8 +1423,6 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - planejar develop e homologacao em EC2 compartilhada, com bancos RDS separados
 - planejar producao com EC2 e RDS proprios
 - considerar `sa-east-1` como regiao recomendada
-- templates futuros de deploy AWS devem permanecer versionados em `docs-sep/ci-pipelines/templates/` ate promocao explicita para `.github/workflows`
-- nenhum workflow de producao deve ser promovido sem estrategia aprovada de secrets, rollback, backup, migrations, controle de acesso, logs e monitoramento
 
 ### Ordem de prioridade funcional consolidada
 1. Fundacao da API
@@ -1508,14 +1477,12 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
   - nao deve concentrar regra de negocio de dominio
   - precondicao para Frontend de Jornadas
 - `Frontend de Jornadas`
-  - camada de experiencia das jornadas funcionais para **publico web** apos ADR 0009: empresa credora completa, financeiro interno, backoffice e governanca avancada
-  - **nao inclui jornada do tomador** (essa vive exclusivamente no mobile — Epic 14)
+  - camada de experiencia das jornadas funcionais (tomador, credora, financeiro, backoffice e governanca avancada)
   - reutiliza shell, tokens e componentes da Fundacao Frontend
   - nao deve concentrar regra de negocio de dominio
   - depende de APIs publicadas pelas Epics 5-11
 - `Mobile SEP`
-  - canal **exclusivo** do tomador (apos ADR 0009 — jornada nao tem versao web)
-  - canal **resumido** da empresa credora (notificacoes + status simplificado; KYB completo e carteira detalhada vivem no web)
+  - camada de experiencia mobile para tomador e empresa credora
   - nao substitui o frontend web/backoffice nem deve incluir financeiro interno ou administracao completa nesta fase
   - deve compartilhar contratos e padroes de autenticacao com o frontend web
 - `Movimentacao Pix`
@@ -1546,9 +1513,8 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - ao final de cada task concluida, a execucao deve parar para testes locais manuais
 - commits podem ser feitos pelo agente de IA
 - push e PR serao manuais
-- testes e build no GitHub Actions podem existir como CI de validacao desde Sprint 0, separados por trilha (`backend`, `frontend web`, `mobile PWA`) e sem secrets produtivos
-- templates futuros de Android, iOS e AWS devem ficar versionados fora de `.github/workflows`, em `docs-sep/ci-pipelines/templates/`, ate que cada fase esteja pronta
-- AWS, EC2, RDS, CD e deploy remoto serao tratados em fase separada de infraestrutura
+- testes, build e deploy no GitHub Actions ficarao para fase separada
+- AWS, EC2, RDS, CI/CD e deploy remoto serao tratados em fase separada de infraestrutura
 - a fase de infraestrutura AWS so podera iniciar, no minimo, apos a conclusao completa da Sprint 3 / Epic 3 de login, autenticacao e autorizacao
 - a primeira fase AWS pode usar deploy manual documentado em ambiente nao produtivo enquanto GitHub Actions ainda nao estiver implementado
 - deploy remoto de producao deve depender de estrategia explicita de secrets, rollback, backup, migrations e controle de acesso
@@ -1557,16 +1523,38 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 ## 27. Premissas
 
 - esta API sera a primeira entrega do projeto antes da integracao completa com Angular
-- a politica de senha de 6 caracteres e valida apenas nas Sprints 1-4; a Sprint 5 (Endurecimento de Seguranca, ADR 0010) substitui por minimo 12 caracteres OU passphrase, com integracao haveibeenpwned e migracao forcada de usuarios existentes
-- o cadastro publico generico de usuarios e valido apenas nas Sprints 1-4; a Sprint 5 desativa esse fluxo e introduz canalizacao por perfil (ADR 0009): cadastro de tomador no mobile, convite de empresa credora pelo admin, criacao interna de admin/financeiro/backoffice
-- nenhum ambiente de producao ou integracao real com Celcoin pode ocorrer antes da Sprint 5 concluida (gate)
+- a politica de senha de 6 caracteres sera seguida exatamente como solicitado nesta fase
+- o cadastro publico de usuarios e valido apenas para a etapa inicial
 - antes da fase AWS, o banco oficial sera PostgreSQL local em Docker Compose
 - o backend continuara sendo um unico Spring Boot na fase inicial
 - o banco continuara unico ate decisao futura explicita
-- CI de validacao nao implica deploy remoto, homologacao, producao nem integracao real com Celcoin
-- workflows futuros de Android/iOS/AWS sao templates de planejamento ate promocao manual e revisao dos gates correspondentes
 - DDD sera usado primeiro como organizacao modular e linguagem de dominio, nao como pretexto para distribuir o sistema cedo demais
 - este PRD e um documento vivo: as specs das Sprints 1 a 4 ja existem em `../specs/` e devem evoluir junto com o produto
 - o frontend consumira esta API a partir de uma base Angular standalone + SCSS, implementada diretamente sobre os dois design systems oficiais (Apple para superficies publicas e Notion para superficies autenticadas), sem reaproveitar templates administrativos prontos nem frameworks CSS de terceiros
 - a versao do Angular esta travada em `20.x` como baseline para o frontend e o mobile; o upgrade para `21` so pode ser avaliado na fase de implementacao mobile e depende de release oficial do Ionic e dos plugins Capacitor com suporte explicito
 - nao ha previsao de downgrade do Angular abaixo de `20`; a clausula anterior de downgrade (motivada pelo template administrativo descartado) foi removida
+
+## 28. Apendice - Orientacao para agentes de IA
+
+A orientacao operacional para os agentes de IA que assumem trabalho neste projeto (Claude, Codex, Copilot) esta consolidada em [`AGENT.md`](../AGENT.md), na raiz do repositorio.
+
+**Pre-requisito de leitura**: toda nova instancia de agente de IA, antes de qualquer acao no repositorio, deve ler:
+
+1. Este PRD (`docs-sep/PRD.md`)
+2. [`docs-sep/CONTEXT.md`](./CONTEXT.md) — historico de decisoes
+3. [`AGENT.md`](../AGENT.md) — pelo menos a secao do agente em uso (Claude, Codex ou Copilot)
+4. O spec relevante em `specs/` quando ha task em andamento
+5. O step correspondente em `steps/{backend,web,mobile}/`, quando existir
+6. ADRs relevantes em `adr/`
+
+**Conteudo do `AGENT.md`** (resumo):
+
+- **Secao Claude** — orientacao para Claude Code: estado do projeto, stack confirmada, arquitetura, roteiro de sprints, marco regulatorio, convencoes, "como iniciar uma nova conversa", hierarquia SDD, "o que NAO fazer" e regras de comunicacao.
+- **Secao Codex** — orientacao para o agente Codex: ordem de leitura, hierarquia SDD, visao do produto, stack, design systems, arquitetura backend, Provider Pattern, marco regulatorio, roteiro de sprints, convencoes, "regras para o Codex" e "o que nao fazer".
+- **Secao Copilot** — orientacao para GitHub Copilot CLI: contexto do produto, stack, design systems, arquitetura obrigatoria, marco regulatorio, convencoes, ordem de leitura, hierarquia SDD, roadmap consolidado, sprints iniciais, "o que o Copilot deve/nao deve fazer", regra pratica para implementacao e comunicacao.
+
+As tres secoes tem sobreposicao intencional (estado, stack, arquitetura, marco regulatorio, convencoes), mas cada uma foi escrita com o tom e os detalhes que fazem sentido para o agente correspondente.
+
+**Resolucao de conflitos**: quando o `AGENT.md` divergir do PRD ou de algum ADR, o **PRD e os ADRs prevalecem**. O `AGENT.md` complementa, nao reescreve, esses artefatos.
+
+**Historico**: o `AGENT.md` substitui os arquivos `CLAUDE.md`, `CODEX.md` e `COPILOT.md` que existiam na raiz do repositorio em sprints anteriores e foram apagados ao consolidar a orientacao em um unico arquivo.

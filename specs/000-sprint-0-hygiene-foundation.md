@@ -19,7 +19,7 @@ Sem isso, a Sprint 1 comecaria produzindo divida tecnica imediata (codigo sem pa
 ## Escopo
 
 ### Em escopo
-- Meta-arquivos do repositorio (`.gitignore`, `.editorconfig`, `.gitattributes`, `CLAUDE.md` ja criado)
+- Meta-arquivos do repositorio (`.gitignore`, `.editorconfig`, `.gitattributes`, `AGENT.md` ja criado)
 - Spotless + Palantir Java Format configurados no Gradle (preparado para Sprint 1)
 - JaCoCo configurado com target inicial 70% por modulo
 - Pre-commit hooks via Git hooks (backend) e Husky + lint-staged (frontend, na trilha paralela 1XX)
@@ -38,7 +38,7 @@ Sem isso, a Sprint 1 comecaria produzindo divida tecnica imediata (codigo sem pa
 ## Pre-requisitos globais
 
 - PRD aprovado (ja existe)
-- CLAUDE.md criado (ja existe na raiz)
+- AGENT.md criado (ja existe na raiz)
 - Repositorio Git inicializado
 - Acesso a GitHub para configurar branch protection
 

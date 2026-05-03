@@ -78,14 +78,10 @@ O produto alvo e uma plataforma SEP com foco em capital de giro PJ.
 O escopo do produto e maior do que a entrega inicial atualmente planejada. A fase atual continua sendo a fundacao tecnica da API, mas o direcionamento consolidado do produto ja prioriza a jornada de contratacao do emprestimo como proxima grande frente funcional.
 
 As quatro jornadas principais definidas pelo PO sao:
-- jornada da pessoa ou empresa que ira pedir emprestimo (**canal mobile exclusivo apos ADR 0009**)
-- jornada da empresa que ira emprestar recursos (**canal web principal + mobile resumido apos ADR 0009**)
-- jornada do financeiro interno (**canal web exclusivo apos ADR 0009**)
-- jornada do administrador do sistema (**canal web exclusivo apos ADR 0009**)
-
-A separacao de canal foi formalizada em [ADR 0009](../adr/0009-separacao-de-canal-por-perfil.md) por motivos de seguranca (biometria nativa, storage Keystore/Keychain, anti-phishing, certificate pinning) e UX (tarefas de credora exigem desktop).
-
-**Sprint 5 (Endurecimento de Seguranca)** foi adicionada entre a Sprint 4 e a Epic 5 (Onboarding KYC/KYB) como **gate para producao**. Implementa MFA via TOTP (web) + biometria nativa (mobile), refresh token com rotacao, rate limiting, account lockout, password policy nova (12+ chars OU passphrase + haveibeenpwned), step-up authentication para operacoes sensiveis, audit log de seguranca, e materializa a canalizacao por perfil (ADR 0009). Detalhada em [ADR 0010](../adr/0010-mfa-totp-com-biometria-mobile.md) e [Spec 005](../specs/005-sprint-5-endurecimento-seguranca.md).
+- jornada da pessoa ou empresa que ira pedir emprestimo
+- jornada da empresa que ira emprestar recursos
+- jornada do financeiro interno
+- jornada do administrador do sistema
 
 Essas jornadas devem existir formalmente na modelagem do produto, mas a execucao sera feita por ondas, em vez de tentar implementar tudo de uma vez.
 
@@ -267,15 +263,6 @@ Tambem foi definido que, na fase de infraestrutura:
 
 Por enquanto, tudo isso permanece apenas como planejamento, nao implementacao.
 
-Atualizacao sobre CI/CD evolutivo:
-- foi adotada uma separacao entre **CI de validacao** e **CD/deploy**
-- CI de validacao pode existir desde Sprint 0 como higiene tecnica, sem deploy e sem secrets produtivos
-- foram criados workflows ativos em `.github/workflows/` para `backend`, `frontend web` e `mobile PWA`
-- esses workflows possuem guardas de prontidao e nao devem quebrar enquanto `gradlew`, `apps/sep-frontend` ou `apps/sep-mobile` ainda nao existirem
-- as fases futuras de Android, iOS e AWS ficam como templates versionados em `docs-sep/ci-pipelines/templates/`, fora de `.github/workflows`, para nao executarem no GitHub Actions antes da hora
-- o guia da estrategia fica em `docs-sep/ci-pipelines/README.md`
-- Android/iOS nativo e deploy AWS continuam dependentes dos gates do PRD, com producao exigindo estrategia explicita de secrets, rollback, backup, migrations, controle de acesso, logs e monitoramento
-
 ## Escopo da primeira grande entrega
 
 Foi definido que a primeira entrega concreta do projeto sera a API base, antes da integracao completa com o frontend.
@@ -368,8 +355,7 @@ Algumas regras importantes foram definidas durante a conversa:
 - commits podem ser feitos pelo agente quando solicitado
 - push e PR serao manuais
 - testes locais devem acontecer ao final de cada task quando a implementacao comecar
-- GitHub Actions de validacao (`backend`, `frontend web`, `mobile PWA`) podem existir desde Sprint 0 como higiene tecnica, sem deploy e sem secrets produtivos
-- CI/CD de deploy, AWS, EC2, RDS, Android/iOS nativo e deploy remoto serao tratados em fases separadas, usando templates versionados ate promocao explicita
+- CI/CD, GitHub Actions, AWS, EC2, RDS e deploy remoto serao tratados em uma fase separada de infraestrutura
 - a fase de infraestrutura AWS so podera iniciar, no minimo, apos a conclusao completa do login, autenticacao e autorizacao
 
 ## Situacao atual
@@ -382,13 +368,6 @@ No estado atual:
 - a implementacao completa ainda nao comecou
 - o uso de template administrativo pronto foi descartado em favor de dois design systems oficiais: Apple para superficies publicas (landing, login, cadastro) e Notion para superficies autenticadas (dashboard frontend e todo o mobile), com SCSS puro como camada de estilizacao
 - ficou registrado que a versao do Angular do frontend e do mobile esta definida em `20.x` como baseline, com opcao de upgrade para `21` condicionada a checagem de compatibilidade Ionic + plugins Capacitor na fase de implementacao mobile; a clausula anterior de downgrade foi removida junto com a saida do template, e a stack mobile baseline ficou consolidada como `Angular 20.x + Ionic 8.4+ + Capacitor 6`
-- foi implementada a estrutura inicial de CI/CD evolutivo:
-  - `.github/workflows/backend-ci.yml`
-  - `.github/workflows/frontend-ci.yml`
-  - `.github/workflows/mobile-pwa-ci.yml`
-  - `docs-sep/ci-pipelines/README.md`
-  - templates futuros em `docs-sep/ci-pipelines/templates/`
-- os workflows ativos sao apenas de validacao e possuem guardas de prontidao; deploy remoto, Android/iOS nativo, AWS, homologacao e producao continuam aguardando gates futuros
 - a revisao tecnica do backend ja consolidou Flyway, BCrypt, Springdoc, Actuator, CORS e UUID como padroes da implementacao
 - a revisao tecnica tambem consolidou o padrao inicial de JWT, auditoria e convencoes de persistencia
 - a fase futura de `Movimentacao Pix` foi aprovada conceitualmente e incorporada ao PRD como epic posterior
@@ -415,6 +394,14 @@ No estado atual:
 - foi definido que AWS/EC2/RDS so entram, no minimo, apos a conclusao completa da Sprint 3 / Epic 3 de login, autenticacao e autorizacao; ate la, o banco permanece local em Docker Compose
 - a nomenclatura foi refinada para evitar ambiguidade: `dev-local` representa o desenvolvimento local com Docker Compose, enquanto `aws-develop` representa o futuro ambiente remoto de desenvolvimento na AWS
 - a infraestrutura AWS ficou registrada como trilha tecnica habilitadora, podendo ocorrer antes de Pix se o time precisar de ambiente remoto, mas sem quebrar a prioridade funcional da jornada de contratacao
+- a pasta `steps/` foi reorganizada em tres subpastas para isolar as trilhas de execucao por papel: `steps/backend/` (Sprints 0XX, Dev Senior), `steps/web/` (F-Sprints 1XX, Devs Plenos Frontend) e `steps/mobile/` (M-Sprints 2XX, Dev Mobile); o indice consolidado vive em `steps/README.md` e os arquivos ja existentes (`000-sprint-0-steps.md` e `100-fsprint-0-steps.md`) foram movidos para suas respectivas pastas com os caminhos relativos atualizados
+- as tres Sprint 0 (backend, web e mobile) ja tem steps detalhados, revisados em conjunto e coesos entre si: `steps/backend/000-sprint-0-steps.md`, `steps/web/100-fsprint-0-steps.md` e `steps/mobile/200-msprint-0-steps.md`
+- decisoes de execucao consolidadas durante a revisao das tres Sprint 0:
+  - pre-commit unico via agregador `.githooks/pre-commit` com tres blocos condicionais (Spotless backend, lint-staged frontend, lint-staged mobile), disparados pelo mesmo `core.hooksPath=.githooks`; Husky entra apenas como dependencia de dev no web e mobile, sem `husky init`, para nao sobrescrever o agregador
+  - Vitest nas duas trilhas Angular (web e mobile) usa `@analogjs/vite-plugin-angular` + `@analogjs/vitest-angular`, pois Vitest puro nao compila templates Angular
+  - MSW alinhado ao PRD §21 em web (perfil `ADMIN`) e mobile (perfil `CLIENTE`), com `POST /auth/login` e `GET /auth/me`
+  - localizacao dos apps padronizada em `apps/sep-frontend/` e `apps/sep-mobile/`, com backend Gradle no root
+  - GitHub Actions com path-filter por trilha, Node 20 + cache npm e Conventional Commits
 
 ## Proximo passo mais natural
 

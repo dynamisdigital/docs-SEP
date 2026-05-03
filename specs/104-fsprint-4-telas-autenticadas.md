@@ -15,8 +15,6 @@
 
 Fechar a Fundacao Frontend (Epic 12) entregando as telas autenticadas iniciais: meu perfil, alterar senha, administracao de usuarios (apenas ADMIN), e dashboard administrativa em formato de casca. Validar o golden path com **smoke E2E Playwright** rodando contra backend real. Ao final, o "Frontend MVP" e demonstravel para stakeholders, e a Epic 13 (Frontend de Jornadas) pode ser iniciada.
 
-> **Nota apos [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)**: as telas autenticadas desta F-Sprint focam em **usuarios internos** (admin, financeiro, backoffice). A jornada do **tomador nao tem versao web** — fica integralmente no mobile (Epic 14). A jornada da **empresa credora completa** (KYB, carteira, oportunidades, operacoes financiadas) entra no escopo da Epic 13 (Frontend de Jornadas), apos as APIs das Epics 5-11 estarem publicadas.
-
 ## Escopo
 
 ### Em escopo

@@ -72,7 +72,7 @@ Regras:
 
 - PRD §11 (Diretriz arquitetural — Hexagonal/Ports & Adapters)
 - PRD §19 (Estrutura de Pacotes detalhada)
-- CLAUDE.md (resumo da arquitetura)
+- AGENT.md (resumo da arquitetura)
 - Spec 001, Task 1.1a cria a estrutura inicial com `package-info.java` documentando cada pacote
 
 ## Referencias

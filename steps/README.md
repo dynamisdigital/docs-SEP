@@ -19,6 +19,17 @@ Step e a camada mais granular antes do codigo. Cada step responde:
 
 Permite codificacao manual ou assistida com fidelidade ao plano.
 
+## Organizacao por trilha
+
+Os steps sao agrupados por trilha de execucao em subpastas:
+
+```
+steps/
+├── backend/   # Sprints 0XX (specs/000-004)
+├── web/       # F-Sprints 1XX (specs/100-104)
+└── mobile/    # M-Sprints 2XX (specs/200-204)
+```
+
 ## Convencoes
 
 - 1 arquivo por sprint (toda a sprint num so doc, em ordem de execucao)
@@ -28,24 +39,35 @@ Permite codificacao manual ou assistida com fidelidade ao plano.
 
 ## Indice
 
+### Backend (`backend/`)
+
 | Sprint | Arquivo | Status |
 |--------|---------|--------|
-| Sprint 0 - Hygiene & Foundation | [`000-sprint-0-steps.md`](./000-sprint-0-steps.md) | Pronto para executar |
-| Sprint 1 - Fundacao Tecnica | `001-sprint-1-steps.md` | A criar antes da Sprint 1 |
-| Sprint 2 - Gestao de Usuarios | `002-sprint-2-steps.md` | A criar antes da Sprint 2 |
-| Sprint 3 - Seguranca e Auth | `003-sprint-3-steps.md` | A criar antes da Sprint 3 |
-| Sprint 4 - Estabilizacao | `004-sprint-4-steps.md` | A criar antes da Sprint 4 |
-| Sprint 5 - Endurecimento de Seguranca | `005-sprint-5-steps.md` | A criar antes da Sprint 5 |
-| F-Sprint 0 Frontend - Setup Angular | `100-fsprint-0-steps.md` | A criar antes da F-Sprint 0 |
-| F-Sprint 1 Frontend - Tokens + Showcase | `101-fsprint-1-steps.md` | A criar antes da F-Sprint 1 |
-| F-Sprint 2 Frontend - Telas Apple | `102-fsprint-2-steps.md` | A criar antes da F-Sprint 2 |
-| F-Sprint 3 Frontend - Shell Notion + Auth | `103-fsprint-3-steps.md` | A criar antes da F-Sprint 3 |
-| F-Sprint 4 Frontend - Telas Autenticadas | `104-fsprint-4-steps.md` | A criar antes da F-Sprint 4 |
-| M-Sprint 0 Mobile - Setup Ionic | `200-msprint-0-steps.md` | A criar antes da M-Sprint 0 |
-| M-Sprint 1 Mobile - Tokens Notion Mobile | `201-msprint-1-steps.md` | A criar antes da M-Sprint 1 |
-| M-Sprint 2 Mobile - Telas Publicas | `202-msprint-2-steps.md` | A criar antes da M-Sprint 2 |
-| M-Sprint 3 Mobile - Shell + Auth | `203-msprint-3-steps.md` | A criar antes da M-Sprint 3 |
-| M-Sprint 4 Mobile - Telas Autenticadas | `204-msprint-4-steps.md` | A criar antes da M-Sprint 4 |
+| Sprint 0 - Hygiene & Foundation | [`backend/000-sprint-0-steps.md`](./backend/000-sprint-0-steps.md) | Pronto para executar |
+| Sprint 1 - Fundacao Tecnica | `backend/001-sprint-1-steps.md` | A criar antes da Sprint 1 |
+| Sprint 2 - Gestao de Usuarios | `backend/002-sprint-2-steps.md` | A criar antes da Sprint 2 |
+| Sprint 3 - Seguranca e Auth | `backend/003-sprint-3-steps.md` | A criar antes da Sprint 3 |
+| Sprint 4 - Estabilizacao | `backend/004-sprint-4-steps.md` | A criar antes da Sprint 4 |
+
+### Web (`web/`)
+
+| Sprint | Arquivo | Status |
+|--------|---------|--------|
+| F-Sprint 0 - Setup Angular | [`web/100-fsprint-0-steps.md`](./web/100-fsprint-0-steps.md) | Pronto para executar |
+| F-Sprint 1 - Tokens + Showcase | `web/101-fsprint-1-steps.md` | A criar antes da F-Sprint 1 |
+| F-Sprint 2 - Telas Apple | `web/102-fsprint-2-steps.md` | A criar antes da F-Sprint 2 |
+| F-Sprint 3 - Shell Notion + Auth | `web/103-fsprint-3-steps.md` | A criar antes da F-Sprint 3 |
+| F-Sprint 4 - Telas Autenticadas | `web/104-fsprint-4-steps.md` | A criar antes da F-Sprint 4 |
+
+### Mobile (`mobile/`)
+
+| Sprint | Arquivo | Status |
+|--------|---------|--------|
+| M-Sprint 0 - Setup Ionic | [`mobile/200-msprint-0-steps.md`](./mobile/200-msprint-0-steps.md) | Pronto para executar |
+| M-Sprint 1 - Tokens Notion Mobile | `mobile/201-msprint-1-steps.md` | A criar antes da M-Sprint 1 |
+| M-Sprint 2 - Telas Publicas | `mobile/202-msprint-2-steps.md` | A criar antes da M-Sprint 2 |
+| M-Sprint 3 - Shell + Auth | `mobile/203-msprint-3-steps.md` | A criar antes da M-Sprint 3 |
+| M-Sprint 4 - Telas Autenticadas | `mobile/204-msprint-4-steps.md` | A criar antes da M-Sprint 4 |
 
 ## Quando criar steps
 
@@ -68,7 +90,7 @@ Apos a task ser executada, o **codigo e a verdade**. Os steps ficam como histori
 | Lista tasks com criterios de pronto | Decompoe cada task em sub-passos sequenciais |
 | Estavel | Pode evoluir conforme experiencia |
 | Aprovado pelo PO/Senior | Detalhado pelo Senior antes da execucao |
-| `specs/0XX-...md` | `steps/0XX-...-steps.md` |
+| `specs/0XX-...md` | `steps/{backend,web,mobile}/0XX-...-steps.md` |
 
 ## Referencias
 
@@ -76,4 +98,4 @@ Apos a task ser executada, o **codigo e a verdade**. Os steps ficam como histori
 - [CONTEXT.md](../docs-sep/CONTEXT.md)
 - [Specs](../specs/)
 - [ADRs](../adr/)
-- [CLAUDE.md](../CLAUDE.md)
+- [AGENT.md](../AGENT.md)

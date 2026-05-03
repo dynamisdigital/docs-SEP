@@ -15,12 +15,6 @@
 
 Trocar a camada de MSW por **API real** entregue pela Sprint 3 backend (login + `/auth/me`), implementar o **shell mobile autenticado** com tabs inferiores e header simples, e introduzir Functional Guards + HTTP interceptors para proteger rotas autenticadas e tratar 401/403/sessao expirada de forma centralizada. Esta e a primeira M-Sprint que depende efetivamente do backend pronto.
 
-> **Nota apos [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)**: o mobile e o **canal exclusivo do tomador** e o **canal resumido da empresa credora**. Apos a Epic 11 introduzir roles dedicadas (`ROLE_TOMADOR`, `ROLE_CREDORA`):
-> - Shell para tomador: tabs **Inicio / Propostas / Parcelas / Perfil** (jornada completa)
-> - Shell para empresa credora: tabs **Inicio / Notificacoes / Perfil** (versao resumida; KYB completo, carteira detalhada, oportunidades ficam no web)
->
-> Nesta M-Sprint 3, ainda usamos `ROLE_CLIENTE` (mapeia para tomador) e admins nao acessam o mobile (rejeitados na tela de login com mensagem orientando a usar o painel web).
-
 ## Escopo
 
 ### Em escopo

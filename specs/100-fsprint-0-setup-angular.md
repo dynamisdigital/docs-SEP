@@ -35,7 +35,7 @@ Inicializar o projeto Angular 20.x com Standalone Components, Signals, SCSS, e c
 ## Pre-requisitos globais
 
 - PRD aprovado, design systems Apple e Notion definidos (existem em `docs-sep/`)
-- `CLAUDE.md` criado (orienta agentes futuros)
+- `AGENT.md` criado (orienta agentes futuros)
 - Sprint 0 backend tem GitHub repo + branch protection + Conventional Commits prontos (compartilhados com frontend)
 - Node.js LTS instalado (>= 20.x)
 

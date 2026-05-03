@@ -8,9 +8,9 @@ Este documento nao substitui o PRD. Ele detalha a camada de experiencia web e de
 
 ## 2. Diretrizes Gerais
 
-- **Apos [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)**: o app web foca em **usuarios internos** (admin, financeiro, backoffice) **+ empresa credora completa** (KYB, carteira, oportunidades, operacoes). **Tomador nao tem versao web** — sua jornada e exclusivamente mobile.
-- O app web cobre tomador, empresa credora, financeiro interno, backoffice operacional e administracao **ate a Sprint 5**; apos a Sprint 5 (Endurecimento de Seguranca), telas de tomador no web sao desativadas e visitantes que tentam cadastrar como cliente sao direcionados para o app mobile.
-- O mobile tem escopo: tomador completo + empresa credora resumida (notificacoes, status). Nao inclui financeiro interno, backoffice completo nem administracao.
+- O app web sera a interface principal para todas as jornadas da SEP.
+- O app web deve cobrir tomador, empresa credora, financeiro interno, backoffice operacional e administracao.
+- O mobile tera escopo menor e nao deve incluir financeiro interno, backoffice completo nem administracao.
 - O web deve consumir a mesma API publica usada pelo mobile, sem backend separado nesta fase.
 - O web nao deve conter regra de negocio de dominio; decisoes, status e permissoes devem vir da API.
 - As telas devem ser planejadas por modulo funcional, alinhadas ao monolito modular DDD do backend.
@@ -40,40 +40,33 @@ Pode acessar:
 - cadastro publico de usuario
 - paginas publicas futuras, se existirem
 
-### Cliente / Tomador (canal MOBILE apos ADR 0009)
-
-> **Nota**: apos a Sprint 5 (Endurecimento de Seguranca, ADR 0009/0010), o tomador **nao tem versao web**. Toda a sua jornada e mobile. As telas listadas abaixo permanecem documentadas como historico das Sprints 1-4 + F-Sprints 0-4 (onde o cadastro publico no web ainda existe), mas serao removidas do web na Sprint 5.
+### Cliente / Tomador
 
 Usuario autenticado que solicita emprestimo.
 
-Pode acessar (mobile-only apos Sprint 5):
-- inicio do tomador (mobile)
-- meu perfil (mobile)
-- alteracao de senha (mobile)
-- onboarding de pessoa/tomador (mobile)
-- solicitacao de emprestimo (mobile)
-- acompanhamento de proposta (mobile)
-- status de analise de credito (mobile)
-- formalizacao (mobile)
-- parcelas e cobranca (mobile)
-- comprovantes e historico futuro (mobile)
+Pode acessar:
+- dashboard do tomador
+- meu perfil
+- alteracao de senha
+- onboarding de pessoa/tomador
+- solicitacao de emprestimo
+- acompanhamento de proposta
+- status de analise de credito
+- formalizacao
+- parcelas e cobranca
+- comprovantes e historico futuro
 
-### Empresa Credora (canal WEB apos ADR 0009)
-
-> **Nota**: apos ADR 0009, a empresa credora tem **web como canal principal** (KYB, carteira, oportunidades, operacoes financiadas — todas as telas listadas abaixo). Mobile cobre versao **resumida** (notificacoes + status agregado, sem KYB completo nem carteira detalhada).
->
-> **Cadastro de empresa credora e por convite** (admin emite link via email; credora completa cadastro autenticando-se no web).
+### Empresa Credora
 
 Usuario autenticado vinculado a empresa que aporta recursos.
 
 Pode acessar:
 - dashboard da empresa credora
 - perfil da empresa
-- onboarding KYB (upload de documentos corporativos, multi-step form longo — desktop-friendly)
-- oportunidades (lista, filtros, comparacao)
-- operacoes financiadas (lista, detalhe, status)
-- carteira e status das operacoes (dashboards densos com graficos)
-- relatorios (exportacao CSV/PDF)
+- onboarding KYB
+- oportunidades futuras
+- operacoes financiadas
+- carteira e status das operacoes
 
 ### Financeiro Interno
 
