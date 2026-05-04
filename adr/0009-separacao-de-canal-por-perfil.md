@@ -78,10 +78,10 @@ Adotar **separacao de canal por perfil**:
 
 ### Sprints/Specs afetadas
 - **Sprint 2 backend (atual)**: cadastro publico continua valido; sera ajustado na Sprint 5 (Endurecimento) para canalizacao por canal
-- **F-Sprint 2 (specs/102)**: tela de registro publico no web sera removida apos Sprint 5; mantida ate la com aviso de "redirecione tomadores para app"
-- **F-Sprint 3, 4 (specs/103, 104)**: foco interno + credora; sem casca de tomador
-- **M-Sprint 2 (specs/202)**: cadastro publico do tomador permanece e e o fluxo principal
-- **M-Sprint 3, 4 (specs/203, 204)**: shell mobile foca em tomador (tabs Inicio/Propostas/Parcelas/Perfil); credora resumida (apenas notificacoes/status, sem KYB nem carteira completos)
+- **F-Sprint 2 (specs/fase-1/102)**: tela de registro publico no web sera removida apos Sprint 5; mantida ate la com aviso de "redirecione tomadores para app"
+- **F-Sprint 3, 4 (specs/fase-1/103, 104)**: foco interno + credora; sem casca de tomador
+- **M-Sprint 2 (specs/fase-1/202)**: cadastro publico do tomador permanece e e o fluxo principal
+- **M-Sprint 3, 4 (specs/fase-1/203, 204)**: shell mobile foca em tomador (tabs Inicio/Propostas/Parcelas/Perfil); credora resumida (apenas notificacoes/status, sem KYB nem carteira completos)
 - **Sprint 5 (Endurecimento — a ser criada)**: implementacao concreta da canalizacao com:
   - validacao de canal de origem nas requests (User-Agent + claim JWT `channel`)
   - desativacao da tela de registro publico no web

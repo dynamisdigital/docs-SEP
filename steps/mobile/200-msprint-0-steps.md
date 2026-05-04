@@ -1,6 +1,6 @@
 # Steps - M-Sprint 0 - Setup Ionic + Angular + Capacitor + Tooling
 
-**Spec de origem**: [`specs/200-msprint-0-setup-ionic.md`](../../specs/200-msprint-0-setup-ionic.md)
+**Spec de origem**: [`specs/fase-1/200-msprint-0-setup-ionic.md`](../../specs/fase-1/200-msprint-0-setup-ionic.md)
 
 **Objetivo geral**: inicializar o projeto Mobile SEP com Ionic `8.4+`, Angular `20.x`, Capacitor `6`, SCSS, strict mode e tooling completo de qualidade antes de implementar telas reais ou integrar com backend.
 
@@ -1091,7 +1091,7 @@ Resultado esperado:
 
 ## Impacto na M-Sprint 1
 
-A M-Sprint 1 (`specs/201-msprint-1-tokens-notion-mobile.md`) deve consumir:
+A M-Sprint 1 (`specs/fase-1/201-msprint-1-tokens-notion-mobile.md`) deve consumir:
 
 - `src/styles/_tokens.scss`
 - `src/styles/_notion-mobile.scss`
@@ -1103,7 +1103,7 @@ A M-Sprint 1 (`specs/201-msprint-1-tokens-notion-mobile.md`) deve consumir:
 
 ## Referencias
 
-- [`specs/200-msprint-0-setup-ionic.md`](../../specs/200-msprint-0-setup-ionic.md)
+- [`specs/fase-1/200-msprint-0-setup-ionic.md`](../../specs/fase-1/200-msprint-0-setup-ionic.md)
 - [`docs-sep/PRD.md`](../../docs-sep/PRD.md)
 - [`docs-sep/MOBILE-SCREENS-PLAN.md`](../../docs-sep/MOBILE-SCREENS-PLAN.md)
 - [`docs-sep/DESIGN-notion.md`](../../docs-sep/DESIGN-notion.md)

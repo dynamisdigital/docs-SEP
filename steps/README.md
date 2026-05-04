@@ -25,9 +25,9 @@ Os steps sao agrupados por trilha de execucao em subpastas:
 
 ```
 steps/
-├── backend/   # Sprints 0XX (specs/000-004)
-├── web/       # F-Sprints 1XX (specs/100-104)
-└── mobile/    # M-Sprints 2XX (specs/200-204)
+├── backend/   # Sprints 0XX (specs/fase-1/000-004)
+├── web/       # F-Sprints 1XX (specs/fase-1/100-104)
+└── mobile/    # M-Sprints 2XX (specs/fase-1/200-204)
 ```
 
 ## Convencoes

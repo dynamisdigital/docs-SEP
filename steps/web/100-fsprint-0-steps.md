@@ -1,6 +1,6 @@
 # Steps - F-Sprint 0 - Setup Angular + Tooling
 
-**Spec de origem**: [`specs/100-fsprint-0-setup-angular.md`](../../specs/100-fsprint-0-setup-angular.md)
+**Spec de origem**: [`specs/fase-1/100-fsprint-0-setup-angular.md`](../../specs/fase-1/100-fsprint-0-setup-angular.md)
 
 **Objetivo geral**: inicializar o projeto Angular 20.x (Standalone Components + Signals + SCSS + strict) e configurar todo o tooling de qualidade (lint, format, hooks, testes, MSW, CI) **antes** de escrever qualquer tela ou componente. Espelha a Sprint 0 backend para o frontend.
 
@@ -175,7 +175,7 @@ touch styles/index.scss
 **Conteudo inicial** de `apps/sep-frontend/src/styles/index.scss` (placeholder, F-Sprint 1 vai popular):
 ```scss
 // Indice central de estilos globais.
-// Os tokens reais vem na F-Sprint 1 (specs/101-fsprint-1-design-tokens-showcase.md).
+// Os tokens reais vem na F-Sprint 1 (specs/fase-1/101-fsprint-1-design-tokens-showcase.md).
 
 @use "tokens" as *;
 @use "mixins" as *;
@@ -1206,7 +1206,7 @@ C:/workspace-sep/
 
 ## Impacto na F-Sprint seguinte
 
-A F-Sprint 1 (`specs/101-fsprint-1-design-tokens-showcase.md`) consome:
+A F-Sprint 1 (`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`) consome:
 - `src/styles/_tokens.scss`, `_apple.scss`, `_notion.scss`, `_mixins.scss` (ja como placeholders) — sera populada com tokens reais
 - Stylelint configurado para validar as variaveis SCSS dos tokens
 - Vitest pronto para testes de snapshot do showcase
@@ -1222,17 +1222,17 @@ A F-Sprint 1 (`specs/101-fsprint-1-design-tokens-showcase.md`) consome:
 
 ## Proximos passos apos F-Sprint 0
 
-1. **F-Sprint 1** — comeca com [`specs/101-fsprint-1-design-tokens-showcase.md`](../../specs/101-fsprint-1-design-tokens-showcase.md). Antes, gerar `steps/101-fsprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
-2. **Sprint 1 backend** — comeca em paralelo com [`specs/001-sprint-1-fundacao-tecnica.md`](../../specs/001-sprint-1-fundacao-tecnica.md).
+1. **F-Sprint 1** — comeca com [`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`](../../specs/fase-1/101-fsprint-1-design-tokens-showcase.md). Antes, gerar `steps/101-fsprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
+2. **Sprint 1 backend** — comeca em paralelo com [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../../specs/fase-1/001-sprint-1-fundacao-tecnica.md).
 
 ## Referencias
 
-- [Spec 100](../../specs/100-fsprint-0-setup-angular.md) — descricao alta das tasks
+- [Spec 100](../../specs/fase-1/100-fsprint-0-setup-angular.md) — descricao alta das tasks
 - [PRD §11, §22](../../docs-sep/PRD.md) — stack frontend e composicao de equipe
 - [DESIGN-apple.md](../../docs-sep/DESIGN-apple.md) — superficies publicas (consumido na F-Sprint 1+)
 - [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md) — superficies autenticadas (consumido na F-Sprint 1+)
 - [WEB-SCREENS-PLAN.md](../../docs-sep/WEB-SCREENS-PLAN.md) — plano de telas web
-- [Spec 000 — Sprint 0 backend](../../specs/000-sprint-0-hygiene-foundation.md)
+- [Spec 000 — Sprint 0 backend](../../specs/fase-1/000-sprint-0-hygiene-foundation.md)
 - [Steps 000 — Sprint 0 backend](../backend/000-sprint-0-steps.md)
 - [AGENT.md](../../AGENT.md)
 - ADRs [0002 — Design systems Apple/Notion + SCSS puro](../../adr/0002-design-systems-apple-e-notion-com-scss-puro.md), [0003 — Stack Angular 20 + Ionic 8 + Capacitor 6](../../adr/0003-stack-angular-20-ionic-8-capacitor-6.md)

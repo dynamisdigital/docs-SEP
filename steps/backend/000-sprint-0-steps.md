@@ -1,6 +1,6 @@
 # Steps - Sprint 0 - Hygiene & Foundation
 
-**Spec de origem**: [`specs/000-sprint-0-hygiene-foundation.md`](../../specs/000-sprint-0-hygiene-foundation.md)
+**Spec de origem**: [`specs/fase-1/000-sprint-0-hygiene-foundation.md`](../../specs/fase-1/000-sprint-0-hygiene-foundation.md)
 
 **Objetivo geral**: estabelecer o terreno tecnico minimo (tooling, repo settings, ADRs, CI) antes da Sprint 1, sem deixar divida tecnica desde o primeiro PR.
 
@@ -797,7 +797,7 @@ git commit -m "chore: adicionar pre-commit hook que roda Spotless"
 ```
 
 ### Observacoes
-- **Frontend**: Husky + lint-staged sera configurado em [`specs/100-fsprint-0-setup-angular.md`](../../specs/100-fsprint-0-setup-angular.md). Os 2 hooks coexistem (Git hook backend + Husky frontend) sem conflito.
+- **Frontend**: Husky + lint-staged sera configurado em [`specs/fase-1/100-fsprint-0-setup-angular.md`](../../specs/fase-1/100-fsprint-0-setup-angular.md). Os 2 hooks coexistem (Git hook backend + Husky frontend) sem conflito.
 - **Hook em CI**: o CI (Task 0.6) tambem roda `spotlessCheck`, garantindo que mesmo commits com `--no-verify` sejam barrados na PR.
 
 ---
@@ -1723,11 +1723,11 @@ C:/workspace-sep/
 
 ## Proximos passos apos Sprint 0
 
-1. **Sprint 1** — comeca com [`specs/001-sprint-1-fundacao-tecnica.md`](../../specs/001-sprint-1-fundacao-tecnica.md). Antes, gerar `steps/001-sprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
-2. **F-Sprint 0 Frontend** — em paralelo, comecar [`specs/100-fsprint-0-setup-angular.md`](../../specs/100-fsprint-0-setup-angular.md) (escopo dos Devs Plenos Frontend). As proximas F-Sprints estao em `specs/101` a `specs/104`.
+1. **Sprint 1** — comeca com [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../../specs/fase-1/001-sprint-1-fundacao-tecnica.md). Antes, gerar `steps/001-sprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
+2. **F-Sprint 0 Frontend** — em paralelo, comecar [`specs/fase-1/100-fsprint-0-setup-angular.md`](../../specs/fase-1/100-fsprint-0-setup-angular.md) (escopo dos Devs Plenos Frontend). As proximas F-Sprints estao em `specs/fase-1/101` a `specs/fase-1/104`.
 
 ## Referencias
-- [Spec 000](../../specs/000-sprint-0-hygiene-foundation.md) — descricao alta das tasks
+- [Spec 000](../../specs/fase-1/000-sprint-0-hygiene-foundation.md) — descricao alta das tasks
 - [PRD §11, §18, §22](../../docs-sep/PRD.md) — stack, decisoes consolidadas, backlog
 - [AGENT.md](../../AGENT.md) — orientacao para agentes
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) — Conventional Commits e workflow

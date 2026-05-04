@@ -15,11 +15,11 @@ Este documento nao substitui o PRD. Ele detalha a camada de experiencia web e de
 - O web nao deve conter regra de negocio de dominio; decisoes, status e permissoes devem vir da API.
 - As telas devem ser planejadas por modulo funcional, alinhadas ao monolito modular DDD do backend.
 - A trilha de execucao do frontend e governada por 5 specs (uma por F-Sprint), em paralelo as Sprints 0-4 do backend:
-  - [`specs/100-fsprint-0-setup-angular.md`](../specs/100-fsprint-0-setup-angular.md) (F-Sprint 0)
-  - [`specs/101-fsprint-1-design-tokens-showcase.md`](../specs/101-fsprint-1-design-tokens-showcase.md) (F-Sprint 1)
-  - [`specs/102-fsprint-2-telas-apple-publicas.md`](../specs/102-fsprint-2-telas-apple-publicas.md) (F-Sprint 2)
-  - [`specs/103-fsprint-3-shell-notion-auth.md`](../specs/103-fsprint-3-shell-notion-auth.md) (F-Sprint 3)
-  - [`specs/104-fsprint-4-telas-autenticadas.md`](../specs/104-fsprint-4-telas-autenticadas.md) (F-Sprint 4)
+  - [`specs/fase-1/100-fsprint-0-setup-angular.md`](../specs/fase-1/100-fsprint-0-setup-angular.md) (F-Sprint 0)
+  - [`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`](../specs/fase-1/101-fsprint-1-design-tokens-showcase.md) (F-Sprint 1)
+  - [`specs/fase-1/102-fsprint-2-telas-apple-publicas.md`](../specs/fase-1/102-fsprint-2-telas-apple-publicas.md) (F-Sprint 2)
+  - [`specs/fase-1/103-fsprint-3-shell-notion-auth.md`](../specs/fase-1/103-fsprint-3-shell-notion-auth.md) (F-Sprint 3)
+  - [`specs/fase-1/104-fsprint-4-telas-autenticadas.md`](../specs/fase-1/104-fsprint-4-telas-autenticadas.md) (F-Sprint 4)
 - A base visual do app web vem de dois design systems oficiais, sem template administrativo pronto e sem framework CSS de terceiros:
   - [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas (sem autenticacao): landing, login e cadastro
   - [`DESIGN-notion.md`](./DESIGN-notion.md) para todas as superficies autenticadas (dashboard, perfil, alteracao de senha, administracao de usuarios e demais jornadas)

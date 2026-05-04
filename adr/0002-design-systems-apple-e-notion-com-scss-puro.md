@@ -49,7 +49,7 @@ Como subproduto: Angular travado em `20.x` baseline (a clausula de downgrade foi
 
 - PRD §11 (Base frontend, Diretriz de adocao dos design systems, Base mobile)
 - PRD §18 (Decisoes Consolidadas)
-- Spec 101 ([`specs/101-fsprint-1-design-tokens-showcase.md`](../specs/101-fsprint-1-design-tokens-showcase.md)) — F-Sprint 1 traduz tokens
+- Spec 101 ([`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`](../specs/fase-1/101-fsprint-1-design-tokens-showcase.md)) — F-Sprint 1 traduz tokens
 - WEB-SCREENS-PLAN.md e MOBILE-SCREENS-PLAN.md atualizados
 
 ## Referencias

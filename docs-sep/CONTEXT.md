@@ -402,6 +402,23 @@ No estado atual:
   - MSW alinhado ao PRD §21 em web (perfil `ADMIN`) e mobile (perfil `CLIENTE`), com `POST /auth/login` e `GET /auth/me`
   - localizacao dos apps padronizada em `apps/sep-frontend/` e `apps/sep-mobile/`, com backend Gradle no root
   - GitHub Actions com path-filter por trilha, Node 20 + cache npm e Conventional Commits
+- planejamento da Fase 2 concluido em 2026-05-04: 10 sprints (Sprint 5 ja existente como gate de hardening + 9 sprints novas para Epics 5-9), apenas backend; web/mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem; decisoes 1B/2B/3C/4D registradas:
+  - **1B**: Sprint 5 abre a Fase 2 (gate de hardening obrigatorio antes de qualquer integracao real com Celcoin)
+  - **2B**: granularidade de 2 sprints por Epic 5-8 (parte 1 + parte 2), Epic 9 em sprint unica → 9 sprints novas (006-014)
+  - **3C**: apenas backend nesta etapa; F-Sprints 5+ e M-Sprints 5+ NAO sao planejadas agora (decisao motivada por evitar planejar UI sobre contratos que ainda evoluem nas Epics 5-9)
+  - **4D**: entregaveis = plano executivo (`/home/mauricio/.claude/plans/precisamos-agora-planejar-as-polished-pumpkin.md`) + atualizacao do PRD (§22 com Sprints 5-14, §25 com sprints alocadas por Epic, nova §29 com tabela executiva Epics × Sprints) + 9 specs novas em `docs-SEP/specs/fase-2/006` ate `docs-SEP/specs/fase-2/014`
+- mapa Sprint → Epic da Fase 2 (referencia rapida):
+  - Sprint 5 → Epic 4 estendida (Endurecimento de Seguranca — gate)
+  - Sprints 6, 7 → Epic 5 (Onboarding KYC PF, Onboarding KYB PJ + PLD)
+  - Sprints 8, 9 → Epic 6 (Credito regras + parecer, Open Finance)
+  - Sprints 10, 11 → Epic 7 (Formalizacao geracao, Assinatura Digital + CCB)
+  - Sprints 12, 13 → Epic 8 (Cobranca parcelas, Inadimplencia)
+  - Sprint 14 → Epic 9 (Backoffice operacional — fechamento Fase 2)
+- ADRs candidatos da Fase 2 (criados just-in-time durante cada sprint, nao agora):
+  - ADR 0011: Motor de regras de credito interno (Sprint 8)
+  - ADR 0012: Provedor de assinatura digital (Sprint 11) — gate da Sprint 11
+  - ADR 0013: Estrategia de notificacoes transacionais (Sprint 13) — gate da Sprint 13
+- steps continuam **just-in-time** (regra do AGENT.md): nao foram gerados em massa nesta etapa, apenas antes da execucao de cada sprint da Fase 2
 
 ## Proximo passo mais natural
 

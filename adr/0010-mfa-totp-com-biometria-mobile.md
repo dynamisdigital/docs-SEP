@@ -135,7 +135,7 @@ Adotar **MFA com 2 fatores adaptados por canal** (combinado com [ADR 0009 - Sepa
 ## Implementacao
 
 ### Sprint 5 - Endurecimento de Seguranca
-Detalhada em [`specs/005-sprint-5-endurecimento-seguranca.md`](../specs/005-sprint-5-endurecimento-seguranca.md). Tasks principais:
+Detalhada em [`specs/fase-2/005-sprint-5-endurecimento-seguranca.md`](../specs/fase-2/005-sprint-5-endurecimento-seguranca.md). Tasks principais:
 
 1. **Task 5.1**: Modelagem de entidades MFA (`UsuarioTotpSecret`, `UsuarioBackupCode`, `RefreshToken`, `AuditLogSeguranca`)
 2. **Task 5.2**: Endpoints de TOTP (`/auth/totp/setup`, `/auth/totp/verify`, `/auth/totp/disable`)
@@ -167,7 +167,7 @@ Detalhada em [`specs/005-sprint-5-endurecimento-seguranca.md`](../specs/005-spri
 - [PRD §14 (Padrao JWT)](../docs-sep/PRD.md)
 - [PRD §18 (Decisoes Consolidadas)](../docs-sep/PRD.md)
 - [PRD §27 (Premissas)](../docs-sep/PRD.md)
-- [Spec 005 - Sprint 5 Endurecimento de Seguranca](../specs/005-sprint-5-endurecimento-seguranca.md)
+- [Spec 005 - Sprint 5 Endurecimento de Seguranca](../specs/fase-2/005-sprint-5-endurecimento-seguranca.md)
 - [ADR 0009 - Separacao de Canal por Perfil](./0009-separacao-de-canal-por-perfil.md)
 - RFC 6238 (TOTP)
 - NIST SP 800-63B (Digital Identity Guidelines)

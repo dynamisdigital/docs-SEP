@@ -962,7 +962,7 @@ Exemplo:
   - depende da aprovacao do PRD e do AGENT.md criado
   - estabelece tooling (Spotless, JaCoCo, pre-commit, CI minimo, ADRs iniciais, conventional commits)
   - pode rodar em paralelo aos primeiros dias da Sprint 1, com a condicao de Spotless e CI estarem prontos antes do primeiro PR de codigo
-  - spec: [`specs/000-sprint-0-hygiene-foundation.md`](../specs/000-sprint-0-hygiene-foundation.md)
+  - spec: [`specs/fase-1/000-sprint-0-hygiene-foundation.md`](../specs/fase-1/000-sprint-0-hygiene-foundation.md)
 - Sprint 1:
   - depende da aprovacao do PRD
   - depende de ambiente local com Java 21 e Docker
@@ -992,11 +992,11 @@ Exemplo:
 Os 2 Devs Plenos Frontend tem trabalho concreto desde a Sprint 0, em paralelo ao backend. Sem isso, ficam ociosos durante as Sprints 1-4 que sao predominantemente backend.
 
 Cada F-Sprint tem seu proprio spec (1 arquivo por F-Sprint, paralelo ao padrao do backend `000-004`):
-- F-Sprint 0: [`specs/100-fsprint-0-setup-angular.md`](../specs/100-fsprint-0-setup-angular.md) — setup Angular 20.x (project scaffold, ESLint + Prettier + Stylelint, Husky + lint-staged, Vitest, Playwright, MSW, Frontend CI)
-- F-Sprint 1: [`specs/101-fsprint-1-design-tokens-showcase.md`](../specs/101-fsprint-1-design-tokens-showcase.md) — traducao dos tokens Apple+Notion para SCSS, design system showcase em rota `/design-system`
-- F-Sprint 2: [`specs/102-fsprint-2-telas-apple-publicas.md`](../specs/102-fsprint-2-telas-apple-publicas.md) — telas Apple (landing, login, register) com MSW (Mock Service Worker) consumindo mocks JSON dos contratos da Sprint 2 backend
-- F-Sprint 3: [`specs/103-fsprint-3-shell-notion-auth.md`](../specs/103-fsprint-3-shell-notion-auth.md) — integracao com auth real, shell Notion, guards funcionais, interceptors HTTP
-- F-Sprint 4: [`specs/104-fsprint-4-telas-autenticadas.md`](../specs/104-fsprint-4-telas-autenticadas.md) — telas autenticadas (perfil, alterar senha, admin de usuarios, dashboard casca) + smoke E2E Playwright
+- F-Sprint 0: [`specs/fase-1/100-fsprint-0-setup-angular.md`](../specs/fase-1/100-fsprint-0-setup-angular.md) — setup Angular 20.x (project scaffold, ESLint + Prettier + Stylelint, Husky + lint-staged, Vitest, Playwright, MSW, Frontend CI)
+- F-Sprint 1: [`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`](../specs/fase-1/101-fsprint-1-design-tokens-showcase.md) — traducao dos tokens Apple+Notion para SCSS, design system showcase em rota `/design-system`
+- F-Sprint 2: [`specs/fase-1/102-fsprint-2-telas-apple-publicas.md`](../specs/fase-1/102-fsprint-2-telas-apple-publicas.md) — telas Apple (landing, login, register) com MSW (Mock Service Worker) consumindo mocks JSON dos contratos da Sprint 2 backend
+- F-Sprint 3: [`specs/fase-1/103-fsprint-3-shell-notion-auth.md`](../specs/fase-1/103-fsprint-3-shell-notion-auth.md) — integracao com auth real, shell Notion, guards funcionais, interceptors HTTP
+- F-Sprint 4: [`specs/fase-1/104-fsprint-4-telas-autenticadas.md`](../specs/fase-1/104-fsprint-4-telas-autenticadas.md) — telas autenticadas (perfil, alterar senha, admin de usuarios, dashboard casca) + smoke E2E Playwright
 
 Cada F-Sprint tem Definition of Done explicita no seu spec correspondente.
 
@@ -1004,11 +1004,11 @@ Cada F-Sprint tem Definition of Done explicita no seu spec correspondente.
 
 O Dev Mobile dedicado tem trabalho concreto desde a Sprint 0, em paralelo ao backend e ao frontend web. Cada M-Sprint tem seu proprio spec (1 arquivo por M-Sprint, paralelo aos padroes 0XX backend e 1XX frontend):
 
-- M-Sprint 0: [`specs/200-msprint-0-setup-ionic.md`](../specs/200-msprint-0-setup-ionic.md) — setup Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling completo (lint, test, hooks, MSW, Mobile CI)
-- M-Sprint 1: [`specs/201-msprint-1-tokens-notion-mobile.md`](../specs/201-msprint-1-tokens-notion-mobile.md) — adaptacao dos tokens Notion para mobile (touch, tabs inferiores), customizacao de componentes Ionic, design system showcase
-- M-Sprint 2: [`specs/202-msprint-2-telas-publicas-mobile.md`](../specs/202-msprint-2-telas-publicas-mobile.md) — splash, boas-vindas, login, register com MSW; token storage via Capacitor Preferences
-- M-Sprint 3: [`specs/203-msprint-3-shell-mobile-auth.md`](../specs/203-msprint-3-shell-mobile-auth.md) — auth real, shell mobile (tabs inferiores), guards funcionais, interceptors HTTP
-- M-Sprint 4: [`specs/204-msprint-4-telas-autenticadas-mobile.md`](../specs/204-msprint-4-telas-autenticadas-mobile.md) — perfil, alterar senha, casca tomador, casca empresa credora + smoke E2E PWA
+- M-Sprint 0: [`specs/fase-1/200-msprint-0-setup-ionic.md`](../specs/fase-1/200-msprint-0-setup-ionic.md) — setup Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling completo (lint, test, hooks, MSW, Mobile CI)
+- M-Sprint 1: [`specs/fase-1/201-msprint-1-tokens-notion-mobile.md`](../specs/fase-1/201-msprint-1-tokens-notion-mobile.md) — adaptacao dos tokens Notion para mobile (touch, tabs inferiores), customizacao de componentes Ionic, design system showcase
+- M-Sprint 2: [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../specs/fase-1/202-msprint-2-telas-publicas-mobile.md) — splash, boas-vindas, login, register com MSW; token storage via Capacitor Preferences
+- M-Sprint 3: [`specs/fase-1/203-msprint-3-shell-mobile-auth.md`](../specs/fase-1/203-msprint-3-shell-mobile-auth.md) — auth real, shell mobile (tabs inferiores), guards funcionais, interceptors HTTP
+- M-Sprint 4: [`specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md`](../specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md) — perfil, alterar senha, casca tomador, casca empresa credora + smoke E2E PWA
 
 Cada M-Sprint tem Definition of Done explicita no seu spec correspondente.
 
@@ -1025,9 +1025,9 @@ Os steps (detalhamento granular por task, criados just-in-time antes de cada spr
 
 ```
 steps/
-├── backend/   # Sprints 0XX (specs/000-004)
-├── web/       # F-Sprints 1XX (specs/100-104)
-└── mobile/    # M-Sprints 2XX (specs/200-204)
+├── backend/   # Sprints 0XX (specs/fase-1/000-004)
+├── web/       # F-Sprints 1XX (specs/fase-1/100-104)
+└── mobile/    # M-Sprints 2XX (specs/fase-1/200-204)
 ```
 
 - `steps/backend/` recebe `000-sprint-0-steps.md` ate `004-sprint-4-steps.md`
@@ -1081,7 +1081,7 @@ Responsavel principal:
 - Dev Senior (com apoio dos Devs Plenos para tooling Frontend, executado na trilha 1XX)
 
 Detalhamento das tasks:
-- consultar: [`specs/000-sprint-0-hygiene-foundation.md`](../specs/000-sprint-0-hygiene-foundation.md)
+- consultar: [`specs/fase-1/000-sprint-0-hygiene-foundation.md`](../specs/fase-1/000-sprint-0-hygiene-foundation.md)
 - entregaveis principais: `.gitignore`, `.editorconfig`, `.gitattributes`, Spotless + Palantir Format, JaCoCo target 70%, pre-commit hooks, GitHub branch protection + PR template, GitHub Actions CI minimo, Conventional Commits, ADRs iniciais (5-7 ADRs migrados do PRD)
 
 ### Sprint 1
@@ -1105,7 +1105,7 @@ Responsavel principal:
 
 Detalhamento das tasks:
 - o detalhamento de tasks, arquivos esperados, verificacao, dependencias internas e criterios de pronto foi extraido do PRD e passa a ser tratado como artefato de especificacao proprio
-- consultar: [`specs/001-sprint-1-fundacao-tecnica.md`](../specs/001-sprint-1-fundacao-tecnica.md)
+- consultar: [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../specs/fase-1/001-sprint-1-fundacao-tecnica.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
 
 ### Sprint 2
@@ -1127,7 +1127,7 @@ Responsavel principal:
 - Dev Senior (com revisao opcional dos devs frontend para aderencia dos contratos)
 
 Detalhamento das tasks:
-- consultar: [`specs/002-sprint-2-gestao-usuarios.md`](../specs/002-sprint-2-gestao-usuarios.md)
+- consultar: [`specs/fase-1/002-sprint-2-gestao-usuarios.md`](../specs/fase-1/002-sprint-2-gestao-usuarios.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
 
 ### Sprint 3
@@ -1149,7 +1149,7 @@ Responsavel principal:
 - Dev Senior
 
 Detalhamento das tasks:
-- consultar: [`specs/003-sprint-3-seguranca-autenticacao.md`](../specs/003-sprint-3-seguranca-autenticacao.md)
+- consultar: [`specs/fase-1/003-sprint-3-seguranca-autenticacao.md`](../specs/fase-1/003-sprint-3-seguranca-autenticacao.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
 
 ### Sprint 4
@@ -1171,7 +1171,249 @@ Responsavel principal:
 - Dev Senior (com revisao funcional dos devs frontend na parte de documentacao)
 
 Detalhamento das tasks:
-- consultar: [`specs/004-sprint-4-erros-docs-testes.md`](../specs/004-sprint-4-erros-docs-testes.md)
+- consultar: [`specs/fase-1/004-sprint-4-erros-docs-testes.md`](../specs/fase-1/004-sprint-4-erros-docs-testes.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Trilha Fase 2 (Sprints 5-14, backend)
+
+Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). As Sprints 5-14 sao **apenas backend** — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+
+Mapeamento Sprint → Epic:
+
+| Sprint | Epic | Tema |
+|--------|------|------|
+| 5 | Epic 4 estendida | Endurecimento de Seguranca (gate de Fase 2) |
+| 6 | Epic 5 (parte 1) | Onboarding KYC Pessoa Fisica |
+| 7 | Epic 5 (parte 2) | Onboarding KYB Empresa + PLD |
+| 8 | Epic 6 (parte 1) | Credito — regras internas + parecer |
+| 9 | Epic 6 (parte 2) | Credito — integracao Open Finance |
+| 10 | Epic 7 (parte 1) | Formalizacao — geracao de contrato |
+| 11 | Epic 7 (parte 2) | Formalizacao — assinatura digital + CCB |
+| 12 | Epic 8 (parte 1) | Cobranca — parcelas e agenda |
+| 13 | Epic 8 (parte 2) | Cobranca — inadimplencia e recuperacao |
+| 14 | Epic 9 | Backoffice operacional |
+
+### Sprint 5
+
+Objetivo de planejamento:
+- endurecer a camada de autenticacao antes de qualquer ambiente de producao ou integracao real com Celcoin: MFA via TOTP (com biometria nativa no mobile), refresh token com rotacao, rate limiting, account lockout, password policy revisada, step-up authentication e audit log de seguranca
+
+Tema:
+- Endurecimento de Seguranca (gate Fase 2)
+
+Pre-requisitos de entrada:
+- Sprint 4 concluida
+- F-Sprint 4 e M-Sprint 4 concluidas (cobertas no escopo do spec 005)
+- ADR 0009 (Separacao de Canal) e ADR 0010 (MFA) aceitos
+
+Dependencias externas:
+- depende da conclusao da Sprint 4
+
+Responsavel principal:
+- Dev Senior (com participacao do Dev Pleno Frontend 2 e Dev Mobile para as Tasks 5.8 e 5.9)
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/005-sprint-5-endurecimento-seguranca.md`](../specs/fase-2/005-sprint-5-endurecimento-seguranca.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 6
+
+Objetivo de planejamento:
+- entregar onboarding de pessoa fisica (KYC): modelar o modulo `onboarding`, criar entidades `SolicitacaoOnboarding`, `DocumentoCadastral` e `ResultadoVerificacao`, expor `KycProvider` (port) com `CelcoinKycProvider` (OCR + FaceMatch + Background Check) e `FakeKycProvider` (testes), receber callbacks Celcoin via Webhook Receiver e gravar trilha de auditoria reforcada
+
+Tema:
+- Onboarding KYC Pessoa Fisica (Epic 5 parte 1)
+
+Pre-requisitos de entrada:
+- Sprint 5 concluida (gate de seguranca)
+- ADRs 0001, 0004, 0007, 0008 vigentes
+- credenciais Celcoin sandbox disponiveis
+
+Dependencias externas:
+- depende da conclusao da Sprint 5
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/006-sprint-6-onboarding-kyc-pessoa.md`](../specs/fase-2/006-sprint-6-onboarding-kyc-pessoa.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 7
+
+Objetivo de planejamento:
+- estender o modulo `onboarding` para pessoa juridica (KYB): modelar `KybEmpresa`, `ConsultaCNPJ` e `RepresentanteLegal`, expor `KybProvider` e `BackgroundCheckProvider` (consulta COAF, OFAC, INTERPOL, MTE conforme exigido pela CMN 4.656/2018) e reusar a infraestrutura de Provider e Webhook da Sprint 6
+
+Tema:
+- Onboarding KYB Empresa + PLD (Epic 5 parte 2)
+
+Pre-requisitos de entrada:
+- Sprint 6 concluida
+- infraestrutura de Provider Pattern e Webhook Receiver da Sprint 6 funcional
+
+Dependencias externas:
+- depende da conclusao da Sprint 6
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/007-sprint-7-onboarding-kyb-empresa.md`](../specs/fase-2/007-sprint-7-onboarding-kyb-empresa.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 8
+
+Objetivo de planejamento:
+- entregar o nucleo de analise de credito interno: criar modulo `credito`, modelar `PropostaCredito`, `ParecerCredito`, `ScoreInterno` e `DecisaoCredito`, implementar motor de regras simples (heuristicas declarativas, sem ML) e esteira de aprovacao manual a ser consumida pelo backoffice na Sprint 14
+
+Tema:
+- Credito — regras internas + parecer (Epic 6 parte 1)
+
+Pre-requisitos de entrada:
+- Sprint 7 concluida
+- modulo `onboarding` funcional para validar pre-requisitos cadastrais da proposta
+
+Dependencias externas:
+- depende da conclusao da Sprint 7
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/008-sprint-8-credito-regras-parecer.md`](../specs/fase-2/008-sprint-8-credito-regras-parecer.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 9
+
+Objetivo de planejamento:
+- enriquecer a analise de credito com dados de Open Finance: expor `OpenFinanceProvider` com `CelcoinOpenFinanceProvider` (via Finansystech), consumir movimentacao bancaria do tomador para enriquecer o `ScoreInterno` e processar respostas assincronas via Webhook
+
+Tema:
+- Credito — integracao Open Finance (Epic 6 parte 2)
+
+Pre-requisitos de entrada:
+- Sprint 8 concluida
+- credenciais Finansystech/Celcoin Open Finance sandbox disponiveis
+
+Dependencias externas:
+- depende da conclusao da Sprint 8
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/009-sprint-9-credito-open-finance.md`](../specs/fase-2/009-sprint-9-credito-open-finance.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 10
+
+Objetivo de planejamento:
+- iniciar a formalizacao contratual: criar modulo `contratos`, modelar `Contrato`, `ClausulaContratual`, `VersaoContrato` e `StatusFormalizacao`, gerar contrato a partir de templates por tipo de operacao (texto inicial; PDF/HTML estruturado em sprint posterior), implementar fluxo de aceite e bloquear desembolso sem formalizacao concluida
+
+Tema:
+- Formalizacao — geracao de contrato (Epic 7 parte 1)
+
+Pre-requisitos de entrada:
+- Sprint 9 concluida
+- proposta de credito aprovada (estado `APROVADA`) disponivel como entrada do fluxo
+
+Dependencias externas:
+- depende da conclusao da Sprint 9
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md`](../specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 11
+
+Objetivo de planejamento:
+- completar a formalizacao com assinatura digital: expor `AssinaturaDigitalProvider` (provedor a definir via ADR 0012), gerar `CCB` (Cedula de Credito Bancario) automaticamente, processar webhook de confirmacao de assinatura e registrar trilha auditavel reforcada do ato
+
+Tema:
+- Formalizacao — assinatura digital + CCB (Epic 7 parte 2)
+
+Pre-requisitos de entrada:
+- Sprint 10 concluida
+- ADR 0012 (escolha do provedor de assinatura digital) aceito antes do inicio da sprint
+- credenciais sandbox do provedor de assinatura disponiveis
+
+Dependencias externas:
+- depende da conclusao da Sprint 10
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/011-sprint-11-formalizacao-assinatura-digital.md`](../specs/fase-2/011-sprint-11-formalizacao-assinatura-digital.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 12
+
+Objetivo de planejamento:
+- entregar a estrutura inicial de cobranca pos-formalizacao: criar modulo `cobranca`, modelar `ParcelaCobranca`, `AgendaPagamento` e `Recebimento`, gerar parcelas automaticamente apos formalizacao, calcular juros/multas/encargos e consumir o modulo `escrow` (modelado desde Sprint 1) para registrar recebimentos na conta segregada
+
+Tema:
+- Cobranca — parcelas e agenda (Epic 8 parte 1)
+
+Pre-requisitos de entrada:
+- Sprint 11 concluida
+- modulo `escrow` funcional (entidades modeladas desde Sprint 1, ainda sem `EscrowProvider` real — Sprint 12 consome apenas a modelagem)
+
+Dependencias externas:
+- depende da conclusao da Sprint 11
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md`](../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 13
+
+Objetivo de planejamento:
+- tratar inadimplencia e recuperacao: deteccao automatica de atraso, estados `EM_ATRASO`/`EM_NEGOCIACAO`/`INADIMPLENTE`, workflows de cobranca com escalonamento, renegociacao basica, expor `NotificationProvider` (email/SMS — adapter inicial via SMTP) e historico auditavel de tentativas
+
+Tema:
+- Cobranca — inadimplencia e recuperacao (Epic 8 parte 2)
+
+Pre-requisitos de entrada:
+- Sprint 12 concluida
+- ADR 0013 (estrategia de notificacoes transacionais) aceito antes do inicio da sprint
+
+Dependencias externas:
+- depende da conclusao da Sprint 12
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/013-sprint-13-cobranca-inadimplencia.md`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md)
+- o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+### Sprint 14
+
+Objetivo de planejamento:
+- consolidar a operacao assistida da Fase 2 entregando o modulo `backoffice`: fila operacional unificada (propostas pendentes, KYC com erro, contratos sem assinatura, cobrancas problematicas), comentarios internos, justificativas, reprocessos manuais (re-disparo de webhook, re-tentativa de provider) e visao consolidada para o financeiro interno
+
+Tema:
+- Backoffice operacional (Epic 9)
+
+Pre-requisitos de entrada:
+- Sprint 13 concluida
+- modulos `onboarding`, `credito`, `contratos` e `cobranca` funcionais (consumidos pela fila operacional)
+
+Dependencias externas:
+- depende da conclusao da Sprint 13
+
+Responsavel principal:
+- Dev Senior
+
+Detalhamento das tasks:
+- consultar: [`specs/fase-2/014-sprint-14-backoffice-operacional.md`](../specs/fase-2/014-sprint-14-backoffice-operacional.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
 
 ## 23. Criterios de Sucesso
@@ -1257,6 +1499,7 @@ Esta fase sera considerada bem-sucedida quando:
 - cobrir com testes automatizados os cenarios criticos de autenticacao, autorizacao, validacao e auditoria
 
 ### Epic 5 - Onboarding KYC/KYB
+- **Sprints alocadas**: Sprint 6 (KYC Pessoa Fisica) e Sprint 7 (KYB Empresa + PLD)
 - implementar onboarding documental de pessoa e empresa
 - preparar coleta e validacao de documentos obrigatorios
 - estruturar verificacoes de identidade e dados cadastrais
@@ -1264,6 +1507,7 @@ Esta fase sera considerada bem-sucedida quando:
 - registrar trilha operacional de aprovacao, rejeicao e pendencias cadastrais
 
 ### Epic 6 - Analise de credito
+- **Sprints alocadas**: Sprint 8 (regras internas + parecer) e Sprint 9 (integracao Open Finance)
 - implementar esteira inicial de analise de credito para o tomador
 - modelar parecer operacional, score interno e decisao de aprovacao ou rejeicao
 - permitir analise assistida pelo time interno
@@ -1271,6 +1515,7 @@ Esta fase sera considerada bem-sucedida quando:
 - integrar a analise ao fluxo da proposta e da elegibilidade para contratacao
 
 ### Epic 7 - Formalizacao contratual
+- **Sprints alocadas**: Sprint 10 (geracao de contrato) e Sprint 11 (assinatura digital + CCB)
 - preparar geracao de contrato e artefatos formais da operacao
 - modelar etapa de aceite e assinatura
 - registrar status de formalizacao da proposta
@@ -1278,6 +1523,7 @@ Esta fase sera considerada bem-sucedida quando:
 - preparar integracao futura com assinatura eletronica e CCB
 
 ### Epic 8 - Cobranca e inadimplencia
+- **Sprints alocadas**: Sprint 12 (parcelas e agenda) e Sprint 13 (inadimplencia e recuperacao)
 - estruturar cobranca basica das parcelas apos contratacao
 - registrar agenda, status e historico de recebimentos
 - permitir acompanhamento de atraso e inadimplencia
@@ -1286,6 +1532,7 @@ Esta fase sera considerada bem-sucedida quando:
 - consumir o modulo `escrow` para registrar recebimentos e movimentacoes na conta segregada (segregacao patrimonial obrigatoria por Resolucao CMN 4.656/2018)
 
 ### Epic 9 - Backoffice operacional
+- **Sprints alocadas**: Sprint 14 (sprint unica que consolida a operacao assistida da Fase 2)
 - estruturar fila operacional para propostas, pendencias e excecoes
 - dar visibilidade consolidada para o financeiro interno acompanhar onboarding, analise, formalizacao e cobranca
 - permitir tratamento manual de inconsistencias, reprocessos e bloqueios operacionais
@@ -1343,11 +1590,11 @@ Esta fase sera considerada bem-sucedida quando:
 
 A primeira fase da Epic 14 e detalhada em 5 specs (1 arquivo por M-Sprint, paralelo aos padroes 0XX backend e 1XX frontend), conduzida pelo Dev Mobile dedicado:
 
-- M-Sprint 0: [`specs/200-msprint-0-setup-ionic.md`](../specs/200-msprint-0-setup-ionic.md) — Setup Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling
-- M-Sprint 1: [`specs/201-msprint-1-tokens-notion-mobile.md`](../specs/201-msprint-1-tokens-notion-mobile.md) — Tokens Notion adaptados (touch, tabs inferiores) + Showcase
-- M-Sprint 2: [`specs/202-msprint-2-telas-publicas-mobile.md`](../specs/202-msprint-2-telas-publicas-mobile.md) — Splash, Boas-vindas, Login, Register com MSW + Capacitor Preferences
-- M-Sprint 3: [`specs/203-msprint-3-shell-mobile-auth.md`](../specs/203-msprint-3-shell-mobile-auth.md) — Auth real, Shell mobile (tabs inferiores), Guards, Interceptors
-- M-Sprint 4: [`specs/204-msprint-4-telas-autenticadas-mobile.md`](../specs/204-msprint-4-telas-autenticadas-mobile.md) — Perfil, Alterar senha, Casca tomador, Casca credora + Smoke E2E PWA
+- M-Sprint 0: [`specs/fase-1/200-msprint-0-setup-ionic.md`](../specs/fase-1/200-msprint-0-setup-ionic.md) — Setup Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling
+- M-Sprint 1: [`specs/fase-1/201-msprint-1-tokens-notion-mobile.md`](../specs/fase-1/201-msprint-1-tokens-notion-mobile.md) — Tokens Notion adaptados (touch, tabs inferiores) + Showcase
+- M-Sprint 2: [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../specs/fase-1/202-msprint-2-telas-publicas-mobile.md) — Splash, Boas-vindas, Login, Register com MSW + Capacitor Preferences
+- M-Sprint 3: [`specs/fase-1/203-msprint-3-shell-mobile-auth.md`](../specs/fase-1/203-msprint-3-shell-mobile-auth.md) — Auth real, Shell mobile (tabs inferiores), Guards, Interceptors
+- M-Sprint 4: [`specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md`](../specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md) — Perfil, Alterar senha, Casca tomador, Casca credora + Smoke E2E PWA
 
 Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornadas funcionais do tomador, da empresa credora e Pix visivel ao usuario), que dependem das APIs das Epics 5-11.
 
@@ -1558,3 +1805,34 @@ As tres secoes tem sobreposicao intencional (estado, stack, arquitetura, marco r
 **Resolucao de conflitos**: quando o `AGENT.md` divergir do PRD ou de algum ADR, o **PRD e os ADRs prevalecem**. O `AGENT.md` complementa, nao reescreve, esses artefatos.
 
 **Historico**: o `AGENT.md` substitui os arquivos `CLAUDE.md`, `CODEX.md` e `COPILOT.md` que existiam na raiz do repositorio em sprints anteriores e foram apagados ao consolidar a orientacao em um unico arquivo.
+
+## 29. Mapeamento Fase 2: Epics × Sprints
+
+Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14, **apenas backend**). Util para PO/PM acompanhar a Fase 2 sem precisar ler a §22 inteira.
+
+| Sprint | Epic | Tema | Spec | Modulo dominio |
+|--------|------|------|------|----------------|
+| 5 | Epic 4 estendida | Endurecimento de Seguranca (gate Fase 2) | [`005`](../specs/fase-2/005-sprint-5-endurecimento-seguranca.md) | `identity` |
+| 6 | Epic 5 (parte 1) | Onboarding KYC Pessoa Fisica | [`006`](../specs/fase-2/006-sprint-6-onboarding-kyc-pessoa.md) | `onboarding` |
+| 7 | Epic 5 (parte 2) | Onboarding KYB Empresa + PLD | [`007`](../specs/fase-2/007-sprint-7-onboarding-kyb-empresa.md) | `onboarding` |
+| 8 | Epic 6 (parte 1) | Credito — regras internas + parecer | [`008`](../specs/fase-2/008-sprint-8-credito-regras-parecer.md) | `credito` |
+| 9 | Epic 6 (parte 2) | Credito — integracao Open Finance | [`009`](../specs/fase-2/009-sprint-9-credito-open-finance.md) | `credito` |
+| 10 | Epic 7 (parte 1) | Formalizacao — geracao de contrato | [`010`](../specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md) | `contratos` |
+| 11 | Epic 7 (parte 2) | Formalizacao — assinatura digital + CCB | [`011`](../specs/fase-2/011-sprint-11-formalizacao-assinatura-digital.md) | `contratos` |
+| 12 | Epic 8 (parte 1) | Cobranca — parcelas e agenda | [`012`](../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md) | `cobranca` + `escrow` |
+| 13 | Epic 8 (parte 2) | Cobranca — inadimplencia e recuperacao | [`013`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md) | `cobranca` |
+| 14 | Epic 9 | Backoffice operacional | [`014`](../specs/fase-2/014-sprint-14-backoffice-operacional.md) | `backoffice` |
+
+**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening, Sprints 6-14 sao novas). Dependencia linear (cada sprint exige a anterior pronta). Trilha exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+
+**Decisoes de planejamento**:
+- **Granularidade**: cada Epic 5-8 foi dividida em 2 sprints (parte 1 + parte 2) para reduzir risco de entrega; Epic 9 ficou em 1 sprint unica.
+- **Trilhas Web/Mobile**: nao planejadas nesta etapa. Decisao motivada por dois fatores: (1) os contratos da API sao definidos pelo backend e ainda podem evoluir durante as Epics 5-9; (2) o frontend de jornadas (Epic 13) e o mobile (Epic 14 fase 2+) so podem comecar de forma estavel quando esses contratos estiverem fechados.
+- **Sprint 5**: ja entregue/planejada antes de 2026-05-04, foi reposicionada como gate de abertura da Fase 2 (e nao mais fechamento da Fase 1) por exigir MFA/refresh token/lockout antes de qualquer integracao real com Celcoin.
+
+**ADRs candidatos durante a Fase 2** (criados just-in-time quando cada decisao for tomada):
+- ADR 0011 — Motor de regras de credito interno (Sprint 8)
+- ADR 0012 — Provedor de assinatura digital (Sprint 11) — gate da Sprint 11
+- ADR 0013 — Estrategia de notificacoes transacionais (Sprint 13) — gate da Sprint 13
+
+**Steps**: continuam sendo gerados just-in-time, antes da execucao de cada sprint (regra do `AGENT.md`). A Fase 2 nao gera steps em massa.

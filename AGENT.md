@@ -75,7 +75,7 @@ A entrega tecnica atual e a fundacao backend da API.
 - Avaliar upgrade para Angular 21 na fase de implementacao mobile, condicionado a release oficial Ionic + plugins
 - Storage de token via `Capacitor Preferences` (PWA + Android/iOS)
 - Validacao em PWA primeiro; build Android/iOS via Capacitor entra em fase posterior
-- Trilha de execucao: M-Sprints 0-4 em `specs/200-204`, conduzida por Dev Mobile dedicado
+- Trilha de execucao: M-Sprints 0-4 em `specs/fase-1/200-204`, conduzida por Dev Mobile dedicado
 
 #### Design Systems
 - [`docs-sep/DESIGN-apple.md`](docs-sep/DESIGN-apple.md) — superficies publicas (landing, login, cadastro)
@@ -108,7 +108,7 @@ Modulos previstos: `identity`, `usuarios`, `onboarding`, `credito`, `contratos`,
 - **Sprint 3** — Seguranca/Auth (JWT, login, autorizacao por perfil/ownership, mTLS prep, correlationId)
 - **Sprint 4** — Erros, Documentacao, Testes, Webhook Receiver (Pix prep)
 
-Specs em `specs/000` a `specs/004` para backend; `specs/100` a `specs/104` para frontend web (1 arquivo por F-Sprint); `specs/200` a `specs/204` para mobile (1 arquivo por M-Sprint).
+Specs em `specs/fase-1/000` a `specs/fase-1/004` para backend; `specs/fase-1/100` a `specs/fase-1/104` para frontend web (1 arquivo por F-Sprint); `specs/fase-1/200` a `specs/fase-1/204` para mobile (1 arquivo por M-Sprint).
 
 ### Roadmap (16 Epics)
 
@@ -373,11 +373,11 @@ O modulo `escrow` deve ser modelado desde a Sprint 1, mesmo antes da integracao 
 - Sprint 3: Seguranca e Autenticacao JWT.
 - Sprint 4: Erros, Documentacao, Testes e Webhook Receiver.
 
-Specs backend: `specs/000` a `specs/004`.
+Specs backend: `specs/fase-1/000` a `specs/fase-1/004`.
 
-Trilha frontend web: `specs/100` a `specs/104`.
+Trilha frontend web: `specs/fase-1/100` a `specs/fase-1/104`.
 
-Trilha mobile: `specs/200` a `specs/204`.
+Trilha mobile: `specs/fase-1/200` a `specs/fase-1/204`.
 
 ### Convencoes do projeto
 

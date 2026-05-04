@@ -837,16 +837,16 @@ dependencies {
   <div class="alert-info" style="margin-bottom: 28px;">
     <strong>Governança por specs:</strong> cada sprint possui um arquivo spec próprio na pasta <code>specs/</code> do repositório, derivado da metodologia SDD (Spec-Driven Development). O PRD mantém apenas o planejamento de alto nível; a execução é governada pelo spec correspondente, que contém detalhes de arquivos esperados, critérios de verificação, dependências internas e cenários de verificação manual.
     <ul style="margin-top: 10px; padding-left: 22px;">
-      <li><code>specs/001-sprint-1-fundacao-tecnica.md</code> — fundação técnica (Gradle, Docker, Flyway, Actuator)</li>
-      <li><code>specs/002-sprint-2-gestao-usuarios.md</code> — entidade Usuario, DTOs, criação pública</li>
-      <li><code>specs/003-sprint-3-seguranca-autenticacao.md</code> — JWT, ownership, alteração de senha</li>
-      <li><code>specs/004-sprint-4-erros-docs-testes.md</code> — ApiExceptionHandler, Swagger, testes</li>
+      <li><code>specs/fase-1/001-sprint-1-fundacao-tecnica.md</code> — fundação técnica (Gradle, Docker, Flyway, Actuator)</li>
+      <li><code>specs/fase-1/002-sprint-2-gestao-usuarios.md</code> — entidade Usuario, DTOs, criação pública</li>
+      <li><code>specs/fase-1/003-sprint-3-seguranca-autenticacao.md</code> — JWT, ownership, alteração de senha</li>
+      <li><code>specs/fase-1/004-sprint-4-erros-docs-testes.md</code> — ApiExceptionHandler, Swagger, testes</li>
     </ul>
   </div>
 
   <div class="sprint-block">
     <div class="sprint-title">Sprint 1 · Fundação Técnica</div>
-    <div class="deps">Depende de: aprovação do PRD · Java 21 + Docker funcionais. Responsável: Dev Senior. Spec: <code>specs/001-sprint-1-fundacao-tecnica.md</code>.</div>
+    <div class="deps">Depende de: aprovação do PRD · Java 21 + Docker funcionais. Responsável: Dev Senior. Spec: <code>specs/fase-1/001-sprint-1-fundacao-tecnica.md</code>.</div>
 
     <div class="task">
       <span class="task-num">1.1</span><h5>Projeto backend base com Gradle, profiles e dependências</h5>
@@ -887,7 +887,7 @@ dependencies {
 
   <div class="sprint-block">
     <div class="sprint-title">Sprint 2 · Gestão de Usuários</div>
-    <div class="deps">Depende de: Sprint 1 concluída · banco e Flyway funcionais. Responsável: Dev Senior. Spec: <code>specs/002-sprint-2-gestao-usuarios.md</code>.</div>
+    <div class="deps">Depende de: Sprint 1 concluída · banco e Flyway funcionais. Responsável: Dev Senior. Spec: <code>specs/fase-1/002-sprint-2-gestao-usuarios.md</code>.</div>
 
     <div class="task">
       <span class="task-num">2.1</span><h5>Entidade Usuario com UUID v6, auditoria e repositório</h5>
@@ -919,7 +919,7 @@ dependencies {
 
   <div class="sprint-block">
     <div class="sprint-title">Sprint 3 · Segurança · JWT · Autorização</div>
-    <div class="deps">Depende de: Sprint 2 · criação de usuário funcional. Responsável: Dev Senior. Spec: <code>specs/003-sprint-3-seguranca-autenticacao.md</code>.</div>
+    <div class="deps">Depende de: Sprint 2 · criação de usuário funcional. Responsável: Dev Senior. Spec: <code>specs/fase-1/003-sprint-3-seguranca-autenticacao.md</code>.</div>
 
     <div class="task">
       <span class="task-num">3.1</span><h5>Segurança JWT, BCrypt e login</h5>
@@ -952,7 +952,7 @@ dependencies {
 
   <div class="sprint-block">
     <div class="sprint-title">Sprint 4 · Erros · Docs · Testes</div>
-    <div class="deps">Depende de: Sprint 3 concluída · endpoints estabilizados. Responsável: Dev Senior. Spec: <code>specs/004-sprint-4-erros-docs-testes.md</code>.</div>
+    <div class="deps">Depende de: Sprint 3 concluída · endpoints estabilizados. Responsável: Dev Senior. Spec: <code>specs/fase-1/004-sprint-4-erros-docs-testes.md</code>.</div>
 
     <div class="task">
       <span class="task-num">4.1</span><h5>ApiExceptionHandler e payload padrão de erro</h5>
