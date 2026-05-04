@@ -3,8 +3,6 @@ name: Mobile Android Validation
 
 on:
   pull_request:
-    paths:
-      - "apps/sep-mobile/**"
   workflow_dispatch:
 
 permissions:
@@ -31,20 +29,20 @@ jobs:
           java-version: "17"
 
       - name: Build PWA and sync Android
-        working-directory: apps/sep-mobile
+        working-directory: .
         run: |
           npm ci
           npm run build
           npx cap sync android
 
       - name: Build Android debug APK
-        working-directory: apps/sep-mobile/android
+        working-directory: android
         run: ./gradlew assembleDebug
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: sep-mobile-android-debug
-          path: apps/sep-mobile/android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 

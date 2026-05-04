@@ -3,8 +3,6 @@ name: Mobile iOS Validation
 
 on:
   pull_request:
-    paths:
-      - "apps/sep-mobile/**"
   workflow_dispatch:
 
 permissions:
@@ -25,14 +23,14 @@ jobs:
           node-version: "20"
 
       - name: Build PWA and sync iOS
-        working-directory: apps/sep-mobile
+        working-directory: .
         run: |
           npm ci
           npm run build
           npx cap sync ios
 
       - name: Build iOS app
-        working-directory: apps/sep-mobile
+        working-directory: .
         run: |
           xcodebuild \
             -workspace ios/App/App.xcworkspace \

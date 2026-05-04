@@ -1,16 +1,26 @@
-name: Mobile PWA CI
+# =============================================================================
+# Template: CI do repositorio sep-mobile (mobile Ionic + PWA build)
+# =============================================================================
+# Como usar:
+#   1. Copie este arquivo para `.github/workflows/ci.yml` na raiz do repo `sep-mobile`
+#   2. Remova o sufixo `.template` do nome
+#   3. (Opcional) Ajuste node-version conforme convencao do repo
+#
+# Cobre apenas validacao PWA (PWA-first, conforme PRD §11). Validacao Android/iOS
+# usa templates separados (sep-mobile-android-*.yml, sep-mobile-ios-*.yml).
+#
+# Diferencas vs versao monorepo anterior:
+#   - Sem path-filter por subpasta (cada repo so tem um app)
+#   - Sem `working-directory` (workflow ja roda no root do repo)
+# =============================================================================
+
+name: CI
 
 on:
   pull_request:
-    paths:
-      - "apps/sep-mobile/**"
-      - ".github/workflows/mobile-pwa-ci.yml"
   push:
     branches:
       - main
-    paths:
-      - "apps/sep-mobile/**"
-      - ".github/workflows/mobile-pwa-ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -25,37 +35,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check mobile readiness
-        id: mobile
-        run: |
-          if [ -f "apps/sep-mobile/package-lock.json" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::apps/sep-mobile/package-lock.json not found. Skipping mobile PWA validation until M-Sprint 0 creates the app."
-          fi
-
       - name: Setup Node
-        if: steps.mobile.outputs.ready == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
 
-      - name: Validate
-        if: steps.mobile.outputs.ready == 'true'
-        working-directory: apps/sep-mobile
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test with coverage
+        run: npm run test -- --coverage
+
+      - name: Build PWA
         run: |
-          npm ci
-          npm run lint
-          npm run test -- --coverage
           npm run build
           test -d www
 
       - name: Upload PWA artifact
-        if: steps.mobile.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: mobile-pwa-www
-          path: apps/sep-mobile/www/
+          path: www/
           if-no-files-found: error
-

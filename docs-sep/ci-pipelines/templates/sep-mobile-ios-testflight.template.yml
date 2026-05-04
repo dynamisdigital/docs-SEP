@@ -23,7 +23,7 @@ jobs:
           node-version: "20"
 
       - name: Build PWA and sync iOS
-        working-directory: apps/sep-mobile
+        working-directory: .
         run: |
           npm ci
           npm run build
@@ -41,7 +41,7 @@ jobs:
           test -n "$IOS_PROVISIONING_PROFILE_BASE64"
 
       - name: Archive iOS app
-        working-directory: apps/sep-mobile
+        working-directory: .
         run: |
           xcodebuild \
             -workspace ios/App/App.xcworkspace \

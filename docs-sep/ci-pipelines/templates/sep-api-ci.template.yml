@@ -1,32 +1,23 @@
-name: Backend CI
+# =============================================================================
+# Template: CI do repositorio sep-api (backend Java + Spring Boot)
+# =============================================================================
+# Como usar:
+#   1. Copie este arquivo para `.github/workflows/ci.yml` na raiz do repo `sep-api`
+#   2. Remova o sufixo `.template` do nome
+#   3. (Opcional) Ajuste java-version conforme convencao do repo
+#
+# Diferencas vs versao monorepo anterior:
+#   - Sem path-filter por subpasta (cada repo so tem o backend Java)
+#   - Postgres via service container (evita Testcontainers desnecessario na CI)
+# =============================================================================
+
+name: CI
 
 on:
   pull_request:
-    paths:
-      - "src/**"
-      - "gradle/**"
-      - "build.gradle"
-      - "build.gradle.kts"
-      - "settings.gradle"
-      - "settings.gradle.kts"
-      - "gradlew"
-      - "gradlew.bat"
-      - "docker-compose*.yml"
-      - ".github/workflows/backend-ci.yml"
   push:
     branches:
       - main
-    paths:
-      - "src/**"
-      - "gradle/**"
-      - "build.gradle"
-      - "build.gradle.kts"
-      - "settings.gradle"
-      - "settings.gradle.kts"
-      - "gradlew"
-      - "gradlew.bat"
-      - "docker-compose*.yml"
-      - ".github/workflows/backend-ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -56,38 +47,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check backend readiness
-        id: backend
-        run: |
-          if [ -f "./gradlew" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Backend Gradle Wrapper not found. Skipping backend validation until Sprint 0/1 creates it."
-          fi
-
       - name: Setup Java
-        if: steps.backend.outputs.ready == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
       - name: Setup Gradle
-        if: steps.backend.outputs.ready == 'true'
         uses: gradle/actions/setup-gradle@v4
 
       - name: Validate
-        if: steps.backend.outputs.ready == 'true'
         run: |
           chmod +x ./gradlew
           ./gradlew spotlessCheck build jacocoTestReport
 
       - name: Upload JaCoCo report
-        if: always() && steps.backend.outputs.ready == 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: backend-jacoco-report
           path: build/reports/jacoco/
           if-no-files-found: ignore
-
