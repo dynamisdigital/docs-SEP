@@ -247,9 +247,9 @@ F-Sprint 3 concluida
 
 ## Referencias
 
-- [PRD - API SEP §22, §23 (criterios de sucesso)](../docs-sep/PRD.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [WEB-SCREENS-PLAN.md §5.5, §5.6, §5.7, §5.8, §5.9](../docs-sep/WEB-SCREENS-PLAN.md)
+- [PRD - API SEP §22, §23 (criterios de sucesso)](../../docs-sep/PRD.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [WEB-SCREENS-PLAN.md §5.5, §5.6, §5.7, §5.8, §5.9](../../docs-sep/WEB-SCREENS-PLAN.md)
 - [Spec 003 - Sprint 3 backend](./003-sprint-3-seguranca-autenticacao.md)
 - [Spec 004 - Sprint 4 backend (paralela)](./004-sprint-4-erros-docs-testes.md)
 - [Spec 103 - F-Sprint 3 (anterior)](./103-fsprint-3-shell-notion-auth.md)

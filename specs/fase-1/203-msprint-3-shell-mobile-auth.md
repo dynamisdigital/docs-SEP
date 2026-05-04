@@ -210,9 +210,9 @@ Ate a Epic 11 (Administracao e Governanca) introduzir uma separacao formal entre
 
 ## Referencias
 
-- [PRD - API SEP §6 (perfis), §14 (JWT), §22](../docs-sep/PRD.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [MOBILE-SCREENS-PLAN.md §6.5, §9](../docs-sep/MOBILE-SCREENS-PLAN.md)
+- [PRD - API SEP §6 (perfis), §14 (JWT), §22](../../docs-sep/PRD.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [MOBILE-SCREENS-PLAN.md §6.5, §9](../../docs-sep/MOBILE-SCREENS-PLAN.md)
 - [Capacitor Preferences API](https://capacitorjs.com/docs/apis/preferences)
 - [Spec 003 - Sprint 3 backend (paralela)](./003-sprint-3-seguranca-autenticacao.md)
 - [Spec 103 - F-Sprint 3 frontend web (paralela)](./103-fsprint-3-shell-notion-auth.md)

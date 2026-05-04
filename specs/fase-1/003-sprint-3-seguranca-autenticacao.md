@@ -269,7 +269,7 @@ Task 3.1 (JWT + login + AuthController + auditoria autenticada)
 
 ## Referencias
 
-- [PRD - API SEP](../docs-sep/PRD.md), Secoes 6, 7, 8, 9, 14, 15 e 22
-- [CONTEXT.md](../docs-sep/CONTEXT.md)
+- [PRD - API SEP](../../docs-sep/PRD.md), Secoes 6, 7, 8, 9, 14, 15 e 22
+- [CONTEXT.md](../../docs-sep/CONTEXT.md)
 - [Spec 001](./001-sprint-1-fundacao-tecnica.md)
 - [Spec 002](./002-sprint-2-gestao-usuarios.md)

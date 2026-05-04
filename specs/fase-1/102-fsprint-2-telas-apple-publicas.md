@@ -162,9 +162,9 @@ A F-Sprint 3 (`specs/103-fsprint-3-shell-notion-auth.md`) consome:
 
 ## Referencias
 
-- [PRD - API SEP §21 (contratos), §22](../docs-sep/PRD.md)
-- [DESIGN-apple.md](../docs-sep/DESIGN-apple.md)
-- [WEB-SCREENS-PLAN.md](../docs-sep/WEB-SCREENS-PLAN.md) §5.1, §5.2, §5.3
+- [PRD - API SEP §21 (contratos), §22](../../docs-sep/PRD.md)
+- [DESIGN-apple.md](../../docs-sep/DESIGN-apple.md)
+- [WEB-SCREENS-PLAN.md](../../docs-sep/WEB-SCREENS-PLAN.md) §5.1, §5.2, §5.3
 - [Spec 002 - Sprint 2 backend (paralela)](./002-sprint-2-gestao-usuarios.md)
 - [Spec 101 - F-Sprint 1 (anterior)](./101-fsprint-1-design-tokens-showcase.md)
 - [Spec 103 - F-Sprint 3 (proxima)](./103-fsprint-3-shell-notion-auth.md)

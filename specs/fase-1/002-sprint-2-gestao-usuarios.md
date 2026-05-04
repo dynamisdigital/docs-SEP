@@ -274,6 +274,6 @@ Task 2.1 (entidade + repository + V3 + tests)
 
 ## Referencias
 
-- [PRD - API SEP](../docs-sep/PRD.md), Secoes 7, 9, 10, 15, 20 e 22
-- [CONTEXT.md](../docs-sep/CONTEXT.md)
+- [PRD - API SEP](../../docs-sep/PRD.md), Secoes 7, 9, 10, 15, 20 e 22
+- [CONTEXT.md](../../docs-sep/CONTEXT.md)
 - [Spec 001](./001-sprint-1-fundacao-tecnica.md)

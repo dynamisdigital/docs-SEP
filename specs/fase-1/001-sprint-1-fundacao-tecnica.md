@@ -380,7 +380,7 @@ Preparar a infraestrutura comum para o `Provider Pattern` definido no PRD §11: 
 
 **Estrategia de teste (preparacao para Epic 5+)**
 
-A camada de adapter (`infrastructure.adapter.<X>`) sera testada com **WireMock 3.x** quando os primeiros `Celcoin<X>Provider` reais forem implementados (Epic 5 em diante). Padrao definido no [ADR 0008](../adr/0008-wiremock-para-testes-integracao-celcoin.md):
+A camada de adapter (`infrastructure.adapter.<X>`) sera testada com **WireMock 3.x** quando os primeiros `Celcoin<X>Provider` reais forem implementados (Epic 5 em diante). Padrao definido no [ADR 0008](../../adr/0008-wiremock-para-testes-integracao-celcoin.md):
 
 - arquivo de teste: `<modulo>.infrastructure.adapter.<X>.Celcoin<X>ProviderIT.java`
 - anotacoes: `@SpringBootTest` + `@WireMockTest(httpPort = 8089)`
@@ -546,6 +546,6 @@ Ao final desta sprint, o desenvolvedor deve executar manualmente os seguintes ce
 
 ## Referencias
 
-- [PRD - API SEP](../docs-sep/PRD.md), Secao 22 - Backlog Tecnico Implementavel
-- [CONTEXT.md](../docs-sep/CONTEXT.md) - historia das decisoes do projeto
-- [documentacao-dev.html](../docs-sep/documentacao-dev.html) - documentacao tecnica consolidada com diagramas
+- [PRD - API SEP](../../docs-sep/PRD.md), Secao 22 - Backlog Tecnico Implementavel
+- [CONTEXT.md](../../docs-sep/CONTEXT.md) - historia das decisoes do projeto
+- [documentacao-dev.html](../../docs-sep/documentacao-dev.html) - documentacao tecnica consolidada com diagramas

@@ -165,7 +165,7 @@ A F-Sprint 4 (`specs/104-fsprint-4-telas-autenticadas.md`) consome:
 
 ## Profile `local-wiremock` (alternativa para Frontend desenvolver sem credenciais Celcoin)
 
-A partir da Epic 5 (Onboarding KYC/KYB), o backend ganha um profile `local-wiremock` (ver [ADR 0008](../adr/0008-wiremock-para-testes-integracao-celcoin.md)) que aponta `app.celcoin.base-url` para um WireMock local em `http://localhost:8089`. Stubs WireMock simulam respostas Celcoin deterministicas.
+A partir da Epic 5 (Onboarding KYC/KYB), o backend ganha um profile `local-wiremock` (ver [ADR 0008](../../adr/0008-wiremock-para-testes-integracao-celcoin.md)) que aponta `app.celcoin.base-url` para um WireMock local em `http://localhost:8089`. Stubs WireMock simulam respostas Celcoin deterministicas.
 
 **Importante para o frontend**: nas F-Sprints 0-4 (escopo desta trilha), o backend nao depende de Celcoin ainda — entao MSW e o suficiente. O profile `local-wiremock` so se torna relevante quando a Epic 13 (Frontend de Jornadas) for desenvolvida, depois da Epic 5 backend introduzir os primeiros adapters Celcoin.
 
@@ -203,10 +203,10 @@ Detalhes finais (mappings, scripts auxiliares) ficam para a Epic 5 quando o prim
 
 ## Referencias
 
-- [PRD - API SEP §14 (JWT), §15 (Auditoria), §22](../docs-sep/PRD.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [WEB-SCREENS-PLAN.md §5.4](../docs-sep/WEB-SCREENS-PLAN.md)
-- [ADR 0008 - WireMock](../adr/0008-wiremock-para-testes-integracao-celcoin.md)
+- [PRD - API SEP §14 (JWT), §15 (Auditoria), §22](../../docs-sep/PRD.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [WEB-SCREENS-PLAN.md §5.4](../../docs-sep/WEB-SCREENS-PLAN.md)
+- [ADR 0008 - WireMock](../../adr/0008-wiremock-para-testes-integracao-celcoin.md)
 - [Spec 003 - Sprint 3 backend (paralela)](./003-sprint-3-seguranca-autenticacao.md)
 - [Spec 102 - F-Sprint 2 (anterior)](./102-fsprint-2-telas-apple-publicas.md)
 - [Spec 104 - F-Sprint 4 (proxima)](./104-fsprint-4-telas-autenticadas.md)

@@ -7,7 +7,7 @@
 - **Status**: aprovada para execucao (apos conclusao da Sprint 4)
 - **Fase do produto**: Epic 4 estendida (Estabilizacao + Endurecimento) — gate para producao e para Epic 5
 - **Origem**: PRD §7 RF-01/RF-05, §14, §18; ADRs 0009 e 0010
-- **Depende de**: [`004-sprint-4-erros-docs-testes.md`](./004-sprint-4-erros-docs-testes.md)
+- **Depende de**: [`004-sprint-4-erros-docs-testes.md`](../fase-1/004-sprint-4-erros-docs-testes.md)
 - **Responsavel principal**: Dev Senior
 
 ## Objetivo
@@ -465,15 +465,15 @@ Task 5.1 (entidades MFA + audit)
 
 ## Referencias
 
-- [PRD §7 RF-01, RF-05 (Cadastro, Autenticacao)](../docs-sep/PRD.md)
-- [PRD §14 (Padrao JWT — atualizado para refresh token)](../docs-sep/PRD.md)
-- [PRD §18 (Decisoes Consolidadas — atualizado com MFA)](../docs-sep/PRD.md)
-- [PRD §22 (Sprint 5 entre Sprint 4 e Epic 5)](../docs-sep/PRD.md)
-- [PRD §27 (Premissas — atualizadas)](../docs-sep/PRD.md)
-- [ADR 0009 - Separacao de Canal por Perfil](../adr/0009-separacao-de-canal-por-perfil.md)
-- [ADR 0010 - MFA TOTP + Biometria Mobile](../adr/0010-mfa-totp-com-biometria-mobile.md)
-- [Spec 003 - Sprint 3 backend (auth basica)](./003-sprint-3-seguranca-autenticacao.md)
-- [Spec 004 - Sprint 4 backend (estabilizacao)](./004-sprint-4-erros-docs-testes.md)
+- [PRD §7 RF-01, RF-05 (Cadastro, Autenticacao)](../../docs-sep/PRD.md)
+- [PRD §14 (Padrao JWT — atualizado para refresh token)](../../docs-sep/PRD.md)
+- [PRD §18 (Decisoes Consolidadas — atualizado com MFA)](../../docs-sep/PRD.md)
+- [PRD §22 (Sprint 5 entre Sprint 4 e Epic 5)](../../docs-sep/PRD.md)
+- [PRD §27 (Premissas — atualizadas)](../../docs-sep/PRD.md)
+- [ADR 0009 - Separacao de Canal por Perfil](../../adr/0009-separacao-de-canal-por-perfil.md)
+- [ADR 0010 - MFA TOTP + Biometria Mobile](../../adr/0010-mfa-totp-com-biometria-mobile.md)
+- [Spec 003 - Sprint 3 backend (auth basica)](../fase-1/003-sprint-3-seguranca-autenticacao.md)
+- [Spec 004 - Sprint 4 backend (estabilizacao)](../fase-1/004-sprint-4-erros-docs-testes.md)
 - RFC 6238 (TOTP)
 - NIST SP 800-63B (Digital Identity Guidelines)
 - OWASP Authentication Cheat Sheet

@@ -13,7 +13,7 @@
 
 ## Objetivo
 
-Traduzir literalmente os tokens dos dois design systems oficiais ([`DESIGN-apple.md`](../docs-sep/DESIGN-apple.md) e [`DESIGN-notion.md`](../docs-sep/DESIGN-notion.md)) para SCSS reutilizavel no projeto Angular, e expor um showcase navegavel em `/design-system` que serve como Storybook leve. Sem essa fundacao, qualquer tela construida nas F-Sprints 2-4 ficaria desalinhada do design system.
+Traduzir literalmente os tokens dos dois design systems oficiais ([`DESIGN-apple.md`](../../docs-sep/DESIGN-apple.md) e [`DESIGN-notion.md`](../../docs-sep/DESIGN-notion.md)) para SCSS reutilizavel no projeto Angular, e expor um showcase navegavel em `/design-system` que serve como Storybook leve. Sem essa fundacao, qualquer tela construida nas F-Sprints 2-4 ficaria desalinhada do design system.
 
 ## Escopo
 
@@ -152,10 +152,10 @@ A F-Sprint 3 (`specs/103-fsprint-3-shell-notion-auth.md`) consome:
 
 ## Referencias
 
-- [PRD - API SEP §11, §22](../docs-sep/PRD.md)
-- [DESIGN-apple.md](../docs-sep/DESIGN-apple.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [WEB-SCREENS-PLAN.md](../docs-sep/WEB-SCREENS-PLAN.md)
-- [ADR 0002 - Design Systems Apple e Notion](../adr/0002-design-systems-apple-e-notion-com-scss-puro.md)
+- [PRD - API SEP §11, §22](../../docs-sep/PRD.md)
+- [DESIGN-apple.md](../../docs-sep/DESIGN-apple.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [WEB-SCREENS-PLAN.md](../../docs-sep/WEB-SCREENS-PLAN.md)
+- [ADR 0002 - Design Systems Apple e Notion](../../adr/0002-design-systems-apple-e-notion-com-scss-puro.md)
 - [Spec 100 - F-Sprint 0 (anterior)](./100-fsprint-0-setup-angular.md)
 - [Spec 102 - F-Sprint 2 (proxima)](./102-fsprint-2-telas-apple-publicas.md)

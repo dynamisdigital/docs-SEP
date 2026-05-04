@@ -13,7 +13,7 @@
 
 ## Objetivo
 
-Traduzir o design system [`DESIGN-notion.md`](../docs-sep/DESIGN-notion.md) para SCSS adaptado ao contexto mobile: tamanhos de toque (touch targets >= 44x44pt), tabs inferiores, navegacao em pilha, mixins de componentes Ionic customizados via CSS variables, e showcase navegavel para validar fidelidade visual antes de qualquer tela ser construida nas M-Sprints 2-4.
+Traduzir o design system [`DESIGN-notion.md`](../../docs-sep/DESIGN-notion.md) para SCSS adaptado ao contexto mobile: tamanhos de toque (touch targets >= 44x44pt), tabs inferiores, navegacao em pilha, mixins de componentes Ionic customizados via CSS variables, e showcase navegavel para validar fidelidade visual antes de qualquer tela ser construida nas M-Sprints 2-4.
 
 A trilha mobile **so usa Notion** (nao Apple) — a fronteira no mobile e diferente do web: ja na primeira tela (boas-vindas/landing mobile) seguimos Notion, conforme PRD §11 ("todo o mobile (visitante e autenticado) segue o design system Notion").
 
@@ -35,7 +35,7 @@ A trilha mobile **so usa Notion** (nao Apple) — a fronteira no mobile e difere
 
 - M-Sprint 0 concluida (projeto Ionic + tooling completo)
 - Stylelint configurado com whitelist de CSS variables Ionic
-- Acesso ao [`DESIGN-notion.md`](../docs-sep/DESIGN-notion.md)
+- Acesso ao [`DESIGN-notion.md`](../../docs-sep/DESIGN-notion.md)
 - Familiaridade com [Ionic Theming](https://ionicframework.com/docs/theming/colors) e CSS variables `--ion-*`
 
 ## Tasks
@@ -173,10 +173,10 @@ A F-Sprint 1 web traduz **dois** design systems (Apple para publico, Notion para
 
 ## Referencias
 
-- [PRD - API SEP §11, §22](../docs-sep/PRD.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [MOBILE-SCREENS-PLAN.md](../docs-sep/MOBILE-SCREENS-PLAN.md)
-- [ADR 0002 - Design Systems Apple e Notion](../adr/0002-design-systems-apple-e-notion-com-scss-puro.md)
+- [PRD - API SEP §11, §22](../../docs-sep/PRD.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [MOBILE-SCREENS-PLAN.md](../../docs-sep/MOBILE-SCREENS-PLAN.md)
+- [ADR 0002 - Design Systems Apple e Notion](../../adr/0002-design-systems-apple-e-notion-com-scss-puro.md)
 - [Ionic Theming](https://ionicframework.com/docs/theming/colors)
 - [Spec 200 - M-Sprint 0 (anterior)](./200-msprint-0-setup-ionic.md)
 - [Spec 202 - M-Sprint 2 (proxima)](./202-msprint-2-telas-publicas-mobile.md)

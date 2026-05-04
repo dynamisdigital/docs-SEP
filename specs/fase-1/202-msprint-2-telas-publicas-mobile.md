@@ -212,9 +212,9 @@ A M-Sprint 3 (`specs/203-msprint-3-shell-mobile-auth.md`) consome:
 
 ## Referencias
 
-- [PRD - API SEP §21 (contratos), §22](../docs-sep/PRD.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [MOBILE-SCREENS-PLAN.md §6.1, §6.2, §6.3, §6.4](../docs-sep/MOBILE-SCREENS-PLAN.md)
+- [PRD - API SEP §21 (contratos), §22](../../docs-sep/PRD.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [MOBILE-SCREENS-PLAN.md §6.1, §6.2, §6.3, §6.4](../../docs-sep/MOBILE-SCREENS-PLAN.md)
 - [Capacitor Preferences API](https://capacitorjs.com/docs/apis/preferences)
 - [Spec 002 - Sprint 2 backend (paralela)](./002-sprint-2-gestao-usuarios.md)
 - [Spec 102 - F-Sprint 2 frontend web (paralela)](./102-fsprint-2-telas-apple-publicas.md)

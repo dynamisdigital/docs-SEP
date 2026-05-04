@@ -283,14 +283,14 @@ A M-Sprint 1 (`specs/201-msprint-1-tokens-notion-mobile.md`) consome:
 
 ## Compatibilidade Ionic v8 + Angular 20
 
-A combinacao `Ionic 8.4+ + Angular 20.x + Capacitor 6` foi consolidada no [ADR 0003](../adr/0003-stack-angular-20-ionic-8-capacitor-6.md) como baseline. Caso a versao mais recente do Ionic no momento da execucao nao suporte Angular 20.x, **atualizar o Ionic** em vez de regredir o Angular (o ADR 0003 estabelece essa direcao).
+A combinacao `Ionic 8.4+ + Angular 20.x + Capacitor 6` foi consolidada no [ADR 0003](../../adr/0003-stack-angular-20-ionic-8-capacitor-6.md) como baseline. Caso a versao mais recente do Ionic no momento da execucao nao suporte Angular 20.x, **atualizar o Ionic** em vez de regredir o Angular (o ADR 0003 estabelece essa direcao).
 
 ## Referencias
 
-- [PRD - API SEP §11 (Base mobile), §22 (Trilha paralela Mobile)](../docs-sep/PRD.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [MOBILE-SCREENS-PLAN.md](../docs-sep/MOBILE-SCREENS-PLAN.md) - Fase Mobile 0
-- [ADR 0003 - Stack Angular 20 + Ionic 8 + Capacitor 6](../adr/0003-stack-angular-20-ionic-8-capacitor-6.md)
+- [PRD - API SEP §11 (Base mobile), §22 (Trilha paralela Mobile)](../../docs-sep/PRD.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [MOBILE-SCREENS-PLAN.md](../../docs-sep/MOBILE-SCREENS-PLAN.md) - Fase Mobile 0
+- [ADR 0003 - Stack Angular 20 + Ionic 8 + Capacitor 6](../../adr/0003-stack-angular-20-ionic-8-capacitor-6.md)
 - [Spec 000 - Sprint 0 backend](./000-sprint-0-hygiene-foundation.md)
 - [Spec 100 - F-Sprint 0 frontend web (paralela)](./100-fsprint-0-setup-angular.md)
 - [Spec 201 - M-Sprint 1 (proxima)](./201-msprint-1-tokens-notion-mobile.md)

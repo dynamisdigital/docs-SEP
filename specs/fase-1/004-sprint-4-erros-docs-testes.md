@@ -334,8 +334,8 @@ Task 4.2 (Springdoc + Swagger UI)      --+---+--> Task 4.3 (cobertura + smoke E2
 
 ## Referencias
 
-- [PRD - API SEP](../docs-sep/PRD.md), Secoes 7, 8, 13, 17, 22, 23 e 24
-- [CONTEXT.md](../docs-sep/CONTEXT.md)
+- [PRD - API SEP](../../docs-sep/PRD.md), Secoes 7, 8, 13, 17, 22, 23 e 24
+- [CONTEXT.md](../../docs-sep/CONTEXT.md)
 - [Spec 001](./001-sprint-1-fundacao-tecnica.md)
 - [Spec 002](./002-sprint-2-gestao-usuarios.md)
 - [Spec 003](./003-sprint-3-seguranca-autenticacao.md)

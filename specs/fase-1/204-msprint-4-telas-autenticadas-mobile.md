@@ -271,9 +271,9 @@ M-Sprint 3 concluida
 
 ## Referencias
 
-- [PRD - API SEP §22, §23](../docs-sep/PRD.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [MOBILE-SCREENS-PLAN.md §6.6, §6.7, §6.8, §6.9](../docs-sep/MOBILE-SCREENS-PLAN.md)
+- [PRD - API SEP §22, §23](../../docs-sep/PRD.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [MOBILE-SCREENS-PLAN.md §6.6, §6.7, §6.8, §6.9](../../docs-sep/MOBILE-SCREENS-PLAN.md)
 - [Spec 003 - Sprint 3 backend](./003-sprint-3-seguranca-autenticacao.md)
 - [Spec 004 - Sprint 4 backend (paralela)](./004-sprint-4-erros-docs-testes.md)
 - [Spec 104 - F-Sprint 4 frontend web (paralela)](./104-fsprint-4-telas-autenticadas.md)

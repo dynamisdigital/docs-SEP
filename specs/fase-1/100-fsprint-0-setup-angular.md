@@ -254,9 +254,9 @@ A F-Sprint 1 (`specs/101-fsprint-1-design-tokens-showcase.md`) consome:
 
 ## Referencias
 
-- [PRD - API SEP §11, §22](../docs-sep/PRD.md)
-- [DESIGN-apple.md](../docs-sep/DESIGN-apple.md)
-- [DESIGN-notion.md](../docs-sep/DESIGN-notion.md)
-- [WEB-SCREENS-PLAN.md](../docs-sep/WEB-SCREENS-PLAN.md)
+- [PRD - API SEP §11, §22](../../docs-sep/PRD.md)
+- [DESIGN-apple.md](../../docs-sep/DESIGN-apple.md)
+- [DESIGN-notion.md](../../docs-sep/DESIGN-notion.md)
+- [WEB-SCREENS-PLAN.md](../../docs-sep/WEB-SCREENS-PLAN.md)
 - [Spec 000 - Sprint 0 backend](./000-sprint-0-hygiene-foundation.md)
 - [Spec 101 - F-Sprint 1 (proxima)](./101-fsprint-1-design-tokens-showcase.md)
