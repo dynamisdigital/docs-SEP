@@ -44,7 +44,7 @@ steps/
 | Sprint | Arquivo | Status |
 |--------|---------|--------|
 | Sprint 0 - Hygiene & Foundation | [`backend/000-sprint-0-steps.md`](./backend/000-sprint-0-steps.md) | Pronto para executar |
-| Sprint 1 - Fundacao Tecnica | `backend/001-sprint-1-steps.md` | A criar antes da Sprint 1 |
+| Sprint 1 - Fundacao Tecnica | [`backend/001-sprint-1-steps.md`](./backend/001-sprint-1-steps.md) | Pronto para executar |
 | Sprint 2 - Gestao de Usuarios | `backend/002-sprint-2-steps.md` | A criar antes da Sprint 2 |
 | Sprint 3 - Seguranca e Auth | `backend/003-sprint-3-steps.md` | A criar antes da Sprint 3 |
 | Sprint 4 - Estabilizacao | `backend/004-sprint-4-steps.md` | A criar antes da Sprint 4 |
@@ -54,7 +54,7 @@ steps/
 | Sprint | Arquivo | Status |
 |--------|---------|--------|
 | F-Sprint 0 - Setup Angular | [`web/100-fsprint-0-steps.md`](./web/100-fsprint-0-steps.md) | Pronto para executar |
-| F-Sprint 1 - Tokens + Showcase | `web/101-fsprint-1-steps.md` | A criar antes da F-Sprint 1 |
+| F-Sprint 1 - Tokens + Showcase | [`web/101-fsprint-1-steps.md`](./web/101-fsprint-1-steps.md) | Pronto para executar |
 | F-Sprint 2 - Telas Apple | `web/102-fsprint-2-steps.md` | A criar antes da F-Sprint 2 |
 | F-Sprint 3 - Shell Notion + Auth | `web/103-fsprint-3-steps.md` | A criar antes da F-Sprint 3 |
 | F-Sprint 4 - Telas Autenticadas | `web/104-fsprint-4-steps.md` | A criar antes da F-Sprint 4 |
@@ -64,7 +64,7 @@ steps/
 | Sprint | Arquivo | Status |
 |--------|---------|--------|
 | M-Sprint 0 - Setup Ionic | [`mobile/200-msprint-0-steps.md`](./mobile/200-msprint-0-steps.md) | Pronto para executar |
-| M-Sprint 1 - Tokens Notion Mobile | `mobile/201-msprint-1-steps.md` | A criar antes da M-Sprint 1 |
+| M-Sprint 1 - Tokens Notion Mobile | [`mobile/201-msprint-1-steps.md`](./mobile/201-msprint-1-steps.md) | Pronto para executar |
 | M-Sprint 2 - Telas Publicas | `mobile/202-msprint-2-steps.md` | A criar antes da M-Sprint 2 |
 | M-Sprint 3 - Shell + Auth | `mobile/203-msprint-3-steps.md` | A criar antes da M-Sprint 3 |
 | M-Sprint 4 - Telas Autenticadas | `mobile/204-msprint-4-steps.md` | A criar antes da M-Sprint 4 |
