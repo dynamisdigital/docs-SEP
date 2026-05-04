@@ -425,14 +425,22 @@ No estado atual:
   - **(3A)** workflows de CI movidos de `docs-SEP/.github/workflows/` para `docs-sep/ci-pipelines/templates/` como `sep-api-ci.template.yml`, `sep-app-ci.template.yml`, `sep-mobile-pwa-ci.template.yml`; templates mobile native renomeados com prefixo `sep-mobile-`; cada template deve ser copiado para o `.github/workflows/` do repo correspondente
   - **(4A)** cada repo gerencia seu proprio pre-commit independentemente: `sep-api` com `.githooks/pre-commit` minimo (Spotless), `sep-app` e `sep-mobile` com Husky + lint-staged padrao via `npx husky init`. O agregador cross-repo foi descontinuado.
 - agente de IA realiza apenas **commits** (com descricao) e **criacao de branches por sprint**; push e PR continuam **manuais**, executados pelo desenvolvedor humano
+- **Sprint 0 (Hygiene & Foundation) concluida em 2026-05-04** no repo `sep-api`, branch `sprint-0/hygiene-foundation`, build CI no GitHub verde. Entregaveis materializados:
+  - meta-arquivos (`.gitignore`, `.editorconfig`, `.gitattributes`)
+  - Gradle wrapper 8.10.2 + `build.gradle` minimo (Spotless 6.25.0 + Palantir 2.50.0; JaCoCo 0.8.12 com `jacocoTestCoverageVerification` DESLIGADO ate a Sprint 4); plugin `org.springframework.boot` e dependencias da aplicacao ficaram para a Sprint 1 Task 1.1b para evitar exigencia prematura de main class
+  - `.githooks/pre-commit` rodando `./gradlew spotlessCheck`; cada dev configura `git config core.hooksPath .githooks`
+  - `.github/PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/{bug_report,feature_request}.md` e `CODEOWNERS` com `@mauriciofcjr`
+  - `.github/workflows/ci.yml` (renomeado para `name: CI-API` para diferenciar dos CIs de `sep-app` e `sep-mobile`) executando build + test + Spotless + JaCoCo com Postgres 16 service container; `.github/workflows/docs.yml` para markdownlint (continue-on-error)
+  - `CONTRIBUTING.md` com Conventional Commits + `README.md` expandido (setup, code style, cobertura, hooks, CI, stack, arquitetura, marco regulatorio, sprints)
+  - 12 modulos x 4 layers = 48 `package-info.java` em `src/main/java/com/dynamis/sep_api/{identity,usuarios,onboarding,credito,contratos,cobranca,escrow,backoffice,financeiro,credores,pix,shared}/{domain,application,infrastructure,web}` + `scripts/create-package-structure.sh` + `SepApiApplication` stub (final class privada, ganhara `@SpringBootApplication` e `main` real na Sprint 1 Task 1.1b)
+  - ADRs nao foram duplicados no `sep-api`: vivem em `docs-SEP/adr/` (0001-0011) e o `sep-api/README.md` referencia via `../docs-SEP/adr/`
+- **Branch protection no GitHub** ativa na `main` do `sep-api` apos a Sprint 0; substituicao do placeholder `@MAURICIO_GITHUB_USERNAME` no `CODEOWNERS` ja foi feita pelo desenvolvedor para `@mauriciofcjr`
 
 ## Proximo passo mais natural
 
-Os proximos passos provaveis, dependendo da orientacao do usuario, sao:
-- criar artefatos de especificacao derivados do PRD
-- quebrar o backlog em specs/plans/tasks
-- iniciar a implementacao da API em etapas pequenas
-- estruturar o repositorio backend real, caso ainda nao exista na workspace
+Com a Sprint 0 concluida em 2026-05-04, os proximos passos provaveis sao:
+- gerar `docs-SEP/steps/backend/001-sprint-1-steps.md` just-in-time antes de executar a Sprint 1
+- iniciar a Sprint 1 (Fundacao Tecnica) no repo `sep-api`: plugin `org.springframework.boot` + dependencias (Task 1.1b), `application.yml`/profile `dev` (Task 1.1c), Docker Compose com PostgreSQL 16 (Task 1.1d), Flyway com migration inicial (Task 1.2), `EntidadeAuditavel` + `AuditorAware` (Task 1.3), `ApiExceptionHandler` stub + `ErrorResponseDto` (Task 1.4), modulo `escrow` modelado (Task 1.5), teste de boot (Task 1.6); detalhe no spec [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../specs/fase-1/001-sprint-1-fundacao-tecnica.md)
 - detalhar no futuro a epic de Pix em artefatos proprios quando a fundacao atual estiver concluida
 
 ## Observacao importante para outro agente

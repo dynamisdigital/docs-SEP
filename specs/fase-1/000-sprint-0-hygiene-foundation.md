@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 000
 - **Titulo**: Sprint 0 - Hygiene & Foundation
-- **Status**: aprovada para execucao
+- **Status**: concluida em 2026-05-04 (branch `sprint-0/hygiene-foundation` no repo `sep-api`)
 - **Fase do produto**: pre-Epic 1 (preparacao do terreno)
 - **Origem**: PRD - API SEP, Secao 22 + Plano de melhorias R1
 - **Responsavel principal**: Dev Senior (com apoio dos Devs Plenos para tooling Frontend)
@@ -368,15 +368,35 @@ Criar a arvore de pacotes do monolito modular DDD prevista no PRD §19, com `pac
 
 ## Criterios de Pronto da Sprint 0
 
-- `.gitignore`, `.editorconfig`, `.gitattributes` aplicados e respeitados
-- Spotless configurado e rodando localmente + CI
-- JaCoCo configurado com target 70% (validacao desligada ate Sprint 4 ter cobertura)
-- Pre-commit hook rodando Spotless
-- Branch protection ativa
-- CI verde rodando build + test + Spotless + JaCoCo report
-- Conventional Commits documentado
-- ADR template + 5-7 ADRs iniciais escritos
-- Estrutura de pacotes inicial criada (Task 0.9 pode ficar pendente para inicio da Sprint 1)
+- [x] `.gitignore`, `.editorconfig`, `.gitattributes` aplicados e respeitados
+- [x] Spotless configurado e rodando localmente + CI
+- [x] JaCoCo configurado com target 70% (validacao desligada ate Sprint 4 ter cobertura)
+- [x] Pre-commit hook rodando Spotless
+- [x] Branch protection ativa
+- [x] CI verde rodando build + test + Spotless + JaCoCo report
+- [x] Conventional Commits documentado
+- [x] ADR template + ADRs iniciais escritos (0001-0011 vivem em `docs-SEP/adr/`, referenciados pelo `sep-api/README.md`)
+- [x] Estrutura de pacotes inicial criada (12 modulos x 4 layers = 48 `package-info.java`)
+
+## Resultado da execucao
+
+- **Data de conclusao**: 2026-05-04
+- **Branch**: `sprint-0/hygiene-foundation` no repo `sep-api`
+- **Commits** (7, em ordem):
+  - `chore: adicionar meta-arquivos do repositorio` (Task 0.1)
+  - `build: adicionar Gradle wrapper 8.10.2 com Spotless e JaCoCo` (bootstrap + Tasks 0.2 e 0.3)
+  - `chore: adicionar pre-commit hook que roda Spotless` (Task 0.4)
+  - `chore: adicionar templates de PR/issue e CODEOWNERS` (Task 0.5)
+  - `ci: adicionar pipeline CI minimo (build + test + spotless + jacoco)` (Task 0.6)
+  - `docs: adicionar CONTRIBUTING.md com Conventional Commits` (Task 0.7)
+  - `chore: criar estrutura inicial de pacotes do monolito modular DDD` (Task 0.9)
+- **Validacoes locais**: `./gradlew check` verde, `./gradlew javadoc` verde, hook pre-commit disparado nos 7 commits
+- **Validacoes manuais (humano)**: build CI no GitHub verde, branch protection ativa, CODEOWNERS preenchido com `@mauriciofcjr`
+- **Desvios do spec/steps**:
+  - Workflow `.github/workflows/ci.yml` renomeado de `name: CI` para `name: CI-API` para diferenciar dos CIs futuros de `sep-app` e `sep-mobile`
+  - `build.gradle` ainda nao inclui o plugin `org.springframework.boot` nem dependencias da aplicacao — esses entram na Sprint 1 Task 1.1b para evitar que o plugin Spring Boot exija main class antes da hora
+  - `SepApiApplication.java` ficou como stub (final class privada) so para destravar `./gradlew javadoc`; ganhara `@SpringBootApplication` e `main` real na Sprint 1 Task 1.1b
+  - ADRs nao foram duplicados no `sep-api`: vivem apenas em `docs-SEP/adr/` e o `sep-api/README.md` referencia via `../docs-SEP/adr/`
 
 ## Decisoes para validar antes da Sprint 0
 
