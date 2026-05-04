@@ -6,9 +6,7 @@
 
 **Esforco total estimado**: 2-3 dias de Dev Mobile dedicado.
 
-**Workspace root**: `<workspace-root>` (neste ambiente local: `/home/mauricio/workspaces/workspace-sep`; em Windows, usar `C:/workspace-sep`).
-
-**Localizacao do projeto mobile**: `<workspace-root>/apps/sep-mobile/`.
+**Repo de destino**: `sep-mobile` (clonado em `<sep-mobile-root>/` na maquina do dev). Modelo de 3 repos independentes (PRD §11, AGENT.md). O projeto Ionic ocupa diretamente a raiz do repo — sem subpasta `apps/`.
 
 **Ordem de execucao recomendada**:
 
@@ -58,7 +56,7 @@ M-0.1 (scaffold Ionic)
 
 ## Task M-0.1 - Scaffold Ionic 8.4+ + Angular 20.x + Capacitor 6
 
-**Objetivo**: criar o projeto Ionic/Angular em `apps/sep-mobile`, com Capacitor configurado para validacao PWA inicial, strict mode e estrutura modular por jornada.
+**Objetivo**: criar o projeto Ionic/Angular em `<sep-mobile-root>`, com Capacitor configurado para validacao PWA inicial, strict mode e estrutura modular por jornada.
 
 **Pre-requisito**: Node.js `>= 20.x`.
 
@@ -69,7 +67,7 @@ M-0.1 (scaffold Ionic)
 **Comando**:
 
 ```bash
-cd <workspace-root>
+cd <sep-mobile-root>
 node -v
 npm -v
 git status --short
@@ -79,57 +77,49 @@ git status --short
 
 - `node -v` deve retornar `v20.x.x` ou superior.
 - `npm -v` deve retornar `10.x.x` ou superior.
-- `git status --short` pode ter alteracoes documentais existentes, mas nao deve haver conflito com `apps/sep-mobile`.
+- `git status --short` pode ter alteracoes documentais existentes, mas nao deve haver conflito com `<sep-mobile-root>`.
 
-### Step 200.1.2 - Criar pasta `apps/`
+### Step 200.1.2 - Gerar projeto Ionic na raiz do repo
+
+O Ionic CLI nao tem flag para gerar in-place. A estrategia e gerar em pasta temporaria e mover o conteudo para a raiz do repo `sep-mobile`.
 
 **Comando**:
 
 ```bash
-cd <workspace-root>
-mkdir -p apps
-```
+cd <sep-mobile-root>
+# 1. Gerar em pasta temporaria
+npx @ionic/cli@latest start .ionic-temp blank \
+  --type=angular --capacitor \
+  --package-id=com.dynamis.sep.mobile --no-git
 
-**Verificacao**:
-
-```bash
-ls -la apps
-```
-
-Espera: pasta `apps/` existente.
-
-### Step 200.1.3 - Gerar projeto Ionic
-
-**Comando base**:
-
-```bash
-cd <workspace-root>/apps
-npx @ionic/cli@latest start sep-mobile blank --type=angular --capacitor --package-id=com.dynamis.sep.mobile --no-git
+# 2. Mover conteudo (incluindo arquivos ocultos) para a raiz do repo
+shopt -s dotglob 2>/dev/null || true
+mv .ionic-temp/* .ionic-temp/.* . 2>/dev/null || true
+rmdir .ionic-temp
 ```
 
 **Respostas esperadas do CLI**:
 
-- Framework: Angular.
-- Template: blank.
-- Capacitor: habilitado.
-- Git: nao inicializar dentro do app, pois o repositorio e o root do workspace.
+- Framework: Angular
+- Template: blank
+- Capacitor: habilitado
+- Git: nao inicializar (o repo `sep-mobile` ja foi criado manualmente no GitHub)
 
 **Verificacao**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
-ls -la
-test -f package.json
-test -f capacitor.config.ts
-test -d src/app
+cd <sep-mobile-root>
+test -f package.json && echo "OK package.json"
+test -f capacitor.config.ts && echo "OK capacitor.config.ts"
+test -d src/app && echo "OK src/app"
 ```
 
-### Step 200.1.4 - Validar Angular 20.x, Ionic 8.4+ e Capacitor 6
+### Step 200.1.3 - Validar Angular 20.x, Ionic 8.4+ e Capacitor 6
 
 **Comando**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npx ng version
 npx ionic info
 npm ls @capacitor/core @capacitor/cli @ionic/angular @angular/core
@@ -145,9 +135,9 @@ npm ls @capacitor/core @capacitor/cli @ionic/angular @angular/core
 
 Se o scaffold gerar Angular abaixo de `20` ou acima de `20`, pausar e ajustar antes de qualquer outro step. O ADR 0003 trava Angular `20.x`; nao regredir para `19` ou `17`, e nao aceitar `21` nesta M-Sprint sem decisao explicita.
 
-### Step 200.1.5 - Ajustar `capacitor.config.ts`
+### Step 200.1.4 - Ajustar `capacitor.config.ts`
 
-**Arquivo**: `apps/sep-mobile/capacitor.config.ts`
+**Arquivo**: `<sep-mobile-root>/capacitor.config.ts`
 
 **Conteudo esperado**:
 
@@ -166,18 +156,18 @@ export default config;
 **Verificacao**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npx cap ls
 ```
 
 Espera: Capacitor reconhece a configuracao, mesmo sem plataformas nativas adicionadas.
 
-### Step 200.1.6 - Confirmar strict mode TypeScript e Angular
+### Step 200.1.5 - Confirmar strict mode TypeScript e Angular
 
 **Arquivos**:
 
-- `apps/sep-mobile/tsconfig.json`
-- `apps/sep-mobile/tsconfig.app.json`
+- `<sep-mobile-root>/tsconfig.json`
+- `<sep-mobile-root>/tsconfig.app.json`
 
 **Conferir** que `tsconfig.json` possui strict habilitado:
 
@@ -197,18 +187,18 @@ Espera: Capacitor reconhece a configuracao, mesmo sem plataformas nativas adicio
 **Verificacao**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npx tsc --noEmit
 ```
 
 Espera: zero erros.
 
-### Step 200.1.7 - Criar estrutura modular de pastas
+### Step 200.1.6 - Criar estrutura modular de pastas
 
 **Comandos**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile/src/app
+cd <sep-mobile-root>/src/app
 mkdir -p core/{auth,http,config,guards,interceptors,storage}
 mkdir -p shared/{components,directives,pipes,models,utils}
 mkdir -p layout/{public-shell,mobile-tabs,stack-shell}
@@ -218,7 +208,7 @@ mkdir -p features/{public,tomador,credora}
 **Comandos para estilos**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile/src
+cd <sep-mobile-root>/src
 mkdir -p styles
 touch styles/_tokens.scss
 touch styles/_notion-mobile.scss
@@ -249,14 +239,14 @@ touch styles/index.scss
 **Verificacao**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 find src/app -maxdepth 3 -type d | sort
 find src/styles -maxdepth 1 -type f | sort
 ```
 
-### Step 200.1.8 - Plugar `src/styles/index.scss` no build
+### Step 200.1.7 - Plugar `src/styles/index.scss` no build
 
-**Arquivo**: `apps/sep-mobile/angular.json`
+**Arquivo**: `<sep-mobile-root>/angular.json`
 
 **Ajuste esperado** em `projects.<nome>.architect.build.options.styles`:
 
@@ -275,18 +265,18 @@ Preserve os arquivos padrao do Ionic, especialmente `src/theme/variables.scss` e
 **Verificacao**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run build
 ```
 
 Espera: build gera `www/`.
 
-### Step 200.1.9 - Subir PWA local
+### Step 200.1.8 - Subir PWA local
 
 **Comando**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run start
 ```
 
@@ -296,19 +286,23 @@ npm run start
 - Espera: app blank do Ionic carregando sem erro no console.
 - Encerrar com `Ctrl+C` depois de confirmar.
 
-### Step 200.1.10 - Conferir `.gitignore` raiz
+### Step 200.1.9 - Conferir `.gitignore` do repo
 
-**Arquivo**: `<workspace-root>/.gitignore`
+**Arquivo**: `<sep-mobile-root>/.gitignore`
 
-**Conferir** se cobre artefatos mobile:
+O Ionic CLI ja gera um `.gitignore` razoavel. Confirmar que cobre os artefatos esperados:
 
 ```gitignore
-apps/*/node_modules/
-apps/*/dist/
-apps/*/.angular/
-apps/*/www/
-apps/*/android/
-apps/*/ios/
+node_modules/
+dist/
+.angular/
+www/
+android/
+ios/
+.capacitor/
+coverage/
+playwright-report/
+test-results/
 ```
 
 **Observacao**:
@@ -317,7 +311,7 @@ apps/*/ios/
 
 ### Definicao de pronto da Task M-0.1
 
-- [ ] `apps/sep-mobile/` criado.
+- [ ] `<sep-mobile-root>/` criado.
 - [ ] Angular `20.x` confirmado.
 - [ ] Ionic `8.4+` confirmado.
 - [ ] Capacitor `6.x` confirmado.
@@ -331,7 +325,7 @@ apps/*/ios/
 ### Commit sugerido da Task M-0.1
 
 ```bash
-git add apps/sep-mobile .gitignore
+git add <sep-mobile-root> .gitignore
 git commit -m "feat(mobile): scaffold ionic app"
 ```
 
@@ -350,7 +344,7 @@ git commit -m "feat(mobile): scaffold ionic app"
 **Comando**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm install --save-dev \
   eslint@^9 \
   @eslint/js@^9 \
@@ -374,7 +368,7 @@ npm ls eslint angular-eslint typescript-eslint prettier stylelint husky lint-sta
 
 ### Step 200.2.2 - Criar `.prettierrc.json`
 
-**Arquivo**: `apps/sep-mobile/.prettierrc.json`
+**Arquivo**: `<sep-mobile-root>/.prettierrc.json`
 
 **Conteudo**:
 
@@ -389,7 +383,7 @@ npm ls eslint angular-eslint typescript-eslint prettier stylelint husky lint-sta
 }
 ```
 
-**Arquivo**: `apps/sep-mobile/.prettierignore`
+**Arquivo**: `<sep-mobile-root>/.prettierignore`
 
 **Conteudo**:
 
@@ -404,7 +398,7 @@ test-results/
 
 ### Step 200.2.3 - Criar `eslint.config.js`
 
-**Arquivo**: `apps/sep-mobile/eslint.config.js`
+**Arquivo**: `<sep-mobile-root>/eslint.config.js`
 
 **Conteudo base**:
 
@@ -443,7 +437,7 @@ Se o pacote `@ionic/eslint-config` expuser preset compativel com ESLint flat con
 
 ### Step 200.2.4 - Criar `.stylelintrc.json`
 
-**Arquivo**: `apps/sep-mobile/.stylelintrc.json`
+**Arquivo**: `<sep-mobile-root>/.stylelintrc.json`
 
 **Conteudo**:
 
@@ -469,7 +463,7 @@ Stylelint nao deve reclamar de variaveis como `--ion-color-primary`.
 
 ### Step 200.2.5 - Ajustar scripts do `package.json`
 
-**Arquivo**: `apps/sep-mobile/package.json`
+**Arquivo**: `<sep-mobile-root>/package.json`
 
 **Scripts esperados**:
 
@@ -494,7 +488,7 @@ Stylelint nao deve reclamar de variaveis como `--ion-color-primary`.
 
 ### Step 200.2.6 - Configurar lint-staged
 
-**Arquivo**: `apps/sep-mobile/package.json`
+**Arquivo**: `<sep-mobile-root>/package.json`
 
 **Adicionar na raiz do JSON**:
 
@@ -508,81 +502,49 @@ Stylelint nao deve reclamar de variaveis como `--ion-color-primary`.
 }
 ```
 
-### Step 200.2.7 - Integrar lint-staged ao agregador `.githooks/pre-commit`
+### Step 200.2.7 - Inicializar Husky no repo `sep-mobile`
 
-**Contexto**: o repositorio adota um **unico agregador** de pre-commit em `<workspace-root>/.githooks/pre-commit`, configurado pela Sprint 0 backend (`steps/backend/000-sprint-0-steps.md`, Task 0.4). A F-Sprint 0 web (`steps/web/100-fsprint-0-steps.md`, Step 100.2.7) ja extendeu esse agregador para incluir o `lint-staged` do frontend. Esta task adiciona o terceiro bloco condicional (mobile), preservando os dois anteriores.
+**Contexto**: o repo `sep-mobile` e independente (modelo de 3 repos). Husky e instalado e configurado de forma padrao na raiz do repo, sem dependencia de outros repositorios.
 
-**Pre-condicoes**:
+**Comandos**:
+```bash
+cd <sep-mobile-root>
+npx husky init
+```
 
-- `git config --get core.hooksPath` deve retornar `.githooks`. Se ainda nao retornar, executar:
-  ```bash
-  cd <workspace-root>
-  git config core.hooksPath .githooks
-  ```
-- O arquivo `<workspace-root>/.githooks/pre-commit` ja deve existir (criado pela Sprint 0 backend Task 0.4).
+`husky init` cria `.husky/_/` (gitignored) e `.husky/pre-commit` com `npm test` por padrao. Vamos sobrescrever para rodar `lint-staged` (mais rapido e relevante).
 
-**Nao usar `husky init`**: Husky por padrao instala `.husky/` em outro caminho e seta `core.hooksPath=.husky`, o que sobrescreveria o agregador. O Husky entra apenas como **dependencia de dev** para que `npx lint-staged` funcione, mas o ponto de entrada do hook continua sendo `.githooks/pre-commit`.
+**Arquivo**: `<sep-mobile-root>/.husky/pre-commit`
 
-**Arquivo**: `<workspace-root>/.githooks/pre-commit`
-
-**Conteudo final esperado** (com os 3 blocos: backend Spotless + frontend lint-staged + mobile lint-staged):
-
+**Conteudo**:
 ```sh
-#!/bin/sh
-# Hook agregador: roda Spotless do backend, lint-staged do frontend e lint-staged do mobile,
-# condicionado aos arquivos staged de cada trilha.
-
-set -e
-
-# Spotless backend (se houver mudanca em arquivos Java/Gradle/Kotlin DSL)
-if git diff --cached --name-only | grep -qE '\.(java|gradle|kts)$'; then
-  echo "→ rodando Spotless backend..."
-  ./gradlew spotlessCheck
-fi
-
-# lint-staged frontend (se houver mudanca em apps/sep-frontend/)
-if git diff --cached --name-only | grep -q '^apps/sep-frontend/'; then
-  echo "→ rodando lint-staged frontend..."
-  cd apps/sep-frontend
-  npx lint-staged
-  cd - > /dev/null
-fi
-
-# lint-staged mobile (se houver mudanca em apps/sep-mobile/)
-if git diff --cached --name-only | grep -q '^apps/sep-mobile/'; then
-  echo "→ rodando lint-staged mobile..."
-  cd apps/sep-mobile
-  npx lint-staged
-  cd - > /dev/null
-fi
+npx lint-staged
 ```
 
 **Tornar executavel** (Linux/macOS):
 ```bash
-chmod +x <workspace-root>/.githooks/pre-commit
+chmod +x <sep-mobile-root>/.husky/pre-commit
 ```
 
 **Verificacao**:
 ```bash
 # 1. Sujar um arquivo TS de proposito
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 echo "const x = 1" >> src/app/app.component.ts
 git add src/app/app.component.ts
 git commit -m "test: validar pre-commit mobile"
-# Espera: hook mobile dispara, auto-corrige (adiciona ;) e o commit passa
+# Espera: hook auto-corrige (adiciona ;) e o commit passa
 git reset --hard HEAD~1   # reverte o commit de teste
 ```
 
-**Observacao**:
-- Husky permanece em `package.json` apenas para o `npx lint-staged` resolver corretamente; nao instalar hooks via `husky init`.
-- Se o agregador ainda nao foi extendido pela F-Sprint 0 web, copiar o bloco frontend do `steps/web/100-fsprint-0-steps.md` Step 100.2.7 antes de adicionar o bloco mobile.
+> Nota sobre os outros repos: `sep-api` usa `.githooks/pre-commit` minimo (Spotless) — ver Sprint 0 backend Task 0.4. `sep-app` segue o mesmo padrao Husky deste repo (ver F-Sprint 0 Step 100.2.6/100.2.7). Cada repo gerencia hooks independentemente.
 
 ### Step 200.2.8 - Rodar lint e format check
 
 **Comando**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run lint
 npm run format:check
 ```
@@ -597,8 +559,8 @@ Zero erros.
 - [ ] Angular ESLint `20` configurado.
 - [ ] Prettier configurado.
 - [ ] Stylelint configurado com suporte a `--ion-*`.
-- [ ] Bloco mobile adicionado ao agregador `.githooks/pre-commit` (sem usar `husky init`).
-- [ ] `core.hooksPath` aponta para `.githooks` (compartilhado com backend e web).
+- [ ] Husky inicializado no repo via `npx husky init`.
+- [ ] `.husky/pre-commit` rodando `npx lint-staged`.
 - [ ] lint-staged configurado para TS, HTML, SCSS, JSON, Markdown e YAML.
 - [ ] `npm run lint` passa.
 - [ ] `npm run format:check` passa.
@@ -606,8 +568,9 @@ Zero erros.
 ### Commit sugerido da Task M-0.2
 
 ```bash
-git add apps/sep-mobile .githooks/pre-commit
-git commit -m "chore(mobile): configure lint and formatting"
+cd <sep-mobile-root>
+git add eslint.config.js .prettierrc.json .prettierignore .stylelintrc.json .husky package.json package-lock.json
+git commit -m "chore: configure lint, formatting and pre-commit hooks"
 ```
 
 ---
@@ -627,7 +590,7 @@ git commit -m "chore(mobile): configure lint and formatting"
 **Comando**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm install --save-dev \
   vitest@^2 \
   @vitest/coverage-v8@^2 \
@@ -648,7 +611,7 @@ npm ls vitest @playwright/test msw @analogjs/vitest-angular @analogjs/vite-plugi
 
 ### Step 200.3.2 - Criar `vitest.config.ts`
 
-**Arquivo**: `apps/sep-mobile/vitest.config.ts`
+**Arquivo**: `<sep-mobile-root>/vitest.config.ts`
 
 **Conteudo**:
 
@@ -683,7 +646,7 @@ export default defineConfig(() => ({
 
 ### Step 200.3.3 - Criar setup de testes
 
-**Arquivo**: `apps/sep-mobile/src/test/setup.ts`
+**Arquivo**: `<sep-mobile-root>/src/test/setup.ts`
 
 **Conteudo**:
 
@@ -704,7 +667,7 @@ getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDyn
 
 **Observacao**: `setup-zone` precisa vir antes de qualquer import do `@angular/core/testing` para configurar `Zone.js` no contexto Vitest.
 
-**Arquivo**: `apps/sep-mobile/src/app/app.component.spec.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/app.component.spec.ts`
 
 **Conteudo base**:
 
@@ -727,7 +690,7 @@ Se o template Ionic inicial nao expuser `role="main"`, ajustar o teste para um e
 
 ### Step 200.3.4 - Ajustar scripts de teste no `package.json`
 
-**Arquivo**: `apps/sep-mobile/package.json`
+**Arquivo**: `<sep-mobile-root>/package.json`
 
 **Scripts esperados**:
 
@@ -745,7 +708,7 @@ Preserve os scripts criados nas tasks anteriores.
 
 ### Step 200.3.5 - Criar handlers MSW
 
-**Arquivo**: `apps/sep-mobile/src/mocks/handlers.ts`
+**Arquivo**: `<sep-mobile-root>/src/mocks/handlers.ts`
 
 **Conteudo**:
 
@@ -785,7 +748,7 @@ export const handlers = [
 ];
 ```
 
-**Arquivo**: `apps/sep-mobile/src/mocks/browser.ts`
+**Arquivo**: `<sep-mobile-root>/src/mocks/browser.ts`
 
 **Conteudo**:
 
@@ -801,7 +764,7 @@ export const worker = setupWorker(...handlers);
 **Comando**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npx msw init public/ --save
 ```
 
@@ -813,7 +776,7 @@ test -f public/mockServiceWorker.js
 
 ### Step 200.3.7 - Ativar MSW somente em desenvolvimento local
 
-**Arquivo**: `apps/sep-mobile/src/main.ts`
+**Arquivo**: `<sep-mobile-root>/src/main.ts`
 
 **Padrao esperado**:
 
@@ -842,7 +805,7 @@ Preserve o bootstrap gerado pelo Ionic. O ponto importante e iniciar MSW antes d
 
 ### Step 200.3.8 - Criar Playwright config mobile PWA
 
-**Arquivo**: `apps/sep-mobile/playwright.config.ts`
+**Arquivo**: `<sep-mobile-root>/playwright.config.ts`
 
 **Conteudo**:
 
@@ -871,7 +834,7 @@ export default defineConfig({
 
 ### Step 200.3.9 - Criar smoke E2E
 
-**Arquivo**: `apps/sep-mobile/e2e/smoke.spec.ts`
+**Arquivo**: `<sep-mobile-root>/e2e/smoke.spec.ts`
 
 **Conteudo**:
 
@@ -887,7 +850,7 @@ test('carrega o PWA mobile', async ({ page }) => {
 
 ### Step 200.3.10 - Ajustar scripts E2E
 
-**Arquivo**: `apps/sep-mobile/package.json`
+**Arquivo**: `<sep-mobile-root>/package.json`
 
 **Scripts esperados**:
 
@@ -905,7 +868,7 @@ test('carrega o PWA mobile', async ({ page }) => {
 **Comando**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run test
 npm run e2e
 ```
@@ -930,7 +893,7 @@ npm run e2e
 ### Commit sugerido da Task M-0.3
 
 ```bash
-git add apps/sep-mobile
+git add <sep-mobile-root>
 git commit -m "test(mobile): configure vitest playwright and msw"
 ```
 
@@ -944,71 +907,28 @@ git commit -m "test(mobile): configure vitest playwright and msw"
 
 **Esforco**: 30-45 min.
 
-### Step 200.4.1 - Criar workflow Mobile CI
+### Step 200.4.1 - Copiar template de CI para o repo
 
-**Arquivo**: `<workspace-root>/.github/workflows/mobile-ci.yml`
-
-**Conteudo**:
-
-```yaml
-name: Mobile CI
-
-on:
-  pull_request:
-    paths:
-      - 'apps/sep-mobile/**'
-      - '.github/workflows/mobile-ci.yml'
-  push:
-    branches:
-      - main
-    paths:
-      - 'apps/sep-mobile/**'
-      - '.github/workflows/mobile-ci.yml'
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: apps/sep-mobile
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
-          cache-dependency-path: apps/sep-mobile/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Unit tests
-        run: npm run test:coverage
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: E2E smoke
-        run: npm run e2e
-
-      - name: Build PWA
-        run: npm run build
-```
-
-### Step 200.4.2 - Validar workflow localmente por equivalencia
+O template de CI mobile vive versionado em `docs-SEP/docs-sep/ci-pipelines/templates/sep-mobile-pwa-ci.template.yml`. Copiar para o repo `sep-mobile`:
 
 **Comando**:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+mkdir -p <sep-mobile-root>/.github/workflows
+cp <docs-SEP-root>/docs-sep/ci-pipelines/templates/sep-mobile-pwa-ci.template.yml \
+   <sep-mobile-root>/.github/workflows/ci.yml
+```
+
+> Substituir `<docs-SEP-root>` pelo caminho local onde o repo `docs-SEP` esta clonado.
+
+O template ja vem sem `paths-filter` nem `working-directory` (cada repo so tem um app — workflow roda no root do repo).
+
+### Step 200.4.2 - Validar suite local antes do primeiro push
+
+**Comando**:
+
+```bash
+cd <sep-mobile-root>
 npm ci
 npm run lint
 npm run test:coverage
@@ -1018,42 +938,29 @@ npm run build
 
 **Espera**:
 
-Todos os comandos passam localmente antes de abrir PR.
-
-### Step 200.4.3 - Conferir escopo do workflow
-
-**Verificacao**:
-
-```bash
-cd <workspace-root>
-grep -n "apps/sep-mobile" .github/workflows/mobile-ci.yml
-```
-
-Espera: workflow dispara apenas para alteracoes mobile ou no proprio workflow.
+Todos os comandos passam localmente antes de abrir PR no GitHub.
 
 ### Definicao de pronto da Task M-0.4
 
-- [ ] `.github/workflows/mobile-ci.yml` criado.
+- [ ] `.github/workflows/ci.yml` copiado do template `sep-mobile-pwa-ci.template.yml`.
 - [ ] CI usa Node `20`.
 - [ ] CI usa `npm ci`.
-- [ ] CI roda lint.
-- [ ] CI roda unit tests com coverage.
-- [ ] CI roda smoke E2E Playwright.
-- [ ] CI roda build PWA.
-- [ ] Paths limitados a `apps/sep-mobile/**` e workflow mobile.
+- [ ] CI roda lint, test:coverage, build PWA.
+- [ ] CI nao tem `paths-filter` (modelo de 3 repos: cada repo so tem um app).
+- [ ] Suite local verde antes do primeiro push.
 
 ### Commit sugerido da Task M-0.4
 
 ```bash
-git add .github/workflows/mobile-ci.yml
-git commit -m "ci(mobile): add mobile pipeline"
+git add .github/workflows/ci.yml
+git commit -m "ci: adicionar workflow de validacao PWA"
 ```
 
 ---
 
 ## Checklist final da M-Sprint 0
 
-- [ ] Projeto Ionic em `apps/sep-mobile/`.
+- [ ] Projeto Ionic em `<sep-mobile-root>/`.
 - [ ] Angular `20.x` confirmado.
 - [ ] Ionic `8.4+` confirmado.
 - [ ] Capacitor `6.x` confirmado.
@@ -1075,7 +982,7 @@ git commit -m "ci(mobile): add mobile pipeline"
 Rodar na ordem:
 
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run lint
 npm run format:check
 npm run test:coverage

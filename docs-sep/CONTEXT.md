@@ -396,12 +396,12 @@ No estado atual:
 - a infraestrutura AWS ficou registrada como trilha tecnica habilitadora, podendo ocorrer antes de Pix se o time precisar de ambiente remoto, mas sem quebrar a prioridade funcional da jornada de contratacao
 - a pasta `steps/` foi reorganizada em tres subpastas para isolar as trilhas de execucao por papel: `steps/backend/` (Sprints 0XX, Dev Senior), `steps/web/` (F-Sprints 1XX, Devs Plenos Frontend) e `steps/mobile/` (M-Sprints 2XX, Dev Mobile); o indice consolidado vive em `steps/README.md` e os arquivos ja existentes (`000-sprint-0-steps.md` e `100-fsprint-0-steps.md`) foram movidos para suas respectivas pastas com os caminhos relativos atualizados
 - as tres Sprint 0 (backend, web e mobile) ja tem steps detalhados, revisados em conjunto e coesos entre si: `steps/backend/000-sprint-0-steps.md`, `steps/web/100-fsprint-0-steps.md` e `steps/mobile/200-msprint-0-steps.md`
-- decisoes de execucao consolidadas durante a revisao das tres Sprint 0:
-  - pre-commit unico via agregador `.githooks/pre-commit` com tres blocos condicionais (Spotless backend, lint-staged frontend, lint-staged mobile), disparados pelo mesmo `core.hooksPath=.githooks`; Husky entra apenas como dependencia de dev no web e mobile, sem `husky init`, para nao sobrescrever o agregador
+- decisoes de execucao consolidadas durante a revisao das tres Sprint 0 (atualizadas em 2026-05-04 apos a separacao em 3 repos — ver item mais abaixo):
+  - **pre-commit por repo independente**: `sep-api` usa `.githooks/pre-commit` minimo (Spotless), `sep-app` e `sep-mobile` usam Husky padrao via `npx husky init`. Sem agregador cross-repo (a versao monorepo anterior foi descontinuada).
   - Vitest nas duas trilhas Angular (web e mobile) usa `@analogjs/vite-plugin-angular` + `@analogjs/vitest-angular`, pois Vitest puro nao compila templates Angular
   - MSW alinhado ao PRD §21 em web (perfil `ADMIN`) e mobile (perfil `CLIENTE`), com `POST /auth/login` e `GET /auth/me`
-  - localizacao dos apps padronizada em `apps/sep-frontend/` e `apps/sep-mobile/`, com backend Gradle no root
-  - GitHub Actions com path-filter por trilha, Node 20 + cache npm e Conventional Commits
+  - cada projeto ocupa a raiz do seu repo (`sep-api`, `sep-app`, `sep-mobile`), sem subpasta `apps/`
+  - GitHub Actions por repo, sem `paths-filter` (cada repo so tem um app); workflows copiados de `docs-sep/ci-pipelines/templates/`
 - planejamento da Fase 2 concluido em 2026-05-04: 10 sprints (Sprint 5 ja existente como gate de hardening + 9 sprints novas para Epics 5-9), apenas backend; web/mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem; decisoes 1B/2B/3C/4D registradas:
   - **1B**: Sprint 5 abre a Fase 2 (gate de hardening obrigatorio antes de qualquer integracao real com Celcoin)
   - **2B**: granularidade de 2 sprints por Epic 5-8 (parte 1 + parte 2), Epic 9 em sprint unica → 9 sprints novas (006-014)
@@ -419,6 +419,12 @@ No estado atual:
   - ADR 0012: Provedor de assinatura digital (Sprint 11) — gate da Sprint 11
   - ADR 0013: Estrategia de notificacoes transacionais (Sprint 13) — gate da Sprint 13
 - steps continuam **just-in-time** (regra do AGENT.md): nao foram gerados em massa nesta etapa, apenas antes da execucao de cada sprint da Fase 2
+- repositorios separados criados manualmente em 2026-05-04: `sep-api` (Java backend), `sep-app` (Angular frontend), `sep-mobile` (Ionic mobile). Documentacao consolidada permanece em `docs-SEP`. Decisoes do planejamento da migracao documental:
+  - **(1B)** package Java renomeado de `com.dynamis.broker_app` para `com.dynamis.sep_api`; artifact ID `broker-app` → `sep-api`; classe principal `BrokerAppApplication` → `SepApiApplication`
+  - **(2A)** paths nos specs/steps usam placeholders `<sep-api-root>`, `<sep-app-root>`, `<sep-mobile-root>` (substituem `apps/sep-frontend/`, `apps/sep-mobile/` e `C:/workspace-sep/`)
+  - **(3A)** workflows de CI movidos de `docs-SEP/.github/workflows/` para `docs-sep/ci-pipelines/templates/` como `sep-api-ci.template.yml`, `sep-app-ci.template.yml`, `sep-mobile-pwa-ci.template.yml`; templates mobile native renomeados com prefixo `sep-mobile-`; cada template deve ser copiado para o `.github/workflows/` do repo correspondente
+  - **(4A)** cada repo gerencia seu proprio pre-commit independentemente: `sep-api` com `.githooks/pre-commit` minimo (Spotless), `sep-app` e `sep-mobile` com Husky + lint-staged padrao via `npx husky init`. O agregador cross-repo foi descontinuado.
+- agente de IA realiza apenas **commits** (com descricao) e **criacao de branches por sprint**; push e PR continuam **manuais**, executados pelo desenvolvedor humano
 
 ## Proximo passo mais natural
 

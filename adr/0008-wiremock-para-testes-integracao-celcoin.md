@@ -84,7 +84,7 @@ testImplementation 'org.wiremock.integrations:wiremock-spring-boot:3.x'
 ### Estrutura de arquivos
 ```
 src/test/
-├── java/com/dynamis/broker_app/
+├── java/com/dynamis/sep_api/
 │   └── <modulo>/infrastructure/adapter/<X>/
 │       └── Celcoin<X>ProviderIT.java
 └── resources/

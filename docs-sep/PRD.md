@@ -252,6 +252,16 @@ Pode autenticar, consultar qualquer usuario por id e listar todos os usuarios.
 
 ## 11. Arquitetura e Tecnologia
 
+### Organizacao em 3 repositorios independentes (2026-05-04)
+
+Os artefatos do produto vivem em 3 repositorios separados no GitHub:
+
+- **`sep-api`** — backend Java + Spring Boot (package `com.dynamis.sep_api`)
+- **`sep-app`** — frontend web Angular 20.x
+- **`sep-mobile`** — mobile Ionic 8.4 + Angular 20.x + Capacitor 6
+
+A documentacao consolidada (este PRD, ADRs, specs, steps, AGENT.md, templates de CI) vive no repositorio **`docs-SEP`** (4o repo). Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias. Specs e steps usam os placeholders `<sep-api-root>`, `<sep-app-root>` e `<sep-mobile-root>` para representar a raiz de cada repo localmente clonado.
+
 ### Stack principal (versoes pinadas)
 
 **Linguagem e build**
@@ -635,19 +645,19 @@ ADRs vivem em [`adr/`](../adr/) e devem ser atualizados quando uma decisao tecni
 O backend deve nascer como monolito modular orientado a DDD. A separacao principal deve ser por modulo de dominio, nao por camada global.
 
 ### Estrutura base recomendada
-- `com.dynamis.broker_app`
-- `com.dynamis.broker_app.identity`
-- `com.dynamis.broker_app.usuarios`
-- `com.dynamis.broker_app.onboarding`
-- `com.dynamis.broker_app.credito`
-- `com.dynamis.broker_app.contratos`
-- `com.dynamis.broker_app.cobranca`
-- `com.dynamis.broker_app.escrow`
-- `com.dynamis.broker_app.backoffice`
-- `com.dynamis.broker_app.financeiro`
-- `com.dynamis.broker_app.credores`
-- `com.dynamis.broker_app.pix`
-- `com.dynamis.broker_app.shared`
+- `com.dynamis.sep_api`
+- `com.dynamis.sep_api.identity`
+- `com.dynamis.sep_api.usuarios`
+- `com.dynamis.sep_api.onboarding`
+- `com.dynamis.sep_api.credito`
+- `com.dynamis.sep_api.contratos`
+- `com.dynamis.sep_api.cobranca`
+- `com.dynamis.sep_api.escrow`
+- `com.dynamis.sep_api.backoffice`
+- `com.dynamis.sep_api.financeiro`
+- `com.dynamis.sep_api.credores`
+- `com.dynamis.sep_api.pix`
+- `com.dynamis.sep_api.shared`
 
 ### Responsabilidade dos modulos
 - `identity`: autenticacao, JWT, senha, roles, permissoes e usuario autenticado
@@ -676,10 +686,10 @@ Estrutura de pacotes detalhada por modulo:
 - `<modulo>.web.{controller,dto,mapper}`
 
 Exemplo conceitual:
-- `com.dynamis.broker_app.identity.domain`
-- `com.dynamis.broker_app.identity.application`
-- `com.dynamis.broker_app.identity.infrastructure`
-- `com.dynamis.broker_app.identity.web`
+- `com.dynamis.sep_api.identity.domain`
+- `com.dynamis.sep_api.identity.application`
+- `com.dynamis.sep_api.identity.infrastructure`
+- `com.dynamis.sep_api.identity.web`
 
 ### Regras de organizacao
 - controladores apenas recebem request e devolvem response
@@ -1047,11 +1057,11 @@ As tres Sprint 0 ja tem steps detalhados, revisados e coesos entre si:
 
 Pontos de coesao entre as tres Sprint 0 (decisoes ja alinhadas no detalhamento):
 
-- **Pre-commit unico via agregador `.githooks/pre-commit`** com tres blocos condicionais (Spotless backend, lint-staged frontend, lint-staged mobile), todos disparados pelo mesmo `core.hooksPath=.githooks` configurado uma unica vez por dev. Husky entra apenas como dependencia de dev no web e mobile, sem usar `husky init` para nao sobrescrever o agregador.
+- **Pre-commit por repo independente** (modelo de 3 repos, ver §11): `sep-api` usa `.githooks/pre-commit` minimo rodando `./gradlew spotlessCheck`; `sep-app` e `sep-mobile` usam Husky + lint-staged padrao via `npx husky init`. Sem agregador cross-repo.
 - **Vitest com `@analogjs/vite-plugin-angular` + `@analogjs/vitest-angular`** nas duas trilhas Angular (web e mobile), pois Vitest puro nao compila templates Angular.
 - **MSW alinhado ao PRD §21** em web e mobile (`POST /auth/login`, `GET /auth/me`), com payloads ISO-8601 e UUID v6 do exemplo do PRD; web cobre perfil `ADMIN` (escopo de gestao de usuarios), mobile cobre `CLIENTE` (escopo tomador/credora).
-- **Localizacao dos apps**: `apps/sep-frontend/` e `apps/sep-mobile/` na raiz do workspace, deixando o backend Gradle no root.
-- **GitHub Actions com path-filter** por trilha (`apps/sep-frontend/**`, `apps/sep-mobile/**`), Node 20 + cache npm, Conventional Commits.
+- **Localizacao dos projetos**: cada repo (`sep-api`, `sep-app`, `sep-mobile`) hospeda o respectivo projeto na propria raiz, sem subpastas `apps/`.
+- **GitHub Actions por repo** sem `paths-filter` (cada repo so tem um app); workflows sao copiados de templates versionados em `docs-sep/ci-pipelines/templates/`. Node 20 + cache npm, Conventional Commits.
 
 ### Definition of Done (DoD) por tipo de task
 
@@ -1783,7 +1793,7 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 
 ## 28. Apendice - Orientacao para agentes de IA
 
-A orientacao operacional para os agentes de IA que assumem trabalho neste projeto (Claude, Codex, Copilot) esta consolidada em [`AGENT.md`](../AGENT.md), na raiz do repositorio.
+A orientacao operacional para os agentes de IA que assumem trabalho neste projeto (Claude, Codex, Copilot) esta consolidada em [`AGENT.md`](../AGENT.md), na raiz do repositorio `docs-SEP`. O projeto opera em 3 repositorios separados (`sep-api`, `sep-app`, `sep-mobile`), conforme descrito na §11; o `AGENT.md` tambem registra essa estrategia logo no inicio (secao "Repositorios do projeto").
 
 **Pre-requisito de leitura**: toda nova instancia de agente de IA, antes de qualquer acao no repositorio, deve ler:
 

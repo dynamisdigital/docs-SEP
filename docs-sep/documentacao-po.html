@@ -1419,6 +1419,10 @@
   <h2>12. Pipeline GitHub (Visão de Produto)</h2>
   <div class="subtitle">Como o fluxo de entrega se conecta ao GitHub — visão alto nível.</div>
 
+  <div class="alert" style="background: #eff6ff; border-left-color: #3b82f6;">
+    <strong>3 repositórios independentes (desde 2026-05-04):</strong> o projeto opera em <code>sep-api</code> (Java), <code>sep-app</code> (Angular) e <code>sep-mobile</code> (Ionic). A documentação consolidada (este HTML, PRD, ADRs, specs, steps, templates de CI) vive em <code>docs-SEP</code>. Cada repositório tem seu próprio CI, pre-commit e dependências. Os templates de CI estão em <code>docs-sep/ci-pipelines/templates/</code> e são copiados para <code>.github/workflows/</code> de cada repo correspondente.
+  </div>
+
   <div class="diagram-wrapper">
     <svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg">
       <defs>

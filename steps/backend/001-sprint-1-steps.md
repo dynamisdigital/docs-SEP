@@ -6,7 +6,7 @@
 
 **Esforco total estimado**: 4-6 dias de Dev Senior dedicado, com possibilidade de paralelismo apos a Task 1.1c (Tasks 1.2, 1.3, 1.5, 1.6, 1.7 podem rodar em paralelo).
 
-**Workspace root**: `C:/workspace-sep/` (mantendo convencao do `steps/backend/000-sprint-0-steps.md`; em Linux/macOS, usar o equivalente local).
+**Workspace root**: `<sep-api-root>/` (mantendo convencao do `steps/backend/000-sprint-0-steps.md`; em Linux/macOS, usar o equivalente local).
 
 **Ordem de execucao recomendada** (dependencias entre tasks):
 
@@ -65,16 +65,16 @@ Task 1.1b (Dependencias) ------> Task 1.1c (application.yml)
 
 **Comando** (gerar projeto base via Spring Initializr CLI ou web):
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 curl https://start.spring.io/starter.zip \
   -d type=gradle-project \
   -d language=java \
   -d bootVersion=3.5.5 \
   -d baseDir=. \
   -d groupId=com.dynamis \
-  -d artifactId=broker-app \
-  -d name=broker-app \
-  -d packageName=com.dynamis.broker_app \
+  -d artifactId=sep-api \
+  -d name=sep-api \
+  -d packageName=com.dynamis.sep_api \
   -d javaVersion=21 \
   -d dependencies=web,security,data-jpa,validation,actuator,flyway,postgresql \
   -o starter.zip
@@ -87,8 +87,8 @@ rm starter.zip
 - Language: Java
 - Spring Boot: 3.5.5 (ou minor mais recente disponivel da linha 3.5.x)
 - Group: `com.dynamis`
-- Artifact: `broker-app`
-- Package name: `com.dynamis.broker_app`
+- Artifact: `sep-api`
+- Package name: `com.dynamis.sep_api`
 - Java: 21
 - Dependencies: Web, Security, Data JPA, Validation, Actuator, Flyway, PostgreSQL
 
@@ -96,7 +96,7 @@ Baixar o ZIP, extrair na raiz do workspace.
 
 **Verificacao**:
 ```bash
-ls -la C:/workspace-sep
+ls -la <sep-api-root>
 # Esperado: build.gradle, settings.gradle, gradlew, gradlew.bat, gradle/, src/
 cat build.gradle | head -10
 # Esperado: ver plugin `org.springframework.boot` e `java`
@@ -106,7 +106,7 @@ cat build.gradle | head -10
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 ./gradlew --version
 # Esperado: Gradle 8.x (qualquer minor da linha 8)
 cat gradle/wrapper/gradle-wrapper.properties | grep distributionUrl
@@ -122,14 +122,14 @@ Se a versao for inferior a 8, atualizar:
 
 **Verificacao**:
 ```bash
-ls -la C:/workspace-sep/src/main/java/com/dynamis/broker_app
-# Esperado: BrokerAppApplication.java
-cat src/main/java/com/dynamis/broker_app/BrokerAppApplication.java
+ls -la <sep-api-root>/src/main/java/com/dynamis/sep_api
+# Esperado: SepApiApplication.java
+cat src/main/java/com/dynamis/sep_api/SepApiApplication.java
 # Esperado: classe @SpringBootApplication
 ```
 
 **Renomear classe principal** (opcional, mas alinhado ao naming do PRD):
-- O Spring Initializr gera `BrokerAppApplication`. Manter.
+- O Spring Initializr gera `SepApiApplication`. Manter.
 
 ### Step 1.1a.4 — Criar/confirmar estrutura DDD por modulo (12 modulos × 4 layers + sub-pacotes Hexagonal)
 
@@ -137,7 +137,7 @@ A Sprint 0 Task 0.9 ja criou 48 `package-info.java` (12 modulos × 4 layers `dom
 
 **Comando**: criar sub-pacotes esperados em cada modulo. Script utilitario:
 ```bash
-cd C:/workspace-sep/src/main/java/com/dynamis/broker_app
+cd <sep-api-root>/src/main/java/com/dynamis/sep_api
 for modulo in identity usuarios onboarding credito contratos cobranca escrow backoffice financeiro credores pix shared; do
   mkdir -p "$modulo/domain/model" "$modulo/domain/event" "$modulo/domain/exception" "$modulo/domain/vo"
   mkdir -p "$modulo/application/usecase" "$modulo/application/port/out" "$modulo/application/service"
@@ -148,9 +148,9 @@ done
 
 **Verificacao**:
 ```bash
-find src/main/java/com/dynamis/broker_app -type d -name "model" | wc -l
+find src/main/java/com/dynamis/sep_api -type d -name "model" | wc -l
 # Esperado: 12 (um para cada modulo)
-find src/main/java/com/dynamis/broker_app -type d -name "port" | wc -l
+find src/main/java/com/dynamis/sep_api -type d -name "port" | wc -l
 # Esperado: 12 (cada port contem subpasta out/)
 ```
 
@@ -158,7 +158,7 @@ find src/main/java/com/dynamis/broker_app -type d -name "port" | wc -l
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 ./gradlew compileJava --no-daemon
 ```
 
@@ -167,13 +167,13 @@ cd C:/workspace-sep
 ### Definicao de pronto da Task 1.1a
 - [ ] Spring Initializr executado, projeto raiz com `build.gradle`, `settings.gradle`, `gradle/wrapper/`, `gradlew`/`gradlew.bat`
 - [ ] Gradle Wrapper na versao 8.x confirmado
-- [ ] `src/main/java/com/dynamis/broker_app/BrokerAppApplication.java` presente
+- [ ] `src/main/java/com/dynamis/sep_api/SepApiApplication.java` presente
 - [ ] 12 modulos com sub-pacotes Hexagonal criados (`domain/{model,event,exception,vo}`, `application/{usecase,port/out,service}`, `infrastructure/{persistence,adapter,config}`, `web/{controller,dto,mapper}`)
 - [ ] `./gradlew compileJava` passa
 
 ### Commit Task 1.1a
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 git add build.gradle settings.gradle gradle/ gradlew gradlew.bat src/main/
 git commit -m "feat(backend): scaffold inicial Spring Boot 3.5 + estrutura DDD por modulo"
 ```
@@ -190,7 +190,7 @@ git commit -m "feat(backend): scaffold inicial Spring Boot 3.5 + estrutura DDD p
 
 ### Step 1.1b.1 — Reescrever `build.gradle` completo
 
-**Arquivo**: `C:/workspace-sep/build.gradle`
+**Arquivo**: `<sep-api-root>/build.gradle`
 
 **Conteudo**:
 ```gradle
@@ -314,7 +314,7 @@ compileJava {
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 ./gradlew dependencies --configuration runtimeClasspath > /tmp/deps-runtime.txt
 ./gradlew dependencies --configuration testRuntimeClasspath > /tmp/deps-test.txt
 ```
@@ -333,7 +333,7 @@ Se houver conflitos de versao, ler a saida e ajustar. Para a maioria dos casos, 
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 ./gradlew clean build --no-daemon -x test
 ```
 
@@ -366,7 +366,7 @@ Se falhar, rodar:
 
 ### Commit Task 1.1b
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 git add build.gradle
 git commit -m "build(backend): pinar dependencias da Sprint 1 (Spring Boot 3.5, MapStruct, WireMock, Resilience4j)"
 ```
@@ -383,7 +383,7 @@ git commit -m "build(backend): pinar dependencias da Sprint 1 (Spring Boot 3.5, 
 
 ### Step 1.1c.1 — Criar `application.yml` (defaults)
 
-**Arquivo**: `C:/workspace-sep/src/main/resources/application.yml`
+**Arquivo**: `<sep-api-root>/src/main/resources/application.yml`
 
 **Conteudo**:
 ```yaml
@@ -391,7 +391,7 @@ spring:
   profiles:
     default: dev
   application:
-    name: broker-app
+    name: sep-api
 
   jpa:
     hibernate:
@@ -458,7 +458,7 @@ app:
 logging:
   level:
     root: INFO
-    com.dynamis.broker_app: DEBUG
+    com.dynamis.sep_api: DEBUG
     org.hibernate.SQL: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{correlationId:-}] %-5level %logger{36} - %msg%n"
@@ -466,7 +466,7 @@ logging:
 
 ### Step 1.1c.2 — Criar `application-dev.yml`
 
-**Arquivo**: `C:/workspace-sep/src/main/resources/application-dev.yml`
+**Arquivo**: `<sep-api-root>/src/main/resources/application-dev.yml`
 
 **Conteudo**:
 ```yaml
@@ -499,12 +499,12 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
-    com.dynamis.broker_app: TRACE
+    com.dynamis.sep_api: TRACE
 ```
 
 ### Step 1.1c.3 — Criar `application-test.yml`
 
-**Arquivo**: `C:/workspace-sep/src/test/resources/application-test.yml`
+**Arquivo**: `<sep-api-root>/src/test/resources/application-test.yml`
 
 **Conteudo**:
 ```yaml
@@ -528,7 +528,7 @@ spring:
 
 logging:
   level:
-    com.dynamis.broker_app: DEBUG
+    com.dynamis.sep_api: DEBUG
     org.testcontainers: INFO
     org.flywaydb: INFO
 
@@ -544,7 +544,7 @@ Esta verificacao falhara em conectar no banco (esperado — Task 1.2 vai prover)
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 ./gradlew bootRun --args='--spring.profiles.active=dev' &
 SERVER_PID=$!
 sleep 10
@@ -558,7 +558,7 @@ Se aparecer "Failed to bind properties" → erro no YAML; investigar.
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 python3 -c "import yaml; yaml.safe_load(open('src/main/resources/application.yml'))" && echo "OK application.yml"
 python3 -c "import yaml; yaml.safe_load(open('src/main/resources/application-dev.yml'))" && echo "OK application-dev.yml"
 python3 -c "import yaml; yaml.safe_load(open('src/test/resources/application-test.yml'))" && echo "OK application-test.yml"
@@ -594,7 +594,7 @@ git commit -m "feat(backend): configurar application.yml com profiles dev e test
 
 ### Step 1.2.1 — Criar `docker-compose.yml`
 
-**Arquivo**: `C:/workspace-sep/docker-compose.yml`
+**Arquivo**: `<sep-api-root>/docker-compose.yml`
 
 **Conteudo**:
 ```yaml
@@ -628,7 +628,7 @@ volumes:
 
 ### Step 1.2.2 — Criar `.env.example` (para devs copiarem)
 
-**Arquivo**: `C:/workspace-sep/.env.example`
+**Arquivo**: `<sep-api-root>/.env.example`
 
 **Conteudo**:
 ```bash
@@ -647,30 +647,30 @@ APP_CORS_ORIGINS=http://localhost:4200,http://localhost:8100
 
 **Confirmar** que `.env` esta no `.gitignore` (Sprint 0 Task 0.1 deve ter coberto):
 ```bash
-grep -E "^\.env$|^\.env\." C:/workspace-sep/.gitignore
+grep -E "^\.env$|^\.env\." <sep-api-root>/.gitignore
 # Esperado: .env (e variantes)
 ```
 
 Se nao estiver, adicionar:
 ```bash
-echo "" >> C:/workspace-sep/.gitignore
-echo "# variaveis de ambiente locais" >> C:/workspace-sep/.gitignore
-echo ".env" >> C:/workspace-sep/.gitignore
-echo ".env.local" >> C:/workspace-sep/.gitignore
+echo "" >> <sep-api-root>/.gitignore
+echo "# variaveis de ambiente locais" >> <sep-api-root>/.gitignore
+echo ".env" >> <sep-api-root>/.gitignore
+echo ".env.local" >> <sep-api-root>/.gitignore
 ```
 
 ### Step 1.2.3 — Subir o banco
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 docker compose up -d postgres
 ```
 
 **Esperado**:
 ```
 [+] Running 2/2
- ✔ Network workspace-sep_default      Created
+ ✔ Network sep-api_default            Created
  ✔ Container sep-postgres             Started
 ```
 
@@ -696,7 +696,7 @@ docker exec -it sep-postgres psql -U sep -d sep_dev -c "SELECT version();"
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 ./gradlew bootRun --args='--spring.profiles.active=dev' &
 SERVER_PID=$!
 sleep 30
@@ -734,11 +734,11 @@ git commit -m "feat(infra): adicionar docker-compose com PostgreSQL 16 para ambi
 
 ### Step 1.3.1 — Criar `LocaleConfig.java`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/config/LocaleConfig.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/config/LocaleConfig.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.config;
+package com.dynamis.sep_api.shared.config;
 
 import jakarta.annotation.PostConstruct;
 import java.time.ZoneId;
@@ -768,11 +768,11 @@ public class LocaleConfig {
 
 ### Step 1.3.2 — Criar `CorsConfig.java`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/config/CorsConfig.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/config/CorsConfig.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.config;
+package com.dynamis.sep_api.shared.config;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -826,11 +826,11 @@ public class CorsConfig {
 
 ### Step 1.3.3 — Criar `SecurityConfig.java` (esqueleto, apenas CORS + endpoints publicos basicos)
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/identity/infrastructure/config/SecurityConfig.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/identity/infrastructure/config/SecurityConfig.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.identity.infrastructure.config;
+package com.dynamis.sep_api.identity.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -847,7 +847,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * O filtro JWT, autorizacao por perfil/ownership e demais regras entram na
  * Sprint 3.
  *
- * @see com.dynamis.broker_app.shared.config.CorsConfig
+ * @see com.dynamis.sep_api.shared.config.CorsConfig
  */
 @Configuration
 public class SecurityConfig {
@@ -890,7 +890,7 @@ public class SecurityConfig {
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 docker compose up -d postgres
 ./gradlew bootRun --args='--spring.profiles.active=dev' &
 SERVER_PID=$!
@@ -922,9 +922,9 @@ kill $SERVER_PID 2>/dev/null || true
 
 ### Commit Task 1.3
 ```bash
-git add src/main/java/com/dynamis/broker_app/shared/config/LocaleConfig.java
-git add src/main/java/com/dynamis/broker_app/shared/config/CorsConfig.java
-git add src/main/java/com/dynamis/broker_app/identity/infrastructure/config/SecurityConfig.java
+git add src/main/java/com/dynamis/sep_api/shared/config/LocaleConfig.java
+git add src/main/java/com/dynamis/sep_api/shared/config/CorsConfig.java
+git add src/main/java/com/dynamis/sep_api/identity/infrastructure/config/SecurityConfig.java
 git commit -m "feat(backend): configurar locale pt-BR, timezone America/Sao_Paulo, CORS e SecurityConfig stub"
 ```
 
@@ -940,7 +940,7 @@ git commit -m "feat(backend): configurar locale pt-BR, timezone America/Sao_Paul
 
 ### Step 1.4.1 — Criar pasta de migrations e V1
 
-**Arquivo**: `C:/workspace-sep/src/main/resources/db/migration/V1__init.sql`
+**Arquivo**: `<sep-api-root>/src/main/resources/db/migration/V1__init.sql`
 
 **Conteudo**:
 ```sql
@@ -982,7 +982,7 @@ COMMENT ON COLUMN usuario.role IS 'Perfil do usuario: ADMIN ou CLIENTE.';
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 docker compose up -d postgres
 ./gradlew bootRun --args='--spring.profiles.active=dev' &
 SERVER_PID=$!
@@ -1045,11 +1045,11 @@ git commit -m "feat(backend): migration V1 com esqueleto da tabela usuario (Flyw
 
 ### Step 1.5.1 — Criar `ErrorResponseDto`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/exception/ErrorResponseDto.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/exception/ErrorResponseDto.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.exception;
+package com.dynamis.sep_api.shared.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.OffsetDateTime;
@@ -1059,7 +1059,7 @@ import java.time.OffsetDateTime;
  * Atende PRD §13 (Padrao de Erros da API).
  *
  * <p>Campo {@code traceId} e opcional e propagado do MDC quando presente
- * (via {@link com.dynamis.broker_app.shared.integration.CorrelationIdFilter}).
+ * (via {@link com.dynamis.sep_api.shared.integration.CorrelationIdFilter}).
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ErrorResponseDto(
@@ -1079,11 +1079,11 @@ public record ErrorResponseDto(
 
 ### Step 1.5.2 — Criar `DomainException` (sealed type)
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/exception/DomainException.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/exception/DomainException.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.exception;
+package com.dynamis.sep_api.shared.exception;
 
 /**
  * Tipo base (sealed) das excecoes de dominio do SEP.
@@ -1116,9 +1116,9 @@ public abstract sealed class DomainException extends RuntimeException
 
 E os 3 subtipos basicos (preparacao para Sprints 2-4):
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/exception/ValidacaoException.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/exception/ValidacaoException.java`
 ```java
-package com.dynamis.broker_app.shared.exception;
+package com.dynamis.sep_api.shared.exception;
 
 public final class ValidacaoException extends DomainException {
     public ValidacaoException(String codigo, String mensagem) {
@@ -1127,9 +1127,9 @@ public final class ValidacaoException extends DomainException {
 }
 ```
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/exception/RecursoNaoEncontradoException.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/exception/RecursoNaoEncontradoException.java`
 ```java
-package com.dynamis.broker_app.shared.exception;
+package com.dynamis.sep_api.shared.exception;
 
 public final class RecursoNaoEncontradoException extends DomainException {
     public RecursoNaoEncontradoException(String codigo, String mensagem) {
@@ -1138,9 +1138,9 @@ public final class RecursoNaoEncontradoException extends DomainException {
 }
 ```
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/exception/ConflitoException.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/exception/ConflitoException.java`
 ```java
-package com.dynamis.broker_app.shared.exception;
+package com.dynamis.sep_api.shared.exception;
 
 public final class ConflitoException extends DomainException {
     public ConflitoException(String codigo, String mensagem) {
@@ -1151,11 +1151,11 @@ public final class ConflitoException extends DomainException {
 
 ### Step 1.5.3 — Criar `ApiExceptionHandler` (stub)
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/exception/ApiExceptionHandler.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/exception/ApiExceptionHandler.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.exception;
+package com.dynamis.sep_api.shared.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -1244,7 +1244,7 @@ public class ApiExceptionHandler {
 
 Para que `NoHandlerFoundException` seja capturado, precisa habilitar via propriedade.
 
-**Arquivo**: `C:/workspace-sep/src/main/resources/application.yml`
+**Arquivo**: `<sep-api-root>/src/main/resources/application.yml`
 
 **Adicionar** (ou confirmar) na chave `spring.mvc`:
 ```yaml
@@ -1260,7 +1260,7 @@ spring:
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 docker compose up -d postgres
 ./gradlew bootRun --args='--spring.profiles.active=dev' &
 SERVER_PID=$!
@@ -1289,7 +1289,7 @@ Se a resposta for HTML do Whitelabel Error Page, a propriedade `throw-exception-
 
 ### Commit Task 1.5
 ```bash
-git add src/main/java/com/dynamis/broker_app/shared/exception/
+git add src/main/java/com/dynamis/sep_api/shared/exception/
 git add src/main/resources/application.yml
 git commit -m "feat(backend): ApiExceptionHandler stub + ErrorResponseDto + DomainException sealed (Sprint 1; Sprint 4 evolui)"
 ```
@@ -1306,11 +1306,11 @@ git commit -m "feat(backend): ApiExceptionHandler stub + ErrorResponseDto + Doma
 
 ### Step 1.6.1 — Criar `EntidadeAuditavel`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/audit/EntidadeAuditavel.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/audit/EntidadeAuditavel.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.audit;
+package com.dynamis.sep_api.shared.audit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -1371,11 +1371,11 @@ public abstract class EntidadeAuditavel {
 
 ### Step 1.6.2 — Criar `AuditorAwareImpl`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/audit/AuditorAwareImpl.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/audit/AuditorAwareImpl.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.audit;
+package com.dynamis.sep_api.shared.audit;
 
 import java.util.Optional;
 import org.springframework.data.domain.AuditorAware;
@@ -1412,11 +1412,11 @@ public class AuditorAwareImpl implements AuditorAware<String> {
 
 ### Step 1.6.3 — Habilitar JPA Auditing
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/audit/JpaAuditingConfig.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/audit/JpaAuditingConfig.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.audit;
+package com.dynamis.sep_api.shared.audit;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -1437,7 +1437,7 @@ A validacao real acontece na Task 1.9 quando criarmos uma entidade de teste e pe
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 docker compose up -d postgres
 ./gradlew bootRun --args='--spring.profiles.active=dev' &
 SERVER_PID=$!
@@ -1458,7 +1458,7 @@ kill $SERVER_PID 2>/dev/null || true
 
 ### Commit Task 1.6
 ```bash
-git add src/main/java/com/dynamis/broker_app/shared/audit/
+git add src/main/java/com/dynamis/sep_api/shared/audit/
 git commit -m "feat(backend): auditoria JPA base com EntidadeAuditavel + AuditorAware fallback system"
 ```
 
@@ -1474,11 +1474,11 @@ git commit -m "feat(backend): auditoria JPA base com EntidadeAuditavel + Auditor
 
 ### Step 1.7.1 — Criar `CorrelationIdFilter`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/integration/CorrelationIdFilter.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/integration/CorrelationIdFilter.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.integration;
+package com.dynamis.sep_api.shared.integration;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -1529,11 +1529,11 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
 
 ### Step 1.7.2 — Criar `IdempotencyKeyInterceptor`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/integration/IdempotencyKeyInterceptor.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/integration/IdempotencyKeyInterceptor.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.integration;
+package com.dynamis.sep_api.shared.integration;
 
 import java.io.IOException;
 import org.slf4j.Logger;
@@ -1580,11 +1580,11 @@ public class IdempotencyKeyInterceptor implements ClientHttpRequestInterceptor {
 
 ### Step 1.7.3 — Criar `RestClientFactory`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/integration/RestClientFactory.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/integration/RestClientFactory.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.integration;
+package com.dynamis.sep_api.shared.integration;
 
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
@@ -1623,7 +1623,7 @@ public class RestClientFactory {
             .baseUrl(baseUrl)
             .requestFactory(factory)
             .requestInterceptor(new IdempotencyKeyInterceptor())
-            .defaultHeader("User-Agent", "broker-app/" + providerName)
+            .defaultHeader("User-Agent", "sep-api/" + providerName)
             .build();
     }
 }
@@ -1631,11 +1631,11 @@ public class RestClientFactory {
 
 ### Step 1.7.4 — Criar `Resilience4jConfig`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/shared/integration/Resilience4jConfig.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/shared/integration/Resilience4jConfig.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.integration;
+package com.dynamis.sep_api.shared.integration;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.retry.RetryConfig;
@@ -1685,7 +1685,7 @@ public class Resilience4jConfig {
 
 ### Step 1.7.5 — Adicionar propriedades default em `application.yml`
 
-**Arquivo**: `C:/workspace-sep/src/main/resources/application.yml` — adicionar:
+**Arquivo**: `<sep-api-root>/src/main/resources/application.yml` — adicionar:
 ```yaml
 app:
   integration:
@@ -1724,7 +1724,7 @@ resilience4j:
 
 ### Commit Task 1.7
 ```bash
-git add src/main/java/com/dynamis/broker_app/shared/integration/
+git add src/main/java/com/dynamis/sep_api/shared/integration/
 git add src/main/resources/application.yml
 git commit -m "feat(backend): infraestrutura para Provider Pattern (RestClientFactory + Resilience4j + CorrelationIdFilter + IdempotencyKeyInterceptor)"
 ```
@@ -1741,27 +1741,27 @@ git commit -m "feat(backend): infraestrutura para Provider Pattern (RestClientFa
 
 ### Step 1.8.1 — Criar enums do dominio escrow
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/escrow/domain/vo/StatusContaEscrow.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/escrow/domain/vo/StatusContaEscrow.java`
 ```java
-package com.dynamis.broker_app.escrow.domain.vo;
+package com.dynamis.sep_api.escrow.domain.vo;
 
 public enum StatusContaEscrow {
     EM_ABERTURA, ATIVA, BLOQUEADA, ENCERRADA
 }
 ```
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/escrow/domain/vo/TipoWallet.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/escrow/domain/vo/TipoWallet.java`
 ```java
-package com.dynamis.broker_app.escrow.domain.vo;
+package com.dynamis.sep_api.escrow.domain.vo;
 
 public enum TipoWallet {
     PROPOSTA, OPERACAO, RESERVA_OPERACIONAL
 }
 ```
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/escrow/domain/vo/TipoMovimentacao.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/escrow/domain/vo/TipoMovimentacao.java`
 ```java
-package com.dynamis.broker_app.escrow.domain.vo;
+package com.dynamis.sep_api.escrow.domain.vo;
 
 /**
  * Tipos de movimentacao na conta escrow segregada (PRD §11, ADR 0005).
@@ -1782,9 +1782,9 @@ public sealed interface TipoMovimentacao
 }
 ```
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/escrow/domain/vo/StatusMovimentacao.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/escrow/domain/vo/StatusMovimentacao.java`
 ```java
-package com.dynamis.broker_app.escrow.domain.vo;
+package com.dynamis.sep_api.escrow.domain.vo;
 
 public enum StatusMovimentacao {
     INICIADA, EM_PROCESSAMENTO, LIQUIDADA, FALHOU, REVERTIDA
@@ -1793,14 +1793,14 @@ public enum StatusMovimentacao {
 
 ### Step 1.8.2 — Criar entidade `ContaEscrow`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/escrow/domain/model/ContaEscrow.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/escrow/domain/model/ContaEscrow.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.escrow.domain.model;
+package com.dynamis.sep_api.escrow.domain.model;
 
-import com.dynamis.broker_app.escrow.domain.vo.StatusContaEscrow;
-import com.dynamis.broker_app.shared.audit.EntidadeAuditavel;
+import com.dynamis.sep_api.escrow.domain.vo.StatusContaEscrow;
+import com.dynamis.sep_api.shared.audit.EntidadeAuditavel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -1848,12 +1848,12 @@ public class ContaEscrow extends EntidadeAuditavel {
 
 ### Step 1.8.3 — Criar entidades `Wallet` e `MovimentacaoEscrow`
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/escrow/domain/model/Wallet.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/escrow/domain/model/Wallet.java`
 ```java
-package com.dynamis.broker_app.escrow.domain.model;
+package com.dynamis.sep_api.escrow.domain.model;
 
-import com.dynamis.broker_app.escrow.domain.vo.TipoWallet;
-import com.dynamis.broker_app.shared.audit.EntidadeAuditavel;
+import com.dynamis.sep_api.escrow.domain.vo.TipoWallet;
+import com.dynamis.sep_api.shared.audit.EntidadeAuditavel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -1898,12 +1898,12 @@ public class Wallet extends EntidadeAuditavel {
 }
 ```
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/escrow/domain/model/MovimentacaoEscrow.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/escrow/domain/model/MovimentacaoEscrow.java`
 ```java
-package com.dynamis.broker_app.escrow.domain.model;
+package com.dynamis.sep_api.escrow.domain.model;
 
-import com.dynamis.broker_app.escrow.domain.vo.StatusMovimentacao;
-import com.dynamis.broker_app.shared.audit.EntidadeAuditavel;
+import com.dynamis.sep_api.escrow.domain.vo.StatusMovimentacao;
+import com.dynamis.sep_api.shared.audit.EntidadeAuditavel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -1959,11 +1959,11 @@ public class MovimentacaoEscrow extends EntidadeAuditavel {
 
 ### Step 1.8.4 — Criar `EscrowProvider` interface (vazia)
 
-**Arquivo**: `C:/workspace-sep/src/main/java/com/dynamis/broker_app/escrow/application/port/out/EscrowProvider.java`
+**Arquivo**: `<sep-api-root>/src/main/java/com/dynamis/sep_api/escrow/application/port/out/EscrowProvider.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.escrow.application.port.out;
+package com.dynamis.sep_api.escrow.application.port.out;
 
 /**
  * Port de saida para integracao com BaaS de escrow (Celcoin, conforme ADR 0005).
@@ -1984,7 +1984,7 @@ public interface EscrowProvider {
 
 ### Step 1.8.5 — Criar migration V2 com tabelas escrow
 
-**Arquivo**: `C:/workspace-sep/src/main/resources/db/migration/V2__criar_estrutura_escrow.sql`
+**Arquivo**: `<sep-api-root>/src/main/resources/db/migration/V2__criar_estrutura_escrow.sql`
 
 **Conteudo**:
 ```sql
@@ -2057,7 +2057,7 @@ COMMENT ON COLUMN movimentacao_escrow.idempotency_key IS 'Chave unica de idempot
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 docker compose down -v   # limpar volume para re-aplicar do zero
 docker compose up -d postgres
 sleep 10
@@ -2085,7 +2085,7 @@ kill $SERVER_PID 2>/dev/null || true
 
 ### Commit Task 1.8
 ```bash
-git add src/main/java/com/dynamis/broker_app/escrow/
+git add src/main/java/com/dynamis/sep_api/escrow/
 git add src/main/resources/db/migration/V2__criar_estrutura_escrow.sql
 git commit -m "feat(escrow): modelagem inicial do modulo escrow (ContaEscrow + Wallet + MovimentacaoEscrow + EscrowProvider port)"
 ```
@@ -2106,11 +2106,11 @@ Ja feito na Task 1.1c. Confirmar que o arquivo `src/test/resources/application-t
 
 ### Step 1.9.2 — Criar `SmokeBootTest`
 
-**Arquivo**: `C:/workspace-sep/src/test/java/com/dynamis/broker_app/SmokeBootTest.java`
+**Arquivo**: `<sep-api-root>/src/test/java/com/dynamis/sep_api/SmokeBootTest.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app;
+package com.dynamis.sep_api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -2175,11 +2175,11 @@ class SmokeBootTest {
 
 ### Step 1.9.3 — Criar `ApiExceptionHandlerTest`
 
-**Arquivo**: `C:/workspace-sep/src/test/java/com/dynamis/broker_app/shared/exception/ApiExceptionHandlerTest.java`
+**Arquivo**: `<sep-api-root>/src/test/java/com/dynamis/sep_api/shared/exception/ApiExceptionHandlerTest.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.exception;
+package com.dynamis.sep_api.shared.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -2250,15 +2250,15 @@ class ApiExceptionHandlerTest {
 
 ### Step 1.9.4 — Criar `EntidadeAuditavelTest` (validacao de auditoria via entidade fictícia)
 
-**Arquivo**: `C:/workspace-sep/src/test/java/com/dynamis/broker_app/shared/audit/EntidadeAuditavelTest.java`
+**Arquivo**: `<sep-api-root>/src/test/java/com/dynamis/sep_api/shared/audit/EntidadeAuditavelTest.java`
 
 **Conteudo**:
 ```java
-package com.dynamis.broker_app.shared.audit;
+package com.dynamis.sep_api.shared.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.dynamis.broker_app.escrow.domain.model.ContaEscrow;
+import com.dynamis.sep_api.escrow.domain.model.ContaEscrow;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2325,7 +2325,7 @@ class EntidadeAuditavelTest {
             titular.set(c, "Conta de Teste");
             java.lang.reflect.Field status = ContaEscrow.class.getDeclaredField("status");
             status.setAccessible(true);
-            status.set(c, com.dynamis.broker_app.escrow.domain.vo.StatusContaEscrow.EM_ABERTURA);
+            status.set(c, com.dynamis.sep_api.escrow.domain.vo.StatusContaEscrow.EM_ABERTURA);
             return c;
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -2338,7 +2338,7 @@ class EntidadeAuditavelTest {
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 ./gradlew clean test
 ```
 
@@ -2400,7 +2400,7 @@ A Sprint 1 esta concluida quando todas as 11 tasks tiverem checklist completo:
 ## Estado esperado do repositorio apos Sprint 1
 
 ```
-C:/workspace-sep/
+<sep-api-root>/
 ├── .editorconfig
 ├── .env.example
 ├── .gitattributes
@@ -2416,8 +2416,8 @@ C:/workspace-sep/
 ├── settings.gradle                         # NOVO Sprint 1.1a
 ├── src/
 │   ├── main/
-│   │   ├── java/com/dynamis/broker_app/
-│   │   │   ├── BrokerAppApplication.java   # NOVO Sprint 1.1a
+│   │   ├── java/com/dynamis/sep_api/
+│   │   │   ├── SepApiApplication.java   # NOVO Sprint 1.1a
 │   │   │   ├── escrow/                     # POPULADO Sprint 1.8
 │   │   │   │   ├── application/port/out/EscrowProvider.java
 │   │   │   │   └── domain/{model,vo}/...
@@ -2450,7 +2450,7 @@ C:/workspace-sep/
 │   │           ├── V1__init.sql            # Sprint 1.4
 │   │           └── V2__criar_estrutura_escrow.sql  # Sprint 1.8
 │   └── test/
-│       ├── java/com/dynamis/broker_app/
+│       ├── java/com/dynamis/sep_api/
 │       │   ├── SmokeBootTest.java                              # Sprint 1.9
 │       │   ├── shared/audit/EntidadeAuditavelTest.java         # Sprint 1.9
 │       │   └── shared/exception/ApiExceptionHandlerTest.java   # Sprint 1.9

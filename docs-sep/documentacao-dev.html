@@ -488,7 +488,7 @@ dependencies {
   <h2>3. Estrutura de Pacotes</h2>
   <div class="subtitle">Separação clara por responsabilidade desde o início.</div>
 
-  <pre><code>com.dynamis.broker_app
+  <pre><code>com.dynamis.sep_api
 ├── <span class="ty">config</span>                    <span class="com"># LocaleConfig, SecurityConfig, OpenApiConfig,</span>
 │                             <span class="com"># SpringJpaAuditingConfig</span>
 ├── <span class="ty">security</span>                  <span class="com"># JwtTokenProvider, JwtAuthenticationFilter,</span>
@@ -1194,6 +1194,10 @@ dependencies {
 <section id="pipeline">
   <h2>10. Pipeline GitHub</h2>
   <div class="subtitle">Fluxo atual (manual) e automação futura planejada no Épico E14.</div>
+
+  <div class="alert" style="background: #eff6ff; border-left-color: #3b82f6;">
+    <strong>3 repositórios independentes (desde 2026-05-04):</strong> <code>sep-api</code> (Java), <code>sep-app</code> (Angular) e <code>sep-mobile</code> (Ionic). Cada repositório tem seu próprio <code>.github/workflows/</code>, copiado de templates versionados em <code>docs-sep/ci-pipelines/templates/</code> (<code>sep-api-ci.template.yml</code>, <code>sep-app-ci.template.yml</code>, <code>sep-mobile-pwa-ci.template.yml</code>). Pre-commit também é independente: <code>sep-api</code> usa <code>.githooks/</code> minimo (Spotless), <code>sep-app</code> e <code>sep-mobile</code> usam Husky + lint-staged padrão via <code>npx husky init</code>.
+  </div>
 
   <div class="diagram-wrapper">
     <svg viewBox="0 0 940 460" xmlns="http://www.w3.org/2000/svg">

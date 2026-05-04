@@ -54,7 +54,7 @@ Inicializar o projeto Spring Boot com Gradle, definir o Wrapper e criar a arvore
 - `build.gradle` (esqueleto)
 - `settings.gradle`
 - `gradle/wrapper/gradle-wrapper.properties` (Gradle `8.x`)
-- `src/main/java/com/dynamis/broker_app/{identity,usuarios,onboarding,credito,contratos,cobranca,escrow,backoffice,financeiro,credores,pix,shared}/{domain,application,infrastructure,web}/package-info.java`
+- `src/main/java/com/dynamis/sep_api/{identity,usuarios,onboarding,credito,contratos,cobranca,escrow,backoffice,financeiro,credores,pix,shared}/{domain,application,infrastructure,web}/package-info.java`
 
 **Padrao interno de cada modulo (Hexagonal/Ports & Adapters)**
 - `<modulo>.domain.{model,event,exception,vo}`
@@ -304,9 +304,9 @@ Observacao: a task pode optar por deixar apenas o esqueleto do schema da tabela 
 Criar a base do tratamento centralizado de erros desde a Sprint 1 para evitar refatoracao tardia. Sprint 4 evolui esse handler com mapeamentos completos.
 
 **Arquivos esperados**
-- `src/main/java/com/dynamis/broker_app/shared/exception/ApiExceptionHandler.java`
-- `src/main/java/com/dynamis/broker_app/shared/exception/ErrorResponseDto.java` (`record`)
-- `src/main/java/com/dynamis/broker_app/shared/exception/DomainException.java` (sealed type para hierarquia de excecoes de dominio)
+- `src/main/java/com/dynamis/sep_api/shared/exception/ApiExceptionHandler.java`
+- `src/main/java/com/dynamis/sep_api/shared/exception/ErrorResponseDto.java` (`record`)
+- `src/main/java/com/dynamis/sep_api/shared/exception/DomainException.java` (sealed type para hierarquia de excecoes de dominio)
 
 **Conteudo minimo**
 - `ErrorResponseDto` como `record` com campos `timestamp`, `status`, `error`, `message`, `path`, `traceId` (opcional)
@@ -336,9 +336,9 @@ Criar a base do tratamento centralizado de erros desde a Sprint 1 para evitar re
 Materializar a auditoria conforme PRD §15: criar entidade abstrata `EntidadeAuditavel` com os 4 campos obrigatorios, `AuditorAware` com fallback `system`, e habilitar `@EnableJpaAuditing`.
 
 **Arquivos esperados**
-- `src/main/java/com/dynamis/broker_app/shared/audit/EntidadeAuditavel.java` (mapped superclass com `@CreatedDate`, `@LastModifiedDate`, `@CreatedBy`, `@LastModifiedBy`)
-- `src/main/java/com/dynamis/broker_app/shared/audit/AuditorAwareImpl.java`
-- `src/main/java/com/dynamis/broker_app/shared/audit/JpaAuditingConfig.java` (`@EnableJpaAuditing(auditorAwareRef = "auditorAware")`)
+- `src/main/java/com/dynamis/sep_api/shared/audit/EntidadeAuditavel.java` (mapped superclass com `@CreatedDate`, `@LastModifiedDate`, `@CreatedBy`, `@LastModifiedBy`)
+- `src/main/java/com/dynamis/sep_api/shared/audit/AuditorAwareImpl.java`
+- `src/main/java/com/dynamis/sep_api/shared/audit/JpaAuditingConfig.java` (`@EnableJpaAuditing(auditorAwareRef = "auditorAware")`)
 
 **Comportamento do AuditorAware**
 - se houver `Authentication` no `SecurityContext` com principal carregando UUID, retorna `Optional.of(uuidAsString)`
@@ -367,10 +367,10 @@ Materializar a auditoria conforme PRD §15: criar entidade abstrata `EntidadeAud
 Preparar a infraestrutura comum para o `Provider Pattern` definido no PRD §11: classes base de adapter HTTP (RestClient + Resilience4j), suporte a `Idempotency-Key`, propagacao de `correlationId` via MDC, e configuracao de `RestClient` por provider.
 
 **Arquivos esperados**
-- `src/main/java/com/dynamis/broker_app/shared/integration/RestClientFactory.java` (configura `RestClient` com timeouts, interceptors de log e MDC)
-- `src/main/java/com/dynamis/broker_app/shared/integration/Resilience4jConfig.java` (configuracao default de circuit breaker + retry + timeout)
-- `src/main/java/com/dynamis/broker_app/shared/integration/IdempotencyKeyInterceptor.java`
-- `src/main/java/com/dynamis/broker_app/shared/integration/CorrelationIdFilter.java` (servlet filter que injeta `correlationId` no MDC para toda request)
+- `src/main/java/com/dynamis/sep_api/shared/integration/RestClientFactory.java` (configura `RestClient` com timeouts, interceptors de log e MDC)
+- `src/main/java/com/dynamis/sep_api/shared/integration/Resilience4jConfig.java` (configuracao default de circuit breaker + retry + timeout)
+- `src/main/java/com/dynamis/sep_api/shared/integration/IdempotencyKeyInterceptor.java`
+- `src/main/java/com/dynamis/sep_api/shared/integration/CorrelationIdFilter.java` (servlet filter que injeta `correlationId` no MDC para toda request)
 
 **Criterios de verificacao**
 - `RestClient` pode ser criado por nome (ex.: `restClientFactory.forProvider("celcoin")`)
@@ -406,10 +406,10 @@ Nesta Sprint 1, apenas a dependencia esta declarada (Task 1.1b). O primeiro uso 
 Modelar as entidades transversais do modulo `escrow` (PRD §11, §19) desde a Sprint 1 para evitar retrabalho arquitetural quando o `EscrowProvider` (Celcoin) for plugado em fase posterior. Sem implementacao de regra de negocio nesta sprint — so estrutura.
 
 **Arquivos esperados**
-- `src/main/java/com/dynamis/broker_app/escrow/domain/model/ContaEscrow.java` (entidade JPA)
-- `src/main/java/com/dynamis/broker_app/escrow/domain/model/Wallet.java` (sub-conta por proposta/operacao)
-- `src/main/java/com/dynamis/broker_app/escrow/domain/model/MovimentacaoEscrow.java`
-- `src/main/java/com/dynamis/broker_app/escrow/application/port/out/EscrowProvider.java` (interface vazia, sera implementada na Epic 15)
+- `src/main/java/com/dynamis/sep_api/escrow/domain/model/ContaEscrow.java` (entidade JPA)
+- `src/main/java/com/dynamis/sep_api/escrow/domain/model/Wallet.java` (sub-conta por proposta/operacao)
+- `src/main/java/com/dynamis/sep_api/escrow/domain/model/MovimentacaoEscrow.java`
+- `src/main/java/com/dynamis/sep_api/escrow/application/port/out/EscrowProvider.java` (interface vazia, sera implementada na Epic 15)
 - `src/main/resources/db/migration/V2__criar_estrutura_escrow.sql` (tabelas correspondentes)
 
 **Conteudo minimo das entidades**
@@ -441,8 +441,8 @@ Modelar as entidades transversais do modulo `escrow` (PRD §11, §19) desde a Sp
 Garantir que o contexto Spring carrega e que o healthcheck responde, com test slice apropriado e Testcontainers para a parte de banco. Inicia a cultura de TDD distribuido.
 
 **Arquivos esperados**
-- `src/test/java/com/dynamis/broker_app/SmokeBootTest.java` (`@SpringBootTest` com Testcontainers Postgres)
-- `src/test/java/com/dynamis/broker_app/shared/exception/ApiExceptionHandlerTest.java` (`@WebMvcTest`)
+- `src/test/java/com/dynamis/sep_api/SmokeBootTest.java` (`@SpringBootTest` com Testcontainers Postgres)
+- `src/test/java/com/dynamis/sep_api/shared/exception/ApiExceptionHandlerTest.java` (`@WebMvcTest`)
 - `src/test/resources/application-test.yml` (overrides para teste)
 
 **Cenarios cobertos**

@@ -66,11 +66,11 @@ npx ionic info  # deve mostrar Ionic 8.4+
 ```
 
 **Estrutura de pastas esperada**
-- `apps/sep-mobile/`
-- `apps/sep-mobile/src/app/{core,shared,features,layout}`
-- `apps/sep-mobile/src/app/features/{public,tomador,credora}` (separacao por jornada)
-- `apps/sep-mobile/src/styles/{_tokens.scss,_notion-mobile.scss,_mixins.scss,index.scss}`
-- `apps/sep-mobile/capacitor.config.ts`
+- `<sep-mobile-root>/`
+- `<sep-mobile-root>/src/app/{core,shared,features,layout}`
+- `<sep-mobile-root>/src/app/features/{public,tomador,credora}` (separacao por jornada)
+- `<sep-mobile-root>/src/styles/{_tokens.scss,_notion-mobile.scss,_mixins.scss,index.scss}`
+- `<sep-mobile-root>/capacitor.config.ts`
 
 **Capacitor: configuracao inicial**
 - `appId: 'com.dynamis.sep.mobile'`
@@ -197,17 +197,17 @@ Setup das ferramentas de teste: Vitest para unit tests, Playwright para E2E em P
 Pipeline minimo: lint, test, build PWA em cada PR.
 
 **Arquivos esperados**
-- `.github/workflows/mobile-ci.yml`
+- `.github/workflows/ci.yml` (copiado do template `sep-mobile-pwa-ci.template.yml`)
 
 ```yaml
 name: Mobile CI
 
 on:
   pull_request:
-    paths: ['apps/sep-mobile/**']
+    paths: ['<sep-mobile-root>/**']
   push:
     branches: [main]
-    paths: ['apps/sep-mobile/**']
+    paths: ['<sep-mobile-root>/**']
 
 jobs:
   build:
@@ -218,8 +218,8 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: apps/sep-mobile/package-lock.json
-      - working-directory: apps/sep-mobile
+          cache-dependency-path: <sep-mobile-root>/package-lock.json
+      - working-directory: <sep-mobile-root>
         run: |
           npm ci
           npm run lint

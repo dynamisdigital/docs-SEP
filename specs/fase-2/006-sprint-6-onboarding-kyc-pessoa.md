@@ -20,7 +20,7 @@ Esta sprint **nao** cobre KYB (pessoa juridica) — fica para a Sprint 7. Tambem
 
 ### Em escopo (apenas backend)
 
-- Novo modulo `onboarding` em `com.dynamis.broker_app.onboarding` (DDD + Hexagonal/Ports & Adapters)
+- Novo modulo `onboarding` em `com.dynamis.sep_api.onboarding` (DDD + Hexagonal/Ports & Adapters)
 - Entidades de dominio: `SolicitacaoOnboarding`, `DocumentoCadastral`, `ResultadoVerificacao`
 - Value objects: `TipoDocumento` (sealed; `RG`, `CNH`, `PASSAPORTE`, `SELFIE`), `StatusOnboarding` (sealed; `INICIADO`, `DOCUMENTOS_RECEBIDOS`, `EM_VERIFICACAO`, `APROVADO`, `REPROVADO`, `PENDENCIA`), `Cpf` (com validacao de digitos)
 - **Provider Pattern** obrigatorio (ADR 0004):

@@ -20,7 +20,7 @@ A sprint **nao** integra Open Finance ainda — fica para a Sprint 9. O motor de
 
 ### Em escopo (apenas backend)
 
-- Novo modulo `credito` em `com.dynamis.broker_app.credito` (DDD + Hexagonal/Ports & Adapters)
+- Novo modulo `credito` em `com.dynamis.sep_api.credito` (DDD + Hexagonal/Ports & Adapters)
 - Entidades de dominio:
   - `PropostaCredito` (agregado raiz; estende `EntidadeAuditavel`)
   - `ParecerCredito` (entidade filha; pode haver multiplos pareceres ao longo do ciclo, com versao)

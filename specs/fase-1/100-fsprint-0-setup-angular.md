@@ -52,10 +52,10 @@ npx @angular/cli@20 new sep-frontend --standalone --style=scss --routing --stric
 ```
 
 **Estrutura de pastas esperada**
-- `apps/sep-frontend/`
-- `apps/sep-frontend/src/app/{core,shared,features,layout}`
-- `apps/sep-frontend/src/styles/{_tokens.scss,_apple.scss,_notion.scss,_mixins.scss,index.scss}`
-- `apps/sep-frontend/src/app/features/{public,authenticated}` (separacao por superficie de DS)
+- `<sep-app-root>/`
+- `<sep-app-root>/src/app/{core,shared,features,layout}`
+- `<sep-app-root>/src/styles/{_tokens.scss,_apple.scss,_notion.scss,_mixins.scss,index.scss}`
+- `<sep-app-root>/src/app/features/{public,authenticated}` (separacao por superficie de DS)
 
 **Criterios de verificacao**
 - `npm run start` sobe em `http://localhost:4200`
@@ -166,17 +166,17 @@ Setup das ferramentas de teste: Vitest para unit tests, Playwright para E2E, MSW
 Pipeline minimo: lint, test, build em cada PR.
 
 **Arquivos esperados**
-- `.github/workflows/frontend-ci.yml`
+- `.github/workflows/ci.yml` (copiado do template `sep-app-ci.template.yml`)
 
 ```yaml
 name: Frontend CI
 
 on:
   pull_request:
-    paths: ['apps/sep-frontend/**']
+    paths: ['<sep-app-root>/**']
   push:
     branches: [main]
-    paths: ['apps/sep-frontend/**']
+    paths: ['<sep-app-root>/**']
 
 jobs:
   build:
@@ -187,8 +187,8 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: apps/sep-frontend/package-lock.json
-      - working-directory: apps/sep-frontend
+          cache-dependency-path: <sep-app-root>/package-lock.json
+      - working-directory: <sep-app-root>
         run: |
           npm ci
           npm run lint

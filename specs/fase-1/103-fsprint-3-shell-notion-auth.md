@@ -188,7 +188,7 @@ cd backend
 java -jar wiremock-standalone.jar --port 8089 --root-dir wiremock/celcoin-mock
 
 # Terminal 3: subir Frontend
-cd apps/sep-frontend
+cd <sep-app-root>
 npm run start
 ```
 

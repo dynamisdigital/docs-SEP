@@ -6,9 +6,9 @@
 
 **Esforco total estimado**: 2-3 dias de Dev Pleno Frontend dedicado, ou 3-4 dias dividido entre os dois Devs Plenos.
 
-**Workspace root**: `C:/workspace-sep/` (em Linux/macOS, substituir pelo equivalente local).
+**Workspace root**: `<sep-app-root>/` (em Linux/macOS, substituir pelo equivalente local).
 
-**Localizacao do projeto Angular**: `C:/workspace-sep/apps/sep-frontend/`.
+**Localizacao do projeto Angular**: `<sep-app-root>/`.
 
 **Ordem de execucao recomendada**:
 
@@ -37,7 +37,7 @@ F-1.0 (prechecks)
 5. Comite com a mensagem sugerida.
 
 **Pre-requisitos globais**:
-- F-Sprint 0 concluida: `apps/sep-frontend/` deve existir.
+- F-Sprint 0 concluida: `<sep-app-root>/` deve existir.
 - Angular `20.x`, Node `>= 20.x` e npm `>= 10.x`.
 - Scripts `lint`, `lint:scss`, `test` e `build` configurados na F-Sprint 0.
 - Arquivos oficiais disponiveis:
@@ -59,23 +59,23 @@ F-1.0 (prechecks)
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
-test -d apps/sep-frontend && echo "sep-frontend encontrado"
+cd <sep-app-root>
+test -d <sep-app-root> && echo "sep-frontend encontrado"
 ```
 
 **Verificacao**:
 ```bash
-ls -la apps/sep-frontend
+ls -la <sep-app-root>
 # Espera: package.json, angular.json, tsconfig*.json, src/
 ```
 
-Se `apps/sep-frontend/` nao existir, **abortar esta sprint** e executar primeiro [`steps/web/100-fsprint-0-steps.md`](./100-fsprint-0-steps.md).
+Se `<sep-app-root>/` nao existir, **abortar esta sprint** e executar primeiro [`steps/web/100-fsprint-0-steps.md`](./100-fsprint-0-steps.md).
 
 ### Step 101.0.2 - Confirmar versoes e scripts
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 node -v
 npm -v
 npx ng version
@@ -91,7 +91,7 @@ npm run
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-app-root>
 ls -la docs-sep/DESIGN-apple.md docs-sep/DESIGN-notion.md
 ```
 
@@ -103,7 +103,7 @@ ls -la docs-sep/DESIGN-apple.md docs-sep/DESIGN-notion.md
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint
 npm run lint:scss
 npm run test
@@ -115,7 +115,7 @@ npm run build
 - Se algum comando falhar por problema herdado da F-Sprint 0, corrigir na trilha F-Sprint 0 antes de seguir.
 
 ### Definicao de pronto da Task F-1.0
-- [ ] `apps/sep-frontend/` existe
+- [ ] `<sep-app-root>/` existe
 - [ ] Angular `20.x` confirmado
 - [ ] Scripts de qualidade existem
 - [ ] Design systems oficiais existem
@@ -132,13 +132,13 @@ npm run build
 **Esforco**: 4-6 horas.
 
 **Arquivos afetados**:
-- `apps/sep-frontend/src/styles/_apple-tokens.scss`
-- `apps/sep-frontend/src/styles/_apple-typography.scss`
-- `apps/sep-frontend/src/styles/_apple-components.scss`
+- `<sep-app-root>/src/styles/_apple-tokens.scss`
+- `<sep-app-root>/src/styles/_apple-typography.scss`
+- `<sep-app-root>/src/styles/_apple-components.scss`
 
 ### Step 101.1.1 - Criar o arquivo base de tokens Apple
 
-**Arquivo**: `apps/sep-frontend/src/styles/_apple-tokens.scss`
+**Arquivo**: `<sep-app-root>/src/styles/_apple-tokens.scss`
 
 **Conteudo esperado**:
 ```scss
@@ -197,13 +197,13 @@ npm run build
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint:scss
 ```
 
 ### Step 101.1.2 - Criar mixins de tipografia Apple
 
-**Arquivo**: `apps/sep-frontend/src/styles/_apple-typography.scss`
+**Arquivo**: `<sep-app-root>/src/styles/_apple-typography.scss`
 
 **Conteudo esperado**:
 ```scss
@@ -289,13 +289,13 @@ $apple-font-text: "SF Pro Text", system-ui, -apple-system, BlinkMacSystemFont, "
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint:scss
 ```
 
 ### Step 101.1.3 - Criar mixins de componentes Apple
 
-**Arquivo**: `apps/sep-frontend/src/styles/_apple-components.scss`
+**Arquivo**: `<sep-app-root>/src/styles/_apple-components.scss`
 
 **Conteudo esperado**:
 ```scss
@@ -375,7 +375,7 @@ npm run lint:scss
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint:scss
 npm run build
 ```
@@ -390,7 +390,7 @@ npm run build
 
 ### Commit Task F-1.1
 ```bash
-git add apps/sep-frontend/src/styles/_apple-*.scss
+git add <sep-app-root>/src/styles/_apple-*.scss
 git commit -m "feat(web): add apple design tokens"
 ```
 
@@ -405,13 +405,13 @@ git commit -m "feat(web): add apple design tokens"
 **Esforco**: 4-6 horas.
 
 **Arquivos afetados**:
-- `apps/sep-frontend/src/styles/_notion-tokens.scss`
-- `apps/sep-frontend/src/styles/_notion-typography.scss`
-- `apps/sep-frontend/src/styles/_notion-components.scss`
+- `<sep-app-root>/src/styles/_notion-tokens.scss`
+- `<sep-app-root>/src/styles/_notion-typography.scss`
+- `<sep-app-root>/src/styles/_notion-components.scss`
 
 ### Step 101.2.1 - Criar o arquivo base de tokens Notion
 
-**Arquivo**: `apps/sep-frontend/src/styles/_notion-tokens.scss`
+**Arquivo**: `<sep-app-root>/src/styles/_notion-tokens.scss`
 
 **Conteudo esperado**:
 ```scss
@@ -483,13 +483,13 @@ git commit -m "feat(web): add apple design tokens"
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint:scss
 ```
 
 ### Step 101.2.2 - Criar mixins de tipografia Notion
 
-**Arquivo**: `apps/sep-frontend/src/styles/_notion-typography.scss`
+**Arquivo**: `<sep-app-root>/src/styles/_notion-typography.scss`
 
 **Conteudo esperado**:
 ```scss
@@ -556,13 +556,13 @@ $notion-font-primary: "NotionInter", "Inter", -apple-system, system-ui, "Segoe U
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint:scss
 ```
 
 ### Step 101.2.3 - Criar mixins de componentes Notion
 
-**Arquivo**: `apps/sep-frontend/src/styles/_notion-components.scss`
+**Arquivo**: `<sep-app-root>/src/styles/_notion-components.scss`
 
 **Conteudo esperado**:
 ```scss
@@ -644,7 +644,7 @@ npm run lint:scss
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint:scss
 npm run build
 ```
@@ -659,7 +659,7 @@ npm run build
 
 ### Commit Task F-1.2
 ```bash
-git add apps/sep-frontend/src/styles/_notion-*.scss
+git add <sep-app-root>/src/styles/_notion-*.scss
 git commit -m "feat(web): add notion design tokens"
 ```
 
@@ -674,15 +674,15 @@ git commit -m "feat(web): add notion design tokens"
 **Esforco**: 6-8 horas.
 
 **Arquivos afetados**:
-- `apps/sep-frontend/src/styles/index.scss`
-- `apps/sep-frontend/src/app/app.routes.ts`
-- `apps/sep-frontend/src/app/features/design-system/design-system.routes.ts`
-- `apps/sep-frontend/src/app/features/design-system/showcase.component.ts`
-- `apps/sep-frontend/src/app/features/design-system/showcase.component.scss`
+- `<sep-app-root>/src/styles/index.scss`
+- `<sep-app-root>/src/app/app.routes.ts`
+- `<sep-app-root>/src/app/features/design-system/design-system.routes.ts`
+- `<sep-app-root>/src/app/features/design-system/showcase.component.ts`
+- `<sep-app-root>/src/app/features/design-system/showcase.component.scss`
 
 ### Step 101.3.1 - Exportar os novos arquivos no indice SCSS
 
-**Arquivo**: `apps/sep-frontend/src/styles/index.scss`
+**Arquivo**: `<sep-app-root>/src/styles/index.scss`
 
 **Conteudo esperado**:
 ```scss
@@ -699,14 +699,14 @@ git commit -m "feat(web): add notion design tokens"
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint:scss
 npm run build
 ```
 
 ### Step 101.3.2 - Criar rota lazy de design system
 
-**Arquivo**: `apps/sep-frontend/src/app/app.routes.ts`
+**Arquivo**: `<sep-app-root>/src/app/app.routes.ts`
 
 **Ajuste esperado**:
 ```ts
@@ -721,7 +721,7 @@ export const routes: Routes = [
 
 Se `app.routes.ts` ja possuir rotas, adicionar esta entrada sem remover as existentes.
 
-**Arquivo**: `apps/sep-frontend/src/app/features/design-system/design-system.routes.ts`
+**Arquivo**: `<sep-app-root>/src/app/features/design-system/design-system.routes.ts`
 
 **Conteudo esperado**:
 ```ts
@@ -748,14 +748,14 @@ export const DESIGN_SYSTEM_ROUTES: Routes = [
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint
 npm run build
 ```
 
 ### Step 101.3.3 - Criar componente standalone do showcase
 
-**Arquivo**: `apps/sep-frontend/src/app/features/design-system/showcase.component.ts`
+**Arquivo**: `<sep-app-root>/src/app/features/design-system/showcase.component.ts`
 
 **Conteudo esperado**:
 ```ts
@@ -792,7 +792,7 @@ export class ShowcaseComponent {
 }
 ```
 
-**Arquivo adicional**: `apps/sep-frontend/src/app/features/design-system/showcase.component.html`
+**Arquivo adicional**: `<sep-app-root>/src/app/features/design-system/showcase.component.html`
 
 **Estrutura minima esperada**:
 ```html
@@ -826,14 +826,14 @@ export class ShowcaseComponent {
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint
 npm run build
 ```
 
 ### Step 101.3.4 - Estilizar o showcase com os mixins
 
-**Arquivo**: `apps/sep-frontend/src/app/features/design-system/showcase.component.scss`
+**Arquivo**: `<sep-app-root>/src/app/features/design-system/showcase.component.scss`
 
 **Conteudo esperado**:
 ```scss
@@ -889,7 +889,7 @@ npm run build
 
 **Verificacao manual**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run start
 ```
 
@@ -911,7 +911,7 @@ Abrir:
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run test
 ```
 
@@ -928,7 +928,7 @@ npm run test
 
 ### Commit Task F-1.3
 ```bash
-git add apps/sep-frontend/src/styles apps/sep-frontend/src/app
+git add <sep-app-root>/src/styles <sep-app-root>/src/app
 git commit -m "feat(web): add design system showcase"
 ```
 
@@ -946,7 +946,7 @@ git commit -m "feat(web): add design system showcase"
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint
 npm run lint:scss
 npm run test
@@ -981,7 +981,7 @@ npm run build
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm ls bootstrap tailwindcss @angular/material || true
 ```
 
@@ -993,7 +993,7 @@ npm ls bootstrap tailwindcss @angular/material || true
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
+cd <sep-app-root>
 git status --short
 ```
 
@@ -1018,7 +1018,7 @@ git status --short
 Se as tasks foram commitadas separadamente, nao e necessario commit final. Se ainda houver ajustes pequenos:
 
 ```bash
-git add apps/sep-frontend
+git add <sep-app-root>
 git commit -m "chore(web): finalize design tokens showcase"
 ```
 

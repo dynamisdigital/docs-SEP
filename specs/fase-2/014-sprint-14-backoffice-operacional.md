@@ -20,7 +20,7 @@ A sprint introduz capacidade de comentarios internos, justificativas auditaveis,
 
 ### Em escopo (apenas backend)
 
-- Novo modulo `backoffice` em `com.dynamis.broker_app.backoffice` (DDD + Hexagonal)
+- Novo modulo `backoffice` em `com.dynamis.sep_api.backoffice` (DDD + Hexagonal)
 - Entidades de dominio:
   - `ItemFilaOperacional` (registro normalizado de cada item que precisa de atencao; agrega referencias para o objeto original via `tipoEntidade` + `entidadeId`)
   - `ComentarioInterno` (comentarios + justificativas; N:1 com `ItemFilaOperacional`)

@@ -20,7 +20,7 @@ A assinatura digital efetiva (com provider externo + CCB) fica para a Sprint 11.
 
 ### Em escopo (apenas backend)
 
-- Novo modulo `contratos` em `com.dynamis.broker_app.contratos` (DDD + Hexagonal/Ports & Adapters)
+- Novo modulo `contratos` em `com.dynamis.sep_api.contratos` (DDD + Hexagonal/Ports & Adapters)
 - Entidades de dominio:
   - `Contrato` (agregado raiz; estende `EntidadeAuditavel`)
   - `ClausulaContratual` (entidade filha; cada clausula tem `ordem`, `titulo`, `texto`)

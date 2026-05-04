@@ -6,9 +6,9 @@
 
 **Esforco total estimado**: 2-3 dias de Dev Mobile dedicado.
 
-**Workspace root**: `<workspace-root>` (neste ambiente: `/home/mauricio/workspaces/workspace-sep`; em Windows: `C:/workspace-sep`).
+**Repo de destino**: `sep-mobile` (clonado em `<sep-mobile-root>/` na maquina do dev). Modelo de 3 repos independentes (PRD §11, AGENT.md).
 
-**Localizacao do projeto mobile**: `<workspace-root>/apps/sep-mobile/`.
+**Localizacao do projeto mobile**: `<sep-mobile-root>/`.
 
 **Lembrete sobre fronteira de design system** (PRD §11): no mobile **so se usa Notion**, nao Apple. A primeira tela publica (boas-vindas, na M-Sprint 2) ja segue Notion adaptado para mobile. Nao reaproveitar tokens da F-Sprint 1 web diretamente — as adaptacoes mobile (touch, fonts, tap highlights) tornam improdutivo compartilhar arquivos.
 
@@ -43,7 +43,7 @@ M-1.4 (validacao final)
 6. Nao avance para a M-Sprint 2 sem a M-Sprint 1 verde localmente
 
 **Pre-requisitos globais**:
-- M-Sprint 0 concluida (`steps/mobile/200-msprint-0-steps.md`): Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling completo + agregador de pre-commit `.githooks/pre-commit` operacional
+- M-Sprint 0 concluida (`steps/mobile/200-msprint-0-steps.md`): Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling completo + Husky + lint-staged operacional via `husky init`
 - Stylelint configurado com whitelist `--ion-*` (Step 200.2.4 da M-Sprint 0)
 - Vitest com `@analogjs/vite-plugin-angular` operacional
 - Acesso de leitura a `docs-sep/DESIGN-notion.md`
@@ -69,11 +69,11 @@ M-1.4 (validacao final)
 
 **Comando**:
 ```bash
-cd <workspace-root>
-test -d apps/sep-mobile && echo "OK apps/sep-mobile existe" || echo "FALTA apps/sep-mobile (rodar M-Sprint 0)"
-test -f apps/sep-mobile/capacitor.config.ts && echo "OK capacitor.config.ts" || echo "FALTA capacitor.config.ts"
-test -f apps/sep-mobile/src/styles/index.scss && echo "OK styles/index.scss" || echo "FALTA styles/index.scss (Step 200.1.7)"
-test -f apps/sep-mobile/src/test/setup.ts && echo "OK test/setup.ts" || echo "FALTA test/setup.ts"
+cd <sep-mobile-root>
+test -d <sep-mobile-root> && echo "OK <sep-mobile-root> existe" || echo "FALTA <sep-mobile-root> (rodar M-Sprint 0)"
+test -f <sep-mobile-root>/capacitor.config.ts && echo "OK capacitor.config.ts" || echo "FALTA capacitor.config.ts"
+test -f <sep-mobile-root>/src/styles/index.scss && echo "OK styles/index.scss" || echo "FALTA styles/index.scss (Step 200.1.7)"
+test -f <sep-mobile-root>/src/test/setup.ts && echo "OK test/setup.ts" || echo "FALTA test/setup.ts"
 ```
 
 **Espera**: todos os 4 arquivos/dirs presentes.
@@ -82,7 +82,7 @@ test -f apps/sep-mobile/src/test/setup.ts && echo "OK test/setup.ts" || echo "FA
 
 **Comando**:
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 node -v          # >= v20.x
 npm -v           # >= 10.x
 npx ng version | grep -E "@angular/core|@angular/cli"
@@ -102,7 +102,7 @@ npm run format:check --silent && echo "OK format:check" || echo "FALHA format"
 
 **Comando**:
 ```bash
-cd <workspace-root>
+cd <sep-mobile-root>
 test -f docs-sep/DESIGN-notion.md && echo "OK DESIGN-notion.md existe" || echo "FALTA DESIGN-notion.md"
 wc -l docs-sep/DESIGN-notion.md
 ```
@@ -113,7 +113,7 @@ wc -l docs-sep/DESIGN-notion.md
 
 **Comando**:
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run build
 npm run test
 ```
@@ -121,7 +121,7 @@ npm run test
 **Espera**: build e test passam (smoke test do `app.component.spec.ts` da M-Sprint 0 deve continuar verde). Se algo falhar **antes** de qualquer alteracao, e bug a corrigir antes de avancar.
 
 ### Definicao de pronto da Task M-1.0
-- [ ] Estrutura `apps/sep-mobile/` validada
+- [ ] Estrutura `<sep-mobile-root>/` validada
 - [ ] Versoes de Angular 20, Ionic 8.4+ e Capacitor 6 confirmadas
 - [ ] Stylelint com suporte a `--ion-*` validado pelo `npm run lint`
 - [ ] Vitest com `@analogjs/vite-plugin-angular` operacional
@@ -143,7 +143,7 @@ Nao gera commit — e apenas validacao do ambiente.
 
 ### Step 201.1.1 — Criar `_notion-mobile-tokens.scss`
 
-**Arquivo**: `apps/sep-mobile/src/styles/_notion-mobile-tokens.scss`
+**Arquivo**: `<sep-mobile-root>/src/styles/_notion-mobile-tokens.scss`
 
 **Conteudo**:
 ```scss
@@ -313,7 +313,7 @@ $notion-transition-slow: 240ms ease-out;
 
 ### Step 201.1.2 — Criar `_notion-mobile-typography.scss`
 
-**Arquivo**: `apps/sep-mobile/src/styles/_notion-mobile-typography.scss`
+**Arquivo**: `<sep-mobile-root>/src/styles/_notion-mobile-typography.scss`
 
 **Conteudo**:
 ```scss
@@ -401,9 +401,9 @@ $notion-transition-slow: 240ms ease-out;
 
 ### Step 201.1.3 — Configurar `theme/variables.scss` com CSS vars Ionic apontando para Notion
 
-O arquivo `apps/sep-mobile/src/theme/variables.scss` ja foi criado pelo scaffold da M-Sprint 0 (template default do Ionic). Agora vamos sobrescrever as `--ion-*` para apontar aos tokens Notion.
+O arquivo `<sep-mobile-root>/src/theme/variables.scss` ja foi criado pelo scaffold da M-Sprint 0 (template default do Ionic). Agora vamos sobrescrever as `--ion-*` para apontar aos tokens Notion.
 
-**Arquivo**: `apps/sep-mobile/src/theme/variables.scss`
+**Arquivo**: `<sep-mobile-root>/src/theme/variables.scss`
 
 **Conteudo** (substituir o que veio do scaffold):
 ```scss
@@ -491,9 +491,9 @@ O arquivo `apps/sep-mobile/src/theme/variables.scss` ja foi criado pelo scaffold
 
 ### Step 201.1.4 — Atualizar `index.scss` para incluir os novos arquivos
 
-A M-Sprint 0 ja criou o `apps/sep-mobile/src/styles/index.scss` com placeholders. Agora atualizamos para usar os tokens reais.
+A M-Sprint 0 ja criou o `<sep-mobile-root>/src/styles/index.scss` com placeholders. Agora atualizamos para usar os tokens reais.
 
-**Arquivo**: `apps/sep-mobile/src/styles/index.scss`
+**Arquivo**: `<sep-mobile-root>/src/styles/index.scss`
 
 **Conteudo** (substituir o placeholder da M-Sprint 0):
 ```scss
@@ -516,7 +516,7 @@ A M-Sprint 0 ja criou o `apps/sep-mobile/src/styles/index.scss` com placeholders
 E remover/limpar `_notion-mobile.scss` e `_ionic-overrides.scss` (placeholders da M-Sprint 0 que sao substituidos pelos arquivos reais desta sprint):
 
 ```bash
-cd <workspace-root>/apps/sep-mobile/src/styles
+cd <sep-mobile-root>/src/styles
 rm -f _notion-mobile.scss _ionic-overrides.scss
 ```
 
@@ -529,7 +529,7 @@ Atualizar tambem `app.component.scss` (vazio do scaffold) para ter um exemplo mi
 
 **Comando**:
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run lint:scss
 npm run build
 ```
@@ -551,12 +551,12 @@ Se o Stylelint reclamar de selector pattern, lembrar que a M-Sprint 0 (Step 200.
 
 ### Commit Task M-1.1
 ```bash
-cd <workspace-root>
-git add apps/sep-mobile/src/styles/_notion-mobile-tokens.scss
-git add apps/sep-mobile/src/styles/_notion-mobile-typography.scss
-git add apps/sep-mobile/src/styles/index.scss
-git add apps/sep-mobile/src/theme/variables.scss
-git rm -f apps/sep-mobile/src/styles/_notion-mobile.scss apps/sep-mobile/src/styles/_ionic-overrides.scss 2>/dev/null || true
+cd <sep-mobile-root>
+git add <sep-mobile-root>/src/styles/_notion-mobile-tokens.scss
+git add <sep-mobile-root>/src/styles/_notion-mobile-typography.scss
+git add <sep-mobile-root>/src/styles/index.scss
+git add <sep-mobile-root>/src/theme/variables.scss
+git rm -f <sep-mobile-root>/src/styles/_notion-mobile.scss <sep-mobile-root>/src/styles/_ionic-overrides.scss 2>/dev/null || true
 git commit -m "feat(mobile): tokens SCSS Notion adaptados para mobile + CSS vars Ionic"
 ```
 
@@ -572,7 +572,7 @@ git commit -m "feat(mobile): tokens SCSS Notion adaptados para mobile + CSS vars
 
 ### Step 201.2.1 — Criar `_notion-mobile-components.scss`
 
-**Arquivo**: `apps/sep-mobile/src/styles/_notion-mobile-components.scss`
+**Arquivo**: `<sep-mobile-root>/src/styles/_notion-mobile-components.scss`
 
 **Conteudo**:
 ```scss
@@ -776,7 +776,7 @@ git commit -m "feat(mobile): tokens SCSS Notion adaptados para mobile + CSS vars
 
 O Ionic CLI gera por default um `src/global.scss` (incluido pelo `angular.json` da M-Sprint 0 Step 200.1.8). Vamos populá-lo com os mixins aplicados aos selectors Ionic globais.
 
-**Arquivo**: `apps/sep-mobile/src/global.scss`
+**Arquivo**: `<sep-mobile-root>/src/global.scss`
 
 **Conteudo** (substituir):
 ```scss
@@ -856,7 +856,7 @@ Verificar que ambos estao no array de styles do build. A M-Sprint 0 Step 200.1.8
 
 **Comando**:
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 node -e "
   const j = require('./angular.json');
   const project = Object.values(j.projects)[0];
@@ -882,7 +882,7 @@ Se algum estiver faltando, ajustar `angular.json` em `projects.<nome>.architect.
 
 **Comando**:
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run lint
 npm run lint:scss
 npm run build
@@ -900,10 +900,10 @@ npm run build
 
 ### Commit Task M-1.2
 ```bash
-cd <workspace-root>
-git add apps/sep-mobile/src/styles/_notion-mobile-components.scss
-git add apps/sep-mobile/src/global.scss
-git add apps/sep-mobile/angular.json
+cd <sep-mobile-root>
+git add <sep-mobile-root>/src/styles/_notion-mobile-components.scss
+git add <sep-mobile-root>/src/global.scss
+git add <sep-mobile-root>/angular.json
 git commit -m "feat(mobile): mixins SCSS para componentes Ionic customizados via tokens Notion"
 ```
 
@@ -919,7 +919,7 @@ git commit -m "feat(mobile): mixins SCSS para componentes Ionic customizados via
 
 ### Step 201.3.1 — Criar rota lazy `/design-system`
 
-**Arquivo**: `apps/sep-mobile/src/app/app.routes.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/app.routes.ts`
 
 Adicionar a rota lazy do design system. Conteudo esperado (preservar rotas existentes):
 ```ts
@@ -948,7 +948,7 @@ export const routes: Routes = [
 
 ### Step 201.3.2 — Criar arquivo de rotas do showcase
 
-**Arquivo**: `apps/sep-mobile/src/app/features/design-system/design-system.routes.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/features/design-system/design-system.routes.ts`
 
 **Conteudo**:
 ```ts
@@ -992,7 +992,7 @@ export const DESIGN_SYSTEM_ROUTES: Routes = [
 
 ### Step 201.3.3 — Criar componente `ShowcaseComponent` (shell com tabs)
 
-**Arquivo**: `apps/sep-mobile/src/app/features/design-system/showcase.component.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/features/design-system/showcase.component.ts`
 
 **Conteudo**:
 ```ts
@@ -1073,7 +1073,7 @@ export class ShowcaseComponent {
 
 ### Step 201.3.4 — Criar 4 paginas do showcase (colors, typography, components, navigation)
 
-**Arquivo**: `apps/sep-mobile/src/app/features/design-system/pages/colors.component.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/features/design-system/pages/colors.component.ts`
 ```ts
 import { Component } from '@angular/core';
 import { IonContent, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
@@ -1130,7 +1130,7 @@ export class ColorsComponent {
 }
 ```
 
-**Arquivo**: `apps/sep-mobile/src/app/features/design-system/pages/typography.component.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/features/design-system/pages/typography.component.ts`
 ```ts
 import { Component } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
@@ -1156,7 +1156,7 @@ import { IonContent } from '@ionic/angular/standalone';
 export class TypographyComponent {}
 ```
 
-**Arquivo**: `apps/sep-mobile/src/app/features/design-system/pages/typography.component.scss`
+**Arquivo**: `<sep-mobile-root>/src/app/features/design-system/pages/typography.component.scss`
 ```scss
 @use '../../../../styles/notion-mobile-typography' as t;
 
@@ -1170,7 +1170,7 @@ export class TypographyComponent {}
 .t-mono { @include t.notion-mono; }
 ```
 
-**Arquivo**: `apps/sep-mobile/src/app/features/design-system/pages/components.component.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/features/design-system/pages/components.component.ts`
 ```ts
 import { Component } from '@angular/core';
 import {
@@ -1260,7 +1260,7 @@ export class ComponentsComponent {
 }
 ```
 
-**Arquivo**: `apps/sep-mobile/src/app/features/design-system/pages/navigation.component.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/features/design-system/pages/navigation.component.ts`
 ```ts
 import { Component } from '@angular/core';
 import { IonContent, IonNote } from '@ionic/angular/standalone';
@@ -1298,7 +1298,7 @@ export class NavigationComponent {}
 
 ### Step 201.3.5 — Adicionar smoke test do showcase
 
-**Arquivo**: `apps/sep-mobile/src/app/features/design-system/showcase.component.spec.ts`
+**Arquivo**: `<sep-mobile-root>/src/app/features/design-system/showcase.component.spec.ts`
 
 **Conteudo**:
 ```ts
@@ -1325,7 +1325,7 @@ describe('ShowcaseComponent', () => {
 
 **Comando**:
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run start
 ```
 
@@ -1355,9 +1355,9 @@ Encerrar com `Ctrl+C` apos validacao.
 
 ### Commit Task M-1.3
 ```bash
-cd <workspace-root>
-git add apps/sep-mobile/src/app/app.routes.ts
-git add apps/sep-mobile/src/app/features/design-system/
+cd <sep-mobile-root>
+git add <sep-mobile-root>/src/app/app.routes.ts
+git add <sep-mobile-root>/src/app/features/design-system/
 git commit -m "feat(mobile): showcase navegavel do design system Notion mobile (rota /design-system)"
 ```
 
@@ -1375,7 +1375,7 @@ git commit -m "feat(mobile): showcase navegavel do design system Notion mobile (
 
 **Comando**:
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm run lint
 npm run lint:scss
 npm run format:check
@@ -1415,7 +1415,7 @@ Se algum item falhar, voltar para a Task correspondente e ajustar.
 
 **Comando**:
 ```bash
-cd <workspace-root>/apps/sep-mobile
+cd <sep-mobile-root>
 npm ls --depth=0 2>&1 | grep -iE "bootstrap|tailwind|@angular/material|primeng|ng-bootstrap" && \
   echo "FALHOU: dependencia proibida detectada" || \
   echo "OK: nenhuma dependencia visual proibida instalada"
@@ -1429,9 +1429,9 @@ Lembrete (CLAUDE/AGENT.md): nao reintroduzir Bootstrap, Tailwind, Material ou te
 
 **Comando**:
 ```bash
-cd <workspace-root>
-git status apps/sep-mobile/
-git diff --stat apps/sep-mobile/ | tail -5
+cd <sep-mobile-root>
+git status <sep-mobile-root>/
+git diff --stat <sep-mobile-root>/ | tail -5
 ```
 
 **Espera**:
@@ -1466,7 +1466,7 @@ A M-Sprint 1 esta concluida quando todas as 5 tasks tiverem checklist completo:
 ## Estado esperado do repositorio apos M-Sprint 1
 
 ```
-<workspace-root>/apps/sep-mobile/
+<sep-mobile-root>/
 ├── angular.json                              # ATUALIZADO Step 201.2.3 (3 styles)
 ├── src/
 │   ├── app/

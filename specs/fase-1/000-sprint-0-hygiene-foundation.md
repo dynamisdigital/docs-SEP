@@ -159,12 +159,11 @@ test {
 ### Task 0.4 - Pre-commit hooks
 
 **Descricao**
-Configurar Git hooks (backend) e Husky + lint-staged (frontend, trilha 1XX) para impedir commits com codigo nao-formatado ou que quebre o build.
+Configurar Git hooks no repositorio `sep-api` para bloquear commits com codigo Java desformatado. Cada repositorio gerencia seu pre-commit independentemente: `sep-api` usa `.githooks/pre-commit` minimalista (so Spotless), `sep-app` e `sep-mobile` usam Husky + lint-staged padrao via `npx husky init` (orientacoes em [`100-fsprint-0-setup-angular.md`](./100-fsprint-0-setup-angular.md) e [`200-msprint-0-setup-ionic.md`](./200-msprint-0-setup-ionic.md)).
 
-**Arquivos esperados**
-- Backend: `.githooks/pre-commit` rodando `./gradlew spotlessCheck`
-- Backend: documentacao no README sobre `git config core.hooksPath .githooks`
-- Frontend: `package.json` com Husky + lint-staged (criado na trilha 1XX, [`specs/100-fsprint-0-setup-angular.md`](./100-fsprint-0-setup-angular.md))
+**Arquivos esperados (apenas no repo `sep-api`)**
+- `<sep-api-root>/.githooks/pre-commit` rodando `./gradlew spotlessCheck`
+- `<sep-api-root>/README.md` documentando `git config core.hooksPath .githooks`
 
 **Criterios de verificacao**
 - Commit com codigo desformatado e bloqueado
@@ -348,7 +347,7 @@ Criar a pasta `adr/` (ja criada) e migrar 5-7 decisoes mais relevantes do PRD pa
 Criar a arvore de pacotes do monolito modular DDD prevista no PRD §19, com `package-info.java` por modulo descrevendo a fronteira. Sem codigo de negocio, so estrutura.
 
 **Arquivos esperados (preparados para Sprint 1)**
-- `src/main/java/com/dynamis/broker_app/identity/{domain,application,infrastructure,web}/package-info.java`
+- `src/main/java/com/dynamis/sep_api/identity/{domain,application,infrastructure,web}/package-info.java`
 - Mesmo padrao para `usuarios`, `onboarding`, `credito`, `contratos`, `cobranca`, `escrow`, `backoffice`, `financeiro`, `credores`, `pix`, `shared`
 - Cada `package-info.java` documenta a responsabilidade do pacote
 

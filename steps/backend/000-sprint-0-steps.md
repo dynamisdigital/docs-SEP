@@ -35,13 +35,13 @@ Task 0.1 (meta-arquivos)
 
 **Objetivo**: criar os 3 arquivos basicos de configuracao do repo (`.gitignore`, `.editorconfig`, `.gitattributes`).
 
-**Pre-requisito**: repositorio Git inicializado em `C:/workspace-sep/`.
+**Pre-requisito**: repositorio Git inicializado em `<sep-api-root>/`.
 
 **Esforco**: 15-20 min.
 
 ### Step 0.1.1 — Criar `.gitignore`
 
-**Arquivo**: `C:/workspace-sep/.gitignore`
+**Arquivo**: `<sep-api-root>/.gitignore`
 
 **Conteudo:**
 ```gitignore
@@ -179,14 +179,14 @@ postgres-data/
 
 **Verificacao:**
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 git status
 # Espera: nao deve listar build/, .gradle/, .idea/, node_modules/ etc.
 ```
 
 ### Step 0.1.2 — Criar `.editorconfig`
 
-**Arquivo**: `C:/workspace-sep/.editorconfig`
+**Arquivo**: `<sep-api-root>/.editorconfig`
 
 **Conteudo:**
 ```editorconfig
@@ -232,7 +232,7 @@ indent_size = 2
 
 ### Step 0.1.3 — Criar `.gitattributes`
 
-**Arquivo**: `C:/workspace-sep/.gitattributes`
+**Arquivo**: `<sep-api-root>/.gitattributes`
 
 **Conteudo:**
 ```gitattributes
@@ -287,7 +287,7 @@ git check-attr eol -- src/main/java/Foo.java
 ### Step 0.1.4 — Renormalizar arquivos existentes (opcional)
 
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 git add --renormalize .
 git status
 git diff --check
@@ -323,7 +323,7 @@ git commit -m "chore: adicionar meta-arquivos do repositorio"
 
 ### Step 0.2.1 — Adicionar plugin Spotless ao `build.gradle`
 
-**Arquivo**: `C:/workspace-sep/build.gradle`
+**Arquivo**: `<sep-api-root>/build.gradle`
 
 **Snippet (bloco plugins completo):**
 ```gradle
@@ -344,7 +344,7 @@ plugins {
 
 ### Step 0.2.2 — Configurar bloco `spotless { }`
 
-**Arquivo**: `C:/workspace-sep/build.gradle` (apos `dependencies { }`)
+**Arquivo**: `<sep-api-root>/build.gradle` (apos `dependencies { }`)
 
 **Snippet:**
 ```gradle
@@ -391,7 +391,7 @@ spotless {
 
 ### Step 0.2.3 — Adicionar `spotlessCheck` como dependencia de `check`
 
-**Arquivo**: `C:/workspace-sep/build.gradle` (apos bloco spotless)
+**Arquivo**: `<sep-api-root>/build.gradle` (apos bloco spotless)
 
 **Snippet:**
 ```gradle
@@ -405,7 +405,7 @@ check.dependsOn 'spotlessCheck'
 
 ### Step 0.2.4 — Documentar comandos no README
 
-**Arquivo**: `C:/workspace-sep/README.md`
+**Arquivo**: `<sep-api-root>/README.md`
 
 **Adicionar secao:**
 ````markdown
@@ -433,9 +433,9 @@ Este projeto usa **Spotless + Palantir Java Format**.
 
 ```bash
 # 1. Criar arquivo Java desformatado
-mkdir -p src/main/java/com/dynamis/broker_app
-cat > src/main/java/com/dynamis/broker_app/SpotlessTest.java << 'EOF'
-package com.dynamis.broker_app;
+mkdir -p src/main/java/com/dynamis/sep_api
+cat > src/main/java/com/dynamis/sep_api/SpotlessTest.java << 'EOF'
+package com.dynamis.sep_api;
 public class SpotlessTest{
     public void   foo(  ){System.out.println("hi"  );}
 }
@@ -453,7 +453,7 @@ EOF
 # Espera: BUILD SUCCESSFUL
 
 # 5. Limpar
-rm src/main/java/com/dynamis/broker_app/SpotlessTest.java
+rm src/main/java/com/dynamis/sep_api/SpotlessTest.java
 ```
 
 ### Definicao de pronto da Task 0.2
@@ -481,7 +481,7 @@ git commit -m "chore: configurar Spotless + Palantir Java Format"
 
 ### Step 0.3.1 — Adicionar plugin JaCoCo
 
-**Arquivo**: `C:/workspace-sep/build.gradle`
+**Arquivo**: `<sep-api-root>/build.gradle`
 
 **Snippet (verificar presenca):**
 ```gradle
@@ -493,7 +493,7 @@ plugins {
 
 ### Step 0.3.2 — Configurar bloco `jacoco { }` e `test { }`
 
-**Arquivo**: `C:/workspace-sep/build.gradle`
+**Arquivo**: `<sep-api-root>/build.gradle`
 
 **Snippet:**
 ```gradle
@@ -509,7 +509,7 @@ test {
 
 ### Step 0.3.3 — Configurar `jacocoTestReport`
 
-**Arquivo**: `C:/workspace-sep/build.gradle`
+**Arquivo**: `<sep-api-root>/build.gradle`
 
 **Snippet:**
 ```gradle
@@ -527,7 +527,7 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, exclude: [
-                '**/BrokerAppApplication.class',
+                '**/SepApiApplication.class',
                 '**/config/**',
                 '**/dto/**',
                 '**/*MapperImpl.class',
@@ -541,9 +541,9 @@ jacocoTestReport {
 
 **Verificacao:**
 ```bash
-mkdir -p src/test/java/com/dynamis/broker_app
-cat > src/test/java/com/dynamis/broker_app/SmokeTest.java << 'EOF'
-package com.dynamis.broker_app;
+mkdir -p src/test/java/com/dynamis/sep_api
+cat > src/test/java/com/dynamis/sep_api/SmokeTest.java << 'EOF'
+package com.dynamis.sep_api;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 class SmokeTest {
@@ -557,7 +557,7 @@ EOF
 
 ### Step 0.3.4 — Configurar `jacocoTestCoverageVerification` (DESATIVADA)
 
-**Arquivo**: `C:/workspace-sep/build.gradle`
+**Arquivo**: `<sep-api-root>/build.gradle`
 
 **Snippet:**
 ```gradle
@@ -606,7 +606,7 @@ start build/reports/jacoco/html/index.html  # Windows
 ```
 
 ### Exclusoes
-- `BrokerAppApplication`, `config/**`, `dto/**`, `*MapperImpl`, `package-info`, excecoes simples
+- `SepApiApplication`, `config/**`, `dto/**`, `*MapperImpl`, `package-info`, excecoes simples
 ````
 
 ### Step 0.3.6 — Teste e limpeza
@@ -614,7 +614,7 @@ start build/reports/jacoco/html/index.html  # Windows
 ```bash
 ./gradlew clean test jacocoTestReport
 ls build/reports/jacoco/html/index.html
-rm src/test/java/com/dynamis/broker_app/SmokeTest.java
+rm src/test/java/com/dynamis/sep_api/SmokeTest.java
 ```
 
 ### Definicao de pronto da Task 0.3
@@ -646,13 +646,13 @@ git commit -m "chore: configurar JaCoCo com target 70% (verificacao desligada at
 
 **Comando:**
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 mkdir -p .githooks
 ```
 
 ### Step 0.4.2 — Criar hook `pre-commit`
 
-**Arquivo**: `C:/workspace-sep/.githooks/pre-commit`
+**Arquivo**: `<sep-api-root>/.githooks/pre-commit`
 
 **Conteudo:**
 ```bash
@@ -706,7 +706,7 @@ chmod +x .githooks/pre-commit
 
 **Comando (executar uma vez por dev):**
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 git config core.hooksPath .githooks
 ```
 
@@ -718,7 +718,7 @@ git config --get core.hooksPath
 
 ### Step 0.4.4 — Documentar setup no README
 
-**Arquivo**: `C:/workspace-sep/README.md`
+**Arquivo**: `<sep-api-root>/README.md`
 
 **Adicionar secao:**
 ````markdown
@@ -758,13 +758,13 @@ Apos clonar o repositorio:
 
 ```bash
 # 1. Criar arquivo Java desformatado
-cat > src/main/java/com/dynamis/broker_app/HookTest.java << 'EOF'
-package com.dynamis.broker_app;
+cat > src/main/java/com/dynamis/sep_api/HookTest.java << 'EOF'
+package com.dynamis.sep_api;
 public class HookTest{public void  foo(){}}
 EOF
 
 # 2. Tentar commit — deve ser bloqueado
-git add src/main/java/com/dynamis/broker_app/HookTest.java
+git add src/main/java/com/dynamis/sep_api/HookTest.java
 git commit -m "test: hook test"
 # Espera: "❌ Spotless detectou codigo desformatado." e commit nao acontece
 
@@ -772,14 +772,14 @@ git commit -m "test: hook test"
 ./gradlew spotlessApply
 
 # 4. Tentar commit de novo — deve passar
-git add src/main/java/com/dynamis/broker_app/HookTest.java
+git add src/main/java/com/dynamis/sep_api/HookTest.java
 git commit -m "test: hook test"
 # Espera: "✅ Spotless OK." e commit feito
 
 # 5. Reverter o teste
 git reset --soft HEAD~1
-rm src/main/java/com/dynamis/broker_app/HookTest.java
-git add src/main/java/com/dynamis/broker_app/HookTest.java  # remove
+rm src/main/java/com/dynamis/sep_api/HookTest.java
+git add src/main/java/com/dynamis/sep_api/HookTest.java  # remove
 ```
 
 ### Definicao de pronto da Task 0.4
@@ -797,7 +797,7 @@ git commit -m "chore: adicionar pre-commit hook que roda Spotless"
 ```
 
 ### Observacoes
-- **Frontend**: Husky + lint-staged sera configurado em [`specs/fase-1/100-fsprint-0-setup-angular.md`](../../specs/fase-1/100-fsprint-0-setup-angular.md). Os 2 hooks coexistem (Git hook backend + Husky frontend) sem conflito.
+- **Repositorios separados**: o repo `sep-api` (Java) usa este `.githooks/pre-commit` minimalista, rodando apenas Spotless. Os repos `sep-app` (Angular) e `sep-mobile` (Ionic) usam **Husky + lint-staged padrao** via `npx husky init` — ver [`specs/fase-1/100-fsprint-0-setup-angular.md`](../../specs/fase-1/100-fsprint-0-setup-angular.md) e [`specs/fase-1/200-msprint-0-setup-ionic.md`](../../specs/fase-1/200-msprint-0-setup-ionic.md). Cada repo gerencia seu hook independentemente; nao ha agregador cross-repo.
 - **Hook em CI**: o CI (Task 0.6) tambem roda `spotlessCheck`, garantindo que mesmo commits com `--no-verify` sejam barrados na PR.
 
 ---
@@ -813,13 +813,13 @@ git commit -m "chore: adicionar pre-commit hook que roda Spotless"
 ### Step 0.5.1 — Criar pasta `.github/`
 
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 mkdir -p .github/ISSUE_TEMPLATE
 ```
 
 ### Step 0.5.2 — Criar `PULL_REQUEST_TEMPLATE.md`
 
-**Arquivo**: `C:/workspace-sep/.github/PULL_REQUEST_TEMPLATE.md`
+**Arquivo**: `<sep-api-root>/.github/PULL_REQUEST_TEMPLATE.md`
 
 **Conteudo:**
 ```markdown
@@ -872,7 +872,7 @@ Closes #
 
 ### Step 0.5.3 — Criar template de bug report
 
-**Arquivo**: `C:/workspace-sep/.github/ISSUE_TEMPLATE/bug_report.md`
+**Arquivo**: `<sep-api-root>/.github/ISSUE_TEMPLATE/bug_report.md`
 
 **Conteudo:**
 ```markdown
@@ -916,7 +916,7 @@ assignees: ''
 
 ### Step 0.5.4 — Criar template de feature request
 
-**Arquivo**: `C:/workspace-sep/.github/ISSUE_TEMPLATE/feature_request.md`
+**Arquivo**: `<sep-api-root>/.github/ISSUE_TEMPLATE/feature_request.md`
 
 **Conteudo:**
 ```markdown
@@ -955,7 +955,7 @@ assignees: ''
 
 ### Step 0.5.5 — Criar `CODEOWNERS` (opcional inicial)
 
-**Arquivo**: `C:/workspace-sep/.github/CODEOWNERS`
+**Arquivo**: `<sep-api-root>/.github/CODEOWNERS`
 
 **Conteudo:**
 ```
@@ -966,7 +966,7 @@ assignees: ''
 * @MAURICIO_GITHUB_USERNAME
 
 # Frontend
-apps/sep-frontend/ @FRONTEND_DEV_1_USERNAME @FRONTEND_DEV_2_USERNAME
+<sep-app-root>/ @FRONTEND_DEV_1_USERNAME @FRONTEND_DEV_2_USERNAME
 
 # Specs e ADRs
 specs/ @MAURICIO_GITHUB_USERNAME
@@ -1049,13 +1049,13 @@ git commit -m "chore: adicionar templates de PR/issue e CODEOWNERS"
 ### Step 0.6.1 — Criar pasta `.github/workflows/`
 
 ```bash
-cd C:/workspace-sep
+cd <sep-api-root>
 mkdir -p .github/workflows
 ```
 
 ### Step 0.6.2 — Criar workflow `ci.yml`
 
-**Arquivo**: `C:/workspace-sep/.github/workflows/ci.yml`
+**Arquivo**: `<sep-api-root>/.github/workflows/ci.yml`
 
 **Conteudo:**
 ```yaml
@@ -1147,7 +1147,7 @@ jobs:
 
 ### Step 0.6.3 — Criar workflow opcional para validacao de Markdown
 
-**Arquivo**: `C:/workspace-sep/.github/workflows/docs.yml` (opcional)
+**Arquivo**: `<sep-api-root>/.github/workflows/docs.yml` (opcional)
 
 **Conteudo:**
 ```yaml
@@ -1181,7 +1181,7 @@ jobs:
 
 ### Step 0.6.4 — Documentar CI no README
 
-**Arquivo**: `C:/workspace-sep/README.md`
+**Arquivo**: `<sep-api-root>/README.md`
 
 **Adicionar secao:**
 ````markdown
@@ -1258,7 +1258,7 @@ git commit -m "ci: adicionar pipeline CI minimo (build + test + spotless + jacoc
 
 ### Step 0.7.1 — Criar `CONTRIBUTING.md`
 
-**Arquivo**: `C:/workspace-sep/CONTRIBUTING.md`
+**Arquivo**: `<sep-api-root>/CONTRIBUTING.md`
 
 **Conteudo:**
 ```markdown
@@ -1408,7 +1408,7 @@ Abra uma issue ou consulte:
 
 ### Step 0.7.2 — Documentar referencia rapida no README
 
-**Arquivo**: `C:/workspace-sep/README.md`
+**Arquivo**: `<sep-api-root>/README.md`
 
 **Adicionar secao:**
 ````markdown
@@ -1458,7 +1458,7 @@ git commit -m "docs: adicionar CONTRIBUTING.md com Conventional Commits"
 
 **Verificacao:**
 ```bash
-ls C:/workspace-sep/adr/
+ls <sep-api-root>/adr/
 # Espera ver:
 # 0000-template.md
 # 0001-monolito-modular-orientado-a-ddd.md
@@ -1505,14 +1505,14 @@ ls C:/workspace-sep/adr/
 
 ### Step 0.9.2 — Criar script para gerar a estrutura
 
-**Arquivo**: `C:/workspace-sep/scripts/create-package-structure.sh` (opcional, agiliza)
+**Arquivo**: `<sep-api-root>/scripts/create-package-structure.sh` (opcional, agiliza)
 
 **Conteudo:**
 ```bash
 #!/usr/bin/env bash
 set -e
 
-BASE_DIR="src/main/java/com/dynamis/broker_app"
+BASE_DIR="src/main/java/com/dynamis/sep_api"
 MODULES=("identity" "usuarios" "onboarding" "credito" "contratos" "cobranca" "escrow" "backoffice" "financeiro" "credores" "pix" "shared")
 LAYERS=("domain" "application" "infrastructure" "web")
 
@@ -1553,10 +1553,10 @@ chmod +x scripts/create-package-structure.sh
  *
  * <p>Sem dependencias de Spring, JPA ou frameworks de infraestrutura.
  *
- * @see com.dynamis.broker_app.identity.application
- * @see com.dynamis.broker_app.identity.infrastructure
+ * @see com.dynamis.sep_api.identity.application
+ * @see com.dynamis.sep_api.identity.infrastructure
  */
-package com.dynamis.broker_app.identity.domain;
+package com.dynamis.sep_api.identity.domain;
 ```
 
 #### `identity/application/package-info.java`
@@ -1570,10 +1570,10 @@ package com.dynamis.broker_app.identity.domain;
  * <p>Expoe portas de saida em {@code application.port.out} para integracoes
  * externas seguindo o Provider Pattern (ADR 0004).
  *
- * @see com.dynamis.broker_app.identity.domain
- * @see com.dynamis.broker_app.identity.infrastructure
+ * @see com.dynamis.sep_api.identity.domain
+ * @see com.dynamis.sep_api.identity.infrastructure
  */
-package com.dynamis.broker_app.identity.application;
+package com.dynamis.sep_api.identity.application;
 ```
 
 #### `identity/infrastructure/package-info.java`
@@ -1584,9 +1584,9 @@ package com.dynamis.broker_app.identity.application;
  * <p>Implementacoes concretas das portas de saida, integracoes com Spring Security,
  * configuracao de filtros JWT e adapters externos quando aplicavel.
  *
- * @see com.dynamis.broker_app.identity.application
+ * @see com.dynamis.sep_api.identity.application
  */
-package com.dynamis.broker_app.identity.infrastructure;
+package com.dynamis.sep_api.identity.infrastructure;
 ```
 
 #### `identity/web/package-info.java`
@@ -1600,9 +1600,9 @@ package com.dynamis.broker_app.identity.infrastructure;
  * <p>Endpoints expostos: {@code POST /api/v1/auth/login},
  * {@code GET /api/v1/auth/me}.
  *
- * @see com.dynamis.broker_app.identity.application
+ * @see com.dynamis.sep_api.identity.application
  */
-package com.dynamis.broker_app.identity.web;
+package com.dynamis.sep_api.identity.web;
 ```
 
 ### Step 0.9.4 — Tabela de responsabilidades por modulo (referencia)
@@ -1628,12 +1628,12 @@ package com.dynamis.broker_app.identity.web;
 
 ```bash
 # Listar a estrutura criada
-find src/main/java/com/dynamis/broker_app -name "package-info.java" | sort
+find src/main/java/com/dynamis/sep_api -name "package-info.java" | sort
 
 # Espera 48 linhas, uma para cada combinacao modulo/layer
 # Exemplo:
-# src/main/java/com/dynamis/broker_app/backoffice/application/package-info.java
-# src/main/java/com/dynamis/broker_app/backoffice/domain/package-info.java
+# src/main/java/com/dynamis/sep_api/backoffice/application/package-info.java
+# src/main/java/com/dynamis/sep_api/backoffice/domain/package-info.java
 # ... etc
 ```
 
@@ -1661,7 +1661,7 @@ find src/main/java/com/dynamis/broker_app -name "package-info.java" | sort
 
 ### Commit Task 0.9
 ```bash
-git add src/main/java/com/dynamis/broker_app/
+git add src/main/java/com/dynamis/sep_api/
 git commit -m "chore: criar estrutura inicial de pacotes do monolito modular DDD"
 ```
 
@@ -1689,7 +1689,7 @@ A Sprint 0 esta concluida quando todas as 9 tasks estiverem com checklist comple
 ## Estado esperado do repositorio apos Sprint 0
 
 ```
-C:/workspace-sep/
+<sep-api-root>/
 ├── .editorconfig
 ├── .gitattributes
 ├── .gitignore
@@ -1713,7 +1713,7 @@ C:/workspace-sep/
 ├── gradlew, gradlew.bat                  # criado em Sprint 1 Task 1.1a
 ├── docs-sep/                             # ja existe
 ├── specs/                                # ja existe
-├── src/main/java/com/dynamis/broker_app/ # 48 package-info.java
+├── src/main/java/com/dynamis/sep_api/ # 48 package-info.java
 ├── AGENT.md                             # ja existe
 ├── CONTRIBUTING.md
 ├── README.md                             # atualizado com secoes Sprint 0

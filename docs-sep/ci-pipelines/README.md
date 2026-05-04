@@ -4,27 +4,53 @@
 
 Este diretorio documenta a evolucao planejada das pipelines do SEP. A regra central e simples: ativar primeiro CI de validacao, sem deploy, e manter qualquer automacao de distribuicao ou infraestrutura como template versionado ate que os gates do PRD sejam cumpridos.
 
-## Workflows ativos
+## Modelo de 3 repositorios
 
-Os workflows ativos ficam em `.github/workflows/` e podem aparecer no GitHub Actions:
+A partir de 2026-05-04 o projeto opera em **3 repositorios independentes** no GitHub:
 
-- `backend-ci.yml`: valida backend Java/Spring quando o Gradle Wrapper existir.
-- `frontend-ci.yml`: valida `apps/sep-frontend` quando a F-Sprint 0 criar o app.
-- `mobile-pwa-ci.yml`: valida `apps/sep-mobile` como PWA quando a M-Sprint 0 criar o app.
+- **`sep-api`** — backend Java + Spring Boot
+- **`sep-app`** — frontend Angular
+- **`sep-mobile`** — mobile Ionic + Capacitor
 
-Esses workflows nao fazem deploy, nao usam secrets produtivos e encerram com aviso quando a respectiva trilha ainda nao existe no repositorio.
+A documentacao consolidada (este repo `docs-SEP`) **nao executa CI proprio** — apenas hospeda os templates abaixo, que sao copiados para o `.github/workflows/` de cada repo correspondente.
 
-## Templates futuros
+## Templates por repositorio
 
-Os arquivos em `docs-sep/ci-pipelines/templates/` nao sao executados pelo GitHub Actions. Eles devem ser copiados para `.github/workflows/` somente quando a fase correspondente for formalmente iniciada.
+Os arquivos em `docs-sep/ci-pipelines/templates/` sao templates versionados. Cada um tem o sufixo `.template.yml` e e copiado para o `.github/workflows/<arquivo>.yml` (sem o sufixo `.template`) no repo correspondente.
 
-- `mobile-android-validation.yml`: build Android debug para validacao interna.
-- `mobile-android-distribution.yml`: build Android assinado para homologacao/distribuicao.
-- `mobile-ios-validation.yml`: build iOS de validacao em runner macOS.
-- `mobile-ios-testflight.yml`: publicacao em TestFlight.
-- `aws-deploy-develop.yml`: deploy futuro para `aws-develop`.
-- `aws-deploy-homologacao.yml`: deploy futuro para `homologacao`.
-- `aws-deploy-producao.yml`: deploy futuro para `producao`.
+### `sep-api`
+
+- [`sep-api-ci.template.yml`](./templates/sep-api-ci.template.yml) — valida backend Java/Spring com Spotless + JaCoCo + build Gradle. Usa Postgres como service container do GitHub Actions.
+
+### `sep-app`
+
+- [`sep-app-ci.template.yml`](./templates/sep-app-ci.template.yml) — valida frontend Angular com lint + test + build.
+
+### `sep-mobile`
+
+- [`sep-mobile-pwa-ci.template.yml`](./templates/sep-mobile-pwa-ci.template.yml) — valida mobile como PWA (lint + test + build). Padrao da fase atual conforme PRD §11 (PWA-first).
+- [`sep-mobile-android-validation.template.yml`](./templates/sep-mobile-android-validation.template.yml) — build Android debug para validacao interna (futuro, apos M-Sprints 0-4).
+- [`sep-mobile-android-distribution.template.yml`](./templates/sep-mobile-android-distribution.template.yml) — build Android assinado para homologacao/distribuicao.
+- [`sep-mobile-ios-validation.template.yml`](./templates/sep-mobile-ios-validation.template.yml) — build iOS de validacao em runner macOS.
+- [`sep-mobile-ios-testflight.template.yml`](./templates/sep-mobile-ios-testflight.template.yml) — publicacao em TestFlight.
+
+### Comuns (deploy AWS — futuro, apos Sprint 3 / Epic 3)
+
+- [`aws-deploy-develop.yml`](./templates/aws-deploy-develop.yml)
+- [`aws-deploy-homologacao.yml`](./templates/aws-deploy-homologacao.yml)
+- [`aws-deploy-producao.yml`](./templates/aws-deploy-producao.yml)
+
+## Como promover um template
+
+1. Copiar o arquivo `.template.yml` para `.github/workflows/<arquivo>.yml` no repo correspondente (remover o sufixo `.template`).
+2. Ajustar `node-version`, `java-version`, environment ou comandos se a implementacao real tiver divergido do plano.
+3. Validar em branch de teste do repo de destino.
+4. Conferir artifacts gerados e logs.
+5. Ativar branch protection ou required checks somente depois do workflow ficar estavel.
+
+## Diferencas vs versao monorepo
+
+Os templates antigos (anteriores a 2026-05-04) tinham `paths-filter` por subpasta (`apps/sep-frontend/**`, `apps/sep-mobile/**`) e `working-directory` apontando para subpastas. **Removidos** porque cada repo agora so contem um app — o workflow roda no root do repo sem filtros de path.
 
 ## Gates de promocao
 
@@ -36,14 +62,14 @@ Os arquivos em `docs-sep/ci-pipelines/templates/` nao sao executados pelo GitHub
 
 ## Secrets previstos
 
-Android:
+Android (no repo `sep-mobile`):
 
 - `ANDROID_KEYSTORE_BASE64`
 - `ANDROID_KEY_ALIAS`
 - `ANDROID_KEYSTORE_PASSWORD`
 - `ANDROID_KEY_PASSWORD`
 
-iOS:
+iOS (no repo `sep-mobile`):
 
 - `APP_STORE_CONNECT_API_KEY_ID`
 - `APP_STORE_CONNECT_ISSUER_ID`
@@ -52,7 +78,7 @@ iOS:
 - `IOS_CERTIFICATE_PASSWORD`
 - `IOS_PROVISIONING_PROFILE_BASE64`
 
-AWS:
+AWS (em todos os repos com deploy):
 
 - `AWS_ROLE_TO_ASSUME`
 - `AWS_REGION` com valor recomendado `sa-east-1`
@@ -60,17 +86,8 @@ AWS:
 
 Nenhum secret de producao deve ser criado ou consumido pelas fases de CI inicial.
 
-## Promocao de template
-
-1. Copiar o template para `.github/workflows/`.
-2. Ajustar apenas nomes de app, comandos e environment se a implementacao real tiver divergido do plano.
-3. Validar em branch de teste.
-4. Conferir artifacts gerados e logs.
-5. Ativar branch protection ou required checks somente depois do workflow ficar estavel.
-
 ## Rollback
 
 - Para CI de validacao, rollback e reverter o commit que adicionou ou alterou o workflow.
 - Para deploy nao produtivo, rollback minimo e redeploy da versao anterior documentada.
 - Para producao, nenhum workflow deve ser promovido sem procedimento de rollback explicito, backup validado, migrations reversiveis ou plano manual de recuperacao aprovado.
-

@@ -55,7 +55,7 @@ Modelar a entidade JPA `Usuario` no modulo `usuarios.domain.model`, **estendendo
 - `usuarios/domain/model/Role.java` (enum nesta Sprint; futura migracao para sealed type fica como follow-up)
 - `usuarios/infrastructure/persistence/UsuarioRepository.java`
 - `src/main/resources/db/migration/V3__criar_tabela_usuario.sql`
-- `src/test/java/com/dynamis/broker_app/usuarios/infrastructure/persistence/UsuarioRepositoryTest.java` (`@DataJpaTest` com Testcontainers)
+- `src/test/java/com/dynamis/sep_api/usuarios/infrastructure/persistence/UsuarioRepositoryTest.java` (`@DataJpaTest` com Testcontainers)
 
 **Detalhes de implementacao**
 - entidade anotada com `@Entity`, `@Table(name = "usuario")`
@@ -100,7 +100,7 @@ Definir os contratos de entrada e saida da API para usuario como **records Java 
 - `usuarios/web/dto/UsuarioResponseDto.java` (`record`)
 - `usuarios/web/dto/UsuarioSenhaUpdateDto.java` (`record`)
 - `usuarios/web/mapper/UsuarioMapper.java` (interface anotada com `@Mapper(componentModel = "spring")`)
-- `src/test/java/com/dynamis/broker_app/usuarios/web/mapper/UsuarioMapperTest.java`
+- `src/test/java/com/dynamis/sep_api/usuarios/web/mapper/UsuarioMapperTest.java`
 
 **Regras de validacao declarativa (Jakarta Bean Validation)**
 - `UsuarioCreateDto.username`: `@NotBlank`, `@Email`
@@ -146,7 +146,7 @@ Implementar o caso de uso `CriarUsuarioUseCase` no modulo `usuarios.application.
 **Arquivos esperados**
 - `usuarios/application/usecase/CriarUsuarioUseCase.java`
 - `usuarios/application/exception/UsernameJaExisteException.java` (estende `DomainException` da Sprint 1)
-- `src/test/java/com/dynamis/broker_app/usuarios/application/usecase/CriarUsuarioUseCaseTest.java` (`@MockitoExtension`, sem Spring)
+- `src/test/java/com/dynamis/sep_api/usuarios/application/usecase/CriarUsuarioUseCaseTest.java` (`@MockitoExtension`, sem Spring)
 
 **Contrato do use case**
 - recebe `UsuarioCreateDto`, retorna `Usuario` persistido
@@ -186,7 +186,7 @@ Expor `POST /api/v1/usuarios` como endpoint publico no `UsuarioController`, dele
 **Arquivos esperados**
 - `usuarios/web/controller/UsuarioController.java`
 - update em `shared/config/SecurityConfig.java` (ou `identity/infrastructure/config/SecurityConfig.java` se ja existir) liberando `POST /api/v1/usuarios`
-- `src/test/java/com/dynamis/broker_app/usuarios/web/controller/UsuarioControllerTest.java` (`@WebMvcTest` com `MockMvc`)
+- `src/test/java/com/dynamis/sep_api/usuarios/web/controller/UsuarioControllerTest.java` (`@WebMvcTest` com `MockMvc`)
 
 **Contrato do endpoint**
 - request: `UsuarioCreateDto`

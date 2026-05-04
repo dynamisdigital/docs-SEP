@@ -6,9 +6,7 @@
 
 **Esforco total estimado**: 2-3 dias de Dev Pleno Frontend dedicado, ou 4-5 dias dividido entre os dois Devs Plenos.
 
-**Workspace root**: `C:/workspace-sep/` (mantida a convencao do `steps/000-sprint-0-steps.md`; em Linux/macOS, substituir pelo equivalente local).
-
-**Localizacao do projeto Angular**: `C:/workspace-sep/apps/sep-frontend/` (subpasta dedicada, deixando o root livre para o backend Gradle e demais artefatos do monorepo).
+**Repo de destino**: `sep-app` (clonado em `<sep-app-root>/` na maquina do dev). Modelo de 3 repos independentes (PRD §11, AGENT.md). O projeto Angular ocupa diretamente a raiz do repo — sem subpasta `apps/`.
 
 **Ordem de execucao recomendada** (dependencias entre tasks):
 
@@ -38,7 +36,7 @@ F-0.1 (scaffold Angular)
 **Pre-requisitos globais**:
 - Node.js LTS `>= 20.x` instalado (`node -v` deve retornar `v20.x.x` ou superior)
 - npm `>= 10.x` (`npm -v`)
-- Git inicializado em `C:/workspace-sep/`
+- Git inicializado em `<sep-app-root>/`
 - Sprint 0 backend ja criou `.gitignore`, `.editorconfig`, `.gitattributes`, branch protection e Conventional Commits documentados em `CONTRIBUTING.md`
 - PRD aprovado e design systems Apple/Notion definidos em `docs-sep/`
 
@@ -52,57 +50,49 @@ F-0.1 (scaffold Angular)
 
 **Esforco**: 30-45 min.
 
-### Step 100.1.1 — Criar a pasta `apps/`
+### Step 100.1.1 — Gerar o projeto Angular na raiz do repo
+
+O Angular CLI nao gera projeto in-place no diretorio atual por padrao; precisamos gerar num diretorio temporario e mover o conteudo para a raiz do repo `sep-app`.
 
 **Comando**:
 ```bash
-cd C:/workspace-sep
-mkdir -p apps
-```
-
-**Verificacao**:
-```bash
-ls -la apps
-# Espera: pasta vazia criada
-```
-
-### Step 100.1.2 — Gerar o projeto com Angular CLI 20
-
-**Comando**:
-```bash
-cd C:/workspace-sep/apps
-npx @angular/cli@20 new sep-frontend \
+cd <sep-app-root>
+npx @angular/cli@20 new sep-app \
   --standalone \
   --style=scss \
   --routing \
   --strict \
   --skip-tests \
   --skip-git \
-  --package-manager=npm
+  --package-manager=npm \
+  --directory=.
 ```
+
+A flag `--directory=.` faz o CLI gerar o projeto **no diretorio atual** (raiz do repo), sem criar subpasta extra. O nome `sep-app` e usado apenas como `name` no `package.json`.
 
 **Flags explicadas**:
 - `--standalone` → sem `NgModule`, todos os componentes standalone (PRD §11)
 - `--style=scss` → SCSS puro, sem framework CSS (PRD §11, ADR 0002)
 - `--routing` → cria `app.routes.ts` (necessario para guards futuros)
 - `--strict` → TypeScript strict mode (`noImplicitAny`, `strictNullChecks`, etc.)
-- `--skip-tests` → nao gera arquivos `.spec.ts` no scaffold; testes vamos configurar com Vitest na F-0.3
-- `--skip-git` → nao cria git init (o repo raiz ja tem git)
-- `--package-manager=npm` → padronizar com a Sprint 0 backend e CI
+- `--skip-tests` → nao gera `.spec.ts` no scaffold; testes vem com Vitest na F-0.3
+- `--skip-git` → nao cria git init (o repo `sep-app` ja foi inicializado manualmente no GitHub)
+- `--package-manager=npm`
+- `--directory=.` → projeto na raiz do repo, sem subpasta
 
 **Verificacao**:
 ```bash
-ls -la C:/workspace-sep/apps/sep-frontend
+ls -la <sep-app-root>
 # Espera: package.json, angular.json, tsconfig*.json, src/, public/
-cat C:/workspace-sep/apps/sep-frontend/package.json | grep '"@angular/core"'
+cat <sep-app-root>/package.json | grep '"@angular/core"'
 # Espera: "^20.x.y"
 ```
 
-### Step 100.1.3 — Confirmar versao Angular instalada
+### Step 100.1.2 — Confirmar versao Angular instalada
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npx ng version
 ```
 
@@ -116,9 +106,9 @@ Angular: 20.x.x
 
 Se o Angular CLI instalou versao `< 20`, abortar e investigar — o PRD trava o baseline em `20.x` (AGENT.md, ADR 0003).
 
-### Step 100.1.4 — Validar TypeScript strict
+### Step 100.1.3 — Validar TypeScript strict
 
-**Arquivo**: `apps/sep-frontend/tsconfig.json`
+**Arquivo**: `<sep-app-root>/tsconfig.json`
 
 **Conferir** que possui (ja vem do `--strict`):
 ```json
@@ -141,18 +131,18 @@ Se o Angular CLI instalou versao `< 20`, abortar e investigar — o PRD trava o 
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npx tsc --noEmit
 # Espera: zero erros
 ```
 
-### Step 100.1.5 — Criar a estrutura de pastas DDD/feature
+### Step 100.1.4 — Criar a estrutura de pastas DDD/feature
 
 A spec exige separacao entre superficies publicas (Apple) e autenticadas (Notion).
 
 **Comandos**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend/src/app
+cd <sep-app-root>/src/app
 
 mkdir -p core/{auth,http,config,guards,interceptors}
 mkdir -p shared/{components,directives,pipes,models,utils}
@@ -163,7 +153,7 @@ mkdir -p features/authenticated
 
 **Comandos para a pasta de styles**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend/src
+cd <sep-app-root>/src
 mkdir -p styles
 touch styles/_tokens.scss
 touch styles/_apple.scss
@@ -172,7 +162,7 @@ touch styles/_mixins.scss
 touch styles/index.scss
 ```
 
-**Conteudo inicial** de `apps/sep-frontend/src/styles/index.scss` (placeholder, F-Sprint 1 vai popular):
+**Conteudo inicial** de `<sep-app-root>/src/styles/index.scss` (placeholder, F-Sprint 1 vai popular):
 ```scss
 // Indice central de estilos globais.
 // Os tokens reais vem na F-Sprint 1 (specs/fase-1/101-fsprint-1-design-tokens-showcase.md).
@@ -191,11 +181,11 @@ touch styles/index.scss
 // _mixins.scss — populado na F-Sprint 1
 ```
 
-### Step 100.1.6 — Plugar `styles/index.scss` no build
+### Step 100.1.5 — Plugar `styles/index.scss` no build
 
-**Arquivo**: `apps/sep-frontend/angular.json`
+**Arquivo**: `<sep-app-root>/angular.json`
 
-**Localizar** `projects.sep-frontend.architect.build.options.styles` e ajustar:
+**Localizar** `projects.sep-app.architect.build.options.styles` e ajustar:
 ```json
 "styles": [
   "src/styles/index.scss",
@@ -205,16 +195,16 @@ touch styles/index.scss
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run build
 # Espera: BUILD SUCCESSFUL, com warnings somente se houver
 ```
 
-### Step 100.1.7 — Subir o dev server
+### Step 100.1.6 — Subir o dev server
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run start
 ```
 
@@ -225,28 +215,31 @@ npm run start
 
 Encerrar com `Ctrl+C` apos confirmar.
 
-### Step 100.1.8 — Atualizar `.gitignore` raiz para a pasta `apps/`
+### Step 100.1.7 — Configurar `.gitignore` do repo
 
-A Sprint 0 backend ja cobriu `node_modules/`, `dist/`, `.angular/` etc. genericamente. Confirmar que continua valido com a nova subpasta:
+O Angular CLI ja gera um `.gitignore` razoavel. Confirmar que cobre os artefatos esperados:
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep
-echo "test" > apps/sep-frontend/dist/foo.txt 2>/dev/null || true
+cd <sep-app-root>
+mkdir -p dist && echo "test" > dist/foo.txt
 git status
 # Espera: dist/ NAO listado em "untracked"
-rm -rf apps/sep-frontend/dist
+rm -rf dist
 ```
 
-Se `dist/` aparecer no `git status`, ajustar o `.gitignore` raiz adicionando:
+Se `dist/` aparecer no `git status`, adicionar ao `<sep-app-root>/.gitignore`:
 ```gitignore
-apps/*/dist/
-apps/*/.angular/
-apps/*/node_modules/
+node_modules/
+dist/
+.angular/
+coverage/
+playwright-report/
+test-results/
 ```
 
 ### Definicao de pronto da Task F-0.1
-- [ ] `apps/sep-frontend/` criado
+- [ ] `<sep-app-root>/` criado
 - [ ] `npx ng version` reporta Angular `20.x`
 - [ ] `npm run start` sobe em `http://localhost:4200/`
 - [ ] `npm run build` passa
@@ -258,7 +251,7 @@ apps/*/node_modules/
 
 ### Commit Task F-0.1
 ```bash
-git add apps/sep-frontend
+git add <sep-app-root>
 git add .gitignore  # se ajustado
 git commit -m "chore(frontend): scaffold inicial Angular 20.x com SCSS e estrutura DDD"
 ```
@@ -277,7 +270,7 @@ git commit -m "chore(frontend): scaffold inicial Angular 20.x com SCSS e estrutu
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npx ng add @angular-eslint/schematics --skip-confirmation
 ```
 
@@ -288,7 +281,7 @@ Este schematic ja:
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npx eslint --version
 # Espera: v9.x
 ls eslint.config.js
@@ -301,11 +294,11 @@ npm run lint
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm install --save-dev prettier@^3 eslint-config-prettier@^9
 ```
 
-**Arquivo**: `apps/sep-frontend/.prettierrc.json`
+**Arquivo**: `<sep-app-root>/.prettierrc.json`
 ```json
 {
   "printWidth": 100,
@@ -335,7 +328,7 @@ npm install --save-dev prettier@^3 eslint-config-prettier@^9
 }
 ```
 
-**Arquivo**: `apps/sep-frontend/.prettierignore`
+**Arquivo**: `<sep-app-root>/.prettierignore`
 ```
 dist
 .angular
@@ -346,7 +339,7 @@ node_modules
 
 ### Step 100.2.3 — Plugar Prettier no `eslint.config.js`
 
-**Arquivo**: `apps/sep-frontend/eslint.config.js`
+**Arquivo**: `<sep-app-root>/eslint.config.js`
 
 Adicionar o `eslint-config-prettier` no fim do array de configs para desligar regras conflitantes com Prettier:
 
@@ -394,7 +387,7 @@ module.exports = tseslint.config(
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint
 # Espera: passa
 npx prettier --check "src/**/*.{ts,html,scss,json}"
@@ -403,7 +396,7 @@ npx prettier --check "src/**/*.{ts,html,scss,json}"
 
 ### Step 100.2.4 — Adicionar npm scripts de format
 
-**Arquivo**: `apps/sep-frontend/package.json` — secao `scripts`:
+**Arquivo**: `<sep-app-root>/package.json` — secao `scripts`:
 ```json
 {
   "scripts": {
@@ -424,14 +417,14 @@ npx prettier --check "src/**/*.{ts,html,scss,json}"
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm install --save-dev \
   stylelint@^16 \
   stylelint-config-standard-scss@^14 \
   stylelint-config-prettier-scss@^1
 ```
 
-**Arquivo**: `apps/sep-frontend/.stylelintrc.json`
+**Arquivo**: `<sep-app-root>/.stylelintrc.json`
 ```json
 {
   "extends": [
@@ -470,40 +463,35 @@ npm install --save-dev \
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run lint:scss
 # Espera: passa (placeholders de styles/ sao apenas comentarios; sem regras pra validar)
 ```
 
 ### Step 100.2.6 — Instalar Husky + lint-staged
 
+**Contexto**: o repo `sep-app` e independente (modelo de 3 repos). Husky e instalado e configurado de forma padrao na raiz do repo, sem necessidade de agregador cross-repo.
+
 **Comandos**:
 ```bash
-cd C:/workspace-sep
-# Os hooks do Husky precisam de package.json no root OU no projeto Angular
-# Como o repo e hibrido (backend Gradle + frontend npm), instalamos o Husky
-# DENTRO de apps/sep-frontend/ e configuramos para subir um nivel.
-cd apps/sep-frontend
+cd <sep-app-root>
 npm install --save-dev husky@^9 lint-staged@^15
 npx husky init
 ```
 
-`husky init` cria `.husky/pre-commit` com `npm test` por padrao. Vamos sobrescrever.
+`husky init` cria `.husky/pre-commit` com `npm test` por padrao. Vamos sobrescrever para rodar `lint-staged` (mais rapido e relevante).
 
-**Arquivo**: `apps/sep-frontend/.husky/pre-commit`
+**Arquivo**: `<sep-app-root>/.husky/pre-commit`
 ```sh
-cd "$(dirname "$0")/.."
 npx lint-staged
 ```
 
-(O `cd` garante que o hook rode no diretorio do projeto Angular, pois o git invoca o hook a partir da raiz do repo.)
-
 **Tornar executavel** (Linux/macOS):
 ```bash
-chmod +x apps/sep-frontend/.husky/pre-commit
+chmod +x <sep-app-root>/.husky/pre-commit
 ```
 
-**Configurar `lint-staged`** em `apps/sep-frontend/package.json`:
+**Configurar `lint-staged`** em `<sep-app-root>/package.json`:
 ```json
 {
   "lint-staged": {
@@ -522,51 +510,13 @@ chmod +x apps/sep-frontend/.husky/pre-commit
 }
 ```
 
-### Step 100.2.7 — Apontar Husky para o root do repo
+### Step 100.2.7 — Validar o pre-commit hook
 
-Como o git esta no root (`C:/workspace-sep/.git`) e o `npm install` rodou em `apps/sep-frontend/`, o Husky por padrao instala hooks em `apps/sep-frontend/.husky`, mas o git procura hooks em `C:/workspace-sep/.git/hooks/` ou `core.hooksPath`.
-
-**Solucao**: configurar `core.hooksPath` apontando para `apps/sep-frontend/.husky` no root.
-
-**Comando**:
-```bash
-cd C:/workspace-sep
-git config core.hooksPath apps/sep-frontend/.husky
-```
-
-**Atencao**: a Sprint 0 backend pode ter configurado `core.hooksPath` para `.githooks/` (pre-commit do Spotless). Se ja existir, **nao sobrescrever** — em vez disso, criar um hook agregador:
-
-**Arquivo alternativo**: `C:/workspace-sep/.githooks/pre-commit` (apendar ao hook do backend):
-```sh
-#!/bin/sh
-# Hook agregador: roda Spotless do backend (se aplicavel) e lint-staged do frontend.
-
-set -e
-
-# Spotless backend (se houver mudanca em arquivos Java/Gradle)
-if git diff --cached --name-only | grep -qE '\.(java|gradle|kts)$'; then
-  echo "→ rodando Spotless backend..."
-  ./gradlew spotlessCheck
-fi
-
-# lint-staged frontend (se houver mudanca em arquivos do apps/sep-frontend)
-if git diff --cached --name-only | grep -q '^apps/sep-frontend/'; then
-  echo "→ rodando lint-staged frontend..."
-  cd apps/sep-frontend
-  npx lint-staged
-fi
-```
-
-```bash
-chmod +x C:/workspace-sep/.githooks/pre-commit
-git config core.hooksPath .githooks
-```
-
-### Step 100.2.8 — Validar o pre-commit hook
+`husky init` ja configura tudo automaticamente — Husky cria o `.husky/_/` e o hook `.husky/pre-commit` aponta para o `prepare` script no `package.json` (instalado pelo `husky init`). Nao precisa setar `core.hooksPath` manualmente.
 
 **Teste de fumaca**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 # 1. Sujar um arquivo TS de proposito (sem ponto-e-virgula)
 echo "const x = 1" >> src/app/app.ts
 git add src/app/app.ts
@@ -578,22 +528,22 @@ git diff HEAD~1 src/app/app.ts
 git reset --hard HEAD~1   # reverte o commit de teste
 ```
 
+> Nota sobre os outros repos: `sep-api` usa `.githooks/pre-commit` minimo (Spotless) — ver Sprint 0 backend Task 0.4. `sep-mobile` segue o mesmo padrao Husky deste repo (ver M-Sprint 0 Step 200.2.7). Cada repo gerencia hooks independentemente.
+
 ### Definicao de pronto da Task F-0.2
 - [ ] ESLint 9 (flat config) configurado e passando
 - [ ] Prettier 3 com `.prettierrc.json` e `.prettierignore`
 - [ ] Stylelint 16 com config standard SCSS
-- [ ] Husky + lint-staged instalados
+- [ ] Husky + lint-staged instalados via `husky init`
 - [ ] Pre-commit hook bloqueia commit com codigo desformatado e auto-corrige issues triviais
-- [ ] `core.hooksPath` apontando para o lugar certo (ou hook agregador se backend ja usa)
 - [ ] Scripts npm: `lint`, `lint:scss`, `format`, `format:check`
 - [ ] Prefixo de seletor configurado para `sep` (componente kebab-case, diretiva camelCase)
 
 ### Commit Task F-0.2
 ```bash
-cd C:/workspace-sep
-git add apps/sep-frontend/{eslint.config.js,.prettierrc.json,.prettierignore,.stylelintrc.json,.husky,package.json,package-lock.json}
-git add .githooks/pre-commit  # se criou o agregador
-git commit -m "chore(frontend): adicionar ESLint, Prettier, Stylelint, Husky e lint-staged"
+cd <sep-app-root>
+git add eslint.config.js .prettierrc.json .prettierignore .stylelintrc.json .husky package.json package-lock.json
+git commit -m "chore: adicionar ESLint, Prettier, Stylelint, Husky e lint-staged"
 ```
 
 ---
@@ -612,7 +562,7 @@ Angular 20 introduziu suporte experimental ao builder `unit-test` com Vitest, ma
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm install --save-dev \
   vitest@^2 \
   @vitest/coverage-v8@^2 \
@@ -625,7 +575,7 @@ npm install --save-dev \
 
 ### Step 100.3.2 — Configurar `vitest.config.ts`
 
-**Arquivo**: `apps/sep-frontend/vitest.config.ts`
+**Arquivo**: `<sep-app-root>/vitest.config.ts`
 ```ts
 /// <reference types="vitest" />
 import angular from '@analogjs/vite-plugin-angular';
@@ -656,7 +606,7 @@ export default defineConfig(() => ({
 }));
 ```
 
-**Arquivo**: `apps/sep-frontend/src/test-setup.ts`
+**Arquivo**: `<sep-app-root>/src/test-setup.ts`
 ```ts
 import '@analogjs/vitest-angular/setup-zone';
 import '@testing-library/jest-dom/vitest';
@@ -674,7 +624,7 @@ getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDyn
 
 ### Step 100.3.3 — Adicionar scripts npm de teste
 
-**Arquivo**: `apps/sep-frontend/package.json`
+**Arquivo**: `<sep-app-root>/package.json`
 ```json
 {
   "scripts": {
@@ -687,7 +637,7 @@ getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDyn
 
 ### Step 100.3.4 — Criar 1 teste smoke
 
-**Arquivo**: `apps/sep-frontend/src/app/app.spec.ts`
+**Arquivo**: `<sep-app-root>/src/app/app.spec.ts`
 ```ts
 import { render, screen } from '@testing-library/angular';
 import { describe, expect, it } from 'vitest';
@@ -705,7 +655,7 @@ describe('App', () => {
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run test
 # Espera: 1 passed (app.spec.ts)
 npm run test:coverage
@@ -716,7 +666,7 @@ npm run test:coverage
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm install --save-dev @playwright/test@^1
 npx playwright install --with-deps chromium
 ```
@@ -725,7 +675,7 @@ npx playwright install --with-deps chromium
 
 ### Step 100.3.6 — Configurar `playwright.config.ts`
 
-**Arquivo**: `apps/sep-frontend/playwright.config.ts`
+**Arquivo**: `<sep-app-root>/playwright.config.ts`
 ```ts
 import { defineConfig, devices } from '@playwright/test';
 
@@ -758,7 +708,7 @@ export default defineConfig({
 
 ### Step 100.3.7 — Criar smoke E2E placeholder
 
-**Arquivo**: `apps/sep-frontend/e2e/smoke.spec.ts`
+**Arquivo**: `<sep-app-root>/e2e/smoke.spec.ts`
 ```ts
 import { expect, test } from '@playwright/test';
 
@@ -768,7 +718,7 @@ test('app sobe e responde no /', async ({ page }) => {
 });
 ```
 
-**Atualizar** `apps/sep-frontend/src/index.html` para garantir um `<title>` matchavel:
+**Atualizar** `<sep-app-root>/src/index.html` para garantir um `<title>` matchavel:
 ```html
 <title>SEP Frontend</title>
 ```
@@ -785,26 +735,26 @@ test('app sobe e responde no /', async ({ page }) => {
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run e2e
 # Espera: 1 passed (smoke.spec.ts), HTML report em playwright-report/
 ```
 
 ### Step 100.3.8 — Atualizar `.gitignore` para artefatos de teste
 
-Confirmar que o `.gitignore` raiz (Sprint 0 backend) cobre, ou complementar:
+Confirmar que o `.gitignore` do repo `sep-app` (gerado pelo Angular CLI) cobre, ou complementar:
 ```gitignore
-apps/*/coverage/
-apps/*/playwright-report/
-apps/*/test-results/
-apps/*/.playwright-cache/
+coverage/
+playwright-report/
+test-results/
+.playwright-cache/
 ```
 
 ### Step 100.3.9 — Instalar e configurar MSW
 
 **Comando**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm install --save-dev msw@^2
 npx msw init public/ --save
 ```
@@ -813,7 +763,7 @@ npx msw init public/ --save
 
 ### Step 100.3.10 — Criar handlers MSW iniciais
 
-**Arquivo**: `apps/sep-frontend/src/mocks/handlers.ts`
+**Arquivo**: `<sep-app-root>/src/mocks/handlers.ts`
 ```ts
 import { http, HttpResponse } from 'msw';
 
@@ -853,7 +803,7 @@ export const handlers = [
 ];
 ```
 
-**Arquivo**: `apps/sep-frontend/src/mocks/browser.ts`
+**Arquivo**: `<sep-app-root>/src/mocks/browser.ts`
 ```ts
 import { setupWorker } from 'msw/browser';
 import { handlers } from './handlers';
@@ -861,7 +811,7 @@ import { handlers } from './handlers';
 export const worker = setupWorker(...handlers);
 ```
 
-**Arquivo**: `apps/sep-frontend/src/mocks/server.ts`
+**Arquivo**: `<sep-app-root>/src/mocks/server.ts`
 ```ts
 import { setupServer } from 'msw/node';
 import { handlers } from './handlers';
@@ -871,7 +821,7 @@ export const server = setupServer(...handlers);
 
 ### Step 100.3.11 — Habilitar MSW em modo `dev` (opt-in)
 
-**Arquivo**: `apps/sep-frontend/src/main.ts`
+**Arquivo**: `<sep-app-root>/src/main.ts`
 
 Modificar para iniciar o worker quando `import.meta.env.NG_APP_USE_MSW === 'true'`:
 
@@ -901,7 +851,7 @@ NG_APP_USE_MSW=true npm run start
 
 ### Step 100.3.12 — Plugar MSW nos testes Vitest (server)
 
-**Atualizar** `apps/sep-frontend/src/test-setup.ts`:
+**Atualizar** `<sep-app-root>/src/test-setup.ts`:
 ```ts
 import '@analogjs/vitest-angular/setup-zone';
 import '@testing-library/jest-dom/vitest';
@@ -926,7 +876,7 @@ afterAll(() => server.close());
 
 **Verificacao**:
 ```bash
-cd C:/workspace-sep/apps/sep-frontend
+cd <sep-app-root>
 npm run test
 # Espera: smoke continua passando, sem warnings de MSW
 ```
@@ -945,197 +895,70 @@ npm run test
 
 ### Commit Task F-0.3
 ```bash
-cd C:/workspace-sep
-git add apps/sep-frontend/{vitest.config.ts,playwright.config.ts,e2e,src/test-setup.ts,src/mocks,src/main.ts,src/index.html,public/mockServiceWorker.js,package.json,package-lock.json}
+cd <sep-app-root>
+git add <sep-app-root>/{vitest.config.ts,playwright.config.ts,e2e,src/test-setup.ts,src/mocks,src/main.ts,src/index.html,public/mockServiceWorker.js,package.json,package-lock.json}
 git commit -m "chore(frontend): adicionar Vitest, Playwright e MSW com smoke tests"
 ```
 
 ---
 
-## Task F-0.4 — GitHub Actions Frontend CI
+## Task F-0.4 — GitHub Actions CI
 
-**Objetivo**: criar pipeline minimo (`lint`, `test`, `build`) que roda em cada PR que mexer em `apps/sep-frontend/`. PR fica vermelho se algum desses passos falhar.
+**Objetivo**: copiar template de CI para o repo `sep-app` para ter validacao automatica em cada PR (lint, test, build).
 
-**Pre-requisito**: Tasks F-0.1, F-0.2 e F-0.3 concluidas; branch protection ja configurada na Sprint 0 backend.
+**Pre-requisito**: Tasks F-0.1, F-0.2 e F-0.3 concluidas; branch protection ja configurada manualmente no GitHub.
 
-**Esforco**: 30-45 min.
+**Esforco**: 15-30 min.
 
-### Step 100.4.1 — Criar o workflow
+### Step 100.4.1 — Copiar template de CI para o repo
 
-**Arquivo**: `C:/workspace-sep/.github/workflows/frontend-ci.yml`
-```yaml
-name: Frontend CI
+O template de CI web vive versionado em `docs-SEP/docs-sep/ci-pipelines/templates/sep-app-ci.template.yml`. Copiar para o repo `sep-app`:
 
-on:
-  pull_request:
-    paths:
-      - 'apps/sep-frontend/**'
-      - '.github/workflows/frontend-ci.yml'
-  push:
-    branches: [main]
-    paths:
-      - 'apps/sep-frontend/**'
-      - '.github/workflows/frontend-ci.yml'
-
-concurrency:
-  group: frontend-ci-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  build:
-    name: Lint, Test e Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    defaults:
-      run:
-        working-directory: apps/sep-frontend
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: apps/sep-frontend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Format check (Prettier)
-        run: npm run format:check
-
-      - name: Lint TypeScript
-        run: npm run lint
-
-      - name: Lint SCSS
-        run: npm run lint:scss
-
-      - name: Unit tests (Vitest)
-        run: npm run test:coverage
-
-      - name: Build (production)
-        run: npm run build
-
-      - name: Upload coverage
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: frontend-coverage
-          path: apps/sep-frontend/coverage
-          retention-days: 7
-```
-
-### Step 100.4.2 — (Opcional) workflow separado para E2E
-
-E2E tende a ser mais lento; manter num job separado evita atrasar o feedback do PR.
-
-**Arquivo**: `C:/workspace-sep/.github/workflows/frontend-e2e.yml`
-```yaml
-name: Frontend E2E
-
-on:
-  pull_request:
-    paths:
-      - 'apps/sep-frontend/**'
-      - '.github/workflows/frontend-e2e.yml'
-
-concurrency:
-  group: frontend-e2e-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  e2e:
-    name: Smoke E2E (Playwright)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    defaults:
-      run:
-        working-directory: apps/sep-frontend
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: apps/sep-frontend/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Run E2E
-        run: npm run e2e
-
-      - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: apps/sep-frontend/playwright-report
-          retention-days: 7
-```
-
-### Step 100.4.3 — Atualizar branch protection no GitHub
-
-A branch protection ja foi criada na Sprint 0 backend (Task 0.5). Adicionar agora os checks novos como **required** em `Settings → Branches → main`:
-
-- `Lint, Test e Build` (do `frontend-ci.yml`)
-- `Smoke E2E (Playwright)` — opcional como required (avaliar custo)
-
-### Step 100.4.4 — Validar com PR de teste
-
-**Procedimento**:
-1. Criar branch `chore/test-frontend-ci`
-2. Fazer mudanca trivial em `apps/sep-frontend/src/app/app.ts` (adicionar comentario)
-3. Commitar e empurrar
-4. Abrir PR
-5. Verificar que `Frontend CI` aparece, roda e fica verde
-6. (Opcional) introduzir erro de lint deliberado, validar que CI fica vermelho, corrigir, validar verde
-
-**Comando para introduzir erro deliberado**:
 ```bash
-# Adicionar uma linha sem ;, com Prettier vai pegar
-echo "const broken = 'no-semi'" >> apps/sep-frontend/src/app/app.ts
-git add apps/sep-frontend/src/app/app.ts
-git commit --no-verify -m "test: forcar erro de lint para validar CI"
-git push
+mkdir -p <sep-app-root>/.github/workflows
+cp <docs-SEP-root>/docs-sep/ci-pipelines/templates/sep-app-ci.template.yml \
+   <sep-app-root>/.github/workflows/ci.yml
 ```
 
-(`--no-verify` apenas para o teste — em commit normal o pre-commit do hook ja barra.)
+> Substituir `<docs-SEP-root>` pelo caminho local onde o repo `docs-SEP` esta clonado.
 
-### Step 100.4.5 — Tempo total < 5 min
+O template ja vem sem `paths-filter` nem `working-directory` (cada repo so tem um app — workflow roda no root do repo).
 
-Conferir no GitHub Actions que o job `Lint, Test e Build` roda em menos de 5 minutos. Se ultrapassar:
-- Ativar caching de `~/.npm` via `cache: 'npm'` (ja esta)
-- Considerar skip de E2E em PRs apenas com mudanca em `*.md`
+### Step 100.4.2 — Validar suite local antes do primeiro push
+
+```bash
+cd <sep-app-root>
+npm ci
+npm run format:check
+npm run lint
+npm run lint:scss
+npm run test:coverage
+npm run build
+```
+
+**Espera**: tudo verde antes de abrir o primeiro PR no GitHub.
+
+### Step 100.4.3 — Configurar branch protection no GitHub
+
+Em `sep-app` → `Settings → Branches → Add branch protection rule` para `main`:
+
+- Marcar `Lint, Test e Build` (job do `ci.yml`) como **required check**
+- Habilitar "Require pull request before merging"
+- Habilitar "Require status checks to pass before merging"
 
 ### Definicao de pronto da Task F-0.4
-- [ ] `.github/workflows/frontend-ci.yml` criado e rodando
-- [ ] CI roda apenas quando ha mudanca em `apps/sep-frontend/**` ou no proprio yaml
-- [ ] Steps: format check, lint TS, lint SCSS, test com coverage, build
-- [ ] Coverage e upload de artefato configurado
-- [ ] (Opcional) `frontend-e2e.yml` rodando smoke E2E
-- [ ] Branch protection inclui o check de Frontend CI como required
-- [ ] PR de teste passou verde, e PR com erro deliberado ficou vermelho
-- [ ] Tempo total do job principal < 5 min
+- [ ] `.github/workflows/ci.yml` copiado do template `sep-app-ci.template.yml`
+- [ ] CI usa Node 20 e roda lint, format:check, test:coverage, build
+- [ ] CI nao tem `paths-filter` (modelo de 3 repos: cada repo so tem um app)
+- [ ] Suite local verde antes do primeiro push
+- [ ] Branch protection inclui o check de CI como required
+- [ ] PR de teste passou verde
 
 ### Commit Task F-0.4
 ```bash
-cd C:/workspace-sep
-git add .github/workflows/frontend-ci.yml
-git add .github/workflows/frontend-e2e.yml  # se criou o E2E
-git commit -m "ci(frontend): adicionar pipeline de lint, test e build no GitHub Actions"
+cd <sep-app-root>
+git add .github/workflows/ci.yml
+git commit -m "ci: adicionar workflow de validacao (lint + test + build)"
 ```
 
 ---
@@ -1152,57 +975,54 @@ A F-Sprint 0 esta concluida quando todas as 4 tasks estiverem com checklist comp
 ## Estado esperado do repositorio apos F-Sprint 0
 
 ```
-C:/workspace-sep/
+<sep-app-root>/                              # repo sep-app (independente)
 ├── .github/
 │   └── workflows/
-│       ├── ci.yml                          # backend (Sprint 0)
-│       ├── frontend-ci.yml                 # NOVO
-│       └── frontend-e2e.yml                # NOVO (opcional)
-├── apps/
-│   └── sep-frontend/
-│       ├── .husky/
-│       │   └── pre-commit
-│       ├── e2e/
-│       │   └── smoke.spec.ts
-│       ├── public/
-│       │   └── mockServiceWorker.js
-│       ├── src/
-│       │   ├── app/
-│       │   │   ├── core/{auth,http,config,guards,interceptors}/
-│       │   │   ├── shared/{components,directives,pipes,models,utils}/
-│       │   │   ├── layout/{public-shell,authenticated-shell}/
-│       │   │   ├── features/
-│       │   │   │   ├── public/
-│       │   │   │   └── authenticated/
-│       │   │   ├── app.ts
-│       │   │   ├── app.config.ts
-│       │   │   ├── app.routes.ts
-│       │   │   └── app.spec.ts
-│       │   ├── mocks/
-│       │   │   ├── browser.ts
-│       │   │   ├── handlers.ts
-│       │   │   └── server.ts
-│       │   ├── styles/
-│       │   │   ├── _apple.scss
-│       │   │   ├── _mixins.scss
-│       │   │   ├── _notion.scss
-│       │   │   ├── _tokens.scss
-│       │   │   └── index.scss
-│       │   ├── index.html
-│       │   ├── main.ts
-│       │   └── test-setup.ts
-│       ├── .prettierrc.json
-│       ├── .prettierignore
-│       ├── .stylelintrc.json
-│       ├── angular.json
-│       ├── eslint.config.js
-│       ├── package.json
-│       ├── package-lock.json
-│       ├── playwright.config.ts
-│       ├── tsconfig.json
-│       └── vitest.config.ts
-└── (demais artefatos da Sprint 0 backend e docs-sep/, specs/, adr/, steps/)
+│       └── ci.yml                          # copiado do template sep-app-ci
+├── .husky/
+│   └── pre-commit                          # npx lint-staged
+├── e2e/
+│   └── smoke.spec.ts
+├── public/
+│   └── mockServiceWorker.js
+├── src/
+│   ├── app/
+│   │   ├── core/{auth,http,config,guards,interceptors}/
+│   │   ├── shared/{components,directives,pipes,models,utils}/
+│   │   ├── layout/{public-shell,authenticated-shell}/
+│   │   ├── features/
+│   │   │   ├── public/
+│   │   │   └── authenticated/
+│   │   ├── app.ts
+│   │   ├── app.config.ts
+│   │   ├── app.routes.ts
+│   │   └── app.spec.ts
+│   ├── mocks/
+│   │   ├── browser.ts
+│   │   ├── handlers.ts
+│   │   └── server.ts
+│   ├── styles/
+│   │   ├── _apple.scss
+│   │   ├── _mixins.scss
+│   │   ├── _notion.scss
+│   │   ├── _tokens.scss
+│   │   └── index.scss
+│   ├── index.html
+│   ├── main.ts
+│   └── test-setup.ts
+├── .prettierrc.json
+├── .prettierignore
+├── .stylelintrc.json
+├── angular.json
+├── eslint.config.js
+├── package.json
+├── package-lock.json
+├── playwright.config.ts
+├── tsconfig.json
+└── vitest.config.ts
 ```
+
+> Os repos `sep-api` e `sep-mobile` vivem em diretorios independentes; nao sao subpastas deste.
 
 ## Impacto na F-Sprint seguinte
 
@@ -1217,7 +1037,7 @@ A F-Sprint 1 (`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`) consome:
 - F-Sprint 0 pode comecar **imediatamente**, em paralelo com Sprint 0 backend; nao depende de backend ainda
 - Commits podem ser feitos pelo agente; push e PR sao manuais (AGENT.md)
 - Code review cruzado entre Devs Plenos Frontend; Dev Senior revisa mudancas que afetam contrato com backend (configuracao de CORS, mocks MSW)
-- Caso a Sprint 0 backend altere `core.hooksPath`, sincronizar para nao quebrar o pre-commit do frontend (Step 100.2.7)
+- O repo `sep-app` gerencia pre-commit independentemente do `sep-api` e `sep-mobile`; Husky padrao instala em `.husky/` automaticamente (Step 100.2.7)
 - Versoes pinadas no `package.json` devem respeitar a stack do PRD: Angular `^20`, ESLint `^9`, Prettier `^3`, Stylelint `^16`, Husky `^9`, lint-staged `^15`, Vitest `^2`, Playwright `^1`, MSW `^2`
 
 ## Proximos passos apos F-Sprint 0

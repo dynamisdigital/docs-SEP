@@ -325,7 +325,7 @@ Implementar no frontend (Spec 104 ja entregue) as 4 novas telas e atualizar tela
 Implementar biometria nativa via Capacitor + fallback TOTP.
 
 **Arquivos esperados**
-- `apps/sep-mobile/src/app/core/auth/biometric.service.ts` (wrapper sobre `@capacitor-community/biometric-auth`)
+- `<sep-mobile-root>/src/app/core/auth/biometric.service.ts` (wrapper sobre `@capacitor-community/biometric-auth`)
 - update em `auth.service.ts` mobile: apos login com senha, oferecer "habilitar biometria neste dispositivo" via biometria + storage de "trust device" em Preferences
 - `src/app/features/authenticated/profile/setup-biometric/setup-biometric.component.ts`
 - `src/app/features/public/login/verify-biometric/verify-biometric.component.ts` (apos senha, oferece biometria; fallback TOTP se biometria nao disponivel/desativada)

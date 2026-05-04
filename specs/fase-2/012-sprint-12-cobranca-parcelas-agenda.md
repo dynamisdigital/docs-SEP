@@ -20,7 +20,7 @@ A integracao com meio de pagamento real (Pix) **nao** entra aqui — fica para a
 
 ### Em escopo (apenas backend)
 
-- Novo modulo `cobranca` em `com.dynamis.broker_app.cobranca` (DDD + Hexagonal/Ports & Adapters)
+- Novo modulo `cobranca` em `com.dynamis.sep_api.cobranca` (DDD + Hexagonal/Ports & Adapters)
 - Entidades de dominio:
   - `AgendaPagamento` (agregado raiz; 1:1 com `Contrato`)
   - `ParcelaCobranca` (entidade filha; N:1 com `AgendaPagamento`)

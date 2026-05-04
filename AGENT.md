@@ -16,9 +16,27 @@ Este arquivo consolida a orientacao para os agentes de IA que assumem trabalho n
 
 ## Indice
 
+- [Repositorios do projeto](#repositorios-do-projeto)
 - [Secao Claude](#secao-claude)
 - [Secao Codex](#secao-codex)
 - [Secao Copilot](#secao-copilot)
+
+---
+
+## Repositorios do projeto
+
+A partir de 2026-05-04, o projeto SEP opera em **3 repositorios independentes** no GitHub:
+
+- **`sep-api`** — backend Java + Spring Boot (package `com.dynamis.sep_api`); pre-commit via `.githooks/pre-commit` minimo (Spotless)
+- **`sep-app`** — frontend web Angular 20.x; pre-commit via Husky + lint-staged padrao (`npx husky init`)
+- **`sep-mobile`** — mobile Ionic 8.4 + Angular 20.x + Capacitor 6; pre-commit via Husky + lint-staged padrao (`npx husky init`)
+- **`docs-SEP`** (este repositorio) — documentacao consolidada (PRD, ADRs, specs, steps, AGENT.md, templates de CI)
+
+Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias. Cross-references nos specs/steps usam os placeholders `<sep-api-root>`, `<sep-app-root>` e `<sep-mobile-root>` para representar a raiz local de cada repo clonado.
+
+**CI**: os workflows de cada repo sao copiados de `docs-sep/ci-pipelines/templates/` (ver [`docs-sep/ci-pipelines/README.md`](docs-sep/ci-pipelines/README.md)). Como cada repo so contem um app, os workflows nao precisam de `paths-filter` nem `working-directory`.
+
+**Operacao git para o agente de IA**: o agente realiza apenas **commits** (com descricao) e **criacao de branches por sprint**. Push e PR continuam **manuais**, executados pelo desenvolvedor humano.
 
 ---
 

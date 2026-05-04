@@ -173,7 +173,7 @@ Cobertura JaCoCo no target 70% por modulo. Os testes unitarios e de slice ja for
 
 **Arquivos esperados**
 - testes complementares onde a cobertura ainda nao atingiu 70%
-- `src/test/java/com/dynamis/broker_app/SmokeE2ETest.java` (`@SpringBootTest` + RestAssured + Testcontainers)
+- `src/test/java/com/dynamis/sep_api/SmokeE2ETest.java` (`@SpringBootTest` + RestAssured + Testcontainers)
 - ativacao de `jacocoTestCoverageVerification` no `build.gradle` (ja configurado na Sprint 0; agora bloqueia merge se < 70%)
 
 **Cenarios minimos do smoke E2E (RestAssured)**
