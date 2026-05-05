@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 200
 - **Titulo**: M-Sprint 0 - Setup do projeto Mobile (Ionic 8.4+ + Angular 20.x + Capacitor 6) + Tooling
-- **Status**: aprovada para execucao
+- **Status**: concluida em 2026-05-04 (branch `msprint-0/setup-ionic` no repo `sep-mobile`)
 - **Fase do produto**: Epic 14 - Mobile SEP (primeira M-Sprint)
 - **Trilha**: Mobile (paralela a Sprint 0 backend e F-Sprint 0 frontend web)
 - **Origem**: PRD - API SEP, Secao 22 + MOBILE-SCREENS-PLAN.md
@@ -254,16 +254,42 @@ M-0.1 (scaffold Ionic)
 
 ## Definicao de pronto da M-Sprint 0
 
-- Projeto Ionic 8.4+ rodando com `npm run start` ou `ionic serve`
-- Angular 20.x Standalone confirmado via `ng version`
-- Capacitor 6 configurado em `capacitor.config.ts`
-- TypeScript strict mode ativo
-- ESLint + Prettier + Stylelint configurados (com whitelist de CSS vars Ionic)
-- Husky + lint-staged bloqueando commits desformatados
-- Vitest e Playwright (viewport mobile) executando localmente
-- MSW configurado e interceptando chamadas em dev
-- GitHub Actions Mobile CI verde em PR de teste
-- Build PWA funcional (`npm run build` gera `www/`)
+- [x] Projeto Ionic 8 rodando com `npm run start` em `http://localhost:8100/`
+- [x] Angular 20.3.x Standalone confirmado via `ng version`
+- [x] Capacitor 8.3.x configurado em `capacitor.config.ts` (Ionic CLI gerou Cap 8 default — ver desvio abaixo)
+- [x] TypeScript strict mode ativo
+- [x] ESLint 9 + Prettier 3 + Stylelint 16 configurados (whitelist `--ion-*`)
+- [x] Husky 9 + lint-staged 15 bloqueando commits desformatados
+- [x] Vitest 2 e Playwright 1 (viewport mobile via Pixel 5) executando localmente
+- [x] MSW 2 configurado: worker (browser) ativo via flag `localStorage.NG_APP_USE_MSW`; server (Node) com wiring deferido para M-Sprint 2/3
+- [x] GitHub Actions Mobile CI (`name: CI-MOBILE`) verde
+- [x] Build PWA funcional (`npm run build` gera `www/`)
+
+## Resultado da execucao
+
+- **Data de conclusao**: 2026-05-04
+- **Branch**: `msprint-0/setup-ionic` no repo `sep-mobile` (originada de `develop` apos `pull --ff-only`)
+- **Commits** (4, em ordem):
+  - `chore(mobile): scaffold Ionic 8 + Angular 20 + Capacitor 8 com SCSS, strict e estrutura DDD` (Task M-0.1)
+  - `chore(mobile): adicionar ESLint, Prettier, Stylelint, Husky e lint-staged` (Task M-0.2)
+  - `chore(mobile): adicionar Vitest, Playwright PWA e MSW com smoke tests` (Task M-0.3)
+  - `ci(mobile): adicionar workflow CI-MOBILE (lint + test + build PWA)` (Task M-0.4)
+- **Validacoes locais**: `npm run format:check`, `lint`, `lint:scss`, `test:coverage` (1 passed), `e2e` (1 passed em Pixel 5/Chromium), `build` (`www/` gerado) — todos verdes
+- **Versoes finais resolvidas**: Ionic 8 + Angular 20.3.19 + **Capacitor 8.3.1** (vs Cap 6 do ADR 0003), `@capacitor/app` 8.1, `@capacitor/haptics` 8.0.2, `@capacitor/keyboard` 8.0.3, `@capacitor/status-bar` 8.0.2, ESLint 9.39, Prettier 3.8, Stylelint 16.26, Husky 9.1, Vitest 2.1, `@analogjs/vitest-angular` 1.22, Playwright 1.59, MSW 2.14, `@testing-library/angular` 18.1.1, happy-dom (substituiu jsdom)
+- **Desvios do spec/steps**:
+  - **Capacitor 8.3.1** (nao 6 como ADR 0003 e o spec). Ionic CLI atual gera Capacitor 8 por default; PRD §11 estabelece direcao de **atualizar Ionic em vez de regredir Capacitor** quando combinacao mais recente nao bater com ADR. ADR de update sera criado antes da fase de Android/iOS para reformalizar a baseline.
+  - Template `--type=angular-standalone` (vs default NgModule). O Ionic CLI default produz template legacy; standalone exigiu flag explicita.
+  - Files legacy karma removidos do scaffold (`test.ts`, `polyfills.ts`, `zone-flags.ts`, `karma.conf.js`, target `test` Karma do `angular.json`) — substituidos por Vitest na M-0.3.
+  - `vitest.config.mts` (nao `.ts`) — `@analogjs/vite-plugin-angular` e ESM-only e Vitest tenta carregar config via require; `.mts` forca ESM.
+  - `environment: 'happy-dom'` (nao `jsdom`) — `@mswjs/interceptors` precisa de `TransformStream` global, jsdom 25 nao expoe.
+  - **MSW server NAO plugado em `test-setup.ts`** — happy-dom nao tem `BroadcastChannel`; deferido para M-Sprint 2/3 quando primeiro teste dependente da API entrar. Polyfills (Web Streams + `BroadcastChannel` stub) ja prontos em `src/test-polyfills.ts`.
+  - `src/main.ts` MSW gate via `localStorage.NG_APP_USE_MSW === 'true'` (nao `isDevMode()` do step) — consistencia com sep-app e desacoplamento de build env vars.
+  - `@testing-library/angular@18.1.1` (nao `^17`) — versao 17 puxa `@angular/animations@21` transitivamente, conflita com Angular 20; 18.1.1 suporta Angular 20+ nativamente.
+  - `npm ci --legacy-peer-deps` necessario — `@angular/build` declara `vitest@^3.1.1` como peer optional, mas pinamos `vitest@^2` por compat com `@analogjs/vitest-angular@^1`.
+  - Playwright **Pixel 5 (Chromium)** ao inves de iPhone 13 (WebKit) do step — viewport mobile real sem precisar instalar webkit no CI.
+  - Workflow renomeado para `name: CI-MOBILE` (template chega como `name: CI`) para diferenciar de `CI-API` e `CI-APP` em required checks cross-repo.
+  - `package.json` e `package-lock.json` versionados ja com todas as devDependencies das 4 Tasks (commit unico em M-0.1) para evitar checkpoints intermediarios.
+  - Repo public folder (`public/mockServiceWorker.js`) adicionado em `angular.json:architect.build.options.assets` para o build copiar para `www/`.
 
 ## Impacto na M-Sprint seguinte
 

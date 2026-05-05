@@ -960,22 +960,24 @@ git commit -m "ci: adicionar workflow de validacao PWA"
 
 ## Checklist final da M-Sprint 0
 
-- [ ] Projeto Ionic em `<sep-mobile-root>/`.
-- [ ] Angular `20.x` confirmado.
-- [ ] Ionic `8.4+` confirmado.
-- [ ] Capacitor `6.x` confirmado.
-- [ ] Capacitor configurado com `appId: com.dynamis.sep.mobile`.
-- [ ] Build PWA gera `www/`.
-- [ ] `npm run start` sobe em `http://localhost:8100`.
-- [ ] Estrutura modular criada para `core`, `shared`, `layout`, `features/public`, `features/tomador`, `features/credora`.
-- [ ] SCSS centralizado em `src/styles/index.scss`.
-- [ ] ESLint, Prettier e Stylelint configurados.
-- [ ] Husky e lint-staged configurados.
-- [ ] Vitest configurado e passando.
-- [ ] Playwright configurado e passando em viewport mobile.
-- [ ] MSW configurado para mocks de auth.
-- [ ] Mobile CI criado.
-- [ ] Nenhuma plataforma nativa Android/iOS adicionada nesta sprint.
+**M-Sprint 0 concluida em 2026-05-04** (branch `msprint-0/setup-ionic` no repo `sep-mobile`, build CI-MOBILE no GitHub verde).
+
+- [x] Projeto Ionic em `<sep-mobile-root>/`.
+- [x] Angular `20.3.x` confirmado.
+- [x] Ionic `8.4+` confirmado.
+- [x] **Capacitor `8.3.x`** confirmado (Ionic CLI gerou Cap 8 default; ADR 0003 sera reformalizado).
+- [x] Capacitor configurado com `appId: com.dynamis.sep.mobile`.
+- [x] Build PWA gera `www/`.
+- [x] `npm run start` sobe em `http://localhost:8100`.
+- [x] Estrutura modular criada para `core`, `shared`, `layout`, `features/public`, `features/tomador`, `features/credora`.
+- [x] SCSS centralizado em `src/styles/index.scss`.
+- [x] ESLint 9, Prettier 3 e Stylelint 16 configurados (whitelist `--ion-*`).
+- [x] Husky 9 e lint-staged 15 configurados.
+- [x] Vitest 2 + `@analogjs/vitest-angular` configurado e smoke `app.component.spec.ts` passando.
+- [x] Playwright 1 configurado e smoke `e2e/smoke.spec.ts` passando em Pixel 5/Chromium.
+- [x] MSW 2 configurado: worker (browser) via flag runtime; server (Node) com wiring deferido para M-Sprint 2/3.
+- [x] Mobile CI criado (`name: CI-MOBILE`).
+- [x] Nenhuma plataforma nativa Android/iOS adicionada nesta sprint.
 
 ## Validacao final local
 
