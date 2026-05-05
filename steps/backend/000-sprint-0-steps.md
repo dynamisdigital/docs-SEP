@@ -1674,17 +1674,17 @@ git commit -m "chore: criar estrutura inicial de pacotes do monolito modular DDD
 
 ## Definicao de Pronto da Sprint 0 (consolidada)
 
-A Sprint 0 esta concluida quando todas as 9 tasks estiverem com checklist completo:
+**Sprint 0 concluida em 2026-05-04** (branch `sprint-0/hygiene-foundation` no repo `sep-api`, build CI no GitHub verde).
 
-- [ ] **Task 0.1** — meta-arquivos criados e respeitados
-- [ ] **Task 0.2** — Spotless rodando localmente + check
-- [ ] **Task 0.3** — JaCoCo configurado (verificacao desligada ate Sprint 4)
-- [ ] **Task 0.4** — pre-commit hook bloqueando codigo desformatado
-- [ ] **Task 0.5** — repo GitHub configurado (branch protection + templates)
-- [ ] **Task 0.6** — CI verde rodando build + test + Spotless + JaCoCo
-- [ ] **Task 0.7** — Conventional Commits documentado em CONTRIBUTING.md
-- [x] **Task 0.8** — ADRs iniciais (ja concluida — 7 ADRs em `adr/`)
-- [ ] **Task 0.9** — estrutura de pacotes DDD com 48 `package-info.java`
+- [x] **Task 0.1** — meta-arquivos criados e respeitados
+- [x] **Task 0.2** — Spotless rodando localmente + check
+- [x] **Task 0.3** — JaCoCo configurado (verificacao desligada ate Sprint 4)
+- [x] **Task 0.4** — pre-commit hook bloqueando codigo desformatado
+- [x] **Task 0.5** — repo GitHub configurado (branch protection + templates + CODEOWNERS com `@mauriciofcjr`)
+- [x] **Task 0.6** — CI verde rodando build + test + Spotless + JaCoCo (workflow renomeado para `CI-API`)
+- [x] **Task 0.7** — Conventional Commits documentado em CONTRIBUTING.md
+- [x] **Task 0.8** — ADRs iniciais (vivem em `docs-SEP/adr/`, 0001-0011, referenciados pelo `sep-api/README.md`)
+- [x] **Task 0.9** — estrutura de pacotes DDD com 48 `package-info.java` + `SepApiApplication` stub (sera anotado com `@SpringBootApplication` na Sprint 1 Task 1.1b)
 
 ## Estado esperado do repositorio apos Sprint 0
 

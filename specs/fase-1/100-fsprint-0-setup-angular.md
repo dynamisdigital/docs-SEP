@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 100
 - **Titulo**: F-Sprint 0 - Setup do projeto Angular 20.x + Tooling completo
-- **Status**: aprovada para execucao
+- **Status**: concluida em 2026-05-04 (branch `fsprint-0/setup-angular` no repo `sep-app`)
 - **Fase do produto**: Epic 12 - Fundacao Frontend (primeira F-Sprint)
 - **Trilha**: Frontend (paralela a Sprint 0 backend)
 - **Origem**: PRD - API SEP, Secao 22 (Trilha paralela Frontend) + Plano de melhorias R7
@@ -228,15 +228,38 @@ F-0.1 (scaffold)
 
 ## Definicao de pronto da F-Sprint 0
 
-- Projeto Angular 20.x rodando com `npm run start`
-- TypeScript strict mode ativo
-- Standalone Components configurados (sem NgModule)
-- ESLint + Prettier + Stylelint configurados
-- Husky + lint-staged bloqueando commits desformatados
-- Vitest e Playwright executando localmente
-- MSW configurado e interceptando chamadas em dev
-- GitHub Actions Frontend CI verde em PR de teste
-- Estrutura de pastas DDD (`features/public`, `features/authenticated`) criada
+- [x] Projeto Angular 20.3.x rodando com `npm run start`
+- [x] TypeScript strict mode ativo
+- [x] Standalone Components configurados (sem NgModule)
+- [x] ESLint + Prettier + Stylelint configurados
+- [x] Husky + lint-staged bloqueando commits desformatados
+- [x] Vitest e Playwright executando localmente
+- [x] MSW configurado e interceptando chamadas em dev (worker browser); server (Node) com wiring deferido para F-Sprint 2/3
+- [x] GitHub Actions Frontend CI (`name: CI-APP`) verde em PR de teste
+- [x] Estrutura de pastas DDD (`features/public`, `features/authenticated`) criada
+
+## Resultado da execucao
+
+- **Data de conclusao**: 2026-05-04
+- **Branch**: `fsprint-0/setup-angular` no repo `sep-app`
+- **Commits** (4, em ordem):
+  - `chore(frontend): scaffold Angular 20.3 com SCSS, strict e estrutura DDD` (Task F-0.1)
+  - `chore(frontend): adicionar ESLint, Prettier, Stylelint, Husky e lint-staged` (Task F-0.2)
+  - `chore(frontend): adicionar Vitest, Playwright e MSW com smoke tests` (Task F-0.3)
+  - `ci(frontend): adicionar workflow CI-APP (lint + test + build)` (Task F-0.4)
+- **Validacoes locais**: `npm run format:check`, `lint`, `lint:scss`, `test:coverage` (1 passed), `e2e` (1 passed), `build` — todos verdes
+- **Validacoes manuais (humano)**: build CI-APP no GitHub verde, branch protection ativa
+- **Versoes finais resolvidas**: Angular 20.3.19, ESLint 9.39, Prettier 3.8, Stylelint 16.26, Husky 9.1, lint-staged 15.5, Vitest 2.1, `@analogjs/vitest-angular` 1.22, Playwright 1.59, MSW 2.14, `@testing-library/angular` 18.1.1, `@angular/animations` 20.3, `@angular/platform-browser-dynamic` 20.3, happy-dom (substituiu jsdom — ver desvios)
+- **Desvios do spec/steps**:
+  - `vitest.config.mts` (nao `.ts`) — `@analogjs/vite-plugin-angular` e ESM-only e Vitest tenta carregar config via require; `.mts` forca ESM
+  - `environment: 'happy-dom'` (nao `jsdom`) — `@mswjs/interceptors` precisa de `TransformStream` global, jsdom 25 nao expoe
+  - **MSW server NAO plugado em `test-setup.ts`** — happy-dom nao tem `BroadcastChannel`; deferido para F-Sprint 2/3 quando primeiro teste dependente da API entrar. Polyfills (Web Streams + `BroadcastChannel` stub) ja prontos em `src/test-polyfills.ts`
+  - `src/main.ts` MSW gate via `localStorage.NG_APP_USE_MSW === 'true'` (nao `import.meta.env.NG_APP_USE_MSW`) — Angular CLI nao injeta env vars `NG_APP_*` em main.ts em build
+  - `@testing-library/angular@18.1.1` (nao `^17`) — versao 17 puxa `@angular/animations@21` transitivamente, conflita com Angular 20; 18.1.1 suporta Angular 20+ nativamente
+  - `npm ci --legacy-peer-deps` necessario — `@angular/build` declara `vitest@^3.1.1` como peer optional, mas pinamos `vitest@^2` por compat com `@analogjs/vitest-angular@^1`
+  - `@angular/platform-browser-dynamic@^20` instalado explicitamente — Angular 20 nao traz por default; necessario para `BrowserDynamicTestingModule`
+  - Workflow renomeado para `name: CI-APP` (template chega como `name: CI`) para diferenciar de `CI-API` e do futuro `CI-MOBILE` em required checks cross-repo
+  - `package.json` e `package-lock.json` versionados ja com todas as devDependencies das 4 Tasks (commit unico em F-0.1) para evitar checkpoints intermediarios na historia
 
 ## Impacto na F-Sprint seguinte
 

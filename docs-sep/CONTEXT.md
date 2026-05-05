@@ -425,14 +425,39 @@ No estado atual:
   - **(3A)** workflows de CI movidos de `docs-SEP/.github/workflows/` para `docs-sep/ci-pipelines/templates/` como `sep-api-ci.template.yml`, `sep-app-ci.template.yml`, `sep-mobile-pwa-ci.template.yml`; templates mobile native renomeados com prefixo `sep-mobile-`; cada template deve ser copiado para o `.github/workflows/` do repo correspondente
   - **(4A)** cada repo gerencia seu proprio pre-commit independentemente: `sep-api` com `.githooks/pre-commit` minimo (Spotless), `sep-app` e `sep-mobile` com Husky + lint-staged padrao via `npx husky init`. O agregador cross-repo foi descontinuado.
 - agente de IA realiza apenas **commits** (com descricao) e **criacao de branches por sprint**; push e PR continuam **manuais**, executados pelo desenvolvedor humano
+- **Sprint 0 (Hygiene & Foundation) concluida em 2026-05-04** no repo `sep-api`, branch `sprint-0/hygiene-foundation`, build CI no GitHub verde. Entregaveis materializados:
+  - meta-arquivos (`.gitignore`, `.editorconfig`, `.gitattributes`)
+  - Gradle wrapper 8.10.2 + `build.gradle` minimo (Spotless 6.25.0 + Palantir 2.50.0; JaCoCo 0.8.12 com `jacocoTestCoverageVerification` DESLIGADO ate a Sprint 4); plugin `org.springframework.boot` e dependencias da aplicacao ficaram para a Sprint 1 Task 1.1b para evitar exigencia prematura de main class
+  - `.githooks/pre-commit` rodando `./gradlew spotlessCheck`; cada dev configura `git config core.hooksPath .githooks`
+  - `.github/PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/{bug_report,feature_request}.md` e `CODEOWNERS` com `@mauriciofcjr`
+  - `.github/workflows/ci.yml` (renomeado para `name: CI-API` para diferenciar dos CIs de `sep-app` e `sep-mobile`) executando build + test + Spotless + JaCoCo com Postgres 16 service container; `.github/workflows/docs.yml` para markdownlint (continue-on-error)
+  - `CONTRIBUTING.md` com Conventional Commits + `README.md` expandido (setup, code style, cobertura, hooks, CI, stack, arquitetura, marco regulatorio, sprints)
+  - 12 modulos x 4 layers = 48 `package-info.java` em `src/main/java/com/dynamis/sep_api/{identity,usuarios,onboarding,credito,contratos,cobranca,escrow,backoffice,financeiro,credores,pix,shared}/{domain,application,infrastructure,web}` + `scripts/create-package-structure.sh` + `SepApiApplication` stub (final class privada, ganhara `@SpringBootApplication` e `main` real na Sprint 1 Task 1.1b)
+  - ADRs nao foram duplicados no `sep-api`: vivem em `docs-SEP/adr/` (0001-0011) e o `sep-api/README.md` referencia via `../docs-SEP/adr/`
+- **Branch protection no GitHub** ativa na `main` do `sep-api` apos a Sprint 0; substituicao do placeholder `@MAURICIO_GITHUB_USERNAME` no `CODEOWNERS` ja foi feita pelo desenvolvedor para `@mauriciofcjr`
+- **F-Sprint 0 (Setup Angular + Tooling) concluida em 2026-05-04** no repo `sep-app`, branch `fsprint-0/setup-angular`, build CI-APP no GitHub verde. Entregaveis materializados:
+  - scaffold Angular 20.3.19 (Standalone Components, Signals, strict, SCSS) com `--directory=.` (raiz do repo, sem subpasta `apps/`)
+  - prefixo Angular `sep` em `angular.json`; selector raiz renomeado para `sep-root`; `index.html` com title `SEP Frontend` e lang `pt-BR`
+  - estrutura DDD em `src/app/{core/{auth,http,config,guards,interceptors},shared/{components,directives,pipes,models,utils},layout/{public-shell,authenticated-shell},features/{public,authenticated}}`
+  - `src/styles/{_tokens,_apple,_notion,_mixins,index}.scss` como placeholders (populados na F-Sprint 1); plugado em `angular.json:architect.build.options.styles`
+  - ESLint 9 (flat config) + angular-eslint 21 + `eslint-config-prettier`; Prettier 3 + `.prettierrc.json` + `.prettierignore`; Stylelint 16 + `stylelint-config-standard-scss` + `.stylelintrc.json`; Husky 9 + lint-staged 15 (`prepare: husky` instala automaticamente)
+  - Vitest 2.1 via `@analogjs/vitest-angular@^1` (Vitest puro nao compila templates Angular); `vitest.config.mts` (extensao `.mts` necessaria porque `@analogjs/vite-plugin-angular` e ESM-only); `environment: 'happy-dom'` (substituiu jsdom porque `TransformStream` ausente em jsdom 25); JIT mode no plugin Angular
+  - `tsconfig.spec.json` refeito para Vitest (types `vitest/globals` e `node`); `src/test-setup.ts` faz `import @angular/compiler` primeiro e init do TestBed via `BrowserDynamicTestingModule`/`platformBrowserDynamicTesting`
+  - Playwright 1.59 (Chromium) com webServer auto em `:4200`; smoke `e2e/smoke.spec.ts` valida title `SEP`
+  - MSW 2.14: handlers em `src/mocks/handlers.ts` para `POST /auth/login` e `GET /auth/me` alinhados ao PRD §21 (UUID v6, ISO-8601, perfil `ADMIN`); worker (browser) em `src/mocks/browser.ts`; server (Node) em `src/mocks/server.ts` pronto. **Wiring do server em `test-setup.ts` deferido para F-Sprint 2/3**, quando primeiro teste dependente da API entrar; happy-dom nao tem `BroadcastChannel`, polyfills Web Streams + `BroadcastChannel` stub ja prontos em `src/test-polyfills.ts` para ativacao futura
+  - `src/main.ts` com gate runtime `localStorage.NG_APP_USE_MSW === 'true'` para ativar worker MSW em dev; substituiu o `import.meta.env.NG_APP_USE_MSW` proposto no step porque Angular CLI nao injeta env vars `NG_APP_*` em build
+  - smoke `src/app/app.spec.ts` (Vitest 2 + happy-dom + JIT) valida classe `App` definida; cobertura v8 100% no escopo
+  - `.github/workflows/ci.yml` (`name: CI-APP` — diferencia de `CI-API` e do futuro `CI-MOBILE`) com `format:check`, `lint`, `lint:scss`, `test:coverage`, `build` em Node 20 + ubuntu-24.04; concurrency cancel-in-progress; artifact `web-coverage` retention 14 dias; `npm ci --legacy-peer-deps` (vitest@^2 vs peer optional vitest@^3.1.1 do `@angular/build`)
+  - `package.json`/`package-lock.json` versionados ja com todas as devDependencies das 4 Tasks no commit unico de F-0.1, evitando checkpoints intermediarios
+- **Versoes finais resolvidas no `sep-app`** (vs versoes pinadas no spec/steps): Angular 20.3.19, ESLint 9.39, Prettier 3.8, Stylelint 16.26, Husky 9.1, lint-staged 15.5, Vitest 2.1, `@analogjs/vitest-angular` 1.22, Playwright 1.59, MSW 2.14, `@testing-library/angular` 18.1.1 (substituiu `^17` que puxava `@angular/animations@21` transitivamente, conflitando com Angular 20), `@angular/animations` 20.3, `@angular/platform-browser-dynamic` 20.3 (instalado explicitamente — Angular 20 nao traz por default), happy-dom (substituiu jsdom)
 
 ## Proximo passo mais natural
 
-Os proximos passos provaveis, dependendo da orientacao do usuario, sao:
-- criar artefatos de especificacao derivados do PRD
-- quebrar o backlog em specs/plans/tasks
-- iniciar a implementacao da API em etapas pequenas
-- estruturar o repositorio backend real, caso ainda nao exista na workspace
+Com a Sprint 0 backend e a F-Sprint 0 frontend concluidas em 2026-05-04, os proximos passos provaveis sao:
+- gerar `docs-SEP/steps/backend/001-sprint-1-steps.md` just-in-time antes de executar a Sprint 1
+- iniciar a Sprint 1 (Fundacao Tecnica) no repo `sep-api`: plugin `org.springframework.boot` + dependencias (Task 1.1b), `application.yml`/profile `dev` (Task 1.1c), Docker Compose com PostgreSQL 16 (Task 1.1d), Flyway com migration inicial (Task 1.2), `EntidadeAuditavel` + `AuditorAware` (Task 1.3), `ApiExceptionHandler` stub + `ErrorResponseDto` (Task 1.4), modulo `escrow` modelado (Task 1.5), teste de boot (Task 1.6); detalhe no spec [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../specs/fase-1/001-sprint-1-fundacao-tecnica.md)
+- iniciar a F-Sprint 1 (Tokens SCSS Apple/Notion + Showcase) no repo `sep-app`, em paralelo com a Sprint 1 backend: spec [`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`](../specs/fase-1/101-fsprint-1-design-tokens-showcase.md), steps [`steps/web/101-fsprint-1-steps.md`](../steps/web/101-fsprint-1-steps.md)
+- iniciar a M-Sprint 0 (Setup Ionic + Capacitor) no repo `sep-mobile`, em paralelo: spec [`specs/fase-1/200-msprint-0-setup-ionic.md`](../specs/fase-1/200-msprint-0-setup-ionic.md), steps [`steps/mobile/200-msprint-0-steps.md`](../steps/mobile/200-msprint-0-steps.md)
 - detalhar no futuro a epic de Pix em artefatos proprios quando a fundacao atual estiver concluida
 
 ## Observacao importante para outro agente
