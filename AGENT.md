@@ -45,15 +45,32 @@ Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias.
 
 - `main` e protegida (squash merge, branch protection, CODEOWNERS); recebe PRs ja revisados.
 - `develop` e a base unificada de trabalho; toda branch nova nasce de `develop`.
-- Antes de criar qualquer branch nova, o agente DEVE, na ordem:
-  1. `git checkout develop`
-  2. validar que `git branch --show-current` retorna `develop`
-  3. `git pull --ff-only` — se falhar (divergencia), abortar e avisar o usuario
-  4. so entao `git checkout -b <nova-branch>`
+
+**Fluxo padrao de branch (FIXADO em 2026-05-05, vale para o resto do projeto)**:
+
+1. `git checkout develop`
+2. validar que `git branch --show-current` retorna `develop`
+3. `git pull --ff-only` — se falhar (divergencia), abortar e avisar o usuario
+4. `git checkout -b feature/<nome-sprint>` (ou `feature/<descricao>` para features pontuais)
+5. Commits incrementais durante a execucao (agente pode commitar quando solicitado)
+6. **Push e PR manuais** — agente NAO faz `git push`, NAO abre PR via `gh pr create`
+7. Apos o usuario informar que o PR foi mergeado:
+   - usuario manualmente faz `git checkout develop`
+   - usuario manualmente faz `git pull` em develop pra teste integrado final com codigo ja mergeado
+8. **Branch trabalhada permanece local** — o agente NAO roda `git branch -d`/`-D feature/...`. A branch local fica como historico/referencia ate que o usuario decida apagar manualmente
 
 Sem `develop` sincronizada, nao criar a branch — o trabalho nasceria sobre codigo desatualizado.
 
 **Bugs em codigo ja entregue**: nao criar branches `fix/*` ou `hotfix/*` separadas. Reusar a branch da sprint que introduziu o bug; o tipo `fix(...)` no proprio Conventional Commit ja diferencia. Mesmo nesses casos, sincronizar a branch com `develop` antes do commit.
+
+**Working tree sujo apos checkout entre branches**: o Git permite `git switch` quando as mudancas nao conflitam, mas elas **viajam junto** para a branch destino. Se isso ocorrer apos um PR ja mergeado, antes de `git pull --ff-only`:
+
+1. `git status` para listar modified + untracked
+2. confirmar via `git log --oneline origin/develop` que a Sprint correspondente ja foi mergeada
+3. se as mudancas locais sao redundantes com o PR mergeado: `git restore <files modified>` + `git clean -fd <paths untracked>`
+4. so entao `git pull --ff-only`
+
+Esta limpeza so e segura quando o conteudo local ja esta em `origin/develop` via PR. Em qualquer outra situacao, parar e perguntar ao usuario.
 
 ---
 

@@ -4,11 +4,22 @@
 
 - **ID da Spec**: 003
 - **Titulo**: Sprint 3 - Seguranca e Autenticacao JWT
-- **Status**: aprovada para execucao (apos conclusao da Spec 002)
+- **Status**: **Concluida em 2026-05-05** (commit `242b2a0` na branch `feature/sprint-3-seguranca-autenticacao` do `sep-api`, mergeada via PR para `develop`/`main`)
 - **Fase do produto**: Epic 3 - Seguranca e Autenticacao JWT
 - **Origem**: PRD - API SEP, Secao 22 (Backlog Tecnico Implementavel)
 - **Depende de**: [`002-sprint-2-gestao-usuarios.md`](./002-sprint-2-gestao-usuarios.md)
 - **Responsavel principal**: Dev Senior
+
+## Erratum (registrado na conclusao)
+
+- **`UsuarioAutenticado` em vez de `User` simples**: spec sugere `User` do Spring Security em alguns trechos; implementacao usa `record UsuarioAutenticado(UUID id, String username, Role role) implements UserDetails` para evitar round-trip ao banco em rotas autenticadas e permitir que `AuditorAwareImpl` extraia o UUID via `principal.id()`. Decisao tecnica documentada nos steps Task 3.1a.1.
+- **`UsuarioMapper.toEntity` continua ausente**: mapper segue sem `toEntity` (decisao da Sprint 2: entidade tem construtor `protected` e factory `Usuario.criar`). `AutenticarUsuarioUseCase` usa apenas `mapper.toResponse`; nenhum use case da Sprint 3 precisou criar entidade via mapper.
+- **`AuthController` busca usuario direto no `UsuarioRepository` para `/me`**: para evitar circular dep com use case que ainda nao existia, `/auth/me` injeta `UsuarioRepository` diretamente. Refactor para `ConsultarUsuarioUseCase` fica como follow-up de Sprint 4 (cobrindo a observacao do step 3.1b.5).
+- **`RecursoNaoEncontradoException` e `ValidacaoException` -> `non-sealed`**: mesma estrategia da `ConflitoException` na Sprint 2. Permite `UsuarioNaoEncontradoException` (Task 3.2.1, codigo `USR-404-001`) e `SenhaAtualIncorretaException` (Task 3.3.2, codigo `USR-400-001`) como subtypes por modulo, sem mexer no `permits` da raiz `DomainException`.
+- **Handlers 401/403 antecipados no `ApiExceptionHandler`**: spec deixa mapeamento completo para Sprint 4, mas testes da Sprint 3 (Tasks 3.2 e 3.3) exigem 401 (`AuthenticationException`) e 403 (`AccessDeniedException`) padronizados via `ErrorResponseDto`. Adicao minima registrada como scope-creep necessario.
+- **Sem token retorna 403 (default Spring Security 6) em vez de 401**: `JwtAuthenticationFilter` so responde 401 quando ha token presente e invalido. Sem header, a chain segue ate `@PreAuthorize` que delega para o `AccessDeniedHandler` default = 403. Sprint 4 pluga `AuthenticationEntryPoint` customizado para uniformizar 401.
+- **`UsuarioRepositoryTest` mantido sem Testcontainers**: heranca do desvio Sprint 1 (issue Docker Engine 28+ documentada em `SmokeBootTest`). Migracao para Testcontainers continua follow-up cross-sprint.
+- **`UsuarioControllerSecurityTest` e `UsuarioControllerSenhaTest`** usam `@WebMvcTest` + `@TestConfiguration` com `@EnableMethodSecurity` + `@AutoConfigureMockMvc(addFilters = false)` para isolar AOP de `@PreAuthorize` da chain de filtros. Pattern documentado para reuso em sprints futuras.
 
 ## Objetivo
 

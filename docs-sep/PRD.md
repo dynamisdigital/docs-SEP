@@ -1469,6 +1469,7 @@ Esta fase sera considerada bem-sucedida quando:
 ## 25. Roadmap Inicial
 
 ### Epic 1 - Fundacao da API
+**Status: Concluida em 2026-05-05** (Sprint 1, commit `ebd6310` mergeado em `main`)
 - configurar Docker Compose e banco dev
 - configurar locale e timezone
 - implementar auditoria JPA
@@ -1479,6 +1480,7 @@ Esta fase sera considerada bem-sucedida quando:
 - definir convencoes de persistencia e identificadores UUID
 
 ### Epic 2 - Gestao de usuarios (escopo da Sprint 2)
+**Status: Concluida em 2026-05-05** (Sprint 2, commit `7fc88ba` mergeado em `main`)
 - modelar entidade `Usuario` com `UUID v6`, repositorio e auditoria JPA
 - configurar `AuditorAware` com fallback `system`
 - criar DTOs de usuario (`UsuarioCreateDto`, `UsuarioResponseDto`, `UsuarioSenhaUpdateDto`) e `UsuarioMapper`
@@ -1487,6 +1489,7 @@ Esta fase sera considerada bem-sucedida quando:
 - garantir que a senha nunca seja exposta em respostas da API
 
 ### Epic 3 - Seguranca, autenticacao e autorizacao (escopo da Sprint 3)
+**Status: Concluida em 2026-05-05** (Sprint 3, commit `242b2a0` mergeado em `develop`/`main`)
 - configurar propriedades JWT (`app.jwt.secret`, `app.jwt.expiration-seconds`)
 - implementar `JwtTokenProvider`, `JwtAuthenticationFilter` e `CustomUserDetailsService`
 - criar `LoginRequestDto` e `TokenResponseDto`
@@ -1499,6 +1502,7 @@ Esta fase sera considerada bem-sucedida quando:
 - persistir na auditoria o UUID do usuario autenticado em operacoes autenticadas
 
 ### Epic 4 - Tratamento de erros, documentacao e testes (escopo da Sprint 4)
+**Status: pendente — proxima na fila do backend**
 - criar `ApiExceptionHandler` com `@RestControllerAdvice`
 - padronizar payload de erro via `ErrorResponseDto` (`timestamp`, `status`, `error`, `message`, `path`, `traceId`)
 - mapear validacao, conflito, autenticacao, autorizacao, excecoes de dominio e fallback generico

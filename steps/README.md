@@ -46,7 +46,7 @@ steps/
 | Sprint 0 - Hygiene & Foundation | [`backend/000-sprint-0-steps.md`](./backend/000-sprint-0-steps.md) | Concluida (2026-05-04) |
 | Sprint 1 - Fundacao Tecnica | [`backend/001-sprint-1-steps.md`](./backend/001-sprint-1-steps.md) | Concluida (2026-05-05) |
 | Sprint 2 - Gestao de Usuarios | [`backend/002-sprint-2-steps.md`](./backend/002-sprint-2-steps.md) | Concluida (2026-05-05) |
-| Sprint 3 - Seguranca e Auth | [`backend/003-sprint-3-steps.md`](./backend/003-sprint-3-steps.md) | Pronto para executar |
+| Sprint 3 - Seguranca e Auth | [`backend/003-sprint-3-steps.md`](./backend/003-sprint-3-steps.md) | Concluida (2026-05-05) |
 | Sprint 4 - Estabilizacao | `backend/004-sprint-4-steps.md` | A criar antes da Sprint 4 |
 
 ### Web (`web/`)
