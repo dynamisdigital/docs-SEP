@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 201
 - **Titulo**: M-Sprint 1 - Tokens Notion adaptados para mobile (touch, tabs inferiores, navegacao em pilha) + Showcase
-- **Status**: aprovada para execucao (apos conclusao da M-Sprint 0)
+- **Status**: concluida em 2026-05-05 (branch `feature/msprint-1-tokens-notion` em `sep-mobile`; push/PR manuais pelo dev)
 - **Fase do produto**: Epic 14 - Mobile SEP
 - **Trilha**: Mobile (paralela a Sprint 1 backend e F-Sprint 1 frontend web)
 - **Origem**: PRD - API SEP, Secao 22 + MOBILE-SCREENS-PLAN.md
