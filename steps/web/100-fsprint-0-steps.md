@@ -965,12 +965,12 @@ git commit -m "ci: adicionar workflow de validacao (lint + test + build)"
 
 ## Definicao de Pronto da F-Sprint 0 (consolidada)
 
-A F-Sprint 0 esta concluida quando todas as 4 tasks estiverem com checklist completo:
+**F-Sprint 0 concluida em 2026-05-04** (branch `fsprint-0/setup-angular` no repo `sep-app`, build CI-APP no GitHub verde).
 
-- [ ] **Task F-0.1** — projeto Angular 20.x rodando, strict, standalone, estrutura DDD
-- [ ] **Task F-0.2** — ESLint + Prettier + Stylelint + Husky + lint-staged
-- [ ] **Task F-0.3** — Vitest + Playwright + MSW com smoke tests
-- [ ] **Task F-0.4** — GitHub Actions Frontend CI verde
+- [x] **Task F-0.1** — projeto Angular 20.3.19 rodando, strict, standalone, estrutura DDD
+- [x] **Task F-0.2** — ESLint + Prettier + Stylelint + Husky + lint-staged
+- [x] **Task F-0.3** — Vitest + Playwright + smoke tests; MSW worker (browser) ativo via `localStorage.NG_APP_USE_MSW`; MSW server (Node) deferido para F-Sprint 2/3 (polyfills ja prontos em `test-polyfills.ts`)
+- [x] **Task F-0.4** — GitHub Actions Frontend CI (`name: CI-APP`) verde
 
 ## Estado esperado do repositorio apos F-Sprint 0
 
