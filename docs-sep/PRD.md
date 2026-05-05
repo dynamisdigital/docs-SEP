@@ -1088,7 +1088,7 @@ Dependencias externas:
 - nenhuma
 
 Responsavel principal:
-- Dev Senior (com apoio dos Devs Plenos para tooling Frontend, executado na trilha 1XX)
+- Dev Senior (com apoio dos Devs Plenos Frontend para o tooling no repo `sep-app`)
 
 Detalhamento das tasks:
 - consultar: [`specs/fase-1/000-sprint-0-hygiene-foundation.md`](../specs/fase-1/000-sprint-0-hygiene-foundation.md)
@@ -1212,8 +1212,7 @@ Tema:
 - Endurecimento de Seguranca (gate Fase 2)
 
 Pre-requisitos de entrada:
-- Sprint 4 concluida
-- F-Sprint 4 e M-Sprint 4 concluidas (cobertas no escopo do spec 005)
+- Sprint 4, F-Sprint 4 e M-Sprint 4 concluidas (Sprint 5 e gate cross-stack: aplica mudancas em `sep-api`, `sep-app` e `sep-mobile`)
 - ADR 0009 (Separacao de Canal) e ADR 0010 (MFA) aceitos
 
 Dependencias externas:
@@ -1814,7 +1813,7 @@ As tres secoes tem sobreposicao intencional (estado, stack, arquitetura, marco r
 
 **Resolucao de conflitos**: quando o `AGENT.md` divergir do PRD ou de algum ADR, o **PRD e os ADRs prevalecem**. O `AGENT.md` complementa, nao reescreve, esses artefatos.
 
-**Historico**: o `AGENT.md` substitui os arquivos `CLAUDE.md`, `CODEX.md` e `COPILOT.md` que existiam na raiz do repositorio em sprints anteriores e foram apagados ao consolidar a orientacao em um unico arquivo.
+**Historico**: o `AGENT.md` substitui os arquivos `CLAUDE.md`, `CODEX.md` e `COPILOT.md` que existiam na raiz do repositorio `docs-SEP` em sprints anteriores e foram apagados ao consolidar a orientacao em um unico arquivo.
 
 ## 29. Mapeamento Fase 2: Epics × Sprints
 
