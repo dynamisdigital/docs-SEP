@@ -4,11 +4,22 @@
 
 - **ID da Spec**: 002
 - **Titulo**: Sprint 2 - Gestao de Usuarios
-- **Status**: aprovada para execucao (apos conclusao da Spec 001)
+- **Status**: **Concluida em 2026-05-05** (commits `87ae142` + `1fe6ab0` na branch `feature/sprint-2-gestao-usuarios` do `sep-api`)
 - **Fase do produto**: Epic 2 - Gestao de Usuarios
 - **Origem**: PRD - API SEP, Secao 22 (Backlog Tecnico Implementavel)
 - **Depende de**: [`001-sprint-1-fundacao-tecnica.md`](./001-sprint-1-fundacao-tecnica.md)
 - **Responsavel principal**: Dev Senior
+
+## Erratum (registrado na conclusao)
+
+- **Migration V3 absorvida pela V1**: a Task 2.1 originalmente listava criacao de `V3__criar_tabela_usuario.sql`. A `V1__init.sql` da Sprint 1 ja entregou o schema completo da tabela `usuario` (id `uuid` nativo, `username` unico, check de role `ADMIN`/`CLIENTE`, 4 colunas de auditoria), entao Sprint 2 nao criou nova migration. A entidade JPA foi materializada sobre o schema existente.
+- **`ConflitoException` `final` -> `non-sealed`**: ajuste minimo na Sprint 1 para permitir `UsernameJaExisteException` como subtype por modulo.
+- **`@Bean PasswordEncoder` adicionado ao `SecurityConfig` da Sprint 1**: bean BCrypt requerido pelo `CriarUsuarioUseCase`. Bean centralizado em `identity/infrastructure/config/SecurityConfig.java` por consistencia (Sprint 3 reusa).
+- **`ApiExceptionHandler` ganhou handler para `HttpMessageNotReadableException`**: necessario para retornar 400 em payloads com `role` invalida (enum binding falha em `HttpMessageNotReadableException`, nao em `MethodArgumentNotValidException`).
+- **`JpaAuditingConfig` ganhou `DateTimeProvider` retornando `OffsetDateTime`**: fix latente da Sprint 1 — `EntidadeAuditavel` declara `OffsetDateTime` para `dataCriacao`/`dataModificacao` mas o provider default do Spring Data nao gera esse tipo.
+- **`UsuarioMapper` sem `toEntity`**: a entidade `Usuario` tem construtor `protected` por design DDD (factory `Usuario.criar(...)` encapsula geracao de UUID v6). MapStruct nao consegue instanciar via construtor publico, e o use case usa a factory diretamente. Mapper documenta a decisao.
+- **`UsuarioRepositoryTest` sem Testcontainers**: segue desvio temporario ja documentado em `SmokeBootTest` da Sprint 1 (issue Docker Engine 28+). Migracao para Testcontainers ficou como follow-up cross-sprint.
+- **`springdoc` 2.6.0 -> 2.8.13**: bump necessario para compat com Spring Boot 3.5.x (`NoSuchMethodError: ControllerAdviceBean.<init>(Object)` em `/v3/api-docs`).
 
 ## Objetivo
 
