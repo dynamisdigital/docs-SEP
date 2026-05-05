@@ -36,7 +36,24 @@ Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias.
 
 **CI**: os workflows de cada repo sao copiados de `docs-sep/ci-pipelines/templates/` (ver [`docs-sep/ci-pipelines/README.md`](docs-sep/ci-pipelines/README.md)). Como cada repo so contem um app, os workflows nao precisam de `paths-filter` nem `working-directory`.
 
-**Operacao git para o agente de IA**: o agente realiza apenas **commits** (com descricao) e **criacao de branches por sprint**. Push e PR continuam **manuais**, executados pelo desenvolvedor humano.
+**Operacao git para o agente de IA**:
+
+- Nos repos **`sep-api`**, **`sep-app`** e **`sep-mobile`** (codigo): o agente realiza apenas **commits** (com descricao) e **criacao de branches por sprint**. Push e PR continuam **manuais**, executados pelo desenvolvedor humano.
+- No repo **`docs-SEP`** (documentacao): **toda operacao git e manual**. O agente **nao** cria branches, **nao** comita, **nao** faz push, **nao** faz reset/rebase/merge. Quando precisar atualizar PRD, CONTEXT, ADRs, specs, steps ou este AGENT.md, o agente edita os arquivos no working tree e para por ai; o desenvolvedor humano revisa, organiza branches e comita manualmente. Esta regra existe porque `docs-SEP` e a fonte de verdade do projeto e o usuario quer controle integral sobre essa historia.
+
+**Modelo de branches em `sep-api`/`sep-app`/`sep-mobile`**:
+
+- `main` e protegida (squash merge, branch protection, CODEOWNERS); recebe PRs ja revisados.
+- `develop` e a base unificada de trabalho; toda branch nova nasce de `develop`.
+- Antes de criar qualquer branch nova, o agente DEVE, na ordem:
+  1. `git checkout develop`
+  2. validar que `git branch --show-current` retorna `develop`
+  3. `git pull --ff-only` — se falhar (divergencia), abortar e avisar o usuario
+  4. so entao `git checkout -b <nova-branch>`
+
+Sem `develop` sincronizada, nao criar a branch — o trabalho nasceria sobre codigo desatualizado.
+
+**Bugs em codigo ja entregue**: nao criar branches `fix/*` ou `hotfix/*` separadas. Reusar a branch da sprint que introduziu o bug; o tipo `fix(...)` no proprio Conventional Commit ja diferencia. Mesmo nesses casos, sincronizar a branch com `develop` antes do commit.
 
 ---
 
