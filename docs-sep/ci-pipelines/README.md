@@ -28,7 +28,7 @@ Os arquivos em `docs-sep/ci-pipelines/templates/` sao templates versionados. Cad
 
 ### `sep-mobile`
 
-- [`sep-mobile-pwa-ci.template.yml`](./templates/sep-mobile-pwa-ci.template.yml) — valida mobile como PWA (lint + test + build). Padrao da fase atual conforme PRD §11 (PWA-first).
+- [`sep-mobile-pwa-ci.template.yml`](./templates/sep-mobile-pwa-ci.template.yml) — valida mobile como PWA em duas etapas: primeiro `Test, Lint, Coverage` com `format:check`, ESLint, Stylelint e cobertura; depois `Build PWA`, dependente da etapa de testes. Roda em push para `feature/**`, `develop` e `main`, alem de PRs para `develop` e `main`. Publica artifacts de cobertura (`coverage/`) e PWA (`www/`) no GitHub Actions, sem deploy nesta fase. Padrao da fase atual conforme PRD §11 (PWA-first).
 - [`sep-mobile-android-validation.template.yml`](./templates/sep-mobile-android-validation.template.yml) — build Android debug para validacao interna (futuro, apos M-Sprints 0-4).
 - [`sep-mobile-android-distribution.template.yml`](./templates/sep-mobile-android-distribution.template.yml) — build Android assinado para homologacao/distribuicao.
 - [`sep-mobile-ios-validation.template.yml`](./templates/sep-mobile-ios-validation.template.yml) — build iOS de validacao em runner macOS.

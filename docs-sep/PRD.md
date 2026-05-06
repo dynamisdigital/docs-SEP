@@ -1502,7 +1502,7 @@ Esta fase sera considerada bem-sucedida quando:
 - persistir na auditoria o UUID do usuario autenticado em operacoes autenticadas
 
 ### Epic 4 - Tratamento de erros, documentacao e testes (escopo da Sprint 4)
-**Status: implementacao concluida em 2026-05-06 — branch `feature/sprint-4-erros-docs-testes` no `sep-api`, aguardando push/PR manual e merge em `develop`/`main`**
+**Status: implementacao concluida em 2026-05-06 — branch `feature/sprint-4-erros-docs-testes` no `sep-api` reimplementada apos incidente de squash merge dos PRs #10/#11 que perderam o conteudo da sprint; aguardando novo push/PR manual e merge em `develop`/`main` (ver `CONTEXT.md` para o postmortem)**
 - criar `ApiExceptionHandler` com `@RestControllerAdvice`
 - padronizar payload de erro via `ErrorResponseDto` (`timestamp`, `status`, `error`, `message`, `path`, `traceId`)
 - mapear validacao, conflito, autenticacao, autorizacao, excecoes de dominio e fallback generico
