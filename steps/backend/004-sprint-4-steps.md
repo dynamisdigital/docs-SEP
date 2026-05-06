@@ -475,12 +475,33 @@ check.dependsOn 'jacocoTestCoverageVerification'
 ./gradlew check
 ```
 
+### Step 4.3.6 - Manter CI em duas etapas
+
+**Arquivo**: `<sep-api-root>/.github/workflows/ci.yml`
+
+**Estrutura esperada**:
+
+- Job `test`:
+  - roda em push para `feature/**`, `develop` e `main`;
+  - roda em PR para `develop` e `main`;
+  - sobe PostgreSQL 16 como service container;
+  - executa `spotlessCheck`;
+  - executa `test jacocoTestCoverageVerification`;
+  - publica artifacts de testes e JaCoCo.
+- Job `build`:
+  - depende de `test`;
+  - executa `bootJar`;
+  - publica o JAR como artifact.
+
+**Regra**: nao adicionar build/push de imagem Docker, GHCR ou deploy remoto nesta sprint. Isso pertence a Epic 16 / infraestrutura futura.
+
 ### Definicao de pronto da Task 4.3
 
 - [ ] JaCoCo verification rule ativa.
 - [ ] `check` depende de `jacocoTestCoverageVerification`.
 - [ ] Cobertura >= 70%.
 - [ ] Smoke E2E passa com Postgres local.
+- [ ] CI separado em `test` -> `build`, sem deploy.
 - [ ] Suite completa verde.
 
 ### Commit sugerido

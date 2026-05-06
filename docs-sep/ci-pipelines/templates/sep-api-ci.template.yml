@@ -9,24 +9,31 @@
 # Diferencas vs versao monorepo anterior:
 #   - Sem path-filter por subpasta (cada repo so tem o backend Java)
 #   - Postgres via service container (evita Testcontainers desnecessario na CI)
+#   - Esteira em duas etapas: test/quality gates primeiro, package depois
 # =============================================================================
 
 name: CI
 
 on:
   pull_request:
+    branches:
+      - main
+      - develop
   push:
     branches:
       - main
+      - develop
+      - "feature/**"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Validate backend
+  test:
+    name: Test, Spotless, JaCoCo
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
 
     services:
       postgres:
@@ -55,11 +62,22 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
 
-      - name: Validate
-        run: |
-          chmod +x ./gradlew
-          ./gradlew spotlessCheck build jacocoTestReport
+      - name: Spotless check
+        run: ./gradlew spotlessCheck --no-daemon
+
+      - name: Test and JaCoCo verification
+        run: ./gradlew test jacocoTestCoverageVerification --no-daemon
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/sep_test
+          SPRING_DATASOURCE_USERNAME: sep
+          SPRING_DATASOURCE_PASSWORD: sep
+
+      - name: JaCoCo report
+        if: always()
+        run: ./gradlew jacocoTestReport --no-daemon
 
       - name: Upload JaCoCo report
         if: always()
@@ -68,3 +86,45 @@ jobs:
           name: backend-jacoco-report
           path: build/reports/jacoco/
           if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: build/reports/tests/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  build:
+    name: Build Package
+    runs-on: ubuntu-24.04
+    needs: test
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' }}
+
+      - name: Build package
+        run: ./gradlew bootJar --no-daemon
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sep-api-jar
+          path: build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 14

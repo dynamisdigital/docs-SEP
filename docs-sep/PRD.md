@@ -1502,7 +1502,7 @@ Esta fase sera considerada bem-sucedida quando:
 - persistir na auditoria o UUID do usuario autenticado em operacoes autenticadas
 
 ### Epic 4 - Tratamento de erros, documentacao e testes (escopo da Sprint 4)
-**Status: pendente — proxima na fila do backend**
+**Status: implementacao concluida em 2026-05-06 — branch `feature/sprint-4-erros-docs-testes` no `sep-api`, aguardando push/PR manual e merge em `develop`/`main`**
 - criar `ApiExceptionHandler` com `@RestControllerAdvice`
 - padronizar payload de erro via `ErrorResponseDto` (`timestamp`, `status`, `error`, `message`, `path`, `traceId`)
 - mapear validacao, conflito, autenticacao, autorizacao, excecoes de dominio e fallback generico
@@ -1510,6 +1510,7 @@ Esta fase sera considerada bem-sucedida quando:
 - expor Swagger UI no profile `dev`
 - documentar todos os endpoints e schemas dos DTOs com exemplos coerentes com o PRD
 - cobrir com testes automatizados os cenarios criticos de autenticacao, autorizacao, validacao e auditoria
+- introduzir `Webhook Receiver Pattern` (`POST /api/v1/webhooks/{provider}/{event}`) com HMAC-SHA256, idempotencia por `Idempotency-Key` e Outbox stub (`webhook_event_log` em V3) para preparacao da Epic 15 (Pix) e Epic 5 (KYC callbacks)
 
 ### Epic 5 - Onboarding KYC/KYB
 - **Sprints alocadas**: Sprint 6 (KYC Pessoa Fisica) e Sprint 7 (KYB Empresa + PLD)

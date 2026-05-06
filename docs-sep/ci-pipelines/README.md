@@ -20,11 +20,11 @@ Os arquivos em `docs-sep/ci-pipelines/templates/` sao templates versionados. Cad
 
 ### `sep-api`
 
-- [`sep-api-ci.template.yml`](./templates/sep-api-ci.template.yml) — valida backend Java/Spring com Spotless + JaCoCo + build Gradle. Usa Postgres como service container do GitHub Actions.
+- [`sep-api-ci.template.yml`](./templates/sep-api-ci.template.yml) — valida backend Java/Spring em duas etapas: primeiro `Test, Spotless, JaCoCo` com PostgreSQL 16 como service container; depois `Build Package` com `bootJar`, dependente da etapa de testes. Roda em push para `feature/**`, `develop` e `main`, alem de PRs para `develop` e `main`. Nao publica imagem Docker nem executa deploy nesta fase.
 
 ### `sep-app`
 
-- [`sep-app-ci.template.yml`](./templates/sep-app-ci.template.yml) — valida frontend Angular com lint + test + build.
+- [`sep-app-ci.template.yml`](./templates/sep-app-ci.template.yml) — valida frontend Angular em duas etapas: primeiro `Test, Lint, Coverage` com `format:check`, ESLint, Stylelint e cobertura; depois `Build`, dependente da etapa de testes. Roda em push para `feature/**`, `develop` e `main`, alem de PRs para `develop` e `main`. Publica artifacts de cobertura (`coverage/`) e build (`dist/`) no GitHub Actions, sem deploy nesta fase.
 
 ### `sep-mobile`
 
@@ -54,6 +54,7 @@ Os templates antigos (anteriores a 2026-05-04) tinham `paths-filter` por subpast
 
 ## Gates de promocao
 
+- A pipeline atual do `sep-api` e somente CI: testes, cobertura e empacotamento. Build/push de imagem, GHCR e deploy remoto nao devem ser promovidos junto com a Sprint 4.
 - Android nativo so deve ser promovido depois da estabilizacao das M-Sprints 0-4.
 - Distribuicao Android exige secrets separados no environment `mobile-android-homologacao`.
 - iOS exige conta Apple Developer, certificados, provisioning profile e runner macOS.
