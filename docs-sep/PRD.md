@@ -262,6 +262,8 @@ Os artefatos do produto vivem em 3 repositorios separados no GitHub:
 
 A documentacao consolidada (este PRD, ADRs, specs, steps, AGENT.md, templates de CI) vive no repositorio **`docs-SEP`** (4o repo). Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias. Specs e steps usam os placeholders `<sep-api-root>`, `<sep-app-root>` e `<sep-mobile-root>` para representar a raiz de cada repo localmente clonado.
 
+**Modelo de branches simplificado (2026-05-06)**: a partir de 2026-05-06, os tres repos de codigo (`sep-api`, `sep-app`, `sep-mobile`) operam com `main` + `feature/*` apenas. A branch `develop` foi eliminada (commits "Develop (#N)" no historico antes desta data ficam por contexto). O fluxo operacional e o template de descricao de PR estao consolidados em [`AGENT.md`](../AGENT.md) — secao "Modelo de branches" e "Fim de sprint — descricao PR". `docs-SEP` continua com operacao git 100% manual.
+
 ### Stack principal (versoes pinadas)
 
 **Linguagem e build**
@@ -1502,7 +1504,7 @@ Esta fase sera considerada bem-sucedida quando:
 - persistir na auditoria o UUID do usuario autenticado em operacoes autenticadas
 
 ### Epic 4 - Tratamento de erros, documentacao e testes (escopo da Sprint 4)
-**Status: implementacao concluida em 2026-05-06 — branch `feature/sprint-4-erros-docs-testes` no `sep-api` reimplementada apos incidente de squash merge dos PRs #10/#11 que perderam o conteudo da sprint; aguardando novo push/PR manual e merge em `develop`/`main` (ver `CONTEXT.md` para o postmortem)**
+**Status: Concluida em 2026-05-06** (Sprint 4, branch `feature/sprint-4-erros-docs-testes` reimplementada apos incidente squash merge dos PRs #10/#11 que perderam o conteudo da sprint; mergeada em `main` via PR #16, commit `c5158de`; ver `CONTEXT.md` para o postmortem completo)
 - criar `ApiExceptionHandler` com `@RestControllerAdvice`
 - padronizar payload de erro via `ErrorResponseDto` (`timestamp`, `status`, `error`, `message`, `path`, `traceId`)
 - mapear validacao, conflito, autenticacao, autorizacao, excecoes de dominio e fallback generico

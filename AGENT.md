@@ -41,36 +41,50 @@ Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias.
 - Nos repos **`sep-api`**, **`sep-app`** e **`sep-mobile`** (codigo): o agente realiza apenas **commits** (com descricao) e **criacao de branches por sprint**. Push e PR continuam **manuais**, executados pelo desenvolvedor humano.
 - No repo **`docs-SEP`** (documentacao): **toda operacao git e manual**. O agente **nao** cria branches, **nao** comita, **nao** faz push, **nao** faz reset/rebase/merge. Quando precisar atualizar PRD, CONTEXT, ADRs, specs, steps ou este AGENT.md, o agente edita os arquivos no working tree e para por ai; o desenvolvedor humano revisa, organiza branches e comita manualmente. Esta regra existe porque `docs-SEP` e a fonte de verdade do projeto e o usuario quer controle integral sobre essa historia.
 
-**Modelo de branches em `sep-api`/`sep-app`/`sep-mobile`**:
+**Modelo de branches em `sep-api`/`sep-app`/`sep-mobile` (simplificado em 2026-05-06)**:
 
-- `main` e protegida (squash merge, branch protection, CODEOWNERS); recebe PRs ja revisados.
-- `develop` e a base unificada de trabalho; toda branch nova nasce de `develop`.
+- `main` e a unica base remota; protegida (squash merge, branch protection, CODEOWNERS).
+- Branches de trabalho usam o prefixo `feature/<sprint-ou-tema>` e nascem direto de `main`.
+- A branch `develop` foi **eliminada** — historico de PRs marcados "Develop (#N)" antes de 2026-05-06 ficam por contexto, mas regra vigente eh `main` + `feature/*`.
 
-**Fluxo padrao de branch (FIXADO em 2026-05-05, vale para o resto do projeto)**:
+**Fluxo padrao de branch (FIXADO em 2026-05-06)**:
 
-1. `git checkout develop`
-2. validar que `git branch --show-current` retorna `develop`
-3. `git pull --ff-only` — se falhar (divergencia), abortar e avisar o usuario
-4. `git checkout -b feature/<nome-sprint>` (ou `feature/<descricao>` para features pontuais)
-5. Commits incrementais durante a execucao (agente pode commitar quando solicitado)
-6. **Push e PR manuais** — agente NAO faz `git push`, NAO abre PR via `gh pr create`
-7. Apos o usuario informar que o PR foi mergeado:
-   - usuario manualmente faz `git checkout develop`
-   - usuario manualmente faz `git pull` em develop pra teste integrado final com codigo ja mergeado
-8. **Branch trabalhada permanece local** — o agente NAO roda `git branch -d`/`-D feature/...`. A branch local fica como historico/referencia ate que o usuario decida apagar manualmente
+1. `git checkout main`
+2. `git pull --ff-only` — se falhar (divergencia), abortar e avisar o usuario
+3. `git checkout -b feature/<nome-sprint>` (ou `feature/<descricao>` para features pontuais; `feature/fix-<descricao>` para bugfix em codigo ja mergeado)
+4. **1 commit por Task** durante a execucao (Conventional Commits obrigatorio)
+5. **Push e PR manuais** — agente NAO faz `git push`, NAO abre PR via `gh pr create`
+6. Apos squash merge em `main`:
+   - branch remota deletada automaticamente (setting `delete_branch_on_merge=true` ativo nos 3 repos)
+   - usuario faz `git checkout main && git pull --ff-only` localmente
+   - branch local pode permanecer como historico ate user apagar manualmente
 
-Sem `develop` sincronizada, nao criar a branch — o trabalho nasceria sobre codigo desatualizado.
+**Bugs em codigo**:
 
-**Bugs em codigo ja entregue**: nao criar branches `fix/*` ou `hotfix/*` separadas. Reusar a branch da sprint que introduziu o bug; o tipo `fix(...)` no proprio Conventional Commit ja diferencia. Mesmo nesses casos, sincronizar a branch com `develop` antes do commit.
+- **Sprint em andamento (branch ainda nao mergeada)**: continuar comitando na propria branch da sprint com Conventional Commit `fix(...)`.
+- **Codigo ja entregue (PR mergeado)**: criar nova branch `feature/fix-<descricao-curta>` a partir de `main` fresca. Nao tentar ressuscitar branch ja deletada no remoto. Conventional Commit `fix(...)` continua diferenciando o tipo no historico.
+- Sem prefixos `fix/*` ou `hotfix/*` — Conventional Commit ja diferencia.
 
-**Working tree sujo apos checkout entre branches**: o Git permite `git switch` quando as mudancas nao conflitam, mas elas **viajam junto** para a branch destino. Se isso ocorrer apos um PR ja mergeado, antes de `git pull --ff-only`:
+**Commits durante execucao**:
 
-1. `git status` para listar modified + untracked
-2. confirmar via `git log --oneline origin/develop` que a Sprint correspondente ja foi mergeada
-3. se as mudancas locais sao redundantes com o PR mergeado: `git restore <files modified>` + `git clean -fd <paths untracked>`
-4. so entao `git pull --ff-only`
+- 1 commit por **Task** (nao por Step nem por arquivo).
+- Antes do commit: `git status` + `git ls-files --others --exclude-standard <paths-da-task>` para garantir que nada novo ficou untracked.
+- `git add <paths-especificos>` (NAO `git add -A` — evita pegar `.claude/`, `.env`, etc.).
+- Mensagem: `<tipo>(<modulo>): <descricao>` — `feat`, `fix`, `ci`, `chore`, `test`, `docs`, `refactor`.
+- Hook automatico de `git add` apos Write/Edit foi removido em 2026-05-06; agente faz `git add` explicito.
 
-Esta limpeza so e segura quando o conteudo local ja esta em `origin/develop` via PR. Em qualquer outra situacao, parar e perguntar ao usuario.
+**Fim de sprint — descricao PR**:
+
+Quando todas as Tasks de uma sprint estiverem `[x]` ou explicitamente confirmadas como concluidas, o agente gera **descricao de PR por branch** contendo:
+
+- **Titulo sugerido** (Conventional Commits)
+- **Resumo** (1-3 bullets)
+- **Escopo tecnico** (modulos/arquivos chave, dependencias adicionadas/removidas, migrations)
+- **Como validar** (comandos de testes/build, endpoints/rotas afetadas)
+- **Riscos / breaking changes** (lista explicita ou "nenhum")
+- **Referencia** ao spec/step relevante
+
+Nao fazer push nem `gh pr create` sem pedido explicito. Usuario abre o PR manualmente com a descricao gerada.
 
 ---
 
