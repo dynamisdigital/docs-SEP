@@ -1510,6 +1510,9 @@ A M-Sprint 2 (`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`) consome:
 ## Restricoes e regras de execucao
 
 - M-Sprint 1 pode rodar em paralelo a Sprint 1 backend e F-Sprint 1 frontend (sem dependencia)
+- **Modelo de branches** (ver `AGENT.md`): 1 branch por M-Sprint = `feature/msprint-1-tokens-notion`, nascida de `develop` apos `git pull --ff-only`. Toda a sprint vive nessa branch unica. PR vai para `develop` (nunca direto para `main`); merge tipo squash.
+- **Commits**: numero flexivel — agente decide pelo escopo logico (Task, Step, modulo, refactor). Conventional Commits obrigatorio. `git status` + `git add <paths>` + `git commit` explicitos (hook automatico de `git add` foi removido em 2026-05-06).
+- **Push e PR sao manuais** (regra do AGENT.md) — agente nao faz `git push` nem `gh pr create`.
 - **Nao** reaproveitar tokens da F-Sprint 1 web diretamente — adaptacoes mobile (touch, fonts, tap highlights) tornam improdutivo compartilhar arquivos
 - Code review por Dev Senior antes de seguir para M-Sprint 2 (validar fidelidade ao Notion + adaptacoes mobile)
 - Showcase `/design-system` NAO deve ir para producao na Epic 14 — sera removido ou colocado atras de feature flag em sprint posterior

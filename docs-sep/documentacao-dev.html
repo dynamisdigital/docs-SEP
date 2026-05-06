@@ -982,7 +982,7 @@ dependencies {
   </div>
 
   <div class="alert-info">
-    <strong>Regra de execução:</strong> ao final de cada task, o agente deve parar para teste local manual. Commits podem ser feitos pelo agente. Push e PR são manuais. CI/CD e GitHub Actions ficam para fase posterior.
+    <strong>Regra de execução:</strong> ao final de cada bloco lógico (Task ou conjunto coerente), o agente deve parar para teste local manual antes de commitar. 1 branch por sprint (<code>feature/&lt;sprint&gt;</code>), com número flexível de commits decidido pelo agente. Push e PR são manuais. PR vai sempre para <code>develop</code> (squash); <code>develop</code> integra <code>main</code> via merge commit. CI/CD e GitHub Actions já configurados; AWS deploy fica para fase posterior.
   </div>
 </section>
 
@@ -1397,8 +1397,9 @@ dependencies {
         <li>Actuator expõe <code>/actuator/health</code></li>
         <li>Swagger UI disponível em ambiente de dev</li>
         <li>Locale <code>pt-BR</code> · Timezone <code>America/Sao_Paulo</code></li>
-        <li>Parar para teste local manual ao final de cada task</li>
-        <li>Commits pelo agente · push e PR manuais</li>
+        <li>Parar para teste local manual ao final de cada bloco logico antes de commitar</li>
+        <li>Commits pelo agente (numero flexivel por sprint) · push e PR manuais</li>
+        <li>Branch model: <code>feature/&lt;sprint&gt;</code> &rarr; <code>develop</code> (squash) &rarr; <code>main</code> (merge commit)</li>
       </ul>
     </div>
   </div>

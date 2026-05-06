@@ -2465,11 +2465,13 @@ A Sprint 1 esta concluida quando todas as 11 tasks tiverem checklist completo:
 
 ## Restricoes e regras de execucao
 
-- Commits podem ser feitos pelo agente de IA quando solicitado; push e PR sao manuais (regra do AGENT.md)
-- Ao final de cada task, parar para teste local manual antes de seguir
-- Spotless deve passar em cada PR (configurado na Sprint 0)
-- JaCoCo nao verifica target ainda nesta sprint (target 70% entra em Sprint 4); apenas gera relatorio
-- Nenhum modulo de dominio (alem de `escrow` schema-only) e implementado nesta sprint — Sprint 2 traz `usuarios`
+- **Modelo de branches** (ver `AGENT.md`): 1 branch por sprint = `feature/sprint-1-fundacao-tecnica`, nascida de `develop` apos `git pull --ff-only`. Toda a sprint vive nessa branch unica. PR vai para `develop` (nunca direto para `main`); merge tipo squash.
+- **Commits**: numero flexivel — agente decide pelo escopo logico (Task, Step, modulo, refactor). Conventional Commits obrigatorio. Cada commit deve ser auto-contido. `git status` + `git add <paths>` + `git commit` explicitos antes de cada commit (hook automatico de `git add` foi removido em 2026-05-06).
+- **Push e PR sao manuais** (regra do AGENT.md) — agente nao faz `git push` nem `gh pr create`.
+- Ao final de cada bloco logico (Task ou conjunto coerente), parar para teste local manual antes de commitar.
+- Spotless deve passar em cada PR (configurado na Sprint 0).
+- JaCoCo nao verifica target ainda nesta sprint (target 70% entra em Sprint 4); apenas gera relatorio.
+- Nenhum modulo de dominio (alem de `escrow` schema-only) e implementado nesta sprint — Sprint 2 traz `usuarios`.
 
 ## Referencias
 

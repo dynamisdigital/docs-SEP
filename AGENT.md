@@ -41,34 +41,60 @@ Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias.
 - Nos repos **`sep-api`**, **`sep-app`** e **`sep-mobile`** (codigo): o agente realiza apenas **commits** (com descricao) e **criacao de branches por sprint**. Push e PR continuam **manuais**, executados pelo desenvolvedor humano.
 - No repo **`docs-SEP`** (documentacao): **toda operacao git e manual**. O agente **nao** cria branches, **nao** comita, **nao** faz push, **nao** faz reset/rebase/merge. Quando precisar atualizar PRD, CONTEXT, ADRs, specs, steps ou este AGENT.md, o agente edita os arquivos no working tree e para por ai; o desenvolvedor humano revisa, organiza branches e comita manualmente. Esta regra existe porque `docs-SEP` e a fonte de verdade do projeto e o usuario quer controle integral sobre essa historia.
 
-**Modelo de branches em `sep-api`/`sep-app`/`sep-mobile` (simplificado em 2026-05-06)**:
+**Modelo de branches em `sep-api`/`sep-app`/`sep-mobile` (FIXADO em 2026-05-06, revisado mesmo dia)**:
 
-- `main` e a unica base remota; protegida (squash merge, branch protection, CODEOWNERS).
-- Branches de trabalho usam o prefixo `feature/<sprint-ou-tema>` e nascem direto de `main`.
-- A branch `develop` foi **eliminada** — historico de PRs marcados "Develop (#N)" antes de 2026-05-06 ficam por contexto, mas regra vigente eh `main` + `feature/*`.
+```
+feature/<sprint-ou-tema>   ──(squash)──>   develop
+                                              │
+                                              │  (futuro: develop → homologacao → main)
+                                              │
+                                              ▼
+                                        (merge commit)
+                                              │
+                                              ▼
+                                            main
+```
 
-**Fluxo padrao de branch (FIXADO em 2026-05-06)**:
+- **`main`** — protegida; recebe **apenas PRs de `develop`** (e futuramente `homologacao`); merge tipo **merge commit** (sem squash) para preservar historico de cada feature; tag de release opcional
+- **`develop`** — base de integracao; recebe PRs de `feature/*` via **squash merge** (1 commit por feature em develop); protegida contra delecao para sobreviver ao setting `delete_branch_on_merge=true`
+- **`homologacao`** (futura) — sera inserida entre `develop` e `main` quando o ambiente AWS de homologacao entrar em jogo (apos Sprint 4 / Epic 16 — `Infraestrutura AWS futura`). **Nao existe atualmente** — documentar como roadmap; criar quando o pipeline `aws-develop`/`homologacao` for ativado
+- **`feature/<sprint-ou-tema>`** — nasce de `develop` apos `pull --ff-only`; PR vai para `develop`; auto-deletada apos squash merge
+- **`feature/fix-<descricao>`** — para bugs em codigo ja integrado em `develop` ou `main`; nasce de `develop`; PR vai para `develop` (tratamento identico a feature normal)
+- **Sem prefixos `fix/*` ou `hotfix/*`** — Conventional Commit `fix(...)` ja diferencia o tipo
 
-1. `git checkout main`
+**Fluxo padrao de feature**:
+
+1. `git checkout develop`
 2. `git pull --ff-only` — se falhar (divergencia), abortar e avisar o usuario
-3. `git checkout -b feature/<nome-sprint>` (ou `feature/<descricao>` para features pontuais; `feature/fix-<descricao>` para bugfix em codigo ja mergeado)
-4. **1 commit por Task** durante a execucao (Conventional Commits obrigatorio)
+3. `git checkout -b feature/<nome-sprint>` (ou `feature/fix-<descricao>` para bugfix) — **1 branch unica para toda a sprint**
+4. Commits durante a execucao com **numero flexivel** (Conventional Commits obrigatorio) — agente decide granularidade pelo escopo logico (Task, Step, modulo, refactor)
 5. **Push e PR manuais** — agente NAO faz `git push`, NAO abre PR via `gh pr create`
-6. Apos squash merge em `main`:
-   - branch remota deletada automaticamente (setting `delete_branch_on_merge=true` ativo nos 3 repos)
-   - usuario faz `git checkout main && git pull --ff-only` localmente
+6. PR sempre tem destino `develop` (NUNCA `main` direto)
+7. Apos squash merge em `develop`:
+   - branch remota deletada automaticamente (setting `delete_branch_on_merge=true`)
+   - usuario faz `git checkout develop && git pull --ff-only` localmente
    - branch local pode permanecer como historico ate user apagar manualmente
+
+**Integracao `develop → main` (release)**:
+
+- Quando o conjunto de features em `develop` esta pronto para liberar:
+  - usuario abre PR `develop → main` manualmente
+  - merge tipo **merge commit** (sem squash) para preservar historico individual de cada feature (evita ruido de "Develop (#N)" como commit unico)
+  - `develop` continua viva apos o merge — protegida contra delecao
+- Quando `homologacao` existir: cadeia vira `develop → homologacao → main`. Cada salto eh PR + merge commit. Validacao funcional roda em `homologacao` antes de chegar em `main`
 
 **Bugs em codigo**:
 
-- **Sprint em andamento (branch ainda nao mergeada)**: continuar comitando na propria branch da sprint com Conventional Commit `fix(...)`.
-- **Codigo ja entregue (PR mergeado)**: criar nova branch `feature/fix-<descricao-curta>` a partir de `main` fresca. Nao tentar ressuscitar branch ja deletada no remoto. Conventional Commit `fix(...)` continua diferenciando o tipo no historico.
-- Sem prefixos `fix/*` ou `hotfix/*` — Conventional Commit ja diferencia.
+- **Sprint em andamento (branch nao mergeada)**: continuar comitando na propria branch da sprint com Conventional Commit `fix(...)`
+- **Codigo ja em `develop` ou `main`**: criar nova branch `feature/fix-<descricao>` a partir de `develop` fresca; PR vai para `develop` como qualquer feature
+- **Hotfix urgente em `main` (codigo em producao quebrado)**: excecao rara — abrir branch `feature/fix-<x>` a partir de `main`, PR direto pra `main` com aprovacao explicita do usuario; depois propagar pra `develop` via merge `main → develop`. Nao automatizar; sempre confirmar com usuario antes
 
 **Commits durante execucao**:
 
-- 1 commit por **Task** (nao por Step nem por arquivo).
-- Antes do commit: `git status` + `git ls-files --others --exclude-standard <paths-da-task>` para garantir que nada novo ficou untracked.
+- **1 branch por sprint** (`feature/<nome-sprint>`); toda a sprint vive nessa unica branch.
+- **Numero de commits flexivel** — quantos forem necessarios pra agrupar mudancas coerentes. Agente decide pelo escopo logico (Task, Step, modulo, refactor), nao por contagem fixa.
+- Heuristica: cada commit deve ser auto-contido e o subject explicar o que mudou. Evitar mega-commit "fim da sprint" (perde rastreabilidade) e tambem commits triviais por arquivo (poluem historico).
+- Antes do commit: `git status` + `git ls-files --others --exclude-standard <paths>` para garantir que nada novo ficou untracked.
 - `git add <paths-especificos>` (NAO `git add -A` — evita pegar `.claude/`, `.env`, etc.).
 - Mensagem: `<tipo>(<modulo>): <descricao>` — `feat`, `fix`, `ci`, `chore`, `test`, `docs`, `refactor`.
 - Hook automatico de `git add` apos Write/Edit foi removido em 2026-05-06; agente faz `git add` explicito.

@@ -1254,13 +1254,14 @@ Sem nova migration. V1 (Sprint 1.4) ja proveu o schema da tabela `usuario`.
 
 ## Restricoes e regras de execucao
 
-- Commits podem ser feitos pelo agente quando solicitado; push e PR ficam manuais (regra do AGENT.md)
-- Branch `feature/sprint-2-gestao-usuarios` nasce de `develop` sincronizada (`git checkout develop && git pull --ff-only && git checkout -b ...`)
-- Bugs introduzidos durante a execucao ficam na propria branch da sprint, sem `fix/*` separada
-- Ao final de cada task, parar para teste local manual antes de commitar
-- TDD distribuido: cada task entrega seus testes junto com o codigo
-- Spotless deve passar em cada PR (configurado na Sprint 0); rodar `./gradlew spotlessApply` antes do commit final
-- JaCoCo nao verifica target ainda nesta sprint (gate 70% liga em Sprint 4); apenas gera relatorio
+- **Modelo de branches** (ver `AGENT.md`): 1 branch por sprint = `feature/sprint-2-gestao-usuarios`, nascida de `develop` apos `git pull --ff-only`. Toda a sprint vive nessa branch unica. PR vai para `develop` (nunca direto para `main`); merge tipo squash.
+- **Commits**: numero flexivel — agente decide pelo escopo logico (Task, Step, modulo, refactor). Conventional Commits obrigatorio. Cada commit deve ser auto-contido. `git status` + `git add <paths>` + `git commit` explicitos antes de cada commit (hook automatico de `git add` foi removido em 2026-05-06).
+- **Push e PR sao manuais** (regra do AGENT.md) — agente nao faz `git push` nem `gh pr create`.
+- **Bugs durante a execucao**: ficam na propria branch da sprint, com Conventional Commit `fix(...)`. Sem prefixos `fix/*` ou `hotfix/*`.
+- Ao final de cada bloco logico (Task ou conjunto coerente), parar para teste local manual antes de commitar.
+- TDD distribuido: cada task entrega seus testes junto com o codigo.
+- Spotless deve passar em cada PR (configurado na Sprint 0); rodar `./gradlew spotlessApply` antes do commit final.
+- JaCoCo nao verifica target ainda nesta sprint (gate 70% liga em Sprint 4); apenas gera relatorio.
 
 ## Referencias
 

@@ -1035,7 +1035,9 @@ A F-Sprint 1 (`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`) consome:
 ## Restricoes e regras de execucao
 
 - F-Sprint 0 pode comecar **imediatamente**, em paralelo com Sprint 0 backend; nao depende de backend ainda
-- Commits podem ser feitos pelo agente; push e PR sao manuais (AGENT.md)
+- **Modelo de branches** (ver `AGENT.md`): 1 branch por F-Sprint, nascida de `develop` apos `git pull --ff-only`. Toda a sprint vive nessa branch unica. PR vai para `develop` (nunca direto para `main`); merge tipo squash.
+- **Commits**: numero flexivel — agente decide pelo escopo logico (Task, Step, modulo, refactor). Conventional Commits obrigatorio. `git status` + `git add <paths>` + `git commit` explicitos (hook automatico de `git add` foi removido em 2026-05-06).
+- **Push e PR sao manuais** (regra do AGENT.md) — agente nao faz `git push` nem `gh pr create`.
 - Code review cruzado entre Devs Plenos Frontend; Dev Senior revisa mudancas que afetam contrato com backend (configuracao de CORS, mocks MSW)
 - O repo `sep-app` gerencia pre-commit independentemente do `sep-api` e `sep-mobile`; Husky padrao instala em `.husky/` automaticamente (Step 100.2.7)
 - Versoes pinadas no `package.json` devem respeitar a stack do PRD: Angular `^20`, ESLint `^9`, Prettier `^3`, Stylelint `^16`, Husky `^9`, lint-staged `^15`, Vitest `^2`, Playwright `^1`, MSW `^2`
