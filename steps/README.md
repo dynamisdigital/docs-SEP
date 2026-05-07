@@ -64,7 +64,7 @@ Regras vivem em [`AGENT.md`](../AGENT.md). Resumo:
 |--------|---------|--------|
 | F-Sprint 0 - Setup Angular | [`web/100-fsprint-0-steps.md`](./web/100-fsprint-0-steps.md) | Concluida (2026-05-04) |
 | F-Sprint 1 - Tokens + Showcase | [`web/101-fsprint-1-steps.md`](./web/101-fsprint-1-steps.md) | Pronto para executar |
-| F-Sprint 2 - Telas Apple | `web/102-fsprint-2-steps.md` | A criar antes da F-Sprint 2 |
+| F-Sprint 2 - Telas Apple | [`web/102-fsprint-2-steps.md`](./web/102-fsprint-2-steps.md) | Pronto para executar |
 | F-Sprint 3 - Shell Notion + Auth | `web/103-fsprint-3-steps.md` | A criar antes da F-Sprint 3 |
 | F-Sprint 4 - Telas Autenticadas | `web/104-fsprint-4-steps.md` | A criar antes da F-Sprint 4 |
 
