@@ -137,11 +137,11 @@ npm run build
 - Warning de budget herdado pode ser registrado, mas erro bloqueia a sprint.
 
 ### Definicao de pronto da Task F-4.0
-- [ ] F-Sprint 3 confirmada no frontend
-- [ ] Tokens Notion existem
-- [ ] Backend real responde localmente
-- [ ] Login real pode ser testado com usuario local
-- [ ] Baseline de lint/test/build passa
+- [x] F-Sprint 3 confirmada no frontend
+- [x] Tokens Notion existem
+- [x] Backend real responde localmente
+- [x] Login real pode ser testado com usuario local
+- [x] Baseline de lint/test/build passa
 
 ---
 
@@ -231,10 +231,10 @@ npm run test -- --run src/app/core/users/usuarios.service.spec.ts
 ```
 
 ### Definicao de pronto da Task F-4.1
-- [ ] `UsuarioSenhaUpdateRequest` existe
-- [ ] `UsuariosService` centraliza endpoints de usuarios
-- [ ] `AuthService` continua responsavel apenas por login/register/me/sessao
-- [ ] Testes do servico passam
+- [x] `UsuarioSenhaUpdateRequest` existe
+- [x] `UsuariosService` centraliza endpoints de usuarios
+- [x] `AuthService` continua responsavel apenas por login/register/me/sessao
+- [x] Testes do servico passam
 
 ---
 
@@ -348,10 +348,10 @@ npm run test -- --run src/app/layout/sidenav/sidenav.component.spec.ts
 ```
 
 ### Definicao de pronto da Task F-4.2
-- [ ] Rotas autenticadas da F-Sprint 4 existem
-- [ ] Rotas admin usam `roleGuard`
-- [ ] Menu lateral aponta para telas reais
-- [ ] Testes do menu passam
+- [x] Rotas autenticadas da F-Sprint 4 existem
+- [x] Rotas admin usam `roleGuard`
+- [x] Menu lateral aponta para telas reais
+- [x] Testes do menu passam
 
 ---
 
@@ -439,11 +439,11 @@ npm run test -- --run src/app/features/authenticated/profile/profile.component.s
 ```
 
 ### Definicao de pronto da Task F-4.3
-- [ ] `/app/profile` renderiza dados do usuario autenticado
-- [ ] Link para alterar senha funciona
-- [ ] Estados basicos existem
-- [ ] Visual segue Notion
-- [ ] Testes passam
+- [x] `/app/profile` renderiza dados do usuario autenticado
+- [x] Link para alterar senha funciona
+- [x] Estados basicos existem
+- [x] Visual segue Notion
+- [x] Testes passam
 
 ---
 
@@ -545,11 +545,11 @@ npm run test -- --run src/app/features/authenticated/profile/change-password/cha
 ```
 
 ### Definicao de pronto da Task F-4.4
-- [ ] `/app/profile/change-password` funciona para usuario autenticado
-- [ ] Validacoes locais estao implementadas
-- [ ] Sucesso nao encerra sessao
-- [ ] Erros de API aparecem na tela
-- [ ] Testes passam
+- [x] `/app/profile/change-password` funciona para usuario autenticado
+- [x] Validacoes locais estao implementadas
+- [x] Sucesso nao encerra sessao
+- [x] Erros de API aparecem na tela
+- [x] Testes passam
 
 ---
 
@@ -690,12 +690,12 @@ npm run start
 - Se o guard ja cobre, nao duplicar teste em componentes.
 
 ### Definicao de pronto da Task F-4.5
-- [ ] `/app/admin/users` lista usuarios para ADMIN
-- [ ] `/app/admin/users/:id` mostra detalhe para ADMIN
-- [ ] CLIENTE nao acessa rotas admin
-- [ ] Estados loading/vazio/erro existem
-- [ ] Filtro local por e-mail existe
-- [ ] Testes passam
+- [x] `/app/admin/users` lista usuarios para ADMIN
+- [x] `/app/admin/users/:id` mostra detalhe para ADMIN
+- [x] CLIENTE nao acessa rotas admin
+- [x] Estados loading/vazio/erro existem
+- [x] Filtro local por e-mail existe
+- [x] Testes passam
 
 ---
 
@@ -773,12 +773,12 @@ npm run test -- --run src/app/features/authenticated/dashboard/dashboard.compone
 ```
 
 ### Definicao de pronto da Task F-4.6
-- [ ] `/app/dashboard` e navegavel e util como casca
-- [ ] Atalhos reais existem
-- [ ] ADMIN ve administracao
-- [ ] CLIENTE nao ve administracao
-- [ ] Cards futuros nao criam rotas quebradas
-- [ ] Testes passam
+- [x] `/app/dashboard` e navegavel e util como casca
+- [x] Atalhos reais existem
+- [x] ADMIN ve administracao
+- [x] CLIENTE nao ve administracao
+- [x] Cards futuros nao criam rotas quebradas
+- [x] Testes passam
 
 ---
 
@@ -892,11 +892,11 @@ npm run e2e
 ```
 
 ### Definicao de pronto da Task F-4.7
-- [ ] Golden path CLIENTE passa contra backend real
-- [ ] Fluxo ADMIN passa contra backend real
-- [ ] CLIENTE nao acessa administracao
-- [ ] Dados de teste sao unicos por execucao
-- [ ] Playwright gera screenshot/trace em falha
+- [x] Golden path CLIENTE passa contra backend real
+- [x] Fluxo ADMIN passa contra backend real
+- [x] CLIENTE nao acessa administracao
+- [x] Dados de teste sao unicos por execucao
+- [x] Playwright gera screenshot/trace em falha
 
 ---
 
@@ -949,15 +949,15 @@ npm run start
 ```
 
 **Checklist manual**:
-- [ ] `/` abre landing Apple.
-- [ ] `/login` autentica usuario real.
-- [ ] `/app/dashboard` usa visual Notion.
-- [ ] `/app/profile` mostra dados do usuario.
-- [ ] `/app/profile/change-password` altera senha.
-- [ ] `/app/admin/users` lista usuarios para ADMIN.
-- [ ] `/app/admin/users/:id` mostra detalhe para ADMIN.
-- [ ] CLIENTE em `/app/admin/users` cai em `/access-denied`.
-- [ ] Logout volta para `/login`.
+- [x] `/` abre landing Apple.
+- [x] `/login` autentica usuario real.
+- [x] `/app/dashboard` usa visual Notion.
+- [x] `/app/profile` mostra dados do usuario.
+- [x] `/app/profile/change-password` altera senha.
+- [x] `/app/admin/users` lista usuarios para ADMIN.
+- [x] `/app/admin/users/:id` mostra detalhe para ADMIN.
+- [x] CLIENTE em `/app/admin/users` cai em `/access-denied`.
+- [x] Logout volta para `/login`.
 
 ### Step 104.8.4 - Conferir arquivos novos e untracked
 
@@ -988,28 +988,28 @@ test(web): adicionar smoke e2e autenticado
 - Push e PR sao manuais.
 
 ### Definicao de pronto da Task F-4.8
-- [ ] Lint passa
-- [ ] Stylelint passa
-- [ ] Vitest passa
-- [ ] Build passa
-- [ ] Playwright passa contra backend real
-- [ ] DoD da F-Sprint 4 atendido
-- [ ] Resumo de PR pode ser gerado
+- [x] Lint passa
+- [x] Stylelint passa
+- [x] Vitest passa
+- [x] Build passa
+- [x] Playwright passa contra backend real
+- [x] DoD da F-Sprint 4 atendido
+- [x] Resumo de PR pode ser gerado
 
 ---
 
 ## Definicao de pronto da F-Sprint 4
 
-- [ ] Tela "Meu Perfil" consumindo `/auth/me`
-- [ ] Tela "Alterar Senha" funcional contra backend real
-- [ ] Administracao de Usuarios restrita a `ADMIN`
-- [ ] Detalhe de Usuario restrito a `ADMIN`
-- [ ] Dashboard autenticada com atalhos reais e placeholders corretos
-- [ ] Role guard barra `CLIENTE` em rotas admin
-- [ ] Smoke E2E Playwright passa contra backend local real
-- [ ] CI pode rodar lint, stylelint, unit tests, build e E2E
-- [ ] Visual autenticado segue Notion, sem Apple tokens e sem frameworks CSS
-- [ ] Frontend MVP demonstravel para stakeholders
+- [x] Tela "Meu Perfil" consumindo `/auth/me`
+- [x] Tela "Alterar Senha" funcional contra backend real
+- [x] Administracao de Usuarios restrita a `ADMIN`
+- [x] Detalhe de Usuario restrito a `ADMIN`
+- [x] Dashboard autenticada com atalhos reais e placeholders corretos
+- [x] Role guard barra `CLIENTE` em rotas admin
+- [x] Smoke E2E Playwright passa contra backend local real
+- [x] CI pode rodar lint, stylelint, unit tests, build e E2E
+- [x] Visual autenticado segue Notion, sem Apple tokens e sem frameworks CSS
+- [x] Frontend MVP demonstravel para stakeholders
 
 ## Riscos e decisoes registradas
 
