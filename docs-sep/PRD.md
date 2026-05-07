@@ -1570,13 +1570,14 @@ Esta fase sera considerada bem-sucedida quando:
 - sustentar seguranca e segregacao de responsabilidades conforme o produto crescer
 
 ### Epic 12 - Fundacao Frontend
-- montar projeto Angular `20.x` com Standalone Components, Signals e SCSS puro
-- traduzir os tokens dos dois design systems oficiais ([`DESIGN-apple.md`](./DESIGN-apple.md) e [`DESIGN-notion.md`](./DESIGN-notion.md)) para variaveis SCSS reutilizaveis
-- implementar telas publicas seguindo Apple: landing, login e cadastro
-- implementar shell autenticado seguindo Notion: header, menu lateral, breadcrumbs e area de conteudo
-- implementar biblioteca interna de componentes Notion: botoes, inputs, formularios, cards, tabelas, modais, toasts e loaders
-- implementar telas autenticadas iniciais consumindo apenas APIs das Sprints 1-4: meu perfil, alterar senha, administracao de usuarios, detalhe de usuario e dashboard administrativa inicial (casca)
-- implementar guards de rota, controle de sessao, integracao HTTP com a API e tratamento padronizado de erros 401, 403, 404 e 409
+**Status: F-Sprints 0-3 concluidas (2026-05-04 a 2026-05-07); F-Sprint 4 (telas autenticadas) pendente.**
+- ✅ F-Sprint 0: scaffold Angular `20.x` Standalone + Signals + SCSS puro + tooling (ESLint, Prettier, Stylelint, Husky, Vitest, Playwright, MSW, CI)
+- ✅ F-Sprint 1: tokens SCSS Apple e Notion fieis aos design systems oficiais ([`DESIGN-apple.md`](./DESIGN-apple.md) e [`DESIGN-notion.md`](./DESIGN-notion.md)) em variaveis SCSS reutilizaveis + showcase navegavel em `/design-system`
+- ✅ F-Sprint 2: telas publicas Apple (landing institucional `/`, login `/login`, register publico `/register`) + AuthService Signals + handlers MSW alinhados ao PRD §21
+- ✅ F-Sprint 3: integracao auth real (environment + interceptors + guards funcionais) + shell autenticado Notion (`/app`) com header, sidenav (filtrado por role), breadcrumbs e dashboard placeholder; MSW disponivel via build configuracao `dev-offline`; pagina `/access-denied` para 403
+- ⏳ F-Sprint 4: telas autenticadas concretas (meu perfil, alterar senha, administracao de usuarios, detalhe de usuario, dashboard administrativa) consumindo apenas APIs das Sprints 1-4
+- biblioteca interna de componentes Notion (botoes, inputs, formularios, cards, tabelas, modais, toasts, loaders) cresce conforme demanda nas F-Sprints 4+
+- guards de rota, controle de sessao, integracao HTTP com a API e tratamento padronizado de erros 401/403/404/409 ja entregues na F-Sprint 3
 - entregar o "Frontend MVP" navegavel, validado e independente de qualquer jornada de negocio
 - escopo: tudo que depende apenas das APIs entregues nas Sprints 1-4 (auth, usuarios e admin de usuarios)
 

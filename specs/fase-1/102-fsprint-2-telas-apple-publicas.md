@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 102
 - **Titulo**: F-Sprint 2 - Landing, Login e Register seguindo Apple, com MSW mockando contratos
-- **Status**: aprovada para execucao (apos conclusao da F-Sprint 1)
+- **Status**: **Concluida em 2026-05-07** (branch `feature/fsprint-2-telas-apple-publicas` no `sep-app`, mergeada via PR #13 em develop, commit `bd2111e`)
 - **Fase do produto**: Epic 12 - Fundacao Frontend
 - **Trilha**: Frontend (paralela a Sprint 2 backend)
 - **Origem**: PRD - API SEP, Secao 22 (Trilha paralela Frontend) + Plano de melhorias R7

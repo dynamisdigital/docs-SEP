@@ -598,14 +598,71 @@ No estado atual:
 
 - **Regra de commits revisada (2026-05-06)** — substitui "1 commit por Task" pela regra mais flexivel **"1 branch por sprint, com numero de commits que for necessario"**. Branch continua sendo `feature/<nome-sprint>`. Granularidade de commits passa a ser decisao do agente baseada no escopo logico (Task, Step, modulo, refactor) — nao por contagem fixa. Heuristica: cada commit auto-contido com subject explicando o que mudou; evitar mega-commit de fim-de-sprint e tambem commits triviais por arquivo. Conventional Commits e ordem `git status` → `git add <paths>` → `git commit` continuam obrigatorios. Atualizado em `AGENT.md` e `feedback_git_workflow.md`.
 
+- **F-Sprint 1 (Tokens SCSS Apple/Notion + Showcase) concluida em 2026-05-06** no repo `sep-app`, branch `feature/fsprint-1-tokens-showcase` (originada de `develop` apos `pull --ff-only`). Mergeada em `develop` via PR `#11`/`#12` e em `main` via PR `#14` (commit `5c14f40`). Entregaveis materializados:
+  - `src/styles/_apple-tokens.scss` (60 linhas) — cores, raios, espacamento, sombra `--apple-shadow-product` (unica do sistema)
+  - `src/styles/_apple-typography.scss` (120 linhas) — 16 mixins SF Pro com fallback Inter; ladder 300/400/600/700 (peso 500 ausente); tracking negativo nos display sizes
+  - `src/styles/_apple-components.scss` (271 linhas) — 16 mixins de botoes pill (primary/secondary/dark/pearl/store-hero/icon-circular), links, nav (global+sub-frosted), tiles (light/parchment/dark), cards (utility/configurator chip), search input, footer
+  - `src/styles/_notion-tokens.scss` (78 linhas) — warm neutrals (`#f6f5f4`/`#31302e`/`#615d59`/`#a39e98`), Notion Blue accent, multi-layer shadows (`card` 4 camadas, `deep` 5 camadas com opacidade <= 5%), border whisper (`1px solid rgb(0 0 0 / 10%)`), raios 4-9999px
+  - `src/styles/_notion-typography.scss` (153 linhas) — 16 mixins NotionInter; compressao em escala (-2.125px @ 64px → -0.625px @ 26px → normal @ 16px); 4 pesos (400/500/600/700)
+  - `src/styles/_notion-components.scss` (217 linhas) — 12 mixins de botoes (primary/secondary/ghost), pill-badge, cards (card/feature/metric), input, nav-link, secoes (warm/whisper-divider), focus-ring
+  - rota lazy `/design-system` (+ subrotas `/apple` e `/notion`) com `ShowcaseComponent` standalone signal-based filtrando paleta + tipografia + botoes + inputs + cards/tiles para os 2 DS lado a lado
+  - `angular.json` budget `anyComponentStyle` aumentado de 4kB→16kB warn / 8kB→24kB error (justificado pelo showcase ser dev-only consumindo mixins dos 2 DS; warning de 851 bytes acima de warn fica registrado mas sob limite error)
+  - placeholders F-Sprint 0 removidos: `_apple.scss`, `_notion.scss`, `_tokens.scss`, `_mixins.scss`
+  - 3 commits atomicos: `16917d0` (Apple), `98df22b` (Notion), `91d71eb` (showcase + budget)
+  - 3 testes Vitest (1 ShowcaseComponent + 2 routes export)
+
+- **F-Sprint 2 (Telas Apple publicas + MSW) concluida em 2026-05-07** no repo `sep-app`, branch `feature/fsprint-2-telas-apple-publicas` (originada de `develop`). Mergeada em `develop` via PR `#13` (commit `bd2111e`). Entregaveis materializados:
+  - `src/app/app.html` reescrito para `<router-outlet />` apenas (placeholder Angular removido)
+  - `src/app/app.routes.ts`: rotas raiz `''` (lazy `PUBLIC_ROUTES`), `'design-system'` (preservada), `'**'` (redirect)
+  - `src/app/app.config.ts`: `provideHttpClient(withInterceptorsFromDi())` (substituido na F-Sprint 3)
+  - `src/app/features/public/public.routes.ts`: 3 rotas lazy (landing, login, register)
+  - `src/app/core/api/api.models.ts`: tipos PRD §21 (`UsuarioRole`, `UsuarioResponse`, `LoginRequest`, `TokenResponse`, `UsuarioCreateRequest`, `ApiErrorResponse`)
+  - `src/app/core/auth/auth.service.ts`: signal `currentUserState`, computed `isAuthenticated`, metodos `login`/`register`/`me`/`logout`/`getAccessToken`; `localStorage` para token (revisitado na F-Sprint 3)
+  - `src/mocks/handlers.ts`: `POST /auth/login` (200 OK ou 401 Unauthorized), `POST /usuarios` (201 ou 409 Conflict para `duplicado@empresa.com`), `GET /auth/me` (200 admin)
+  - `src/test-setup.ts`: importa `test-polyfills`, plugar `server.listen({ onUnhandledRequest: 'error' })` em `beforeAll`, `resetHandlers()` em `afterEach`, `close()` em `afterAll`
+  - `src/app/features/public/landing/`: tiles full-bleed alternados (parchment/dark/light/dark-2) + CTAs pill blue + footer parchment + 3 SVG placeholders em `src/assets/landing/` (`sep-capital`, `sep-escrow`, `sep-credito`)
+  - `angular.json`: assets passa a copiar `src/assets` para `/assets`
+  - `src/app/features/public/login/`: form reativo (email + senha 6 chars), redirect provisorio `/design-system/notion` (substituido pra `/app/dashboard` na F-Sprint 3), erro de credenciais
+  - `src/app/features/public/register/`: form reativo (email + senha 6 + role CLIENTE/ADMIN), redirect `/login` em sucesso, erro 409 para duplicado
+  - 6 commits atomicos (rotas, AuthService, MSW, landing, login, register)
+  - 17 testes Vitest novos (3 landing + 5 login + 5 register + 4 AuthService)
+  - Pattern de testes assincronos: `result.fixture.whenStable() + flush(5)` em vez de `waitFor` (happy-dom MutationObserver incompleto)
+
+- **F-Sprint 3 (Shell Notion + Auth real + Guards) concluida em 2026-05-07** no repo `sep-app`, branch `feature/fsprint-3-shell-notion-auth` (originada de `develop` apos `pull --ff-only`). Suite local verde: lint + lint:scss + 45 tests + build production + build dev-offline. Push/PR manual a cargo do dev. Entregaveis materializados:
+  - `src/environments/environment.ts` (apiBaseUrl + useMsw=false) e `environment.dev-offline.ts` (useMsw=true)
+  - `angular.json`: configuracoes `dev-offline` em build e serve com `fileReplacements` apontando para `environment.dev-offline.ts`
+  - `src/main.ts`: gating MSW por `environment.useMsw OR localStorage.NG_APP_USE_MSW='true'` (override em dev sem mudar build)
+  - `auth.service.ts` evoluido: `API_BASE_URL` lido de `environment.apiBaseUrl` (sem hardcode); novos signals `loadingUserState` + `loadingUser` (readonly); `hasToken` (computed) e `isAuthenticated` agora exige token + currentUser; `loadCurrentUser()` chama `/auth/me` e popula state com `finalize` para resetar loading; `clearSession()` centraliza limpeza; `logout()` delega para `clearSession()`
+  - `auth.service.spec.ts` reescrito: 6 cenarios (login OK + 401, loadCurrentUser, register, clearSession, logout)
+  - `core/interceptors/auth.interceptor.ts`: anexa `Authorization: Bearer <token>` em rotas protegidas; pula `/auth/login`
+  - `core/interceptors/error.interceptor.ts`: 401 fora de `/auth/login` chama `clearSession()` + redireciona `/login`; 403 redireciona `/access-denied`
+  - `core/guards/auth.guard.ts`: sem token → UrlTree `/login`; com token + currentUser → permite; com token sem user → chama `loadCurrentUser()` e permite (ou clearSession + `/login` se falhar)
+  - `core/guards/role.guard.ts`: le `route.data.roles`; sem roles → permite; user com role exigida → permite; senao → UrlTree `/access-denied`
+  - `app.config.ts`: `withInterceptors([authInterceptor, errorInterceptor])` substitui `withInterceptorsFromDi()`
+  - `app.routes.ts`: novas rotas `/app` (lazy `AUTHENTICATED_ROUTES`) e `/access-denied` (lazy AccessDeniedComponent)
+  - `features/authenticated/authenticated.routes.ts`: shell em `''` com `authGuard`, children `dashboard` (todos autenticados) e `admin` (com `roleGuard` + `data: { roles: ['ADMIN'] }`); `data.breadcrumb` por rota
+  - `layout/shell/`: `ShellComponent` standalone com signal `sidenavCollapsed`; html em duas colunas (header + body{sidenav, main{breadcrumbs, content}})
+  - `layout/header/`: `HeaderComponent` mostra brand SEP + currentUser + role badge + botao Sair (logout + redirect `/login`); `@Output toggleSidenav`
+  - `layout/sidenav/`: `SidenavComponent` filtra items por role (Dashboard universal, Administracao apenas `ADMIN`, Meu perfil disabled placeholder); `@Input collapsed`; visual Notion warm-white + whisper border
+  - `layout/breadcrumbs/`: `BreadcrumbsComponent` reage a `NavigationEnd` via `toSignal` e monta trail a partir de `route.data.breadcrumb`; `Inicio` + nivel atual
+  - `features/authenticated/dashboard/`: `DashboardComponent` placeholder com saudacao + role badge + 3 cards Notion (Perfil, Administracao, Proximas jornadas); nao chama endpoints alem de `/auth/me` (via guard)
+  - `features/error/access-denied.component.ts`: pagina 403 inline template com badge + heading + body + link `/app/dashboard`; warm-white background
+  - `login.component.ts` redirect atualizado: `/design-system/notion` → `/app/dashboard`; spec atualizado
+  - 4 commits atomicos: `cdab564` (env+AuthService), `1dde213` (interceptors+guards), `cd3a566` (shell+dashboard+access-denied), `75a8dcd` (login redirect)
+  - 25 testes novos (3 auth interceptor + 3 error interceptor + 3 auth guard + 4 role guard + 3 header + 2 sidenav + 1 shell + 1 breadcrumbs + 2 dashboard + 1 access-denied + 2 auth service novos cenarios)
+  - **Visual 100% Notion** dentro de `/app`: warm whites, whisper borders, raio micro 4px nos botoes funcionais, sem Apple tokens
+  - **Compatibilidade dev-offline**: `npx ng build --configuration dev-offline` substitui `environment.ts` por versao com `useMsw=true`; MSW interceptam chamadas no browser sem precisar de backend rodando
+
+- **Hooks PostToolUse `git add` removidos definitivamente em 2026-05-06** dos 3 `.claude/settings.json` de codigo (`sep-api`, `sep-app`, `sep-mobile`). `.claude/` esta no `.gitignore` dos 3 repos via PR #16/#17. Memoria do agente reforcada: `chown -R mauricio:mauricio .git .claude` deve ser SEMPRE a ULTIMA operacao da sequencia (memoria `feedback_chown_pos_git.md` atualizada com reincidencia diagnosticada na F-Sprint 1).
+
 ## Proximo passo mais natural
 
-Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1, 2, 3 e 4 backend + M-Sprint 1 mobile (2026-05-05/2026-05-06) concluidas, e fluxo GitHub revisado (2026-05-06: feature → develop → main), os proximos passos provaveis sao:
+Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1, 2, 3 e 4 backend + M-Sprint 1 mobile (2026-05-05/06) + **F-Sprints 1, 2 e 3 web (2026-05-06/07)** concluidas, e fluxo GitHub revisado (2026-05-06: feature → develop → main), os proximos passos provaveis sao:
 - **Configurar branch protection no GitHub**: nos 3 repos (`sep-api`, `sep-app`, `sep-mobile`) — proteger `develop` contra delecao (`allow_deletions=false`), exigir PR + status checks; em `main` desabilitar squash merge e habilitar merge commit (preserva historico das features); definir `develop` como default branch (PRs apontam pra develop por padrao). Comandos `gh api` listados em conversa do agente; usuario executa apos `gh auth login`
-- usuario abrir o PR da branch `feature/msprint-1-tokens-notion` no `sep-mobile` (push e PR sao manuais por design); destino `develop`; apos squash merge, branch remota apaga sozinha e branch local permanece como historico ate decisao manual
-- iniciar F-Sprint 2 (telas Apple publicas) consumindo contratos reais de `POST /api/v1/usuarios` (MSW so para erros): spec [`specs/fase-1/102-fsprint-2-telas-apple-publicas.md`](../specs/fase-1/102-fsprint-2-telas-apple-publicas.md), steps a criar
+- usuario abrir o PR da branch `feature/fsprint-3-shell-notion-auth` no `sep-app` (push e PR manuais por design); destino `develop`; apos merge, branch remota apaga e local permanece como historico
+- usuario abrir o PR da branch `feature/msprint-1-tokens-notion` no `sep-mobile`; destino `develop`
+- iniciar F-Sprint 4 (telas autenticadas web — perfil, alterar senha, admin de usuarios, dashboard) usando shell Notion + AuthService + guards/interceptors da F-Sprint 3: spec [`specs/fase-1/104-fsprint-4-telas-autenticadas.md`](../specs/fase-1/104-fsprint-4-telas-autenticadas.md), steps a criar
 - iniciar M-Sprint 2 (telas publicas mobile) consumindo os tokens/mixins/CSS vars Notion ja entregues pela M-Sprint 1: spec [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../specs/fase-1/202-msprint-2-telas-publicas-mobile.md), steps a criar
-- iniciar F-Sprint 3 (shell Notion + auth web) consumindo `POST /auth/login` + `GET /auth/me` ja entregues: spec [`specs/fase-1/103-fsprint-3-shell-notion-auth.md`](../specs/fase-1/103-fsprint-3-shell-notion-auth.md), steps a criar
 - iniciar M-Sprint 3 (shell + auth mobile) com Capacitor Preferences guardando token: spec [`specs/fase-1/203-msprint-3-shell-mobile-auth.md`](../specs/fase-1/203-msprint-3-shell-mobile-auth.md), steps a criar
 - com Sprint 4 mergeada, gate minimo da fase AWS (Sprint 3 / Epic 3) ja esta vencido; usuario pode optar por iniciar trilha AWS em paralelo as F-Sprints/M-Sprints, dado que erros, OpenAPI e cobertura ja estao estabilizados (ver PRD §12 "gate recomendado: iniciar apos Sprint 4")
 - planejamento da Fase 2 (Sprints 5-14) ja existe em specs/fase-2 e pode comecar pela Sprint 5 (Endurecimento de Seguranca / gate Fase 2) assim que as F-Sprints/M-Sprints 2-4 estabilizem o consumo dos contratos atuais

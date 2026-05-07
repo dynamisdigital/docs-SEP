@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 103
 - **Titulo**: F-Sprint 3 - Substituir MSW por API real + Shell autenticado Notion + Guards funcionais
-- **Status**: aprovada para execucao (apos conclusao da F-Sprint 2 e Sprint 3 backend)
+- **Status**: **Concluida em 2026-05-07** (branch `feature/fsprint-3-shell-notion-auth` no `sep-app`; suite local verde — lint/lint:scss/45 tests/build production/build dev-offline; push/PR manual a cargo do dev)
 - **Fase do produto**: Epic 12 - Fundacao Frontend
 - **Trilha**: Frontend (paralela a Sprint 3 backend)
 - **Origem**: PRD - API SEP, Secao 22 (Trilha paralela Frontend) + Plano de melhorias R7

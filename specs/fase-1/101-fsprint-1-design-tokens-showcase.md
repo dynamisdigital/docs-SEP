@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 101
 - **Titulo**: F-Sprint 1 - Tokens SCSS dos design systems Apple e Notion + Showcase navegavel
-- **Status**: aprovada para execucao (apos conclusao da F-Sprint 0)
+- **Status**: **Concluida em 2026-05-06** (branch `feature/fsprint-1-tokens-showcase` no `sep-app`, mergeada via PR #11/#12 em develop e #14 em main, commit `5c14f40`)
 - **Fase do produto**: Epic 12 - Fundacao Frontend
 - **Trilha**: Frontend (paralela a Sprint 1 backend)
 - **Origem**: PRD - API SEP, Secao 22 (Trilha paralela Frontend) + Plano de melhorias R7
