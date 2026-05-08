@@ -694,14 +694,53 @@ No estado atual:
 
 - **Hooks PostToolUse `git add` removidos definitivamente em 2026-05-06** dos 3 `.claude/settings.json` de codigo (`sep-api`, `sep-app`, `sep-mobile`). `.claude/` esta no `.gitignore` dos 3 repos via PR #16/#17. Memoria do agente reforcada: `chown -R mauricio:mauricio .git .claude` deve ser SEMPRE a ULTIMA operacao da sequencia (memoria `feedback_chown_pos_git.md` atualizada com reincidencia diagnosticada na F-Sprint 1).
 
+- **M-Sprint 3 (Auth Real + Shell Mobile + Guards) concluida em 2026-05-08** no repo `sep-mobile`, branch `feature/msprint-3-shell-mobile-auth` (originada de `develop` apos `pull --ff-only`). 7 commits locais; **push/PR manuais a cargo do dev** (regra mobile). Suite local verde: `lint`, `lint:scss`, **63/63 testes Vitest** (28 → 63: +35 novos), `build` production e `npx ng build --configuration dev-offline`. Entregaveis materializados:
+  - **Task M-3.1 — Environments + dev-offline**:
+    - `src/environments/environment.ts` e `environment.prod.ts` ganham `apiBaseUrl: 'http://localhost:8080/api/v1'` + `useMsw: false`; novo `environment.dev-offline.ts` com `useMsw: true`
+    - `angular.json` recebe configuracao `dev-offline` em `architect.build.configurations` (com `fileReplacements` apontando para `environment.dev-offline.ts`) e `architect.serve.configurations` (referenciando `app:build:dev-offline`)
+    - `src/main.ts` reescreve `prepare()` para gating MSW por `environment.useMsw OR localStorage.NG_APP_USE_MSW`; `provideHttpClient(withInterceptors([authInterceptor, errorInterceptor]))` substitui `withInterceptorsFromDi()`
+    - `AuthService.API_BASE_URL` lido de `environment.apiBaseUrl` (sem hardcode)
+  - **Task M-3.2 — AuthService + sessao**:
+    - novos signals/metodos: `loadingUser` (signal readonly), `hasToken()` async, `getAccessToken()` async, `clearSession()` centralizado; `loadCurrentUser()` deixa de enviar header manual de `Authorization` (interceptor cuida) e usa `clearSession` em falha; `logout()` delega para `clearSession`
+    - `auth.service.spec.ts` reescrito: 9 cenarios cobrindo login OK/invalido, register, clearSession, logout, hasToken e loadCurrentUser (sem token / com token / falha)
+  - **Task M-3.3 — Interceptors funcionais**:
+    - `core/interceptors/auth.interceptor.ts`: `from(getAccessToken()).pipe(switchMap(token → req.clone({setHeaders})))`. Pula `/auth/login` e endpoints terminados em `/usuarios` (cadastro publico)
+    - `core/interceptors/error.interceptor.ts`: `401` fora de `/auth/login` chama `clearSession` + `router.navigateByUrl('/session-expired')`; `403` redireciona para `/access-denied`; outros erros sao apenas re-thrown
+    - 8 testes Vitest novos (4 auth + 4 error)
+  - **Task M-3.4 — Functional Guards**:
+    - `core/guards/auth.guard.ts`: permite com user em memoria; sem token → UrlTree `/welcome`; com token sem user em memoria → `loadCurrentUser()` e permite (ou clearSession + UrlTree `/welcome` em falha)
+    - `core/guards/role.guard.ts`: le `route.data['roles']`; sem roles exigidas → permite; user com role exigida → permite; senao → UrlTree `/access-denied`. Roles em formato canonico `ADMIN`/`CLIENTE` (NAO `ROLE_ADMIN`)
+    - 9 testes Vitest novos (4 auth + 5 role) usando `runInInjectionContext` + `TestBed`
+  - **Task M-3.5 — Shell autenticado + tabs**:
+    - `features/authenticated/authenticated.routes.ts`: `AUTHENTICATED_ROUTES` com `ShellComponent` em `path:''` + `canActivate: [authGuard]` + children (`inicio` lazy `HomeComponent`, `propostas`/`parcelas`/`perfil` placeholder lazy, `admin` placeholder com `canActivate: [roleGuard]` e `data.roles=['ADMIN']`); redirect `'' → 'inicio'`
+    - `app.routes.ts` ganha `path: 'app'` (lazy `AUTHENTICATED_ROUTES`), `path: 'access-denied'` e `path: 'session-expired'`
+    - `layout/shell/shell.component.ts`: standalone com `<ion-tabs>` envolvendo `<ion-router-outlet />` + `<sep-tabs />` (slot bottom)
+    - `layout/header-mobile/header-mobile.component.ts`: standalone com signals `user`, `userEmail`, `userRole`; metodo `logout()` chama `auth.logout()` + `router.navigateByUrl('/welcome')`
+    - `layout/tabs/tabs.component.ts`: standalone com `<ion-tab-bar slot="bottom">` + `<ion-tab-button>` por tab; computed `tabs()` filtra `ALL_TABS` por role: `CLIENTE` ve Inicio/Propostas/Parcelas/Perfil; `ADMIN` ve Inicio/Perfil/Admin; sem user, lista vazia
+    - `features/authenticated/home/home.component.ts`: standalone com `RouterLink`; computed `shortcuts()` por role (`CLIENTE`: Meu perfil + Propostas + Parcelas; `ADMIN`: Meu perfil + Administracao); cards Notion mobile
+    - `features/authenticated/placeholder/placeholder.component.ts`: standalone com `toSignal(route.data)` lendo `data.title`; renderiza titulo + `Em preparacao`
+    - 17 testes Vitest novos (header 3, tabs 3, shell 1, home 3 + ajustes)
+  - **Task M-3.6 — Paginas 401/403 + redirects**:
+    - `features/error/access-denied.component.ts`: standalone com `<ion-content>`; `fallbackLink` computed (`/app/inicio` se autenticado, `/welcome` caso contrario); 3 testes
+    - `features/error/session-expired.component.ts`: standalone simples com link para `/welcome`; 1 teste
+    - `login.component.ts`: redirect apos login OK passa de `/welcome` para `/app/inicio`
+    - `splash.component.ts`: usa retorno de `loadCurrentUser()` para decidir destino — sessao valida → `/app/inicio`, caso contrario → `/welcome`
+  - **Pendencia documental**: ADR de update reformalizando baseline mobile com **Capacitor 8.3.x** continua pendente (item ja registrado apos M-Sprint 0)
+  - **Decisao tecnica registrada (M-3.5 layout)**: `IonPage` nao e exportado em `@ionic/angular/standalone`; shell usa `<div>` wrapper + `<ion-tabs>` com `<ion-router-outlet>` filho. Smoke spec do Shell valida apenas classe definida (montar template com Ionic web components quebra em `CSSStyleSheet.replaceSync` no happy-dom — mesmo padrao da M-Sprint 0/1)
+
+- **Bug header mobile (overlap brand × email) corrigido em 3 iteracoes apos M-Sprint 3 (2026-05-08)**:
+  - **Tentativa 1** (`f8a57a4`): trocar div custom dentro de `ion-toolbar` por slots Ionic (`ion-buttons slot="start"` + `ion-title` + `ion-buttons slot="end"`). Falhou: `ion-title` usa `position: absolute` com left/right padded para slots, e email longo invadia espaco da brand
+  - **Tentativa 2** (`f44697a`): substituir `<ion-header><ion-toolbar>` por `<header>` nativo com CSS grid de 3 colunas (`auto / minmax(0,1fr) / auto`), drop completo do shadow DOM Ionic. Falhou: `<ion-tabs>` ocupa o viewport com `position: absolute`, cobrindo qualquer header global renderizado fora dele no shell
+  - **Tentativa 3 (final, `f8392aa`)**: padrao Ionic-idiomatico — cada pagina roteada declara o proprio `<ion-header>` acima do `<ion-content>`, ion-page interno aloca a altura do header. `HeaderMobileComponent` voltou a renderizar `<ion-header>` como wrapper; layout grid de 3 colunas preservado dentro dele. `ShellComponent` agora e apenas `<ion-tabs>` + router-outlet + tab-bar. `HomeComponent` e `PlaceholderComponent` importam `HeaderMobileComponent` e renderizam `<sep-header-mobile />` antes do `<ion-content>`. **Memoria do agente atualizada** (`project_msprints_progress.md`) registrando o padrao Ionic obrigatorio para shell global em apps com `ion-tabs`
+
 ## Proximo passo mais natural
 
-Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1, 2, 3 e 4 backend + **M-Sprints 1 e 2 mobile (2026-05-05/07)** + **F-Sprints 1, 2, 3 e 4 web (2026-05-06/07)** concluidas, e fluxo GitHub revisado (2026-05-06: feature → develop → main), os proximos passos provaveis sao:
+Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1, 2, 3 e 4 backend + **M-Sprints 1, 2 e 3 mobile (2026-05-05/08)** + **F-Sprints 1, 2, 3 e 4 web (2026-05-06/07)** concluidas, e fluxo GitHub revisado (2026-05-06: feature → develop → main), os proximos passos provaveis sao:
 - **Configurar branch protection no GitHub**: nos 3 repos (`sep-api`, `sep-app`, `sep-mobile`) — proteger `develop` contra delecao (`allow_deletions=false`), exigir PR + status checks; em `main` desabilitar squash merge e habilitar merge commit (preserva historico das features); definir `develop` como default branch (PRs apontam pra develop por padrao). Comandos `gh api` listados em conversa do agente; usuario executa apos `gh auth login`
 - usuario abrir o PR da branch `feature/fsprint-4-telas-autenticadas` no `sep-app` (push e PR manuais por design); destino `develop`; apos merge, branch remota apaga e local permanece como historico — com isso, a Fundacao Frontend (F-Sprints 0-4) fica completa e o web vira MVP autenticado demonstravel para stakeholders
 - usuario abrir o PR da branch `feature/msprint-1-tokens-notion` no `sep-mobile`, caso ainda nao tenha sido mergeada; destino `develop`
-- usuario abrir o PR da branch `feature/msprint-2-telas-publicas-mobile` no `sep-mobile`; destino `develop`; apos merge, a base mobile publica com MSW fica pronta para a M-Sprint 3
-- iniciar M-Sprint 3 (shell + auth mobile) com Capacitor Preferences guardando token: spec [`specs/fase-1/203-msprint-3-shell-mobile-auth.md`](../specs/fase-1/203-msprint-3-shell-mobile-auth.md), steps a criar
+- usuario abrir o PR da branch `feature/msprint-3-shell-mobile-auth` no `sep-mobile`; destino `develop`; apos merge, a Foundation Mobile (M-Sprints 0-3) fica concluida e a base mobile autenticada com tabs role-based fica pronta para a M-Sprint 4
+- iniciar M-Sprint 4 (telas autenticadas concretas: perfil, alterar senha, casca tomador, casca credora + smoke E2E PWA): spec [`specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md`](../specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md), steps a criar
 - iniciar Epic 13 (Frontend de Jornadas) — proxima frente web depois da Fundacao: dashboards reais por jornada, tela de onboarding, tela de proposta de credito, formalizacao etc. (specs ainda nao criados; aguardar PO definir prioridade)
 - com Sprint 4 mergeada, gate minimo da fase AWS (Sprint 3 / Epic 3) ja esta vencido; usuario pode optar por iniciar trilha AWS em paralelo as F-Sprints/M-Sprints, dado que erros, OpenAPI e cobertura ja estao estabilizados (ver PRD §12 "gate recomendado: iniciar apos Sprint 4")
 - planejamento da Fase 2 (Sprints 5-14) ja existe em specs/fase-2 e pode comecar pela Sprint 5 (Endurecimento de Seguranca / gate Fase 2) assim que as F-Sprints/M-Sprints 2-4 estabilizem o consumo dos contratos atuais
