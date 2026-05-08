@@ -74,8 +74,8 @@ Regras vivem em [`AGENT.md`](../AGENT.md). Resumo:
 |--------|---------|--------|
 | M-Sprint 0 - Setup Ionic | [`mobile/200-msprint-0-steps.md`](./mobile/200-msprint-0-steps.md) | Concluida (2026-05-04) |
 | M-Sprint 1 - Tokens Notion Mobile | [`mobile/201-msprint-1-steps.md`](./mobile/201-msprint-1-steps.md) | Concluida (2026-05-05/06, push/PR pendente) |
-| M-Sprint 2 - Telas Publicas | `mobile/202-msprint-2-steps.md` | A criar antes da M-Sprint 2 |
-| M-Sprint 3 - Shell + Auth | `mobile/203-msprint-3-steps.md` | A criar antes da M-Sprint 3 |
+| M-Sprint 2 - Telas Publicas | [`mobile/202-msprint-2-steps.md`](./mobile/202-msprint-2-steps.md) | Concluida (2026-05-07) |
+| M-Sprint 3 - Shell + Auth | [`mobile/203-msprint-3-steps.md`](./mobile/203-msprint-3-steps.md) | Planejada para execucao |
 | M-Sprint 4 - Telas Autenticadas | `mobile/204-msprint-4-steps.md` | A criar antes da M-Sprint 4 |
 
 ## Quando criar steps
