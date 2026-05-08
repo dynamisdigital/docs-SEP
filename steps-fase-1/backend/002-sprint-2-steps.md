@@ -41,7 +41,7 @@ Task 2.1 (entidade Usuario + Role + repo + teste)
 
 ## Pre-requisitos globais
 
-- Sprint 1 concluida e fechada ([`steps/backend/001-sprint-1-steps.md`](./001-sprint-1-steps.md))
+- Sprint 1 concluida e fechada ([`steps-fase-1/backend/001-sprint-1-steps.md`](./001-sprint-1-steps.md))
 - `EntidadeAuditavel`, `AuditorAwareImpl` e `JpaAuditingConfig` operacionais (Sprint 1.6)
 - `ApiExceptionHandler` stub + `DomainException` sealed + 3 subtypes (`ValidacaoException`, `RecursoNaoEncontradoException`, `ConflitoException`) operacionais (Sprint 1.5)
 - `SecurityConfig` esqueleto presente em `identity/infrastructure/config/` (Sprint 1.3)
@@ -1249,7 +1249,7 @@ Sem nova migration. V1 (Sprint 1.4) ja proveu o schema da tabela `usuario`.
 
 ## Proximos passos apos Sprint 2
 
-1. **Sprint 3** — comeca com [`specs/fase-1/003-sprint-3-seguranca-autenticacao.md`](../../specs/fase-1/003-sprint-3-seguranca-autenticacao.md). Antes, gerar `steps/backend/003-sprint-3-steps.md` just-in-time. Sprint 3 entrega login, JWT, filtros de seguranca, autorizacao por ownership e troca de senha autenticada (consumindo `UsuarioSenhaUpdateDto` declarado nesta sprint).
+1. **Sprint 3** — comeca com [`specs/fase-1/003-sprint-3-seguranca-autenticacao.md`](../../specs/fase-1/003-sprint-3-seguranca-autenticacao.md). Antes, gerar `steps-fase-1/backend/003-sprint-3-steps.md` just-in-time. Sprint 3 entrega login, JWT, filtros de seguranca, autorizacao por ownership e troca de senha autenticada (consumindo `UsuarioSenhaUpdateDto` declarado nesta sprint).
 2. **F-Sprint 3 / M-Sprint 3** — frontend e mobile passam a consumir contratos reais do `POST /api/v1/usuarios` (deixando MSW para casos de erro).
 
 ## Restricoes e regras de execucao

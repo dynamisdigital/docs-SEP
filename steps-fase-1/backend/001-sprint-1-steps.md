@@ -6,7 +6,7 @@
 
 **Esforco total estimado**: 4-6 dias de Dev Senior dedicado, com possibilidade de paralelismo apos a Task 1.1c (Tasks 1.2, 1.3, 1.5, 1.6, 1.7 podem rodar em paralelo).
 
-**Workspace root**: `<sep-api-root>/` (mantendo convencao do `steps/backend/000-sprint-0-steps.md`; em Linux/macOS, usar o equivalente local).
+**Workspace root**: `<sep-api-root>/` (mantendo convencao do `steps-fase-1/backend/000-sprint-0-steps.md`; em Linux/macOS, usar o equivalente local).
 
 **Ordem de execucao recomendada** (dependencias entre tasks):
 
@@ -45,7 +45,7 @@ Task 1.1b (Dependencias) ------> Task 1.1c (application.yml)
 6. Marque a task como concluida no checklist final
 
 **Pre-requisitos globais**:
-- Sprint 0 concluida (`steps/backend/000-sprint-0-steps.md`): tooling, branch protection, CI minimo, ADRs iniciais, estrutura raiz de pacotes
+- Sprint 0 concluida (`steps-fase-1/backend/000-sprint-0-steps.md`): tooling, branch protection, CI minimo, ADRs iniciais, estrutura raiz de pacotes
 - Java 21 LTS instalado (`java -version` retorna `openjdk version "21.x.x"`)
 - Docker e Docker Compose funcionais (`docker --version`, `docker compose version`)
 - Gradle Wrapper sera gerado na Task 1.1a
@@ -2460,7 +2460,7 @@ A Sprint 1 esta concluida quando todas as 11 tasks tiverem checklist completo:
 
 ## Proximos passos apos Sprint 1
 
-1. **Sprint 2** — comeca com [`specs/fase-1/002-sprint-2-gestao-usuarios.md`](../../specs/fase-1/002-sprint-2-gestao-usuarios.md). Antes, gerar `steps/backend/002-sprint-2-steps.md` seguindo o mesmo padrao deste arquivo (just-in-time, conforme regra do AGENT.md).
+1. **Sprint 2** — comeca com [`specs/fase-1/002-sprint-2-gestao-usuarios.md`](../../specs/fase-1/002-sprint-2-gestao-usuarios.md). Antes, gerar `steps-fase-1/backend/002-sprint-2-steps.md` seguindo o mesmo padrao deste arquivo (just-in-time, conforme regra do AGENT.md).
 2. **F-Sprint 2 Web** — em paralelo, ja deve estar consumindo MSW e preparada para receber contratos reais quando a Sprint 2 entregar `POST /api/v1/usuarios`.
 
 ## Restricoes e regras de execucao

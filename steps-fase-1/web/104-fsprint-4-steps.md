@@ -1025,4 +1025,4 @@ test(web): adicionar smoke e2e autenticado
 - [`docs-sep/PRD.md`](../../docs-sep/PRD.md)
 - [`docs-sep/WEB-SCREENS-PLAN.md`](../../docs-sep/WEB-SCREENS-PLAN.md)
 - [`docs-sep/DESIGN-notion.md`](../../docs-sep/DESIGN-notion.md)
-- [`steps/web/103-fsprint-3-steps.md`](./103-fsprint-3-steps.md)
+- [`steps-fase-1/web/103-fsprint-3-steps.md`](./103-fsprint-3-steps.md)

@@ -6,7 +6,7 @@ Esta pasta contem os **steps** detalhados de cada Task das specs em `../specs/`.
 
 ```
 PRD → ADRs → Specs → Steps → Codigo
-docs-sep/  adr/  specs/  steps/
+docs-sep/  adr/  specs/  steps-fase-1/
 ```
 
 ## O que e um Step
@@ -24,10 +24,10 @@ Permite codificacao manual ou assistida com fidelidade ao plano.
 Os steps sao agrupados por trilha de execucao em subpastas:
 
 ```
-steps/
-├── backend/   # Sprints 0XX (specs/fase-1/000-004)
-├── web/       # F-Sprints 1XX (specs/fase-1/100-104)
-└── mobile/    # M-Sprints 2XX (specs/fase-1/200-204)
+steps-fase-1/
++-- backend/   # Sprints 0XX (specs/fase-1/000-004)
++-- web/       # F-Sprints 1XX (specs/fase-1/100-104)
++-- mobile/    # M-Sprints 2XX (specs/fase-1/200-204)
 ```
 
 ## Convencoes
@@ -99,7 +99,7 @@ Apos a task ser executada, o **codigo e a verdade**. Os steps ficam como histori
 | Lista tasks com criterios de pronto | Decompoe cada task em sub-passos sequenciais |
 | Estavel | Pode evoluir conforme experiencia |
 | Aprovado pelo PO/Senior | Detalhado pelo Senior antes da execucao |
-| `specs/0XX-...md` | `steps/{backend,web,mobile}/0XX-...-steps.md` |
+| `specs/fase-1/0XX-...md` | `steps-fase-1/{backend,web,mobile}/0XX-...-steps.md` |
 
 ## Referencias
 

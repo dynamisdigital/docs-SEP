@@ -1044,7 +1044,7 @@ A F-Sprint 1 (`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`) consome:
 
 ## Proximos passos apos F-Sprint 0
 
-1. **F-Sprint 1** — comeca com [`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`](../../specs/fase-1/101-fsprint-1-design-tokens-showcase.md). Antes, gerar `steps/101-fsprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
+1. **F-Sprint 1** — comeca com [`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`](../../specs/fase-1/101-fsprint-1-design-tokens-showcase.md). Antes, gerar `steps-fase-1/web/101-fsprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
 2. **Sprint 1 backend** — comeca em paralelo com [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../../specs/fase-1/001-sprint-1-fundacao-tecnica.md).
 
 ## Referencias

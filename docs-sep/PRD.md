@@ -1031,21 +1031,27 @@ Cada M-Sprint tem Definition of Done explicita no seu spec correspondente.
 - Escopo reduzido: **apenas tomador e empresa credora**, sem financeiro interno, backoffice ou administracao completa
 - Nao recria contratos: reusa DTOs e endpoints definidos pelo backend e validados pelo frontend web
 
-### Organizacao da pasta `steps/`
+### Organizacao das pastas de steps
 
-Os steps (detalhamento granular por task, criados just-in-time antes de cada sprint) sao organizados em tres subpastas, espelhando as tres trilhas de execucao:
+Os steps (detalhamento granular por task, criados just-in-time antes de cada sprint) agora sao separados por fase:
 
 ```
-steps/
-├── backend/   # Sprints 0XX (specs/fase-1/000-004)
-├── web/       # F-Sprints 1XX (specs/fase-1/100-104)
-└── mobile/    # M-Sprints 2XX (specs/fase-1/200-204)
+steps-fase-1/
++-- backend/   # Sprints 0XX (specs/fase-1/000-004)
++-- web/       # F-Sprints 1XX (specs/fase-1/100-104)
++-- mobile/    # M-Sprints 2XX (specs/fase-1/200-204)
+
+steps-fase-2/
++-- backend/   # Sprints backend 005-014
++-- web/       # Steps web futuros da Fase 2, quando planejados
++-- mobile/    # Steps mobile futuros da Fase 2, quando planejados
 ```
 
-- `steps/backend/` recebe `000-sprint-0-steps.md` ate `004-sprint-4-steps.md`
-- `steps/web/` recebe `100-fsprint-0-steps.md` ate `104-fsprint-4-steps.md`
-- `steps/mobile/` recebe `200-msprint-0-steps.md` ate `204-msprint-4-steps.md`
-- O indice consolidado das tres trilhas vive em [`steps/README.md`](../steps/README.md)
+- `steps-fase-1/backend/` recebe `000-sprint-0-steps.md` ate `004-sprint-4-steps.md`
+- `steps-fase-1/web/` recebe `100-fsprint-0-steps.md` ate `104-fsprint-4-steps.md`
+- `steps-fase-1/mobile/` recebe `200-msprint-0-steps.md` ate `204-msprint-4-steps.md`
+- `steps-fase-2/backend/` recebe os steps backend da Fase 2, com Sprint 5 ja detalhada em [`steps-fase-2/backend/005-sprint-5-steps.md`](../steps-fase-2/backend/005-sprint-5-steps.md)
+- Os indices vivem em [`steps-fase-1/README.md`](../steps-fase-1/README.md) e [`steps-fase-2/README.md`](../steps-fase-2/README.md)
 
 Esta separacao isola o trabalho dos tres papeis (Dev Senior backend, Devs Plenos Frontend, Dev Mobile) e mantem a fronteira de cada trilha visivel desde a estrutura de arquivos.
 
@@ -1053,9 +1059,9 @@ Esta separacao isola o trabalho dos tres papeis (Dev Senior backend, Devs Plenos
 
 As tres Sprint 0 ja tem steps detalhados, revisados e coesos entre si:
 
-- [`steps/backend/000-sprint-0-steps.md`](../steps/backend/000-sprint-0-steps.md) — Hygiene & Foundation backend
-- [`steps/web/100-fsprint-0-steps.md`](../steps/web/100-fsprint-0-steps.md) — Setup Angular 20.x + tooling
-- [`steps/mobile/200-msprint-0-steps.md`](../steps/mobile/200-msprint-0-steps.md) — Setup Ionic 8.4+ + Capacitor 6 + tooling
+- [`steps-fase-1/backend/000-sprint-0-steps.md`](../steps-fase-1/backend/000-sprint-0-steps.md) — Hygiene & Foundation backend
+- [`steps-fase-1/web/100-fsprint-0-steps.md`](../steps-fase-1/web/100-fsprint-0-steps.md) — Setup Angular 20.x + tooling
+- [`steps-fase-1/mobile/200-msprint-0-steps.md`](../steps-fase-1/mobile/200-msprint-0-steps.md) — Setup Ionic 8.4+ + Capacitor 6 + tooling
 
 Pontos de coesao entre as tres Sprint 0 (decisoes ja alinhadas no detalhamento):
 
@@ -1808,7 +1814,7 @@ A orientacao operacional para os agentes de IA que assumem trabalho neste projet
 2. [`docs-sep/CONTEXT.md`](./CONTEXT.md) — historico de decisoes
 3. [`AGENT.md`](../AGENT.md) — pelo menos a secao do agente em uso (Claude, Codex ou Copilot)
 4. O spec relevante em `specs/` quando ha task em andamento
-5. O step correspondente em `steps/{backend,web,mobile}/`, quando existir
+5. O step correspondente em `steps-fase-1/{backend,web,mobile}/` ou `steps-fase-2/{backend,web,mobile}/`, quando existir
 6. ADRs relevantes em `adr/`
 
 **Conteudo do `AGENT.md`** (resumo):

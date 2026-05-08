@@ -43,7 +43,7 @@ M-1.4 (validacao final)
 6. Nao avance para a M-Sprint 2 sem a M-Sprint 1 verde localmente
 
 **Pre-requisitos globais**:
-- M-Sprint 0 concluida (`steps/mobile/200-msprint-0-steps.md`): Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling completo + Husky + lint-staged operacional via `husky init`
+- M-Sprint 0 concluida (`steps-fase-1/mobile/200-msprint-0-steps.md`): Ionic 8.4+ + Angular 20.x + Capacitor 6 + tooling completo + Husky + lint-staged operacional via `husky init`
 - Stylelint configurado com whitelist `--ion-*` (Step 200.2.4 da M-Sprint 0)
 - Vitest com `@analogjs/vite-plugin-angular` operacional
 - Acesso de leitura a `docs-sep/DESIGN-notion.md`

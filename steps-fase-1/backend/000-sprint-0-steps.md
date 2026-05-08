@@ -1723,7 +1723,7 @@ git commit -m "chore: criar estrutura inicial de pacotes do monolito modular DDD
 
 ## Proximos passos apos Sprint 0
 
-1. **Sprint 1** — comeca com [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../../specs/fase-1/001-sprint-1-fundacao-tecnica.md). Antes, gerar `steps/001-sprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
+1. **Sprint 1** — comeca com [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../../specs/fase-1/001-sprint-1-fundacao-tecnica.md). Antes, gerar `steps-fase-1/backend/001-sprint-1-steps.md` seguindo o mesmo padrao deste arquivo.
 2. **F-Sprint 0 Frontend** — em paralelo, comecar [`specs/fase-1/100-fsprint-0-setup-angular.md`](../../specs/fase-1/100-fsprint-0-setup-angular.md) (escopo dos Devs Plenos Frontend). As proximas F-Sprints estao em `specs/fase-1/101` a `specs/fase-1/104`.
 
 ## Referencias

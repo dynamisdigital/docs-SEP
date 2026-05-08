@@ -69,7 +69,7 @@ ls -la <sep-app-root>
 # Espera: package.json, angular.json, tsconfig*.json, src/
 ```
 
-Se `<sep-app-root>/` nao existir, **abortar esta sprint** e executar primeiro [`steps/web/100-fsprint-0-steps.md`](./100-fsprint-0-steps.md).
+Se `<sep-app-root>/` nao existir, **abortar esta sprint** e executar primeiro [`steps-fase-1/web/100-fsprint-0-steps.md`](./100-fsprint-0-steps.md).
 
 ### Step 101.0.2 - Confirmar versoes e scripts
 

@@ -9,7 +9,7 @@ Este arquivo consolida a orientacao para os agentes de IA que assumem trabalho n
   2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md)
   3. Este arquivo (`AGENT.md`), pelo menos a secao do agente em uso
   4. O spec relevante em `specs/`
-  5. O step correspondente em `steps/{backend,web,mobile}/`, quando existir
+  5. O step correspondente em `steps-fase-1/{backend,web,mobile}/` ou `steps-fase-2/{backend,web,mobile}/`, quando existir
   6. ADRs relevantes em `adr/`
 - O conteudo esta organizado em **tres secoes**, uma por agente: Claude, Codex e Copilot. As secoes tem sobreposicao (estado do projeto, stack, arquitetura, marco regulatorio, convencoes), mas cada uma foi escrita com o tom e os detalhes que fazem sentido para o agente correspondente.
 - Quando houver conflito aparente entre as secoes, **prevalece o PRD** (`docs-sep/PRD.md`) e os ADRs (`adr/`). As secoes deste arquivo nao reescrevem o PRD; complementam-no.
@@ -30,7 +30,7 @@ A partir de 2026-05-04, o projeto SEP opera em **3 repositorios independentes** 
 - **`sep-api`** — backend Java + Spring Boot (package `com.dynamis.sep_api`); pre-commit via `.githooks/pre-commit` minimo (Spotless)
 - **`sep-app`** — frontend web Angular 20.x; pre-commit via Husky + lint-staged padrao (`npx husky init`)
 - **`sep-mobile`** — mobile Ionic 8.4 + Angular 20.x + Capacitor 6; pre-commit via Husky + lint-staged padrao (`npx husky init`)
-- **`docs-SEP`** (este repositorio) — documentacao consolidada (PRD, ADRs, specs, steps, AGENT.md, templates de CI)
+- **`docs-SEP`** (este repositorio) — documentacao consolidada (PRD, ADRs, specs, steps-fase-1, steps-fase-2, AGENT.md, templates de CI)
 
 Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias. Cross-references nos specs/steps usam os placeholders `<sep-api-root>`, `<sep-app-root>` e `<sep-mobile-root>` para representar a raiz local de cada repo clonado.
 
@@ -244,7 +244,7 @@ SEPs sao reguladas pela **Resolucao CMN nº 4.656/2018**. Implicacoes:
 2. Leia [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) para historico de decisoes
 3. Leia este `AGENT.md` (pelo menos a [Secao Claude](#secao-claude))
 4. Leia o spec relevante em `specs/`
-5. Leia o steps correspondente em `steps/` (detalhamento por task antes de codificar)
+5. Leia o steps correspondente em `steps-fase-1/` ou `steps-fase-2/` (detalhamento por task antes de codificar)
 6. Leia ADRs em `adr/` para racional de decisoes arquiteturais
 7. Antes de propor mudanca grande, considere abrir um ADR novo
 
@@ -252,7 +252,7 @@ SEPs sao reguladas pela **Resolucao CMN nº 4.656/2018**. Implicacoes:
 
 ```
 PRD → ADRs → Specs → Steps → Codigo
-docs-sep/  adr/  specs/  steps/
+docs-sep/  adr/  specs/  steps-fase-1/  steps-fase-2/
 ```
 
 - **PRD** = visao do produto (alto nivel)
@@ -293,7 +293,8 @@ Fase: **100% documental**. Ainda nao ha codigo de aplicacao implementado. Os art
 
 - `docs-sep/`
 - `specs/`
-- `steps/`
+- `steps-fase-1/`
+- `steps-fase-2/`
 - `adr/`
 
 Documento principal: [`docs-sep/PRD.md`](docs-sep/PRD.md). Sempre comece lendo o PRD antes de propor mudancas de produto, arquitetura, specs, steps ou codigo.
@@ -308,7 +309,7 @@ Ordem padrao de leitura:
 2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md)
 3. Este arquivo (`AGENT.md`), com foco na [Secao Claude](#secao-claude) para a visao geral e nesta [Secao Codex](#secao-codex) para o operacional do agente
 4. O spec relevante em `specs/`
-5. O step correspondente em `steps/`, quando existir
+5. O step correspondente em `steps-fase-1/` ou `steps-fase-2/`, quando existir
 6. ADRs relevantes em `adr/`
 
 Se o trabalho for implementar uma sprint ou task, leia primeiro o spec e o step correspondente. Steps devem ser criados **just-in-time**, antes da execucao da sprint ou task, e nao todos de uma vez.
@@ -317,7 +318,7 @@ Se o trabalho for implementar uma sprint ou task, leia primeiro o spec e o step 
 
 ```text
 PRD -> ADRs -> Specs -> Steps -> Codigo
-docs-sep/  adr/  specs/  steps/
+docs-sep/  adr/  specs/  steps-fase-1/  steps-fase-2/
 ```
 
 - **PRD**: visao de produto, escopo, roadmap e prioridades.
@@ -519,7 +520,8 @@ Trilha mobile: `specs/fase-1/200` a `specs/fase-1/204`.
 - [Secao Claude](#secao-claude) deste arquivo
 - [`adr/`](adr/)
 - [`specs/`](specs/)
-- [`steps/`](steps/)
+- [`steps-fase-1/`](steps-fase-1/)
+- [`steps-fase-2/`](steps-fase-2/)
 
 ---
 
@@ -531,7 +533,7 @@ Este arquivo orienta o GitHub Copilot CLI ao assumir trabalho no projeto SEP. Le
 
 ### Estado atual do projeto
 
-Fase: **100% documental**. Zero codigo escrito. Todos os artefatos atuais estao em `docs-sep/`, `specs/`, `steps/` e `adr/`.
+Fase: documentacao consolidada com repos de codigo separados. Os artefatos documentais atuais estao em `docs-sep/`, `specs/`, `steps-fase-1/`, `steps-fase-2/` e `adr/`.
 
 Documento principal: [`docs-sep/PRD.md`](docs-sep/PRD.md). Sempre comece por ele antes de propor mudanca, spec ou implementacao.
 
@@ -639,7 +641,7 @@ O produto deve respeitar a **Resolucao CMN 4.656/2018** desde a fundacao:
 2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md)
 3. Este arquivo (`AGENT.md`), com prioridade para esta [Secao Copilot](#secao-copilot)
 4. spec relevante em `specs/`
-5. steps relevante em `steps/`
+5. steps relevante em `steps-fase-1/` ou `steps-fase-2/`
 6. ADRs em `adr/`
 
 Antes de alteracoes grandes de arquitetura, considerar novo ADR.
@@ -648,7 +650,7 @@ Antes de alteracoes grandes de arquitetura, considerar novo ADR.
 
 ```text
 PRD -> ADRs -> Specs -> Steps -> Codigo
-docs-sep/  adr/  specs/  steps/
+docs-sep/  adr/  specs/  steps-fase-1/  steps-fase-2/
 ```
 
 - PRD = visao do produto

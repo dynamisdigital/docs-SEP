@@ -585,7 +585,7 @@ git commit -m "chore: configure lint, formatting and pre-commit hooks"
 
 ### Step 200.3.1 - Instalar dependencias de teste
 
-**Por que `@analogjs/vitest-angular`**: o Vitest sozinho nao compila templates Angular (HTML/SCSS inline dos componentes). O plugin `@analogjs/vite-plugin-angular` plugado em `vitest.config.ts` faz o Vite entender Angular, e o `@analogjs/vitest-angular` cuida do bootstrap do TestBed para o ambiente Vitest. Sem esses dois pacotes, qualquer teste que chame `render(AppComponent)` quebra. Mesmo padrao adotado pela F-Sprint 0 web (`steps/web/100-fsprint-0-steps.md`, Step 100.3.1).
+**Por que `@analogjs/vitest-angular`**: o Vitest sozinho nao compila templates Angular (HTML/SCSS inline dos componentes). O plugin `@analogjs/vite-plugin-angular` plugado em `vitest.config.ts` faz o Vite entender Angular, e o `@analogjs/vitest-angular` cuida do bootstrap do TestBed para o ambiente Vitest. Sem esses dois pacotes, qualquer teste que chame `render(AppComponent)` quebra. Mesmo padrao adotado pela F-Sprint 0 web (`steps-fase-1/web/100-fsprint-0-steps.md`, Step 100.3.1).
 
 **Comando**:
 
