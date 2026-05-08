@@ -4,12 +4,39 @@
 
 - **ID da Spec**: 202
 - **Titulo**: M-Sprint 2 - Splash, Boas-vindas, Login e Register mobile com MSW
-- **Status**: aprovada para execucao (apos conclusao da M-Sprint 1)
+- **Status**: concluida em 2026-05-07 (branch `feature/msprint-2-telas-publicas-mobile` em `sep-mobile`; push/PR manuais pelo dev)
 - **Fase do produto**: Epic 14 - Mobile SEP
 - **Trilha**: Mobile (paralela a Sprint 2 backend e F-Sprint 2 frontend web)
 - **Origem**: PRD - API SEP, Secao 22 + MOBILE-SCREENS-PLAN.md secoes 6.1-6.4
 - **Depende de**: [`201-msprint-1-tokens-notion-mobile.md`](./201-msprint-1-tokens-notion-mobile.md)
 - **Responsavel principal**: Dev Mobile
+
+## Resultado da execucao
+
+Implementacao concluida no repo `sep-mobile`, branch `feature/msprint-2-telas-publicas-mobile`, com os entregaveis principais:
+
+- rotas publicas lazy para splash, boas-vindas, login e register
+- `AuthService` baseado em Signals e `TokenStorageService` usando Capacitor Preferences
+- modelos TypeScript alinhados aos contratos do PRD secao 21
+- handlers MSW para `POST /api/v1/auth/login`, `GET /api/v1/auth/me` e `POST /api/v1/usuarios`
+- formularios mobile com validacao de e-mail, senha de 6 caracteres, role e feedback de erro
+- ajustes finais de UX/visual para input legivel e dark mode do Ionic desativado no browser
+- testes Vitest cobrindo servicos e telas publicas
+
+Validacao local em 2026-05-07:
+
+- `npm run lint` passou
+- `npm run lint:scss` passou
+- `npm run test` passou: 8 arquivos, 28 testes
+- `npm run build` passou
+- `npm run e2e` executado apos a documentacao: 2/3 testes passaram; o teste do splash falhou por assert procurando `Credito empresarial...` como heading, enquanto o texto real esta em paragrafo na tela `/welcome`
+
+Observacoes:
+
+- O build ainda emite warnings nao bloqueantes de budget SCSS em `welcome.component.scss` (+572 bytes) e `design-system/pages/typography.component.scss` (+360 bytes).
+- O Vitest ainda emite warnings de depreciacao do Sass legacy JS API e um stderr do Ionic em teste de splash, sem falhar a suite.
+- O smoke E2E da rota inicial precisa de ajuste pequeno no seletor/assert de welcome; a navegacao para `/welcome` ocorreu, mas o texto validado nao possui role `heading`.
+- O login permanece com fluxo mockado via MSW; a troca para API real e shell autenticado fica para a M-Sprint 3.
 
 ## Objetivo
 

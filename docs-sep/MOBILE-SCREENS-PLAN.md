@@ -9,7 +9,7 @@ O mobile deve apoiar a validacao e o acompanhamento das jornadas de contratacao 
 A trilha de execucao do mobile e governada por 5 specs (uma por M-Sprint), em paralelo as Sprints 0-4 do backend e as F-Sprints 0-4 do frontend web:
 - [`specs/fase-1/200-msprint-0-setup-ionic.md`](../specs/fase-1/200-msprint-0-setup-ionic.md) (M-Sprint 0)
 - [`specs/fase-1/201-msprint-1-tokens-notion-mobile.md`](../specs/fase-1/201-msprint-1-tokens-notion-mobile.md) (M-Sprint 1)
-- [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../specs/fase-1/202-msprint-2-telas-publicas-mobile.md) (M-Sprint 2)
+- [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../specs/fase-1/202-msprint-2-telas-publicas-mobile.md) (M-Sprint 2 - concluida em 2026-05-07)
 - [`specs/fase-1/203-msprint-3-shell-mobile-auth.md`](../specs/fase-1/203-msprint-3-shell-mobile-auth.md) (M-Sprint 3)
 - [`specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md`](../specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md) (M-Sprint 4)
 

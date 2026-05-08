@@ -675,15 +675,32 @@ No estado atual:
   - **Decisao tecnica F-4.7**: e-mail aparece no header (`sep-header-user-name`) e na pagina (perfil ou detalhe) ao mesmo tempo. Para evitar `strict mode violation` do Playwright, escopa busca via `page.getByRole('main')` (template do shell em `layout/shell/shell.component.html` envolve `router-outlet` em `<main class="sep-shell-main">`)
   - `angular.json`: `cli.analytics: false` adicionado pelo CLI; mantido no commit `4906f45`
 
+- **M-Sprint 2 (Telas Mobile Publicas + MSW) concluida em 2026-05-07** no repo `sep-mobile`, branch `feature/msprint-2-telas-publicas-mobile` (originada de `develop`). Suite local verde: lint + lint:scss + 28 testes Vitest + build. Push/PR manual a cargo do dev. Entregaveis materializados:
+  - `src/main.ts`: `HttpClient` habilitado no bootstrap do Ionic/Angular; MSW continua ativavel por flag `localStorage.NG_APP_USE_MSW`
+  - `package.json` / `package-lock.json`: `@capacitor/preferences` adicionado para persistencia mobile/PWA do token
+  - `src/app/core/api/api.models.ts`: contratos TypeScript alinhados ao PRD secao 21 (`UsuarioResponse`, `LoginRequest`, `TokenResponse`, `UsuarioCreateRequest`, `ApiErrorResponse`)
+  - `src/app/core/auth/token-storage.service.ts`: wrapper sobre Capacitor Preferences com chave do access token; testes unitarios cobrindo salvar, ler e limpar
+  - `src/app/core/auth/auth.service.ts`: signals para usuario atual/autenticacao; metodos `login`, `register`, `me`/carregamento de usuario e `logout`; token salvo via `TokenStorageService`
+  - `src/mocks/handlers.ts`: handlers MSW para `POST /auth/login`, `GET /auth/me` e `POST /usuarios`, com cenarios de sucesso, credenciais invalidas, token invalido, e-mail duplicado e validacao basica
+  - `src/app/features/public/public.routes.ts`: rotas lazy para splash, welcome, login e register; `/design-system` preservada no roteamento raiz
+  - `src/app/features/public/splash/`: tela inicial com marca SEP, verificacao de sessao e redirecionamento para `/welcome` nesta sprint
+  - `src/app/features/public/welcome/`: boas-vindas Notion mobile com proposta de valor, cards `Sou tomador` / `Sou empresa credora` e CTAs para login/cadastro
+  - `src/app/features/public/login/`: formulario reativo com e-mail, senha de 6 caracteres, feedback de erro e login mockado via MSW
+  - `src/app/features/public/register/`: cadastro publico com e-mail, senha de 6 caracteres, role `CLIENTE`/`ADMIN`, feedback para e-mail duplicado e redirecionamento para login
+  - fixes finais: `fix(mobile): exibir caracteres digitados em ion-input` e `fix(mobile): desativar dark.system do Ionic em browser dark mode`
+  - 10 commits atomicos na branch: `a5acbf7` (preferences + HttpClient), `e7efb34` (rotas publicas), `eeb81bc` (AuthService + Preferences), `6750f6b` (MSW), `af19117` (splash), `bcfc841` (welcome), `9e1ca4d` (login/register), `9411abd` (testes), `8965515` (ion-input), `7172bb4` (dark mode)
+  - validacao local em 2026-05-07: `npm run lint`, `npm run lint:scss`, `npm run test` (8 arquivos / 28 testes) e `npm run build` verdes; `npm run e2e` executado depois da documentacao ficou 2/3, com falha no smoke de splash por assert procurando `Credito empresarial...` como heading enquanto o texto real esta em paragrafo na tela `/welcome`
+  - observacoes remanescentes nao bloqueantes: build com warnings de budget SCSS em `welcome.component.scss` (+572 bytes) e `design-system/pages/typography.component.scss` (+360 bytes); Vitest com warnings de depreciacao do Sass legacy JS API e stderr do Ionic no teste de splash, sem falhar a suite; ajustar assert E2E do splash e validar PWA manualmente sem `console.error` inesperado
+
 - **Hooks PostToolUse `git add` removidos definitivamente em 2026-05-06** dos 3 `.claude/settings.json` de codigo (`sep-api`, `sep-app`, `sep-mobile`). `.claude/` esta no `.gitignore` dos 3 repos via PR #16/#17. Memoria do agente reforcada: `chown -R mauricio:mauricio .git .claude` deve ser SEMPRE a ULTIMA operacao da sequencia (memoria `feedback_chown_pos_git.md` atualizada com reincidencia diagnosticada na F-Sprint 1).
 
 ## Proximo passo mais natural
 
-Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1, 2, 3 e 4 backend + M-Sprint 1 mobile (2026-05-05/06) + **F-Sprints 1, 2, 3 e 4 web (2026-05-06/07)** concluidas, e fluxo GitHub revisado (2026-05-06: feature → develop → main), os proximos passos provaveis sao:
+Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1, 2, 3 e 4 backend + **M-Sprints 1 e 2 mobile (2026-05-05/07)** + **F-Sprints 1, 2, 3 e 4 web (2026-05-06/07)** concluidas, e fluxo GitHub revisado (2026-05-06: feature → develop → main), os proximos passos provaveis sao:
 - **Configurar branch protection no GitHub**: nos 3 repos (`sep-api`, `sep-app`, `sep-mobile`) — proteger `develop` contra delecao (`allow_deletions=false`), exigir PR + status checks; em `main` desabilitar squash merge e habilitar merge commit (preserva historico das features); definir `develop` como default branch (PRs apontam pra develop por padrao). Comandos `gh api` listados em conversa do agente; usuario executa apos `gh auth login`
 - usuario abrir o PR da branch `feature/fsprint-4-telas-autenticadas` no `sep-app` (push e PR manuais por design); destino `develop`; apos merge, branch remota apaga e local permanece como historico — com isso, a Fundacao Frontend (F-Sprints 0-4) fica completa e o web vira MVP autenticado demonstravel para stakeholders
-- usuario abrir o PR da branch `feature/msprint-1-tokens-notion` no `sep-mobile`; destino `develop`
-- iniciar M-Sprint 2 (telas publicas mobile) consumindo os tokens/mixins/CSS vars Notion ja entregues pela M-Sprint 1: spec [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../specs/fase-1/202-msprint-2-telas-publicas-mobile.md), steps a criar
+- usuario abrir o PR da branch `feature/msprint-1-tokens-notion` no `sep-mobile`, caso ainda nao tenha sido mergeada; destino `develop`
+- usuario abrir o PR da branch `feature/msprint-2-telas-publicas-mobile` no `sep-mobile`; destino `develop`; apos merge, a base mobile publica com MSW fica pronta para a M-Sprint 3
 - iniciar M-Sprint 3 (shell + auth mobile) com Capacitor Preferences guardando token: spec [`specs/fase-1/203-msprint-3-shell-mobile-auth.md`](../specs/fase-1/203-msprint-3-shell-mobile-auth.md), steps a criar
 - iniciar Epic 13 (Frontend de Jornadas) — proxima frente web depois da Fundacao: dashboards reais por jornada, tela de onboarding, tela de proposta de credito, formalizacao etc. (specs ainda nao criados; aguardar PO definir prioridade)
 - com Sprint 4 mergeada, gate minimo da fase AWS (Sprint 3 / Epic 3) ja esta vencido; usuario pode optar por iniciar trilha AWS em paralelo as F-Sprints/M-Sprints, dado que erros, OpenAPI e cobertura ja estao estabilizados (ver PRD §12 "gate recomendado: iniciar apos Sprint 4")

@@ -2,6 +2,8 @@
 
 **Spec de origem**: [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../../specs/fase-1/202-msprint-2-telas-publicas-mobile.md)
 
+**Status**: concluida em 2026-05-07 no repo `sep-mobile`, branch `feature/msprint-2-telas-publicas-mobile`.
+
 **Objetivo geral**: implementar as telas publicas iniciais do app mobile SEP seguindo o design system Notion adaptado para mobile: splash, boas-vindas, login e cadastro publico. Nesta sprint, as chamadas HTTP usam MSW para simular os contratos do PRD secao 21 antes da integracao real prevista para a M-Sprint 3.
 
 **Esforco total estimado**: 3-4 dias de Dev Mobile dedicado.
@@ -17,6 +19,18 @@
 - O app mobile configura providers diretamente em `src/main.ts`; nao existe `src/app/app.config.ts`.
 - `@capacitor/preferences` ainda precisa ser instalado para esta sprint.
 - `src/mocks/handlers.ts` ja possui mocks iniciais de `auth/login` e `auth/me`, mas deve ser substituido/expandido por handlers com sucesso e falha.
+
+**Resultado observado apos a sprint**:
+- `@capacitor/preferences` instalado e usado por `TokenStorageService`.
+- `src/main.ts` passou a prover `HttpClient`.
+- Rotas publicas em `features/public/public.routes.ts`.
+- Telas entregues: `splash`, `welcome`, `login`, `register`.
+- `core/api/api.models.ts`, `core/auth/auth.service.ts` e `core/auth/token-storage.service.ts` implementados.
+- `src/mocks/handlers.ts` cobre login, `/auth/me` e cadastro publico.
+- Fixes finais aplicados para exibir caracteres digitados em `ion-input` e impedir que dark mode do browser quebre o visual Notion.
+- Validacao local em 2026-05-07: `npm run lint`, `npm run lint:scss`, `npm run test` (8 arquivos, 28 testes) e `npm run build` passaram.
+- `npm run e2e` executado apos a atualizacao documental: 2/3 testes passaram; o smoke do splash falhou por assert procurando `Credito empresarial...` como heading, enquanto o texto real esta em paragrafo na tela `/welcome`.
+- Warnings remanescentes nao bloqueantes: budget SCSS em `welcome.component.scss` e `design-system/pages/typography.component.scss`; Sass legacy JS API no Vitest; stderr Ionic em teste de splash sem falhar suite.
 
 **Ordem de execucao recomendada**:
 
@@ -880,15 +894,15 @@ git ls-files --others --exclude-standard src e2e package.json package-lock.json 
 - Nao adicionar `.angular/`, `coverage/`, `www/`, `test-results/`, `playwright-report/` ou arquivos locais.
 
 ### Definicao de pronto da M-Sprint 2
-- [ ] Splash, welcome, login e register navegaveis
-- [ ] Login e register usam MSW
-- [ ] Token storage via Capacitor Preferences
-- [ ] `AuthService` com Signals
-- [ ] Handlers MSW para `auth/login`, `auth/me` e `usuarios`
-- [ ] Testes Vitest cobrindo servicos e telas criticas
-- [ ] Smoke E2E atualizado ou limitacao documentada
-- [ ] `npm run lint`, `npm run lint:scss`, `npm run test` e `npm run build` passam
-- [ ] Sem `console.error` inesperado no PWA
+- [x] Splash, welcome, login e register navegaveis
+- [x] Login e register usam MSW
+- [x] Token storage via Capacitor Preferences
+- [x] `AuthService` com Signals
+- [x] Handlers MSW para `auth/login`, `auth/me` e `usuarios`
+- [x] Testes Vitest cobrindo servicos e telas criticas
+- [x] Smoke E2E atualizado; execucao local documentada com 2/3 passando e ajuste pendente no assert do splash
+- [x] `npm run lint`, `npm run lint:scss`, `npm run test` e `npm run build` passam
+- [ ] Validacao manual PWA sem `console.error` inesperado ainda deve ser confirmada junto do ajuste E2E
 
 ### Commit Task M-2.8
 Mensagem sugerida:
@@ -909,6 +923,7 @@ feat(mobile): implementar telas publicas com msw
 - Implementa splash, boas-vindas, login e cadastro publico no mobile.
 - Adiciona `AuthService` com Signals e storage via Capacitor Preferences.
 - Mocka contratos de auth/usuarios com MSW para validar a UX antes do backend real.
+- Inclui fixes finais para inputs Ionic e dark mode do browser.
 
 **Escopo tecnico**:
 - Rotas publicas lazy em `features/public`.
@@ -929,6 +944,8 @@ npm run e2e
 - Nenhum breaking change esperado.
 - O login ainda redireciona temporariamente para `/welcome`; o shell autenticado entra na M-Sprint 3.
 - Cadastro mobile ainda permite `ADMIN` e `CLIENTE`, conforme PRD atual; restringir para cliente/tomador e revisao futura.
+- Build verde com warnings nao bloqueantes de budget SCSS.
+- Smoke E2E atualizado, mas `npm run e2e` local ficou 2/3: ajustar o assert do splash para validar o paragrafo/headline real da tela welcome.
 
 **Referencias**:
 - `docs-SEP/specs/fase-1/202-msprint-2-telas-publicas-mobile.md`
