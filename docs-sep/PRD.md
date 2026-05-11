@@ -499,10 +499,19 @@ Campo opcional recomendado para evolucao futura:
 
 ## 14. Padrao de JWT
 
-### Estrategia inicial
+### Estrategia inicial (Sprints 1-4)
 - autenticacao baseada em `access token` JWT
-- sem `refresh token` nesta fase
-- expiracao curta e configuravel por propriedade
+- sem `refresh token`
+- expiracao 1h configuravel por propriedade
+
+### Estrategia consolidada (Sprint 5 em diante)
+- `access token` JWT com expiracao curta de 15 min (`app.jwt.access-expiration-seconds=900`)
+- `refresh token` rotativo de 30 dias (`app.jwt.refresh-expiration-seconds=2592000`) com:
+  - persistencia somente do hash SHA-256 hex em `refresh_token`
+  - `familyId` mantido entre rotacoes
+  - reuse detection: token marcado `USADO` reapresentado -> revoga toda a familia + grava `REFRESH_REUSE_DETECTED` em `audit_log_seguranca`
+- MFA TOTP obrigatorio antes de producao (RFC 6238 via `googleauth:1.5.0`): senha valida com MFA ATIVO emite apenas `mfaChallengeId`; `/auth/totp/verify` conclui o login emitindo o par access+refresh
+- step-up authentication para operacoes sensiveis: token efemero de 5 min apresentado em header `X-Step-Up-Token` (annotation `@RequireStepUp`)
 
 ### Claims minimas obrigatorias
 - `sub`: identificador do usuario autenticado
@@ -513,6 +522,7 @@ Campo opcional recomendado para evolucao futura:
 - o `sub` deve carregar o `UUID` do usuario
 - o backend deve validar expiracao, assinatura e integridade do token em todas as rotas protegidas
 - as autorizacoes devem usar os papeis do token e, quando necessario, confirmacao de ownership no backend
+- detalhes operacionais (politica de senha, MFA, rate limit, lockout, audit log, step-up) consolidados em [`docs-sep/SEGURANCA.md`](./SEGURANCA.md)
 
 ## 15. Padrao de Auditoria
 
