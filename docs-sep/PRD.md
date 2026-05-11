@@ -1030,7 +1030,7 @@ O Dev Mobile dedicado tem trabalho concreto desde a Sprint 0, em paralelo ao bac
 - M-Sprint 1: [`specs/fase-1/201-msprint-1-tokens-notion-mobile.md`](../specs/fase-1/201-msprint-1-tokens-notion-mobile.md) — adaptacao dos tokens Notion para mobile (touch, tabs inferiores), customizacao de componentes Ionic, design system showcase
 - M-Sprint 2: [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../specs/fase-1/202-msprint-2-telas-publicas-mobile.md) — splash, boas-vindas, login, register com MSW; token storage via Capacitor Preferences (**concluida em 2026-05-07**)
 - M-Sprint 3: [`specs/fase-1/203-msprint-3-shell-mobile-auth.md`](../specs/fase-1/203-msprint-3-shell-mobile-auth.md) — auth real, shell mobile (tabs inferiores), guards funcionais, interceptors HTTP (**concluida em 2026-05-08**)
-- M-Sprint 4: [`specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md`](../specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md) — perfil, alterar senha, casca tomador, casca empresa credora + smoke E2E PWA (**implementada em 2026-05-08**, push/PR pendente; validacao live com backend real e device fisico pendentes)
+- M-Sprint 4: [`specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md`](../specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md) — perfil, alterar senha, casca tomador, casca empresa credora + smoke E2E PWA (**concluida em 2026-05-08**)
 
 Cada M-Sprint tem Definition of Done explicita no seu spec correspondente.
 
@@ -1202,9 +1202,9 @@ Detalhamento das tasks:
 - consultar: [`specs/fase-1/004-sprint-4-erros-docs-testes.md`](../specs/fase-1/004-sprint-4-erros-docs-testes.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
 
-### Trilha Fase 2 (Sprints 5-14, backend)
+### Trilha Fase 2 (Sprints 5-14)
 
-Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). As Sprints 5-14 sao **apenas backend** — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-14 seguem como **backend-only** nesta etapa — Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 Mapeamento Sprint → Epic:
 
@@ -1222,6 +1222,9 @@ Mapeamento Sprint → Epic:
 | 14 | Epic 9 | Backoffice operacional |
 
 ### Sprint 5
+
+Status:
+- concluida em 2026-05-11; gate de Fase 2, producao e integracao Celcoin sandbox real liberado
 
 Objetivo de planejamento:
 - endurecer a camada de autenticacao antes de qualquer ambiente de producao ou integracao real com Celcoin: MFA via TOTP (com biometria nativa no mobile), refresh token com rotacao, rate limiting, account lockout, password policy revisada, step-up authentication e audit log de seguranca
@@ -1242,6 +1245,7 @@ Responsavel principal:
 Detalhamento das tasks:
 - consultar: [`specs/fase-2/005-sprint-5-endurecimento-seguranca.md`](../specs/fase-2/005-sprint-5-endurecimento-seguranca.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+- referencia operacional pos-sprint: [`docs-sep/SEGURANCA.md`](./SEGURANCA.md)
 
 ### Sprint 6
 
@@ -1586,12 +1590,13 @@ Esta fase sera considerada bem-sucedida quando:
 - sustentar seguranca e segregacao de responsabilidades conforme o produto crescer
 
 ### Epic 12 - Fundacao Frontend
-**Status: F-Sprints 0-3 concluidas (2026-05-04 a 2026-05-07); F-Sprint 4 (telas autenticadas) pendente.**
+**Status: F-Sprints 0-5 concluidas (2026-05-04 a 2026-05-11).**
 - ✅ F-Sprint 0: scaffold Angular `20.x` Standalone + Signals + SCSS puro + tooling (ESLint, Prettier, Stylelint, Husky, Vitest, Playwright, MSW, CI)
 - ✅ F-Sprint 1: tokens SCSS Apple e Notion fieis aos design systems oficiais ([`DESIGN-apple.md`](./DESIGN-apple.md) e [`DESIGN-notion.md`](./DESIGN-notion.md)) em variaveis SCSS reutilizaveis + showcase navegavel em `/design-system`
 - ✅ F-Sprint 2: telas publicas Apple (landing institucional `/`, login `/login`, register publico `/register`) + AuthService Signals + handlers MSW alinhados ao PRD §21
 - ✅ F-Sprint 3: integracao auth real (environment + interceptors + guards funcionais) + shell autenticado Notion (`/app`) com header, sidenav (filtrado por role), breadcrumbs e dashboard placeholder; MSW disponivel via build configuracao `dev-offline`; pagina `/access-denied` para 403
-- ⏳ F-Sprint 4: telas autenticadas concretas (meu perfil, alterar senha, administracao de usuarios, detalhe de usuario, dashboard administrativa) consumindo apenas APIs das Sprints 1-4
+- ✅ F-Sprint 4: telas autenticadas concretas (meu perfil, alterar senha, administracao de usuarios, detalhe de usuario, dashboard administrativa) consumindo apenas APIs das Sprints 1-4
+- ✅ F-Sprint 5: hardening de seguranca no web (MFA TOTP, step-up, refresh token rotativo, account locked e canalizacao do cadastro publico)
 - biblioteca interna de componentes Notion (botoes, inputs, formularios, cards, tabelas, modais, toasts, loaders) cresce conforme demanda nas F-Sprints 4+
 - guards de rota, controle de sessao, integracao HTTP com a API e tratamento padronizado de erros 401/403/404/409 ja entregues na F-Sprint 3
 - entregar o "Frontend MVP" navegavel, validado e independente de qualquer jornada de negocio
@@ -1627,7 +1632,8 @@ A primeira fase da Epic 14 e detalhada em 5 specs (1 arquivo por M-Sprint, paral
 - M-Sprint 1: [`specs/fase-1/201-msprint-1-tokens-notion-mobile.md`](../specs/fase-1/201-msprint-1-tokens-notion-mobile.md) — Tokens Notion adaptados (touch, tabs inferiores) + Showcase
 - M-Sprint 2: [`specs/fase-1/202-msprint-2-telas-publicas-mobile.md`](../specs/fase-1/202-msprint-2-telas-publicas-mobile.md) — Splash, Boas-vindas, Login, Register com MSW + Capacitor Preferences (**concluida em 2026-05-07**)
 - M-Sprint 3: [`specs/fase-1/203-msprint-3-shell-mobile-auth.md`](../specs/fase-1/203-msprint-3-shell-mobile-auth.md) — Auth real, Shell mobile (tabs inferiores), Guards, Interceptors (**concluida em 2026-05-08**)
-- M-Sprint 4: [`specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md`](../specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md) — Perfil, Alterar senha, Casca tomador, Casca credora + Smoke E2E PWA (**implementada em 2026-05-08**, push/PR pendente; validacao live com backend real e device fisico pendentes)
+- M-Sprint 4: [`specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md`](../specs/fase-1/204-msprint-4-telas-autenticadas-mobile.md) — Perfil, Alterar senha, Casca tomador, Casca credora + Smoke E2E PWA (**concluida em 2026-05-08**)
+- M-Sprint 5: hardening mobile da Sprint 5 — MFA verify, refresh token rotativo, account locked e preparacao de biometria via stub PWA (**concluida em 2026-05-11**, PR #21)
 
 Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornadas funcionais do tomador, da empresa credora e Pix visivel ao usuario), que dependem das APIs das Epics 5-11.
 
@@ -1841,7 +1847,7 @@ As tres secoes tem sobreposicao intencional (estado, stack, arquitetura, marco r
 
 ## 29. Mapeamento Fase 2: Epics × Sprints
 
-Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14, **apenas backend**). Util para PO/PM acompanhar a Fase 2 sem precisar ler a §22 inteira.
+Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14). Util para PO/PM acompanhar a Fase 2 sem precisar ler a §22 inteira. Sprint 5 ja esta concluida como gate cross-stack; Sprints 6-14 seguem backend-only ate estabilizacao dos contratos da API.
 
 | Sprint | Epic | Tema | Spec | Modulo dominio |
 |--------|------|------|------|----------------|
@@ -1856,12 +1862,12 @@ Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14,
 | 13 | Epic 8 (parte 2) | Cobranca — inadimplencia e recuperacao | [`013`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md) | `cobranca` |
 | 14 | Epic 9 | Backoffice operacional | [`014`](../specs/fase-2/014-sprint-14-backoffice-operacional.md) | `backoffice` |
 
-**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening, Sprints 6-14 sao novas). Dependencia linear (cada sprint exige a anterior pronta). Trilha exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-14 sao novas). Dependencia linear (cada sprint exige a anterior pronta). A partir da Sprint 6, a trilha e exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 **Decisoes de planejamento**:
 - **Granularidade**: cada Epic 5-8 foi dividida em 2 sprints (parte 1 + parte 2) para reduzir risco de entrega; Epic 9 ficou em 1 sprint unica.
 - **Trilhas Web/Mobile**: nao planejadas nesta etapa. Decisao motivada por dois fatores: (1) os contratos da API sao definidos pelo backend e ainda podem evoluir durante as Epics 5-9; (2) o frontend de jornadas (Epic 13) e o mobile (Epic 14 fase 2+) so podem comecar de forma estavel quando esses contratos estiverem fechados.
-- **Sprint 5**: ja entregue/planejada antes de 2026-05-04, foi reposicionada como gate de abertura da Fase 2 (e nao mais fechamento da Fase 1) por exigir MFA/refresh token/lockout antes de qualquer integracao real com Celcoin.
+- **Sprint 5**: concluida em 2026-05-11; foi reposicionada como gate de abertura da Fase 2 (e nao mais fechamento da Fase 1) por exigir MFA/refresh token/lockout antes de qualquer integracao real com Celcoin.
 
 **ADRs candidatos durante a Fase 2** (criados just-in-time quando cada decisao for tomada):
 - ADR 0011 — Motor de regras de credito interno (Sprint 8)

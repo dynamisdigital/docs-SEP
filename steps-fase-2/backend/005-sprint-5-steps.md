@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`specs/fase-2/005-sprint-5-endurecimento-seguranca.md`](../../specs/fase-2/005-sprint-5-endurecimento-seguranca.md)
 
-**Status**: planejada para execucao nos repos `sep-api`, `sep-app` e `sep-mobile`, com ownership principal do backend.
+**Status**: concluida em 2026-05-11 nos repos `sep-api`, `sep-app` e `sep-mobile`, com ownership principal do backend.
 
 **Objetivo geral**: endurecer autenticacao e sessao antes de qualquer producao, integracao real com Celcoin ou Epic 5. A sprint adiciona MFA TOTP, biometria mobile, refresh token rotativo, rate limit, lockout, nova politica de senha, step-up authentication, audit log de seguranca e canalizacao de cadastro por perfil.
 
@@ -15,6 +15,13 @@
 
 **Branch sugerida por repo**:
 - `feature/sprint-5-endurecimento-seguranca`
+
+**Branches/PRs executados**:
+- `sep-api`: `feature/sprint-5-endurecimento-seguranca`, mergeada via PR #27; fix CVE em PR separado (`feature/fix-httpclient-cve`).
+- `sep-app`: `feature/fsprint-5-mfa`, mergeada via PR #22.
+- `sep-mobile`: `feature/msprint-5-biometria`, mergeada via PR #21.
+
+**Referencia pos-sprint**: [`docs-sep/SEGURANCA.md`](../../docs-sep/SEGURANCA.md) consolida fluxos, configuracao por ambiente, codigos de erro e follow-ups de seguranca.
 
 **Pre-requisitos globais**:
 - Sprint 4 backend concluida e verde.
