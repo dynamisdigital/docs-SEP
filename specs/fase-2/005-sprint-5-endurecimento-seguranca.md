@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 005
 - **Titulo**: Sprint 5 - Endurecimento de Seguranca (MFA + Refresh Token + Rate Limit + Lockout + Password Policy)
-- **Status**: aprovada para execucao (apos conclusao da Sprint 4)
+- **Status**: concluida em 2026-05-11 (backend PR #27 + fix CVE em PR separado; web PR #22; mobile PR #21)
 - **Fase do produto**: Epic 4 estendida (Estabilizacao + Endurecimento) — gate para producao e para Epic 5
 - **Origem**: PRD §7 RF-01/RF-05, §14, §18; ADRs 0009 e 0010
 - **Depende de**: [`004-sprint-4-erros-docs-testes.md`](../fase-1/004-sprint-4-erros-docs-testes.md)
@@ -19,6 +19,8 @@ Esta Sprint e **gate** para:
 - Integracao real com Celcoin sandbox
 - Epic 5 (Onboarding KYC/KYB)
 - Epic 14 Fase Mobile 2+ (jornadas funcionais do tomador)
+
+**Resultado pos-execucao**: gate liberado. A sprint entregou MFA TOTP, refresh token rotativo, lockout, rate limit, password policy revisada, step-up authentication, audit log de seguranca, migracao de usuarios legados, telas web de MFA/step-up e preparacao mobile para biometria/fallback TOTP. A referencia consolidada de operacao e [`docs-sep/SEGURANCA.md`](../../docs-sep/SEGURANCA.md).
 
 ## Escopo
 

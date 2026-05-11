@@ -17,7 +17,7 @@ steps-fase-2/
 
 | Sprint | Arquivo | Status |
 |--------|---------|--------|
-| Sprint 5 - Endurecimento de Seguranca | [`backend/005-sprint-5-steps.md`](./backend/005-sprint-5-steps.md) | Planejada para execucao |
+| Sprint 5 - Endurecimento de Seguranca | [`backend/005-sprint-5-steps.md`](./backend/005-sprint-5-steps.md) | Concluida em 2026-05-11 |
 | Sprint 6 - Onboarding KYC Pessoa Fisica | `backend/006-sprint-6-steps.md` | A criar antes da Sprint 6 |
 | Sprint 7 - Onboarding KYB Empresa + PLD | `backend/007-sprint-7-steps.md` | A criar antes da Sprint 7 |
 | Sprint 8 - Credito Regras + Parecer | `backend/008-sprint-8-steps.md` | A criar antes da Sprint 8 |
@@ -31,5 +31,5 @@ steps-fase-2/
 ## Regras
 
 - Steps continuam sendo criados just-in-time.
-- A Sprint 5 e cross-stack, mas fica em `backend/` porque o backend e o owner principal e concentra os contratos de seguranca.
+- A Sprint 5 foi cross-stack, mas fica em `backend/` porque o backend foi o owner principal e concentra os contratos de seguranca.
 - Quando uma sprint da Fase 2 tiver trilha web/mobile propria, criar subpasta/arquivo correspondente apenas quando o spec estiver aprovado.
