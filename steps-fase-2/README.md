@@ -18,6 +18,7 @@ steps-fase-2/
 | Sprint | Arquivo | Status |
 |--------|---------|--------|
 | Sprint 5 - Endurecimento de Seguranca | [`backend/005-sprint-5-steps.md`](./backend/005-sprint-5-steps.md) | Concluida em 2026-05-11 |
+| Sprint 5 - Follow-ups de Seguranca | [`backend/005-sprint-5-followups-seguranca-steps.md`](./backend/005-sprint-5-followups-seguranca-steps.md) | A implementar |
 | Sprint 6 - Onboarding KYC Pessoa Fisica | `backend/006-sprint-6-steps.md` | A criar antes da Sprint 6 |
 | Sprint 7 - Onboarding KYB Empresa + PLD | `backend/007-sprint-7-steps.md` | A criar antes da Sprint 7 |
 | Sprint 8 - Credito Regras + Parecer | `backend/008-sprint-8-steps.md` | A criar antes da Sprint 8 |
