@@ -2,13 +2,13 @@
 	"info": {
 		"_postman_id": "8f3a2c1e-4b5d-4e8a-9f2c-1234567890ab",
 		"name": "SEP API",
-		"description": "Coleção Postman da SEP API (Java 21 + Spring Boot 3.5).\n\n**Endpoints cobertos:**\n- Auth (login, /me)\n- Usuários (cadastro público, consulta por id, listagem admin, alteração de senha)\n- Webhooks (Pix/Celcoin com HMAC-SHA256 + Idempotency-Key)\n- Actuator (health, info)\n- OpenAPI (specs JSON, Swagger UI)\n\n**Variáveis de ambiente esperadas** (collection variables abaixo, sobrescrevíveis em environment):\n- `baseUrl` — `http://localhost:8080`\n- `adminToken` — JWT do usuário ADMIN (preencher após login)\n- `clienteToken` — JWT do usuário CLIENTE (preencher após login)\n- `adminId` — UUID do admin\n- `clienteId` — UUID do cliente\n- `webhookSecret` — secret HMAC do provider (default `dev-webhook-secret-change-me`)\n\n**Ordem sugerida de execução:**\n1. POST /usuarios (criar admin) → copiar `id` para `adminId`\n2. POST /usuarios (criar cliente) → copiar `id` para `clienteId`\n3. POST /auth/login (admin) → copiar `accessToken` para `adminToken`\n4. POST /auth/login (cliente) → copiar `accessToken` para `clienteToken`\n5. Demais requests autenticados\n\n**Marco regulatório:** SEP (Resolução CMN 4.656/2018). KYC/KYB, escrow e auditoria reforçada modelados desde Sprint 1.",
+		"description": "Colecao Postman da SEP API (Java 21 + Spring Boot 3.5).\n\n**Endpoints cobertos:**\n- Auth Sprint 5 (login, refresh token rotativo, logout, logout-all, /me)\n- MFA TOTP (setup, confirm, verify, disable)\n- Step-up authentication\n- Usuarios (cadastro publico CLIENTE, cadastro interno ADMIN, consulta, listagem, alteracao de senha)\n- Webhooks (Pix/Celcoin com HMAC-SHA256 + Idempotency-Key)\n- Actuator\n- OpenAPI / Swagger\n\n**Variaveis de ambiente esperadas** (collection variables abaixo, sobrescreviveis em environment):\n- baseUrl — http://localhost:8080\n- adminToken / clienteToken — JWTs de acesso\n- adminRefreshToken / clienteRefreshToken — refresh tokens retornados no body no contrato atual\n- adminId / clienteId — UUIDs dos usuarios\n- mfaChallengeId — challenge retornado por /auth/login quando MFA esta ativo\n- stepUpChallengeId / stepUpToken — dados do fluxo step-up\n- webhookSecret — secret HMAC do provider\n\n**Ordem sugerida de execucao local:**\n1. POST /usuarios (criar cliente publico)\n2. Obter/criar admin via seed ou POST /admin/usuarios usando adminToken existente\n3. POST /auth/login (admin/cliente)\n4. Fluxos de MFA/step-up conforme necessidade\n5. Demais requests autenticados\n\n**Nota Sprint 5:** a politica de senha agora e 12+ caracteres OU passphrase; cadastro publico cria sempre CLIENTE. Criacao de ADMIN fica em endpoint autenticado.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Auth",
-			"description": "Autenticação via JWT (sem refresh token nesta fase). Login retorna `accessToken` Bearer; rotas protegidas exigem header `Authorization: Bearer <token>`.",
+			"description": "Autenticacao Sprint 5: access token curto, refresh token rotativo, logout e usuario autenticado.",
 			"item": [
 				{
 					"name": "POST /auth/login (admin)",
@@ -19,11 +19,10 @@
 								"exec": [
 									"pm.test('Status 200', () => pm.response.to.have.status(200));",
 									"const json = pm.response.json();",
-									"if (json.accessToken) {",
-									"  pm.collectionVariables.set('adminToken', json.accessToken);",
-									"  pm.collectionVariables.set('adminId', json.usuario.id);",
-									"  console.log('adminToken salvo:', json.accessToken.substring(0, 20) + '...');",
-									"}"
+									"if (json.mfaRequired && json.mfaChallengeId) { pm.collectionVariables.set('mfaChallengeId', json.mfaChallengeId); }",
+									"if (json.accessToken) pm.collectionVariables.set('adminToken', json.accessToken);",
+									"if (json.refreshToken) pm.collectionVariables.set('adminRefreshToken', json.refreshToken);",
+									"if (json.usuario?.id) pm.collectionVariables.set('adminId', json.usuario.id);"
 								],
 								"type": "text/javascript"
 							}
@@ -32,18 +31,28 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"123456\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
 						},
-						"description": "Login do admin. Salva `adminToken` e `adminId` automaticamente via test script."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+						},
+						"description": "Login do admin. Se MFA nao estiver ativo, salva adminToken/adminRefreshToken/adminId. Se MFA estiver ativo, salva mfaChallengeId."
 					}
 				},
 				{
@@ -55,10 +64,10 @@
 								"exec": [
 									"pm.test('Status 200', () => pm.response.to.have.status(200));",
 									"const json = pm.response.json();",
-									"if (json.accessToken) {",
-									"  pm.collectionVariables.set('clienteToken', json.accessToken);",
-									"  pm.collectionVariables.set('clienteId', json.usuario.id);",
-									"}"
+									"if (json.mfaRequired && json.mfaChallengeId) { pm.collectionVariables.set('mfaChallengeId', json.mfaChallengeId); }",
+									"if (json.accessToken) pm.collectionVariables.set('clienteToken', json.accessToken);",
+									"if (json.refreshToken) pm.collectionVariables.set('clienteRefreshToken', json.refreshToken);",
+									"if (json.usuario?.id) pm.collectionVariables.set('clienteId', json.usuario.id);"
 								],
 								"type": "text/javascript"
 							}
@@ -67,18 +76,28 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"123456\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
 						},
-						"description": "Login do cliente. Salva `clienteToken` e `clienteId` automaticamente via test script."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+						},
+						"description": "Login do cliente. Salva clienteToken/clienteRefreshToken/clienteId quando nao exige MFA."
 					}
 				},
 				{
@@ -86,18 +105,168 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"wrongpw\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/login",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "auth", "login"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
 						},
-						"description": "Cenário de erro: deve retornar 401 Unauthorized com `ErrorResponseDto` JSON (`status: 401`, `error: Unauthorized`)."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"wrong-password\"\n}"
+						},
+						"description": "Cenario de erro: deve retornar 401 Unauthorized com ErrorResponseDto."
+					}
+				},
+				{
+					"name": "POST /auth/refresh (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"if (json.accessToken) pm.collectionVariables.set('adminToken', json.accessToken);",
+									"if (json.refreshToken) pm.collectionVariables.set('adminRefreshToken', json.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{adminRefreshToken}}\"\n}"
+						},
+						"description": "Rotaciona refresh token do admin. Salva novo access e novo refresh."
+					}
+				},
+				{
+					"name": "POST /auth/refresh (cliente)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"if (json.accessToken) pm.collectionVariables.set('clienteToken', json.accessToken);",
+									"if (json.refreshToken) pm.collectionVariables.set('clienteRefreshToken', json.refreshToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{clienteRefreshToken}}\"\n}"
+						},
+						"description": "Rotaciona refresh token do cliente. Salva novo access e novo refresh."
+					}
+				},
+				{
+					"name": "POST /auth/logout (admin) — 204",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{adminRefreshToken}}\"\n}"
+						},
+						"description": "Revoga refresh token atual do admin. Idempotente."
+					}
+				},
+				{
+					"name": "POST /auth/logout-all (admin) — 204",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/logout-all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout-all"
+							]
+						},
+						"description": "Revoga todos os refresh tokens do usuario autenticado."
 					}
 				},
 				{
@@ -105,14 +274,24 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/me",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "auth", "me"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"me"
+							]
 						},
-						"description": "Retorna `UsuarioResponseDto` do usuário autenticado (admin)."
+						"description": "Retorna UsuarioResponseDto do admin autenticado."
 					}
 				},
 				{
@@ -120,13 +299,24 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{clienteToken}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/me",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "auth", "me"]
-						}
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Retorna UsuarioResponseDto do cliente autenticado."
 					}
 				},
 				{
@@ -136,20 +326,364 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/me",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "auth", "me"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"me"
+							]
 						},
-						"description": "Cenário de erro: deve retornar 401 Unauthorized via `ApiAuthenticationEntryPoint` (Sprint 4)."
+						"description": "Cenario de erro: deve retornar 401 Unauthorized."
+					}
+				}
+			]
+		},
+		{
+			"name": "MFA TOTP (Sprint 5)",
+			"description": "Setup, confirmacao, verify de login e disable de TOTP. Backup codes tambem sao aceitos nos campos codigo.",
+			"item": [
+				{
+					"name": "POST /auth/totp/setup (admin) — 200",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/totp/setup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"totp",
+								"setup"
+							]
+						},
+						"description": "Gera secret, otpauth URI, QR code data URL e backup codes. Exibir backup codes uma unica vez."
+					}
+				},
+				{
+					"name": "POST /auth/totp/confirm (admin) — 204",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/totp/confirm",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"totp",
+								"confirm"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"codigo\": \"123456\"\n}"
+						},
+						"description": "Confirma primeiro codigo TOTP e ativa MFA. Substituir codigo pelo gerado no app autenticador."
+					}
+				},
+				{
+					"name": "POST /auth/totp/verify — 200",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"if (json.usuario?.role === 'ADMIN') { pm.collectionVariables.set('adminToken', json.accessToken); pm.collectionVariables.set('adminRefreshToken', json.refreshToken); pm.collectionVariables.set('adminId', json.usuario.id); }",
+									"if (json.usuario?.role === 'CLIENTE') { pm.collectionVariables.set('clienteToken', json.accessToken); pm.collectionVariables.set('clienteRefreshToken', json.refreshToken); pm.collectionVariables.set('clienteId', json.usuario.id); }"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/totp/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"totp",
+								"verify"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mfaChallengeId\": \"{{mfaChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
+						},
+						"description": "Conclui login com mfaChallengeId retornado por /auth/login. Salva tokens conforme usuario retornado."
+					}
+				},
+				{
+					"name": "POST /auth/totp/disable (admin) — 204",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							},
+							{
+								"key": "X-Step-Up-Token",
+								"value": "{{stepUpToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/totp/disable",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"totp",
+								"disable"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\"\n}"
+						},
+						"description": "Desabilita TOTP. Exige senha atual e X-Step-Up-Token valido."
+					}
+				}
+			]
+		},
+		{
+			"name": "Step-up (Sprint 5)",
+			"description": "Step-up authentication para operacoes sensiveis. O token emitido deve ser enviado em X-Step-Up-Token na proxima request sensivel.",
+			"item": [
+				{
+					"name": "POST /auth/step-up/initiate (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"if (json.stepUpChallengeId) pm.collectionVariables.set('stepUpChallengeId', json.stepUpChallengeId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/step-up/initiate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"step-up",
+								"initiate"
+							]
+						},
+						"description": "Inicia challenge de step-up para admin."
+					}
+				},
+				{
+					"name": "POST /auth/step-up/complete (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"if (json.stepUpToken) pm.collectionVariables.set('stepUpToken', json.stepUpToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/step-up/complete",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"step-up",
+								"complete"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"stepUpChallengeId\": \"{{stepUpChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
+						},
+						"description": "Conclui step-up com codigo TOTP ou backup code e salva stepUpToken."
+					}
+				},
+				{
+					"name": "POST /auth/step-up/initiate (cliente)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"if (json.stepUpChallengeId) pm.collectionVariables.set('stepUpChallengeId', json.stepUpChallengeId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/step-up/initiate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"step-up",
+								"initiate"
+							]
+						},
+						"description": "Inicia challenge de step-up para cliente."
+					}
+				},
+				{
+					"name": "POST /auth/step-up/complete (cliente)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"const json = pm.response.json();",
+									"if (json.stepUpToken) pm.collectionVariables.set('stepUpToken', json.stepUpToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/step-up/complete",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"step-up",
+								"complete"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"stepUpChallengeId\": \"{{stepUpChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
+						},
+						"description": "Conclui step-up do cliente e salva stepUpToken."
 					}
 				}
 			]
 		},
 		{
 			"name": "Usuários",
-			"description": "Recursos de usuário. Cadastro público (sem auth); consulta/listagem/alteração de senha exigem JWT com regras de perfil/ownership.",
+			"description": "Recursos de usuario. Cadastro publico cria sempre CLIENTE; criacao de ADMIN fica em /api/v1/admin/usuarios com token ADMIN.",
 			"item": [
 				{
-					"name": "POST /usuarios (criar admin) — 201",
+					"name": "POST /usuarios (criar cliente publico) — 201",
 					"event": [
 						{
 							"listen": "test",
@@ -157,8 +691,9 @@
 								"exec": [
 									"pm.test('Status 201', () => pm.response.to.have.status(201));",
 									"const json = pm.response.json();",
-									"if (json.id) pm.collectionVariables.set('adminId', json.id);",
-									"pm.test('senha não exposta', () => pm.expect(json).to.not.have.property('password'));"
+									"if (json.id) pm.collectionVariables.set('clienteId', json.id);",
+									"pm.test('senha nao exposta', () => pm.expect(json).to.not.have.property('password'));",
+									"pm.test('role CLIENTE', () => pm.expect(json.role).to.eql('CLIENTE'));"
 								],
 								"type": "text/javascript"
 							}
@@ -167,22 +702,31 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"123456\",\n  \"role\": \"ADMIN\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios"
+							]
 						},
-						"description": "Cadastro público do admin. Header `Location: /api/v1/usuarios/{id}` no response."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+						},
+						"description": "Cadastro publico. Sempre cria role CLIENTE; campo role nao existe mais no DTO publico."
 					}
 				},
 				{
-					"name": "POST /usuarios (criar cliente) — 201",
+					"name": "POST /admin/usuarios (criar admin interno) — 201",
 					"event": [
 						{
 							"listen": "test",
@@ -190,7 +734,7 @@
 								"exec": [
 									"pm.test('Status 201', () => pm.response.to.have.status(201));",
 									"const json = pm.response.json();",
-									"if (json.id) pm.collectionVariables.set('clienteId', json.id);"
+									"pm.test('senha nao exposta', () => pm.expect(json).to.not.have.property('password'));"
 								],
 								"type": "text/javascript"
 							}
@@ -199,56 +743,121 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
 						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/usuarios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"usuarios"
+							]
+						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"123456\",\n  \"role\": \"CLIENTE\"\n}"
+							"raw": "{\n  \"username\": \"admin2@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios"]
-						},
-						"description": "Cadastro público do cliente."
+						"description": "Cadastro autenticado de usuario interno. Requer token ADMIN."
 					}
 				},
 				{
-					"name": "POST /usuarios (email inválido) — 400",
+					"name": "POST /admin/usuarios (cliente tenta criar admin) — 403",
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
 						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/usuarios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"usuarios"
+							]
+						},
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"nao-eh-email\",\n  \"password\": \"123456\",\n  \"role\": \"CLIENTE\"\n}"
+							"raw": "{\n  \"username\": \"admin-negado@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios"]
-						},
-						"description": "Bean Validation deve rejeitar com 400 + `ErrorResponseDto`."
+						"description": "CLIENTE nao pode criar usuario interno. Espera 403."
 					}
 				},
 				{
-					"name": "POST /usuarios (senha fora de 6) — 400",
+					"name": "POST /usuarios (email invalido) — 400",
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"x@y.com\",\n  \"password\": \"12345\",\n  \"role\": \"CLIENTE\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios"
+							]
 						},
-						"description": "Política de senha exatamente 6 caracteres (PRD §7 RF-01). Espera 400."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"nao-eh-email\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+						},
+						"description": "Bean Validation deve rejeitar email invalido."
+					}
+				},
+				{
+					"name": "POST /usuarios (senha fraca) — 400",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/usuarios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"fraca@empresa.com\",\n  \"password\": \"123456\"\n}"
+						},
+						"description": "Politica Sprint 5 deve rejeitar senha curta/fraca."
 					}
 				},
 				{
@@ -256,63 +865,102 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"123456\",\n  \"role\": \"ADMIN\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios"
+							]
 						},
-						"description": "Esperado: 409 Conflict via `UsernameJaExisteException` (`USR-409-001`)."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+						},
+						"description": "Esperado: 409 Conflict para username duplicado."
 					}
 				},
 				{
-					"name": "GET /usuarios/{id} (admin → qualquer) — 200",
+					"name": "GET /usuarios/{id} (admin -> qualquer) — 200",
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios", "{{clienteId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios",
+								"{{clienteId}}"
+							]
 						},
-						"description": "Admin pode consultar qualquer usuário."
+						"description": "Admin pode consultar qualquer usuario."
 					}
 				},
 				{
-					"name": "GET /usuarios/{id} (cliente → próprio) — 200",
+					"name": "GET /usuarios/{id} (cliente -> proprio) — 200",
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{clienteToken}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios", "{{clienteId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios",
+								"{{clienteId}}"
+							]
 						},
-						"description": "Cliente consulta apenas o próprio (ownership check no use case)."
+						"description": "Cliente consulta apenas o proprio usuario."
 					}
 				},
 				{
-					"name": "GET /usuarios/{id} (cliente → alheio) — 403",
+					"name": "GET /usuarios/{id} (cliente -> alheio) — 403",
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{clienteToken}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios/{{adminId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios", "{{adminId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios",
+								"{{adminId}}"
+							]
 						},
-						"description": "Cliente NÃO pode consultar admin (ou qualquer outro id). Espera 403 via `ApiAccessDeniedHandler`."
+						"description": "Cliente nao pode consultar outro usuario."
 					}
 				},
 				{
@@ -320,64 +968,110 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios/00000000-0000-0000-0000-000000000000",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios", "00000000-0000-0000-0000-000000000000"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios",
+								"00000000-0000-0000-0000-000000000000"
+							]
 						},
-						"description": "Esperado: 404 via `UsuarioNaoEncontradoException` (`USR-404-001`)."
+						"description": "Usuario inexistente deve retornar 404."
 					}
 				},
 				{
-					"name": "GET /usuarios (admin → lista) — 200",
+					"name": "GET /usuarios (admin -> lista) — 200",
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios"
+							]
 						},
-						"description": "Listagem de todos os usuários — apenas ROLE_ADMIN."
+						"description": "Listagem restrita a ADMIN."
 					}
 				},
 				{
-					"name": "GET /usuarios (cliente → lista) — 403",
+					"name": "GET /usuarios (cliente -> lista) — 403",
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{clienteToken}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
 						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios"
+							]
 						},
-						"description": "Cliente NÃO pode listar (`@PreAuthorize(\"hasRole('ADMIN')\")`). Espera 403."
+						"description": "Cliente nao pode listar usuarios."
 					}
 				},
 				{
-					"name": "PATCH /usuarios/{id}/senha (próprio cliente) — 204",
+					"name": "PATCH /usuarios/{id}/senha (proprio cliente) — 204",
 					"request": {
 						"method": "PATCH",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Authorization", "value": "Bearer {{clienteToken}}" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							},
+							{
+								"key": "X-Step-Up-Token",
+								"value": "{{stepUpToken}}"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"passwordAtual\": \"123456\",\n  \"novaSenha\": \"654321\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios", "{{clienteId}}", "senha"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios",
+								"{{clienteId}}",
+								"senha"
+							]
 						},
-						"description": "Usuário altera própria senha. Espera 204 No Content."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+						},
+						"description": "Altera propria senha. Se MFA estiver ativo, exige X-Step-Up-Token; se MFA nao estiver ativo, backend faz bypass temporario."
 					}
 				},
 				{
@@ -385,19 +1079,37 @@
 					"request": {
 						"method": "PATCH",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Authorization", "value": "Bearer {{clienteToken}}" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							},
+							{
+								"key": "X-Step-Up-Token",
+								"value": "{{stepUpToken}}"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"passwordAtual\": \"errada\",\n  \"novaSenha\": \"abcdef\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios", "{{clienteId}}", "senha"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios",
+								"{{clienteId}}",
+								"senha"
+							]
 						},
-						"description": "Esperado: 400 via `SenhaAtualIncorretaException` (`USR-400-001`)."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passwordAtual\": \"senha-errada\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+						},
+						"description": "Senha atual incorreta deve retornar 400."
 					}
 				},
 				{
@@ -405,19 +1117,37 @@
 					"request": {
 						"method": "PATCH",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Authorization", "value": "Bearer {{adminToken}}" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							},
+							{
+								"key": "X-Step-Up-Token",
+								"value": "{{stepUpToken}}"
+							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"passwordAtual\": \"123456\",\n  \"novaSenha\": \"abcdef\"\n}"
-						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "usuarios", "{{clienteId}}", "senha"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"usuarios",
+								"{{clienteId}}",
+								"senha"
+							]
 						},
-						"description": "Mesmo admin não pode trocar senha de outro usuário (regra de ownership). Espera 403."
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+						},
+						"description": "Mesmo ADMIN nao troca senha de outro usuario."
 					}
 				}
 			]
@@ -446,8 +1176,14 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Idempotency-Key", "value": "evt-{{$timestamp}}" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Idempotency-Key",
+								"value": "evt-{{$timestamp}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -455,8 +1191,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "webhooks", "celcoin", "pix-recebimento"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"webhooks",
+								"celcoin",
+								"pix-recebimento"
+							]
 						},
 						"description": "Evento novo: 202 Accepted, persiste em `webhook_event_log` com status PENDENTE."
 					}
@@ -480,8 +1224,14 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Idempotency-Key", "value": "evt-fixed-id-12345" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Idempotency-Key",
+								"value": "evt-fixed-id-12345"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -489,8 +1239,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "webhooks", "celcoin", "pix-recebimento"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"webhooks",
+								"celcoin",
+								"pix-recebimento"
+							]
 						},
 						"description": "Reenvio com mesmo `Idempotency-Key`: 202 Accepted (idempotente, NÃO duplica registro). Rodar 2× para validar."
 					}
@@ -514,7 +1272,10 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -522,8 +1283,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "webhooks", "celcoin", "pix-recebimento"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"webhooks",
+								"celcoin",
+								"pix-recebimento"
+							]
 						},
 						"description": "Esperado: 400 via `ValidacaoException` (`WHK-400-002`)."
 					}
@@ -533,9 +1302,18 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Idempotency-Key", "value": "evt-bad-signature" },
-							{ "key": "X-Webhook-Signature", "value": "0000000000000000000000000000000000000000000000000000000000000000" }
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Idempotency-Key",
+								"value": "evt-bad-signature"
+							},
+							{
+								"key": "X-Webhook-Signature",
+								"value": "0000000000000000000000000000000000000000000000000000000000000000"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -543,8 +1321,16 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "webhooks", "celcoin", "pix-recebimento"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"webhooks",
+								"celcoin",
+								"pix-recebimento"
+							]
 						},
 						"description": "Esperado: 401 (BadCredentialsException via HMAC mismatch). `MessageDigest.isEqual` constant-time."
 					}
@@ -562,8 +1348,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/actuator/health",
-							"host": ["{{baseUrl}}"],
-							"path": ["actuator", "health"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
 						},
 						"description": "Healthcheck. Espera `{\"status\": \"UP\"}`."
 					}
@@ -575,8 +1366,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/actuator/info",
-							"host": ["{{baseUrl}}"],
-							"path": ["actuator", "info"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"info"
+							]
 						}
 					}
 				},
@@ -587,8 +1383,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/actuator/metrics",
-							"host": ["{{baseUrl}}"],
-							"path": ["actuator", "metrics"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"metrics"
+							]
 						}
 					}
 				},
@@ -599,8 +1400,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/actuator/prometheus",
-							"host": ["{{baseUrl}}"],
-							"path": ["actuator", "prometheus"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"prometheus"
+							]
 						},
 						"description": "Métricas em formato Prometheus (Micrometer)."
 					}
@@ -618,8 +1424,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/v3/api-docs",
-							"host": ["{{baseUrl}}"],
-							"path": ["v3", "api-docs"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v3",
+								"api-docs"
+							]
 						},
 						"description": "OpenAPI spec JSON com todos os endpoints, schemas e SecurityScheme `bearerAuth`."
 					}
@@ -631,8 +1442,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/swagger-ui/index.html",
-							"host": ["{{baseUrl}}"],
-							"path": ["swagger-ui", "index.html"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"swagger-ui",
+								"index.html"
+							]
 						},
 						"description": "Swagger UI no browser. Botão Authorize aceita JWT Bearer."
 					}
@@ -641,11 +1457,60 @@
 		}
 	],
 	"variable": [
-		{ "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
-		{ "key": "adminToken", "value": "", "type": "string" },
-		{ "key": "clienteToken", "value": "", "type": "string" },
-		{ "key": "adminId", "value": "", "type": "string" },
-		{ "key": "clienteId", "value": "", "type": "string" },
-		{ "key": "webhookSecret", "value": "dev-webhook-secret-change-me", "type": "string" }
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "clienteToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminRefreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "clienteRefreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "clienteId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "mfaChallengeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "stepUpChallengeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "stepUpToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "webhookSecret",
+			"value": "dev-webhook-secret-change-me",
+			"type": "string"
+		}
 	]
 }
