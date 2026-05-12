@@ -6,7 +6,15 @@ conformidade com a Resolucao CMN 4.656/2018, NIST SP 800-63B e OWASP
 Authentication Cheat Sheet.
 
 Origem: `docs-sep/PRD.md` §14, `specs/fase-2/005-sprint-5-endurecimento-seguranca.md`,
-`steps-fase-2/backend/005-sprint-5-steps.md`, ADR 0009 e ADR 0010.
+`steps-fase-2/backend/005-sprint-5-steps.md`,
+`steps-fase-2/backend/005-sprint-5-followups-seguranca-steps.md`,
+ADR 0009 e ADR 0010.
+
+> **Atualizacao 2026-05-12**: incorporados os follow-ups
+> 5F-FIX-01/02/03/04/05/06 (code review pos-merge da Sprint 5). Veja §16 para
+> a mudanca de contrato no cadastro publico, refresh via cookie HttpOnly,
+> enforcement server-side de redefinicao de senha, transicao atomica de
+> refresh, CORS para step-up e fallback TOTP mobile.
 
 ## 1. Camadas de autenticacao
 
@@ -17,7 +25,8 @@ Origem: `docs-sep/PRD.md` §14, `specs/fase-2/005-sprint-5-endurecimento-seguran
 | Backup codes | 10 codigos uso unico, hash BCrypt | `identity.application.service.BackupCodeService` |
 | Biometria mobile | `@capacitor-community/biometric-auth` (planejado) | `sep-mobile/.../biometric.service.ts` (stub PWA) |
 | Step-up | TOTP/backup code -> token efemero 5 min | `identity.application.usecase.{Iniciar,Completar}StepUpUseCase` |
-| Sessao | Access JWT 15 min + Refresh rotativo 30 dias | `identity.infrastructure.security.JwtTokenProvider` + `RefreshTokenService` |
+| Sessao | Access JWT 15 min + Refresh rotativo 30 dias (cookie WEB / body MOBILE) | `JwtTokenProvider` + `RefreshTokenService` + `RefreshCookieService` (5F-FIX-02) |
+| Reset obrigatorio | Claim `password_reset_required` + filter server-side | `PasswordResetEnforcementFilter` (5F-FIX-04) |
 
 ## 2. Politica de senha
 
@@ -79,6 +88,24 @@ digito + simbolo"), seguindo NIST SP 800-63B §5.1.1.2.
 - Persistencia: somente `tokenHash` SHA-256 hex; o cru e devolvido uma unica
   vez ao cliente.
 
+### Canal de entrega (5F-FIX-02)
+
+A entrega do refresh diferencia o canal cliente via header
+`X-Client-Channel: WEB|MOBILE` (default `MOBILE` para compat com clientes
+antigos):
+
+- **WEB**: refresh viaja em `Set-Cookie sep-refresh` (HttpOnly, SameSite,
+  Secure-configuravel, Path `/api/v1/auth`); body de `TokenResponse` omite o
+  campo `refreshToken`. Refresh e logout aceitam o token via cookie ou body
+  (cookie tem prioridade quando body vier vazio); logout WEB devolve
+  `Set-Cookie Max-Age=0` para limpeza.
+- **MOBILE**: refresh continua no body (`TokenResponse.refreshToken`), porque
+  apps nativos persistem via Capacitor Preferences; cookie nao se aplica.
+
+Implementacao backend: `ClientChannel` + `RefreshCookieService` em
+`identity.application`/`identity.infrastructure.security`. Propriedades em
+`app.refresh-cookie.*` (`name`, `path`, `secure`, `same-site`, `domain`).
+
 ### Reuse detection
 
 Se um refresh token marcado como `USADO` for reapresentado:
@@ -88,6 +115,21 @@ Se um refresh token marcado como `USADO` for reapresentado:
 
 Politica aceita: o usuario podera ter sido alvo de roubo do refresh; melhor
 forcar re-autenticacao.
+
+### Concurrency-safe (5F-FIX-06)
+
+A transicao `ATIVO -> USADO` no banco e feita por UPDATE condicional
+(`RefreshTokenRepository.marcarUsadoSeAtivo`):
+
+```sql
+UPDATE refresh_token SET status = 'USADO', usado_em = :agora
+WHERE token_hash = :hash AND status = 'ATIVO'
+```
+
+Apenas a primeira transacao concorrente recebe `rows=1` e emite o novo par;
+a segunda recebe `rows=0` e cai no caminho de reuse detection (revoga a
+familia + audita). Impede que duas chamadas simultaneas com o mesmo refresh
+recebam dois pares validos.
 
 ### Logout
 
@@ -209,6 +251,7 @@ Recomendado disparar 24-48h antes do deploy avisando:
 | `AUTH-400-101` | 400 | Senha nao atende politica |
 | `AUTH-400-102` | 400 | Senha presente em vazamentos publicos |
 | `AUTH-401-001` | 401 | Refresh token invalido (via `BadCredentialsException`) |
+| `AUTH-403-PASSWORD_RESET_REQUIRED` | 403 | Redefinicao de senha obrigatoria antes de continuar (5F-FIX-04) |
 | `AUTH-423-001` | 423 | Conta bloqueada temporariamente |
 
 ## 10. Configuracao por ambiente
@@ -234,12 +277,27 @@ app:
     hibp:
       enabled: ${APP_SECURITY_HIBP_ENABLED:false}
       base-url: ${APP_SECURITY_HIBP_BASE_URL:https://api.pwnedpasswords.com}
+  # Cookie HttpOnly de refresh token para canal WEB (5F-FIX-02).
+  refresh-cookie:
+    name: ${APP_REFRESH_COOKIE_NAME:sep-refresh}
+    path: ${APP_REFRESH_COOKIE_PATH:/api/v1/auth}
+    secure: ${APP_REFRESH_COOKIE_SECURE:false}
+    same-site: ${APP_REFRESH_COOKIE_SAME_SITE:Lax}
+    domain: ${APP_REFRESH_COOKIE_DOMAIN:}
+  cors:
+    # 5F-FIX-03: X-Step-Up-Token liberado no preflight; X-Client-Channel
+    # adicionado para 5F-FIX-02.
+    allowed-headers: Authorization,Content-Type,Idempotency-Key,X-Correlation-Id,X-Step-Up-Token,X-Client-Channel
 ```
 
 Variaveis obrigatorias em producao (sem default seguro):
 - `APP_JWT_SECRET` (>= 32 bytes; Base64 ou UTF-8)
 - `APP_TOTP_ENCRYPTION_KEY` (>= 32 bytes; usada como base para AES-256)
 - `APP_SECURITY_HIBP_ENABLED=true`
+- `APP_REFRESH_COOKIE_SECURE=true` (HTTPS obrigatorio em prod)
+- `APP_REFRESH_COOKIE_SAME_SITE=Strict` (ou `Lax` se houver fluxo cross-site
+  controlado; nunca `None` sem `Secure=true`)
+- `APP_CORS_ORIGINS` sem wildcard quando cookie estiver habilitado
 
 ## 11. Tabelas Sprint 5
 
@@ -258,10 +316,14 @@ V5 ajustou FKs de V4 para `ON DELETE CASCADE` em tokens MFA e
 
 ## 12. Componentes web (sep-app)
 
-- `AuthService` (refresh rotativo, `applyMfaVerifyResponse`, `pendingMfaChallenge` signal)
-- `MfaService` (wrappers HTTP)
-- `StepUpTokenStore` + `stepUpInterceptor` (anexa `X-Step-Up-Token`)
-- `errorInterceptor` (423 -> `/account-locked`)
+- `clientChannelInterceptor` (5F-FIX-02): anexa `X-Client-Channel: WEB` e
+  `withCredentials: true` em chamadas a `environment.apiBaseUrl`; ignora URLs
+  fora da API (anti-vazamento de cookie para CDNs/analytics).
+- `AuthService` (refresh via cookie HttpOnly; refresh NUNCA persistido em
+  `localStorage`; `pendingMfaChallenge` signal; `applyMfaVerifyResponse`).
+- `MfaService` (wrappers HTTP).
+- `StepUpTokenStore` + `stepUpInterceptor` (anexa `X-Step-Up-Token`).
+- `errorInterceptor` (423 -> `/account-locked`).
 - Telas:
   - `/login/verify-totp` — codigo TOTP no login
   - `/account-locked` — 423
@@ -269,19 +331,47 @@ V5 ajustou FKs de V4 para `ON DELETE CASCADE` em tokens MFA e
   - `/app/step-up?next=...` — wizard para step-up
   - `/register` -> `RedirectToAppComponent` (canalizacao por perfil)
 
+> 5F-FIX-02 web: `RefreshTokenRequest` e `LogoutRequest` removidos do
+> `api.models.ts`; refresh e logout postam com body vazio e cookie
+> `sep-refresh` viaja automaticamente via `withCredentials`. Acess token
+> continua em `localStorage` por decisao do projeto.
+
+> 5F-FIX-01 web: `UsuarioCreateRequest.role` ficou opcional; cadastro publico
+> em `POST /api/v1/usuarios` cria sempre `CLIENTE`. Promocao para ADMIN so
+> via `POST /api/v1/admin/usuarios` autenticado.
+
 ## 13. Componentes mobile (sep-mobile)
 
-- `TokenStorageService` com Capacitor Preferences (access/refresh/trust device/pending MFA)
-- `AuthService` analogo ao web (refresh + MFA verify + logout HTTP fire-and-forget)
-- `MfaService` para `/auth/totp/verify`
+- `clientChannelInterceptor` (5F-FIX-02): anexa `X-Client-Channel: MOBILE` em
+  chamadas a `environment.apiBaseUrl`; sem `withCredentials` (cookie nao se
+  aplica em app nativo).
+- `TokenStorageService` com Capacitor Preferences (access/refresh/trust
+  device/pending MFA — refresh continua no body, persistido localmente).
+- `AuthService` analogo ao web (refresh + MFA verify + logout HTTP
+  fire-and-forget).
+- `MfaService` para `/auth/totp/verify`.
 - `BiometricService` (stub PWA; plugin nativo `@capacitor-community/biometric-auth`
-  entra na fase Android/iOS)
+  entra na fase Android/iOS).
+- `StepUpTokenStore` (signal in-memory, uso unico) + `stepUpInterceptor`
+  (5F-FIX-05): anexa `X-Step-Up-Token` apenas em `PATCH /usuarios/:id/senha`.
+- `StepUpService` envolve `POST /auth/step-up/initiate` e `/complete`.
+- `ChangePasswordComponent`: se `currentUser().mfaHabilitado` e
+  `StepUpTokenStore` sem token, redireciona para `/app/step-up?next=...`
+  antes do PATCH; fallback adicional ao receber 403 com mensagem de step-up.
 - Telas:
   - `/login/verify-totp` — codigo TOTP no login + botao biometria
   - `/account-locked` — 423
   - `/app/perfil/biometria` — toggle "confiar neste dispositivo"
+  - `/app/step-up?next=...` — fallback TOTP para operacoes sensiveis (5F-FIX-05)
 
 ## 14. Pendencias e follow-ups
+
+**Resolvidos em 2026-05-12 (5F-FIX-01..06)**: bloqueio de criacao publica de
+ADMIN, refresh em cookie HttpOnly WEB, CORS para `X-Step-Up-Token`,
+enforcement server-side de `precisaRedefinirSenha`, step-up TOTP fallback
+mobile, transicao atomica concurrency-safe do refresh. Detalhes em §16.
+
+**Em aberto**:
 
 - ADR de update reformalizando baseline mobile com Capacitor 8.3.x (herdada
   da M-Sprint 0).
@@ -297,15 +387,149 @@ V5 ajustou FKs de V4 para `ON DELETE CASCADE` em tokens MFA e
 - Captcha — avaliar apos primeiros incidentes em producao.
 - Migrar testes do backend de Postgres local via Docker Compose para
   Testcontainers (issue Docker Engine 28+ ainda pendente).
+- E2E cross-repo (web + mobile + API) — cada repo mantem suites locais ate
+  pipeline orquestrado existir.
 
 ## 15. Referencias
 
 - `docs-sep/PRD.md` §14 (Padrao JWT) e §18 (Decisoes Tecnicas Consolidadas)
 - `specs/fase-2/005-sprint-5-endurecimento-seguranca.md`
 - `steps-fase-2/backend/005-sprint-5-steps.md`
+- `steps-fase-2/backend/005-sprint-5-followups-seguranca-steps.md`
 - ADR 0009 - Separacao de Canal por Perfil
 - ADR 0010 - MFA TOTP + Biometria Mobile
 - NIST SP 800-63B - Digital Identity Guidelines
 - OWASP Authentication Cheat Sheet
 - RFC 6238 (TOTP)
 - Resolucao CMN nº 4.656/2018
+
+## 16. Follow-ups 5F (2026-05-12)
+
+Origem: code review pos-merge da Sprint 5; plano executivo em
+`steps-fase-2/backend/005-sprint-5-followups-seguranca-steps.md`. Distribuidos
+em 4 branches (uma por repo de codigo). Pull-request e push manuais; abaixo,
+o estado pos-merge esperado de cada FIX.
+
+### 5F-FIX-01 — Bloquear criacao publica de ADMIN (Critico)
+
+Repo: `sep-api`. Branch: `feature/fix-sprint-5-seguranca` (commit `11fd5e1`,
+mergeada em `develop`/`main`).
+
+- `UsuarioCreateDto` perde o campo `role`; `POST /api/v1/usuarios` publico
+  cria sempre `Role.CLIENTE` (5F-FIX-01 + Jackson `fail-on-unknown=false` na
+  config base, entao payload com `role=ADMIN` e ignorado sem erro).
+- Novo endpoint `POST /api/v1/admin/usuarios` (`AdminUsuarioController`) com
+  `@PreAuthorize("hasRole('ADMIN')")`; aceita `UsuarioInternoCreateDto`
+  (username/password/role) e gera ADMIN ou CLIENTE explicitamente.
+- `CriarUsuarioUseCase` ganha `executarInterno`; smoke E2E cobre escalada
+  publica negada + endpoint admin protegido.
+
+Cliente web/mobile sao compativeis sem mudanca (continuam enviando
+`role=CLIENTE`; backend ignora). `UsuarioCreateRequest.role` ficou opcional
+nos tipos TS para sinalizar a mudanca.
+
+### 5F-FIX-02 — Refresh token via cookie HttpOnly no canal WEB (Alto)
+
+Repos: `sep-api` (`feature/fix-sprint-5-seguranca-cookie`, commit `b9da65a`),
+`sep-app` (`feature/fix-fsprint-5-seguranca-cookie`, commit `12b6630`),
+`sep-mobile` (`feature/fix-msprint-5-seguranca`, commit `d66cd53`).
+
+Backend:
+
+- `ClientChannel` enum (`WEB|MOBILE`) com `fromHeader(...)` default MOBILE.
+- `RefreshCookieProperties` + `RefreshCookieService.emitir(canal, body)`:
+  WEB recebe `Set-Cookie sep-refresh` (HttpOnly, Path `/api/v1/auth`,
+  SameSite configuravel, Secure configuravel) e `body.refreshToken = null`;
+  MOBILE recebe body inalterado.
+- `AuthController.login/refresh/logout/logout-all` e `MfaController.verify`
+  injetam o servico e leem `X-Client-Channel`. `/auth/refresh` e
+  `/auth/logout` aceitam o token via cookie OU body (cookie usado quando
+  body vier vazio). Logout WEB devolve `Set-Cookie sep-refresh; Max-Age=0`.
+
+Cliente WEB (`sep-app`):
+
+- `clientChannelInterceptor` anexa `X-Client-Channel: WEB` e
+  `withCredentials: true` em chamadas `environment.apiBaseUrl` (ignora URLs
+  fora pra nao vazar cookie a CDNs/analytics).
+- `AuthService` deixa de persistir `SEP_REFRESH_TOKEN`. `refresh()` e
+  `logout()` postam corpo vazio; cookie viaja via `withCredentials`.
+- Tipos `RefreshTokenRequest` e `LogoutRequest` removidos.
+
+Cliente MOBILE (`sep-mobile`):
+
+- `clientChannelInterceptor` anexa `X-Client-Channel: MOBILE` (sem cookie).
+- `TokenStorageService` continua persistindo refresh via Capacitor
+  Preferences; nenhuma mudanca de contrato visivel.
+
+### 5F-FIX-03 — CORS para `X-Step-Up-Token` (Alto)
+
+Repo: `sep-api`. `application.yml`: `app.cors.allowed-headers` inclui
+`X-Step-Up-Token` (e `X-Client-Channel` para 5F-FIX-02). `CorsConfigTest`
+cobre o preflight `PATCH /api/v1/usuarios/{id}/senha`.
+
+### 5F-FIX-04 — Reset obrigatorio server-side (Alto)
+
+Repo: `sep-api`. Decisao: token JWT limitado com claim
+`password_reset_required=true`.
+
+- `JwtTokenProvider.gerarToken` adiciona a claim quando
+  `Usuario.precisaRedefinirSenha=true`.
+- `UsuarioAutenticado` ganha 4o campo `passwordResetRequired` (com construtor
+  de conveniencia 3-arg pra preservar callsites legados).
+- `PasswordResetEnforcementFilter` (`@Component`, registrado *after*
+  `JwtAuthenticationFilter`) responde `403 Forbidden` +
+  `AUTH-403-PASSWORD_RESET_REQUIRED` quando o flag esta ativo, exceto para:
+  - `GET /api/v1/auth/me`
+  - `PATCH /api/v1/usuarios/{id}/senha`
+  - `POST /api/v1/auth/logout`
+- `Usuario.alterarSenha()` ja zerava o flag; SmokeE2E cobre confinamento +
+  libertacao apos PATCH senha.
+
+Codigo de erro novo: `AUTH-403-PASSWORD_RESET_REQUIRED`.
+
+### 5F-FIX-05 — Step-up TOTP fallback mobile (Medio)
+
+Repo: `sep-mobile`. Plug nativo de biometria continua follow-up Android/iOS;
+PWA + dev-local usam fallback TOTP.
+
+- `StepUpTokenStore`: signal in-memory, uso unico (`set/consume/clear/hasToken`).
+- `stepUpInterceptor`: anexa `X-Step-Up-Token` apenas em
+  `PATCH /usuarios/:id/senha`.
+- `StepUpService`: `initiate()` + `complete(...)` consomem
+  `/auth/step-up/initiate` e `/complete`; em sucesso, persistem token no
+  store.
+- `StepUpComponent` em `/app/step-up?next=...` (form TOTP/backup code,
+  tratamento de erro, redirect anti open-redirect).
+- `ChangePasswordComponent`: se `currentUser().mfaHabilitado` e store sem
+  token, navega para `/app/step-up?next=/app/perfil/alterar-senha`; fallback
+  adicional em 403 com mensagem contendo "step-up".
+
+### 5F-FIX-06 — Refresh token concurrency-safe (Medio)
+
+Repo: `sep-api`. Estrategia: UPDATE condicional no banco.
+
+- `RefreshTokenRepository.marcarUsadoSeAtivo(hash, agora)`:
+  `UPDATE refresh_token SET status='USADO', usado_em=:agora WHERE token_hash=:hash AND status='ATIVO'`;
+  retorna `rows` (0 ou 1).
+- `RefreshTokenUseCase` reescrito: rows=1 → emite novo par; rows=0 →
+  recarrega entidade pra classificar (`USADO`=reuse → revoga familia +
+  audita; outros estados → 401 silencioso sem revogar).
+- Testes deterministicos no `RefreshTokenRepositoryTest` (apenas 1 vencedor
+  + REVOGADO/USADO nao afetados) e cenario de corrida no
+  `RefreshTokenUseCaseTest`.
+
+### Smoke validacao pos-merge
+
+| Cenario | Resultado esperado |
+|---|---|
+| `POST /api/v1/usuarios {"role":"ADMIN"}` anonimo | 201 + `role: CLIENTE` |
+| `POST /api/v1/admin/usuarios` sem token | 401 |
+| `POST /api/v1/admin/usuarios` com CLIENTE | 403 |
+| `POST /api/v1/admin/usuarios` com ADMIN | 201 ADMIN |
+| Login WEB (`X-Client-Channel: WEB`) | 200 + `Set-Cookie sep-refresh; HttpOnly` + body sem `refreshToken` |
+| Login MOBILE | 200 + `refreshToken` no body (sem cookie) |
+| `OPTIONS /usuarios/{id}/senha` com `Access-Control-Request-Headers: x-step-up-token` | 200 + header echoa `X-Step-Up-Token` |
+| Login com `precisaRedefinirSenha=true` + GET `/api/v1/usuarios` | 403 + `AUTH-403-PASSWORD_RESET_REQUIRED` |
+| Mesmo usuario apos PATCH senha + novo login + GET `/api/v1/usuarios` | 200 |
+| Refresh concorrente (mesmo cru): 2 chamadas simultaneas | 1 vence (200), 1 perde (401) + familia revogada |
+| Mobile alterar senha com MFA ativo | redireciona `/app/step-up?next=/app/perfil/alterar-senha`; pos-step-up, PATCH 204 |
