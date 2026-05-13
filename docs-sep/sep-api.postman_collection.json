@@ -1338,6 +1338,283 @@
 			]
 		},
 		{
+			"name": "Onboarding KYC PF (Sprint 6)",
+			"description": "Modulo `onboarding` — KYC Pessoa Fisica via Provider Pattern (Celcoin). CMN 4.656/2018 Art. 8.\n\n**Endpoints REST** (`/api/v1/onboarding/pessoa`):\n- POST `/` — iniciar solicitacao (autenticado)\n- POST `/{id}/documentos` — multipart upload (owner ou ADMIN)\n- POST `/{id}/verificar` — disparar verificacao (owner ou ADMIN)\n- GET `/{id}` — consultar status (owner ou ADMIN)\n\n**Webhook**: `POST /api/v1/webhooks/celcoin/kyc` com HMAC SHA-256 + Idempotency-Key.\n\n**Provider**: `app.kyc.provider=fake` (default) usa `FakeKycProvider` que devolve `Finalizado(APROVADO)` quando o callback simulado e enviado com `verification_id=\"fake-<solicitacaoId>\"`.\n\n**Variaveis adicionais**:\n- `onboardingSolicitacaoId` — capturado do POST de criacao\n- `kycWebhookSecret` — `dev-kyc-webhook-secret-change-me` (env `APP_WEBHOOK_SECRET_CELCOIN_KYC`)",
+			"item": [
+				{
+					"name": "POST /onboarding/pessoa — 201",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 201', () => pm.response.to.have.status(201));",
+									"const json = pm.response.json();",
+									"if (json.id) pm.collectionVariables.set('onboardingSolicitacaoId', json.id);",
+									"pm.test('Status INICIADO', () => pm.expect(json.status).to.eql('INICIADO'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cpf\": \"52998224725\",\n  \"nomeCompleto\": \"Joao da Silva\",\n  \"dataNascimento\": \"1990-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"onboarding",
+								"pessoa"
+							]
+						},
+						"description": "Cria solicitacao KYC PF. CPF duplicado em status ativo retorna 409 (`ONB-409-001`). CPF nulo/branco/invalido retorna 400 (`ONB-400-002`)."
+					}
+				},
+				{
+					"name": "POST /onboarding/pessoa/{id}/documentos — RG (204)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "RG",
+									"type": "text"
+								},
+								{
+									"key": "arquivo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/documentos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"onboarding",
+								"pessoa",
+								"{{onboardingSolicitacaoId}}",
+								"documentos"
+							]
+						},
+						"description": "Anexa documento RG. Selecione arquivo JPEG/PNG/PDF (<= 10MB) no campo `arquivo`. Validacoes: MIME (`ONB-400-003`), tamanho (`ONB-400-004`), status (`ONB-400-001`), ownership (403 — exceto ADMIN). SHA-256 calculado server-side."
+					}
+				},
+				{
+					"name": "POST /onboarding/pessoa/{id}/documentos — SELFIE (204)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "SELFIE",
+									"type": "text"
+								},
+								{
+									"key": "arquivo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/documentos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"onboarding",
+								"pessoa",
+								"{{onboardingSolicitacaoId}}",
+								"documentos"
+							]
+						},
+						"description": "Anexa SELFIE — combinacao RG/CNH/PASSAPORTE + SELFIE eh requisito minimo para disparar verificacao."
+					}
+				},
+				{
+					"name": "POST /onboarding/pessoa/{id}/verificar — 202",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/verificar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"onboarding",
+								"pessoa",
+								"{{onboardingSolicitacaoId}}",
+								"verificar"
+							]
+						},
+						"description": "Dispara verificacao no KycProvider. Idempotency-Key deterministica `solicitacaoId:revisaoDocumentos` propagada via MDC. Documentos minimos ausentes retorna 400 (`ONB-400-005`). Status fora de DOCUMENTOS_RECEBIDOS retorna 400 (`ONB-400-001`) ANTES da chamada externa."
+					}
+				},
+				{
+					"name": "GET /onboarding/pessoa/{id} — 200",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{clienteToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"onboarding",
+								"pessoa",
+								"{{onboardingSolicitacaoId}}"
+							]
+						},
+						"description": "Status atual + documentos enviados + resultado quando ja existir. Cliente le apenas a propria; ADMIN le qualquer."
+					}
+				},
+				{
+					"name": "POST /webhooks/celcoin/kyc — APPROVED (202)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const secret = pm.collectionVariables.get('kycWebhookSecret');",
+									"const body = pm.request.body.raw;",
+									"const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
+									"pm.request.headers.upsert({ key: 'X-Webhook-Signature', value: hmac });",
+									"console.log('kyc signature:', hmac);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Idempotency-Key",
+								"value": "kyc-{{$timestamp}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"verification_id\": \"fake-{{onboardingSolicitacaoId}}\",\n  \"status\": \"APPROVED\",\n  \"reason\": null\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/kyc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"webhooks",
+								"celcoin",
+								"kyc"
+							]
+						},
+						"description": "Simula callback Celcoin com FakeKycProvider. Status mapeados: APPROVED -> APROVADO, REJECTED -> REPROVADO, PENDING -> PENDENCIA, PROCESSING/desconhecido -> EmAndamento (nao finaliza). 202 sempre (incluindo duplicado idempotente). Header alias `X-Celcoin-Signature` aceito quando `X-Webhook-Signature` ausente."
+					}
+				},
+				{
+					"name": "POST /webhooks/celcoin/kyc (assinatura invalida) — 401",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Idempotency-Key",
+								"value": "kyc-bad-{{$timestamp}}"
+							},
+							{
+								"key": "X-Webhook-Signature",
+								"value": "0000000000000000000000000000000000000000000000000000000000000000"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"verification_id\": \"fake-xyz\",\n  \"status\": \"APPROVED\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/kyc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"webhooks",
+								"celcoin",
+								"kyc"
+							]
+						},
+						"description": "Esperado: 401 via `BadCredentialsException` (HMAC nao bate com `app.webhooks.secrets.celcoin-kyc`). `MessageDigest.isEqual` constant-time."
+					}
+				}
+			]
+		},
+		{
 			"name": "Actuator",
 			"description": "Endpoints de observabilidade do Spring Boot Actuator. Liberados publicamente (sem JWT) para monitoramento.",
 			"item": [
@@ -1510,6 +1787,16 @@
 		{
 			"key": "webhookSecret",
 			"value": "dev-webhook-secret-change-me",
+			"type": "string"
+		},
+		{
+			"key": "kycWebhookSecret",
+			"value": "dev-kyc-webhook-secret-change-me",
+			"type": "string"
+		},
+		{
+			"key": "onboardingSolicitacaoId",
+			"value": "",
 			"type": "string"
 		}
 	]
