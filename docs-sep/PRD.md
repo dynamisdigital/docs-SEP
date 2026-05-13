@@ -1247,7 +1247,7 @@ Detalhamento das tasks:
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
 - referencia operacional pos-sprint: [`docs-sep/SEGURANCA.md`](./SEGURANCA.md)
 
-### Sprint 6
+### Sprint 6 (executada — 2026-05-13)
 
 Objetivo de planejamento:
 - entregar onboarding de pessoa fisica (KYC): modelar o modulo `onboarding`, criar entidades `SolicitacaoOnboarding`, `DocumentoCadastral` e `ResultadoVerificacao`, expor `KycProvider` (port) com `CelcoinKycProvider` (OCR + FaceMatch + Background Check) e `FakeKycProvider` (testes), receber callbacks Celcoin via Webhook Receiver e gravar trilha de auditoria reforcada
@@ -1269,6 +1269,15 @@ Responsavel principal:
 Detalhamento das tasks:
 - consultar: [`specs/fase-2/006-sprint-6-onboarding-kyc-pessoa.md`](../specs/fase-2/006-sprint-6-onboarding-kyc-pessoa.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+Status de execucao (concluida em 2026-05-13, PR #41 -> `develop`, PR #42 -> `main`):
+- Modulo `onboarding` completo em DDD + Hexagonal: dominio (`SolicitacaoOnboarding`, `DocumentoCadastral`, `ResultadoVerificacao`, VOs `Cpf`/`TipoDocumento`/`StatusOnboarding`, 4 eventos), 4 use cases (Iniciar/EnviarDocumento/IniciarVerificacao/ConsultarStatus), controller REST `/api/v1/onboarding/pessoa`, webhook dedicado `/api/v1/webhooks/celcoin/kyc`, audit listener `@TransactionalEventListener(AFTER_COMMIT) + @Transactional(REQUIRES_NEW)`.
+- Provider Pattern: port `KycProvider` + `ResultadoKycProvider` sealed (`EmAndamento`/`Finalizado` com guard de status final); `FakeKycProvider` (default `app.kyc.provider=fake`); `CelcoinKycProvider` com OAuth2 client-credentials (`CelcoinOAuthTokenProvider` com cache + refresh) + Resilience4j (instance `celcoin-kyc`, retry 3x em 5xx/IOException, circuit breaker, timeout 30s); `CelcoinKycMapper` MapStruct mapeando APPROVED/REJECTED/PENDING para `Finalizado`, PROCESSING/desconhecido para `EmAndamento` (safe default).
+- Migrations V7 (3 tabelas + indice unico parcial `uq_onboarding_cpf_ativo` para CPF ativo + extensao `chk_audit_seguranca_tipo` com 6 eventos `KYC_*`), V8 reverteu CASCADE da FK via V9 (risco LGPD — producao nao deleta usuario fisicamente, isolamento de testes via `@AfterEach`).
+- Idempotencia: `Idempotency-Key` deterministica `solicitacaoId:revisaoDocumentos` propagada via MDC; webhook outbox reusa `RegistrarWebhookEventUseCase` da Sprint 4; `ProcessarCallbackKycUseCase` trata callback tardio com chave diferente (mesmo status -> evento PROCESSADO sem reescrita; status divergente -> evento FALHOU sem erro 500).
+- Seguranca: ADMIN tem ownership-bypass nos 4 endpoints (operacao em nome do cliente); eventos de dominio preservam dono real; HMAC `app.webhooks.secrets.celcoin-kyc` como fonte unica (campo `webhookSecret` removido de `CelcoinKycProperties`); audit listener com guard de status nao-final + `ObjectMapper` para escape JSON seguro.
+- Testes: 346 verdes no total (83 novos Sprint 6) incluindo E2E `OnboardingPessoaIT` (RestAssured + Postgres local) cobrindo fluxo feliz + 8 negativos, WireMock IT `CelcoinKycProviderIT`/`CelcoinOAuthTokenProviderIT` (Bearer OAuth + retry 5xx + cache token + idempotencia preservada no MDC). `./gradlew check` verde com JaCoCo gate 70% + Spotless.
+- Documentacao: `sep-api/docs/ONBOARDING.md` (fluxo, smoke manual, profile `local-wiremock`), `sep-api/docs/SPRINT-6-PR.md` (descricao do PR consolidada), README atualizado com 4 caminhos de setup (Fake, Celcoin sandbox, local-wiremock, IT WireMock). Postman `docs-SEP/docs-sep/sep-api.postman_collection.json` ganhou pasta "Onboarding KYC PF (Sprint 6)" com 7 requests.
 
 ### Sprint 7
 
