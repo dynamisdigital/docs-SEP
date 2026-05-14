@@ -39,6 +39,7 @@ Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias.
 **Operacao git para o agente de IA**:
 
 - Nos repos **`sep-api`**, **`sep-app`** e **`sep-mobile`** (codigo): o agente realiza apenas **commits** (com descricao) e **criacao de branches por sprint**. Push e PR continuam **manuais**, executados pelo desenvolvedor humano.
+- **Checkpoint obrigatorio ao final de cada Task**: antes de preparar staging ou commit da Task, o agente deve parar e apresentar um checkpoint para revisao humana. O checkpoint deve listar arquivos criados/modificados/removidos, comandos de teste/build executados e resultado, riscos/pendencias e sugestao de mensagem de commit. O agente fica aguardando comando explicito do usuario para seguir com `git add` e `git commit`. Sem esse comando, nao deve fazer staging nem commit.
 - No repo **`docs-SEP`** (documentacao): **toda operacao git e manual**. O agente **nao** cria branches, **nao** comita, **nao** faz push, **nao** faz reset/rebase/merge. Quando precisar atualizar PRD, CONTEXT, ADRs, specs, steps ou este AGENT.md, o agente edita os arquivos no working tree e para por ai; o desenvolvedor humano revisa, organiza branches e comita manualmente. Esta regra existe porque `docs-SEP` e a fonte de verdade do projeto e o usuario quer controle integral sobre essa historia.
 
 **Modelo de branches em `sep-api`/`sep-app`/`sep-mobile` (FIXADO em 2026-05-06, revisado mesmo dia)**:
@@ -94,7 +95,13 @@ feature/<sprint-ou-tema>   ──(squash)──>   develop
 - **1 branch por sprint** (`feature/<nome-sprint>`); toda a sprint vive nessa unica branch.
 - **Numero de commits flexivel** — quantos forem necessarios pra agrupar mudancas coerentes. Agente decide pelo escopo logico (Task, Step, modulo, refactor), nao por contagem fixa.
 - Heuristica: cada commit deve ser auto-contido e o subject explicar o que mudou. Evitar mega-commit "fim da sprint" (perde rastreabilidade) e tambem commits triviais por arquivo (poluem historico).
-- Antes do commit: `git status` + `git ls-files --others --exclude-standard <paths>` para garantir que nada novo ficou untracked.
+- Ao concluir uma Task implementada, executar um **checkpoint pre-commit** antes de qualquer staging:
+  - `git status --short --branch`
+  - `git diff --stat` e, quando util, lista de arquivos alterados
+  - testes/build/lint relevantes da Task e seus resultados
+  - pendencias, riscos e sugestao de mensagem Conventional Commit
+  - aguardar o usuario testar manualmente e responder com comando explicito para seguir
+- Antes do commit, somente depois do checkpoint aprovado pelo usuario: `git status` + `git ls-files --others --exclude-standard <paths>` para garantir que nada novo ficou untracked.
 - `git add <paths-especificos>` (NAO `git add -A` — evita pegar `.claude/`, `.env`, etc.).
 - Mensagem: `<tipo>(<modulo>): <descricao>` — `feat`, `fix`, `ci`, `chore`, `test`, `docs`, `refactor`.
 - Hook automatico de `git add` apos Write/Edit foi removido em 2026-05-06; agente faz `git add` explicito.
@@ -496,6 +503,7 @@ Trilha mobile: `specs/fase-1/200` a `specs/fase-1/204`.
 - Nao gere todos os specs, plans ou steps automaticamente sem confirmacao.
 - Prefira tarefas pequenas, alinhadas ao spec ou step atual.
 - Ao implementar codigo, rode testes locais relevantes ao final da task, quando o ambiente permitir.
+- Ao final de cada Task, faca checkpoint pre-commit e aguarde aprovacao/comando explicito do usuario antes de `git add` e `git commit`.
 - Nao reverta alteracoes existentes do usuario.
 - Nao use comandos destrutivos sem pedido explicito.
 - Commits podem ser feitos pelo agente apenas quando solicitado; push e PR sao manuais.

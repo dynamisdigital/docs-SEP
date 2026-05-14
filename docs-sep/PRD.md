@@ -262,7 +262,7 @@ Os artefatos do produto vivem em 3 repositorios separados no GitHub:
 
 A documentacao consolidada (este PRD, ADRs, specs, steps, AGENT.md, templates de CI) vive no repositorio **`docs-SEP`** (4o repo). Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias. Specs e steps usam os placeholders `<sep-api-root>`, `<sep-app-root>` e `<sep-mobile-root>` para representar a raiz de cada repo localmente clonado.
 
-**Modelo de branches (FIXADO em 2026-05-06)**: os tres repos de codigo (`sep-api`, `sep-app`, `sep-mobile`) operam com hierarquia `feature/* → develop → (homologacao futura) → main`. `feature/*` nasce de `develop` e PR vai sempre para `develop` via squash merge (1 commit por feature). `develop` integra em `main` via merge commit (preserva historico das features). `homologacao` sera inserida entre `develop` e `main` quando o ambiente AWS de homologacao entrar em jogo (apos Epic 16). `develop` e protegida contra delecao para sobreviver ao `delete_branch_on_merge=true`. **Regra de commits**: 1 branch por sprint = `feature/<nome-sprint>`, com numero de commits flexivel (agente decide pelo escopo logico — Task, Step, modulo, refactor); Conventional Commits obrigatorio. O fluxo operacional, template de descricao de PR e demais regras estao consolidados em [`AGENT.md`](../AGENT.md). `docs-SEP` continua com operacao git 100% manual.
+**Modelo de branches (FIXADO em 2026-05-06; checkpoint pre-commit obrigatorio adicionado em 2026-05-14)**: os tres repos de codigo (`sep-api`, `sep-app`, `sep-mobile`) operam com hierarquia `feature/* → develop → (homologacao futura) → main`. `feature/*` nasce de `develop` e PR vai sempre para `develop` via squash merge (1 commit por feature). `develop` integra em `main` via merge commit (preserva historico das features). `homologacao` sera inserida entre `develop` e `main` quando o ambiente AWS de homologacao entrar em jogo (apos Epic 16). `develop` e protegida contra delecao para sobreviver ao `delete_branch_on_merge=true`. **Regra de commits**: 1 branch por sprint = `feature/<nome-sprint>`, com numero de commits flexivel (agente decide pelo escopo logico — Task, Step, modulo, refactor); Conventional Commits obrigatorio; ao final de cada Task implementada, antes de staging/commit, o agente faz checkpoint para revisao humana (arquivos alterados, testes/build executados, riscos e sugestao de commit) e aguarda comando explicito do usuario para seguir com `git add` e `git commit`. O fluxo operacional, template de descricao de PR e demais regras estao consolidados em [`AGENT.md`](../AGENT.md). `docs-SEP` continua com operacao git 100% manual.
 
 ### Stack principal (versoes pinadas)
 
@@ -1805,7 +1805,9 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 ## 26. Regras de Execucao
 
 - a implementacao deve acontecer em tarefas pequenas
-- ao final de cada task concluida, a execucao deve parar para testes locais manuais
+- ao final de cada task concluida, a execucao deve parar em checkpoint pre-commit para revisao humana dos arquivos criados/modificados e para testes locais manuais
+- o agente deve informar no checkpoint: arquivos alterados, testes/build/lint executados e resultado, riscos/pendencias e mensagem de commit sugerida
+- o agente deve aguardar comando explicito do usuario antes de fazer `git add` e `git commit` daquela task
 - commits podem ser feitos pelo agente de IA
 - push e PR serao manuais
 - testes, build e deploy no GitHub Actions ficarao para fase separada
