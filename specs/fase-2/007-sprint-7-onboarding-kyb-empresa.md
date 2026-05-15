@@ -300,8 +300,8 @@ Atualizar artefatos de documentacao da Sprint 7.
 
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 7 — marcar como executada (apos merge)
-- update `docs-sep/ONBOARDING.md` (criado na Sprint 6) — adicionar secao PJ + PLD com diagrama de estados consolidado
-- novo `docs-sep/PLD.md` — politica PLD do produto: bases, criterios de bloqueio, retencao, fluxo de excecoes
+- update `docs-SEP/repos/sep-api/ONBOARDING.md` (criado na Sprint 6) — adicionar secao PJ + PLD com diagrama de estados consolidado
+- novo `docs-SEP/repos/sep-api/PLD.md` — politica PLD do produto: bases, criterios de bloqueio, retencao, fluxo de excecoes
 - update Swagger UI
 
 **Pre-requisitos**: Tasks 7.1-7.9.
@@ -353,7 +353,7 @@ Task 7.1 (refactor SolicitacaoOnboarding tipo PF/PJ)
 - Suite E2E passando com cenarios de hit PLD em representante legal
 - WireMock tests dos 2 novos `*ProviderIT` passando
 - Cobertura JaCoCo do modulo `onboarding` >= 70% (consolidada com a Sprint 6)
-- `PLD.md` revisado pela area juridica e publicado em `docs-sep/`
+- `PLD.md` revisado pela area juridica e publicado em `docs-SEP/repos/sep-api/`
 
 ## Impacto na Sprint seguinte (Sprint 8 — Credito)
 

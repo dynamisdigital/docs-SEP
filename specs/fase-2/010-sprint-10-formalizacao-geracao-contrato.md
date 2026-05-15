@@ -305,7 +305,7 @@ Permitir cancelamento de contrato pelo financeiro antes do aceite.
 
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 10 — marcar como executada (apos merge)
-- novo `docs-sep/CONTRATOS.md` — fluxo, estados, templates, retencao
+- novo `docs-SEP/repos/sep-api/CONTRATOS.md` — fluxo, estados, templates, retencao
 - update Swagger UI
 
 **Pre-requisitos**: Tasks 10.1-10.8.

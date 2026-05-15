@@ -747,7 +747,7 @@ cd <sep-api-root>
 ### Step 006.8.1 - Criar documentacao de onboarding
 
 **Arquivo**:
-- `<sep-api-root>/docs/ONBOARDING.md` ou local equivalente ja usado pelo repo.
+- `<docs-SEP-root>/repos/sep-api/ONBOARDING.md`.
 
 **Conteudo minimo**:
 - Visao do modulo.

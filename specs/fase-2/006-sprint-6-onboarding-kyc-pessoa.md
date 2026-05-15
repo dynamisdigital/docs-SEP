@@ -303,7 +303,7 @@ Atualizar documentacao e fechar a sprint.
 
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 6 — marcar como executada (apos merge)
-- novo `docs-sep/ONBOARDING.md` (visao consolidada do modulo, com diagrama de estados, contratos REST, contratos do `KycProvider`, exemplos de payload)
+- novo `docs-SEP/repos/sep-api/ONBOARDING.md` (visao consolidada do modulo, com diagrama de estados, contratos REST, contratos do `KycProvider`, exemplos de payload)
 - update `README.md`: secao "Como rodar onboarding localmente" (perfil `local-wiremock` com `FakeKycProvider`)
 - atualizar Swagger UI — todos os endpoints `/onboarding/pessoa` e `/webhooks/celcoin/kyc` documentados
 
@@ -351,7 +351,7 @@ Task 6.1 (entidades dominio + migrations)
 - Suite de integration tests E2E passando (cenarios da Task 6.7)
 - WireMock test do `CelcoinKycProviderIT` passando (sem precisar do Celcoin real)
 - Cobertura JaCoCo do modulo `onboarding` >= 70%
-- `ONBOARDING.md` publicado em `docs-sep/`
+- `ONBOARDING.md` publicado em `docs-SEP/repos/sep-api/`
 - README atualizado com instrucao de profile `local-wiremock`
 
 ## Impacto na Sprint seguinte (Sprint 7)

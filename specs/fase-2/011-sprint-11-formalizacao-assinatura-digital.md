@@ -269,8 +269,8 @@ public interface AssinaturaDigitalProvider {
 
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 11 — marcar como executada (apos merge)
-- update `docs-sep/CONTRATOS.md` — adicionar secao de assinatura + CCB + estados completos
-- novo `docs-sep/CCB.md` — estrutura da CCB, validade juridica, retencao
+- update `docs-SEP/repos/sep-api/CONTRATOS.md` — adicionar secao de assinatura + CCB + estados completos
+- novo `docs-SEP/repos/sep-api/CCB.md` — estrutura da CCB, validade juridica, retencao
 - update Swagger UI
 
 **Pre-requisitos**: Tasks 11.1-11.9.

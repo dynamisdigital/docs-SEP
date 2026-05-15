@@ -886,7 +886,7 @@ cd <sep-api-root>
 ### Step 007.10.1 - Atualizar documentacao de onboarding
 
 **Arquivo**:
-- `<sep-api-root>/docs/ONBOARDING.md`
+- `<docs-SEP-root>/repos/sep-api/ONBOARDING.md`
 
 **Adicionar**:
 - Fluxo PJ.
@@ -907,7 +907,7 @@ cd <sep-api-root>
 ### Step 007.10.2 - Criar `PLD.md`
 
 **Arquivo**:
-- `<sep-api-root>/docs/PLD.md`
+- `<docs-SEP-root>/repos/sep-api/PLD.md`
 
 **Conteudo minimo**:
 - Bases consultadas: COAF, OFAC, INTERPOL, MTE.

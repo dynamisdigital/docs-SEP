@@ -30,7 +30,26 @@ A partir de 2026-05-04, o projeto SEP opera em **3 repositorios independentes** 
 - **`sep-api`** — backend Java + Spring Boot (package `com.dynamis.sep_api`); pre-commit via `.githooks/pre-commit` minimo (Spotless)
 - **`sep-app`** — frontend web Angular 20.x; pre-commit via Husky + lint-staged padrao (`npx husky init`)
 - **`sep-mobile`** — mobile Ionic 8.4 + Angular 20.x + Capacitor 6; pre-commit via Husky + lint-staged padrao (`npx husky init`)
-- **`docs-SEP`** (este repositorio) — documentacao consolidada (PRD, ADRs, specs, steps-fase-1, steps-fase-2, AGENT.md, templates de CI)
+- **`docs-SEP`** (este repositorio) — documentacao consolidada (PRD, ADRs, specs, steps-fase-1, steps-fase-2, AGENT.md, templates de CI e documentacao especifica por repo em `repos/`)
+
+Documentacao especifica de cada repositorio de codigo deve ser criada em `docs-SEP/repos/<repo>/`:
+
+- `docs-SEP/repos/sep-api/` — backend/API
+- `docs-SEP/repos/sep-app/` — frontend web
+- `docs-SEP/repos/sep-mobile/` — mobile
+
+Nao recrie pastas `docs/` dentro de `sep-api`, `sep-app` ou `sep-mobile` para documentacao tecnica local. Os repositorios de codigo devem manter apenas entrypoints minimos, como `README.md` e `CONTRIBUTING.md`, apontando para `docs-SEP/repos/<repo>/`.
+
+Regra para novas documentacoes:
+
+- **Docs de modulo/API/backend** (`ONBOARDING.md`, `PLD.md`, `CREDITO.md`, `CONTRATOS.md`, `CCB.md`, `COBRANCA.md`, `NOTIFICACOES.md`, `BACKOFFICE.md` e equivalentes): criar ou atualizar em `docs-SEP/repos/sep-api/`.
+- **Docs especificos do web**: criar ou atualizar em `docs-SEP/repos/sep-app/`.
+- **Docs especificos do mobile**: criar ou atualizar em `docs-SEP/repos/sep-mobile/`.
+- **Docs globais de produto, processo, seguranca transversal, contexto, apresentacao ou operacao cross-repo**: manter em `docs-SEP/docs-sep/`.
+- **ADRs**: manter em `docs-SEP/adr/`.
+- **Specs**: manter em `docs-SEP/specs/`.
+- **Steps**: manter em `docs-SEP/steps-fase-1/` ou `docs-SEP/steps-fase-2/`.
+- **Templates de CI**: manter em `docs-SEP/docs-sep/ci-pipelines/templates/`.
 
 Cada repo gerencia independentemente seu CI, hooks de pre-commit e dependencias. Cross-references nos specs/steps usam os placeholders `<sep-api-root>`, `<sep-app-root>` e `<sep-mobile-root>` para representar a raiz local de cada repo clonado.
 

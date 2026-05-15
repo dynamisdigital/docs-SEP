@@ -263,7 +263,7 @@ Adicionar tipos e listener.
 
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 9 — marcar como executada (apos merge)
-- update `docs-sep/CREDITO.md` — adicionar secao Open Finance (fluxo de consentimento, regra, reavaliacao)
+- update `docs-SEP/repos/sep-api/CREDITO.md` — adicionar secao Open Finance (fluxo de consentimento, regra, reavaliacao)
 - update Swagger UI
 
 **Pre-requisitos**: Tasks 9.1-9.8.

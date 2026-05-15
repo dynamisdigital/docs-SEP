@@ -306,7 +306,7 @@ Atualizar artefatos da Sprint 8.
 
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 8 — marcar como executada (apos merge)
-- novo `docs-sep/CREDITO.md` — visao consolidada do modulo credito (regras, motor, parecer, fluxo)
+- novo `docs-SEP/repos/sep-api/CREDITO.md` — visao consolidada do modulo credito (regras, motor, parecer, fluxo)
 - update Swagger UI
 
 **Pre-requisitos**: Tasks 8.1-8.8.
@@ -354,7 +354,7 @@ Task 8.1 (entidades + migrations)
 - ADR 0011 publicado e aceito
 - Suite E2E passando
 - Cobertura JaCoCo do modulo `credito` >= 70%
-- `CREDITO.md` publicado em `docs-sep/`
+- `CREDITO.md` publicado em `docs-SEP/repos/sep-api/`
 
 ## Impacto na Sprint seguinte (Sprint 9 — Open Finance)
 

@@ -276,8 +276,8 @@ app:
 
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 13 — marcar como executada (apos merge)
-- update `docs-sep/COBRANCA.md` (criada na Sprint 12) — adicionar secao inadimplencia + workflow + renegociacao
-- novo `docs-sep/NOTIFICACOES.md` — politica de comunicacao com tomador, opt-out, retencao
+- update `docs-SEP/repos/sep-api/COBRANCA.md` (criada na Sprint 12) — adicionar secao inadimplencia + workflow + renegociacao
+- novo `docs-SEP/repos/sep-api/NOTIFICACOES.md` — politica de comunicacao com tomador, opt-out, retencao
 - update Swagger UI
 
 **Pre-requisitos**: Tasks 13.1-13.9.

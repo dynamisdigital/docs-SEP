@@ -310,7 +310,7 @@ CREATE TABLE reprocesso (
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 14 — marcar como executada (apos merge)
 - update `docs-sep/PRD.md` §29 — marcar Fase 2 como concluida
-- novo `docs-sep/BACKOFFICE.md` — fluxo, papeis, reprocessos, dashboard
+- novo `docs-SEP/repos/sep-api/BACKOFFICE.md` — fluxo, papeis, reprocessos, dashboard
 - update `docs-sep/CONTEXT.md` — registrar conclusao da Fase 2
 - update Swagger UI
 

@@ -11,6 +11,7 @@ Este diretório reúne toda a documentação funcional, técnica e de produto do
 - **specs/**: Especificações detalhadas por sprint, descrevendo tasks, critérios de pronto, dependências e arquivos esperados.
 - **steps-fase-1/**: Steps granulares da Fase 1, separados por trilha (`backend`, `web`, `mobile`).
 - **steps-fase-2/**: Steps granulares da Fase 2. A Sprint 5 ja possui steps em `steps-fase-2/backend/005-sprint-5-steps.md`.
+- **repos/**: Documentacao especifica por repositorio (`sep-api`, `sep-app`, `sep-mobile`).
 
 ## Como usar
 
@@ -19,6 +20,7 @@ Este diretório reúne toda a documentação funcional, técnica e de produto do
 - Use a **documentacao-dev.html** para referência técnica, implementação e onboarding de novos devs.
 - Consulte as **specs** para detalhes de cada sprint e entregáveis técnicos.
 - Consulte os **steps-fase-1** e **steps-fase-2** para a execução granular just-in-time de cada sprint.
+- Consulte **repos/** para documentacao tecnica especifica de cada repositorio de codigo.
 - Utilize os materiais de aprendizado para aprofundar o domínio e as integrações do projeto.
 
 ## Observações

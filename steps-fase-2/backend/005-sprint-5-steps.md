@@ -1168,7 +1168,7 @@ test(security): cobrir fluxos mfa e refresh
 **Arquivos esperados**:
 - `<sep-api-root>/README.md`
 - `<sep-api-root>/CONTRIBUTING.md`
-- `<sep-api-root>/docs-sep/SEGURANCA.md` se existir pasta local de docs, ou documentar no `docs-SEP/docs-sep/SEGURANCA.md`.
+- `docs-SEP/docs-sep/SEGURANCA.md`.
 
 **Conteudo minimo**:
 - Como configurar `SEP_TOTP_ENCRYPTION_KEY`.

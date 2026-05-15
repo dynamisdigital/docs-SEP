@@ -298,7 +298,7 @@ Registrar recebimento de uma parcela, atualizar status, gerar movimentacao no es
 
 **Arquivos esperados**
 - update `docs-sep/PRD.md` §22 Sprint 12 — marcar como executada (apos merge)
-- novo `docs-sep/COBRANCA.md` — fluxo, calculadoras, integracao com escrow, retencao
+- novo `docs-SEP/repos/sep-api/COBRANCA.md` — fluxo, calculadoras, integracao com escrow, retencao
 - update Swagger UI
 
 **Pre-requisitos**: Tasks 12.1-12.8.
