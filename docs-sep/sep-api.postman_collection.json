@@ -1,1803 +1,2206 @@
 {
-	"info": {
-		"_postman_id": "8f3a2c1e-4b5d-4e8a-9f2c-1234567890ab",
-		"name": "SEP API",
-		"description": "Colecao Postman da SEP API (Java 21 + Spring Boot 3.5).\n\n**Endpoints cobertos:**\n- Auth Sprint 5 (login, refresh token rotativo, logout, logout-all, /me)\n- MFA TOTP (setup, confirm, verify, disable)\n- Step-up authentication\n- Usuarios (cadastro publico CLIENTE, cadastro interno ADMIN, consulta, listagem, alteracao de senha)\n- Webhooks (Pix/Celcoin com HMAC-SHA256 + Idempotency-Key)\n- Actuator\n- OpenAPI / Swagger\n\n**Variaveis de ambiente esperadas** (collection variables abaixo, sobrescreviveis em environment):\n- baseUrl — http://localhost:8080\n- adminToken / clienteToken — JWTs de acesso\n- adminRefreshToken / clienteRefreshToken — refresh tokens retornados no body no contrato atual\n- adminId / clienteId — UUIDs dos usuarios\n- mfaChallengeId — challenge retornado por /auth/login quando MFA esta ativo\n- stepUpChallengeId / stepUpToken — dados do fluxo step-up\n- webhookSecret — secret HMAC do provider\n\n**Ordem sugerida de execucao local:**\n1. POST /usuarios (criar cliente publico)\n2. Obter/criar admin via seed ou POST /admin/usuarios usando adminToken existente\n3. POST /auth/login (admin/cliente)\n4. Fluxos de MFA/step-up conforme necessidade\n5. Demais requests autenticados\n\n**Nota Sprint 5:** a politica de senha agora e 12+ caracteres OU passphrase; cadastro publico cria sempre CLIENTE. Criacao de ADMIN fica em endpoint autenticado.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "Auth",
-			"description": "Autenticacao Sprint 5: access token curto, refresh token rotativo, logout e usuario autenticado.",
-			"item": [
-				{
-					"name": "POST /auth/login (admin)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.mfaRequired && json.mfaChallengeId) { pm.collectionVariables.set('mfaChallengeId', json.mfaChallengeId); }",
-									"if (json.accessToken) pm.collectionVariables.set('adminToken', json.accessToken);",
-									"if (json.refreshToken) pm.collectionVariables.set('adminRefreshToken', json.refreshToken);",
-									"if (json.usuario?.id) pm.collectionVariables.set('adminId', json.usuario.id);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/login",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"login"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-						},
-						"description": "Login do admin. Se MFA nao estiver ativo, salva adminToken/adminRefreshToken/adminId. Se MFA estiver ativo, salva mfaChallengeId."
-					}
-				},
-				{
-					"name": "POST /auth/login (cliente)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.mfaRequired && json.mfaChallengeId) { pm.collectionVariables.set('mfaChallengeId', json.mfaChallengeId); }",
-									"if (json.accessToken) pm.collectionVariables.set('clienteToken', json.accessToken);",
-									"if (json.refreshToken) pm.collectionVariables.set('clienteRefreshToken', json.refreshToken);",
-									"if (json.usuario?.id) pm.collectionVariables.set('clienteId', json.usuario.id);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/login",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"login"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-						},
-						"description": "Login do cliente. Salva clienteToken/clienteRefreshToken/clienteId quando nao exige MFA."
-					}
-				},
-				{
-					"name": "POST /auth/login (senha invalida) — 401",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/login",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"login"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"wrong-password\"\n}"
-						},
-						"description": "Cenario de erro: deve retornar 401 Unauthorized com ErrorResponseDto."
-					}
-				},
-				{
-					"name": "POST /auth/refresh (admin)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.accessToken) pm.collectionVariables.set('adminToken', json.accessToken);",
-									"if (json.refreshToken) pm.collectionVariables.set('adminRefreshToken', json.refreshToken);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/refresh",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"refresh"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"refreshToken\": \"{{adminRefreshToken}}\"\n}"
-						},
-						"description": "Rotaciona refresh token do admin. Salva novo access e novo refresh."
-					}
-				},
-				{
-					"name": "POST /auth/refresh (cliente)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.accessToken) pm.collectionVariables.set('clienteToken', json.accessToken);",
-									"if (json.refreshToken) pm.collectionVariables.set('clienteRefreshToken', json.refreshToken);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/refresh",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"refresh"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"refreshToken\": \"{{clienteRefreshToken}}\"\n}"
-						},
-						"description": "Rotaciona refresh token do cliente. Salva novo access e novo refresh."
-					}
-				},
-				{
-					"name": "POST /auth/logout (admin) — 204",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/logout",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"logout"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"refreshToken\": \"{{adminRefreshToken}}\"\n}"
-						},
-						"description": "Revoga refresh token atual do admin. Idempotente."
-					}
-				},
-				{
-					"name": "POST /auth/logout-all (admin) — 204",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/logout-all",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"logout-all"
-							]
-						},
-						"description": "Revoga todos os refresh tokens do usuario autenticado."
-					}
-				},
-				{
-					"name": "GET /auth/me (admin)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"me"
-							]
-						},
-						"description": "Retorna UsuarioResponseDto do admin autenticado."
-					}
-				},
-				{
-					"name": "GET /auth/me (cliente)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"me"
-							]
-						},
-						"description": "Retorna UsuarioResponseDto do cliente autenticado."
-					}
-				},
-				{
-					"name": "GET /auth/me (sem token) — 401",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"me"
-							]
-						},
-						"description": "Cenario de erro: deve retornar 401 Unauthorized."
-					}
-				}
-			]
-		},
-		{
-			"name": "MFA TOTP (Sprint 5)",
-			"description": "Setup, confirmacao, verify de login e disable de TOTP. Backup codes tambem sao aceitos nos campos codigo.",
-			"item": [
-				{
-					"name": "POST /auth/totp/setup (admin) — 200",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/totp/setup",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"totp",
-								"setup"
-							]
-						},
-						"description": "Gera secret, otpauth URI, QR code data URL e backup codes. Exibir backup codes uma unica vez."
-					}
-				},
-				{
-					"name": "POST /auth/totp/confirm (admin) — 204",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/totp/confirm",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"totp",
-								"confirm"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"codigo\": \"123456\"\n}"
-						},
-						"description": "Confirma primeiro codigo TOTP e ativa MFA. Substituir codigo pelo gerado no app autenticador."
-					}
-				},
-				{
-					"name": "POST /auth/totp/verify — 200",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.usuario?.role === 'ADMIN') { pm.collectionVariables.set('adminToken', json.accessToken); pm.collectionVariables.set('adminRefreshToken', json.refreshToken); pm.collectionVariables.set('adminId', json.usuario.id); }",
-									"if (json.usuario?.role === 'CLIENTE') { pm.collectionVariables.set('clienteToken', json.accessToken); pm.collectionVariables.set('clienteRefreshToken', json.refreshToken); pm.collectionVariables.set('clienteId', json.usuario.id); }"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/totp/verify",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"totp",
-								"verify"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"mfaChallengeId\": \"{{mfaChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
-						},
-						"description": "Conclui login com mfaChallengeId retornado por /auth/login. Salva tokens conforme usuario retornado."
-					}
-				},
-				{
-					"name": "POST /auth/totp/disable (admin) — 204",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							},
-							{
-								"key": "X-Step-Up-Token",
-								"value": "{{stepUpToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/totp/disable",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"totp",
-								"disable"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\"\n}"
-						},
-						"description": "Desabilita TOTP. Exige senha atual e X-Step-Up-Token valido."
-					}
-				}
-			]
-		},
-		{
-			"name": "Step-up (Sprint 5)",
-			"description": "Step-up authentication para operacoes sensiveis. O token emitido deve ser enviado em X-Step-Up-Token na proxima request sensivel.",
-			"item": [
-				{
-					"name": "POST /auth/step-up/initiate (admin)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.stepUpChallengeId) pm.collectionVariables.set('stepUpChallengeId', json.stepUpChallengeId);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/step-up/initiate",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"step-up",
-								"initiate"
-							]
-						},
-						"description": "Inicia challenge de step-up para admin."
-					}
-				},
-				{
-					"name": "POST /auth/step-up/complete (admin)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.stepUpToken) pm.collectionVariables.set('stepUpToken', json.stepUpToken);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/step-up/complete",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"step-up",
-								"complete"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"stepUpChallengeId\": \"{{stepUpChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
-						},
-						"description": "Conclui step-up com codigo TOTP ou backup code e salva stepUpToken."
-					}
-				},
-				{
-					"name": "POST /auth/step-up/initiate (cliente)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.stepUpChallengeId) pm.collectionVariables.set('stepUpChallengeId', json.stepUpChallengeId);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/step-up/initiate",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"step-up",
-								"initiate"
-							]
-						},
-						"description": "Inicia challenge de step-up para cliente."
-					}
-				},
-				{
-					"name": "POST /auth/step-up/complete (cliente)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 200', () => pm.response.to.have.status(200));",
-									"const json = pm.response.json();",
-									"if (json.stepUpToken) pm.collectionVariables.set('stepUpToken', json.stepUpToken);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/step-up/complete",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"step-up",
-								"complete"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"stepUpChallengeId\": \"{{stepUpChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
-						},
-						"description": "Conclui step-up do cliente e salva stepUpToken."
-					}
-				}
-			]
-		},
-		{
-			"name": "Usuários",
-			"description": "Recursos de usuario. Cadastro publico cria sempre CLIENTE; criacao de ADMIN fica em /api/v1/admin/usuarios com token ADMIN.",
-			"item": [
-				{
-					"name": "POST /usuarios (criar cliente publico) — 201",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 201', () => pm.response.to.have.status(201));",
-									"const json = pm.response.json();",
-									"if (json.id) pm.collectionVariables.set('clienteId', json.id);",
-									"pm.test('senha nao exposta', () => pm.expect(json).to.not.have.property('password'));",
-									"pm.test('role CLIENTE', () => pm.expect(json.role).to.eql('CLIENTE'));"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-						},
-						"description": "Cadastro publico. Sempre cria role CLIENTE; campo role nao existe mais no DTO publico."
-					}
-				},
-				{
-					"name": "POST /admin/usuarios (criar admin interno) — 201",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 201', () => pm.response.to.have.status(201));",
-									"const json = pm.response.json();",
-									"pm.test('senha nao exposta', () => pm.expect(json).to.not.have.property('password'));"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/admin/usuarios",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admin",
-								"usuarios"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin2@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
-						},
-						"description": "Cadastro autenticado de usuario interno. Requer token ADMIN."
-					}
-				},
-				{
-					"name": "POST /admin/usuarios (cliente tenta criar admin) — 403",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/admin/usuarios",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admin",
-								"usuarios"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin-negado@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
-						},
-						"description": "CLIENTE nao pode criar usuario interno. Espera 403."
-					}
-				},
-				{
-					"name": "POST /usuarios (email invalido) — 400",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"nao-eh-email\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-						},
-						"description": "Bean Validation deve rejeitar email invalido."
-					}
-				},
-				{
-					"name": "POST /usuarios (senha fraca) — 400",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"fraca@empresa.com\",\n  \"password\": \"123456\"\n}"
-						},
-						"description": "Politica Sprint 5 deve rejeitar senha curta/fraca."
-					}
-				},
-				{
-					"name": "POST /usuarios (email duplicado) — 409",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-						},
-						"description": "Esperado: 409 Conflict para username duplicado."
-					}
-				},
-				{
-					"name": "GET /usuarios/{id} (admin -> qualquer) — 200",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios",
-								"{{clienteId}}"
-							]
-						},
-						"description": "Admin pode consultar qualquer usuario."
-					}
-				},
-				{
-					"name": "GET /usuarios/{id} (cliente -> proprio) — 200",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios",
-								"{{clienteId}}"
-							]
-						},
-						"description": "Cliente consulta apenas o proprio usuario."
-					}
-				},
-				{
-					"name": "GET /usuarios/{id} (cliente -> alheio) — 403",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios/{{adminId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios",
-								"{{adminId}}"
-							]
-						},
-						"description": "Cliente nao pode consultar outro usuario."
-					}
-				},
-				{
-					"name": "GET /usuarios/{id} (id inexistente) — 404",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios/00000000-0000-0000-0000-000000000000",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios",
-								"00000000-0000-0000-0000-000000000000"
-							]
-						},
-						"description": "Usuario inexistente deve retornar 404."
-					}
-				},
-				{
-					"name": "GET /usuarios (admin -> lista) — 200",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios"
-							]
-						},
-						"description": "Listagem restrita a ADMIN."
-					}
-				},
-				{
-					"name": "GET /usuarios (cliente -> lista) — 403",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios"
-							]
-						},
-						"description": "Cliente nao pode listar usuarios."
-					}
-				},
-				{
-					"name": "PATCH /usuarios/{id}/senha (proprio cliente) — 204",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							},
-							{
-								"key": "X-Step-Up-Token",
-								"value": "{{stepUpToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios",
-								"{{clienteId}}",
-								"senha"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
-						},
-						"description": "Altera propria senha. Se MFA estiver ativo, exige X-Step-Up-Token; se MFA nao estiver ativo, backend faz bypass temporario."
-					}
-				},
-				{
-					"name": "PATCH /usuarios/{id}/senha (senha atual errada) — 400",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							},
-							{
-								"key": "X-Step-Up-Token",
-								"value": "{{stepUpToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios",
-								"{{clienteId}}",
-								"senha"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"passwordAtual\": \"senha-errada\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
-						},
-						"description": "Senha atual incorreta deve retornar 400."
-					}
-				},
-				{
-					"name": "PATCH /usuarios/{id}/senha (admin sobre cliente) — 403",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{adminToken}}"
-							},
-							{
-								"key": "X-Step-Up-Token",
-								"value": "{{stepUpToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"usuarios",
-								"{{clienteId}}",
-								"senha"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
-						},
-						"description": "Mesmo ADMIN nao troca senha de outro usuario."
-					}
-				}
-			]
-		},
-		{
-			"name": "Webhooks (Sprint 4)",
-			"description": "Webhook Receiver Pattern (`POST /api/v1/webhooks/{provider}/{event}`) com HMAC-SHA256 + `Idempotency-Key` + Outbox stub. Preparação para Epic 15 (Pix) e Epic 5 (KYC callbacks Celcoin).\n\n**Headers obrigatórios:**\n- `Idempotency-Key`: UUID/string única por evento\n- `X-Webhook-Signature`: hex lowercase do HMAC-SHA256(secret, payload)\n\n**Como gerar a assinatura no Postman (Pre-request Script):**\n```js\nconst secret = pm.collectionVariables.get('webhookSecret');\nconst body = pm.request.body.raw;\nconst hmac = CryptoJS.HmacSHA256(body, secret).toString();\npm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});\n```",
-			"item": [
-				{
-					"name": "POST /webhooks/celcoin/pix-recebimento — 202",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const secret = pm.collectionVariables.get('webhookSecret');",
-									"const body = pm.request.body.raw;",
-									"const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
-									"pm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});",
-									"console.log('signature:', hmac);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Idempotency-Key",
-								"value": "evt-{{$timestamp}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"transactionId\": \"abc-123\",\n  \"valor\": 1500.50,\n  \"chavePix\": \"00000000000\",\n  \"status\": \"LIQUIDADO\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"webhooks",
-								"celcoin",
-								"pix-recebimento"
-							]
-						},
-						"description": "Evento novo: 202 Accepted, persiste em `webhook_event_log` com status PENDENTE."
-					}
-				},
-				{
-					"name": "POST /webhooks/celcoin/pix-recebimento (mesma idempotency) — 202",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const secret = pm.collectionVariables.get('webhookSecret');",
-									"const body = pm.request.body.raw;",
-									"const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
-									"pm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Idempotency-Key",
-								"value": "evt-fixed-id-12345"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"transactionId\": \"abc-123\",\n  \"valor\": 1500.50,\n  \"chavePix\": \"00000000000\",\n  \"status\": \"LIQUIDADO\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"webhooks",
-								"celcoin",
-								"pix-recebimento"
-							]
-						},
-						"description": "Reenvio com mesmo `Idempotency-Key`: 202 Accepted (idempotente, NÃO duplica registro). Rodar 2× para validar."
-					}
-				},
-				{
-					"name": "POST /webhooks/celcoin/pix-recebimento (sem Idempotency-Key) — 400",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const secret = pm.collectionVariables.get('webhookSecret');",
-									"const body = pm.request.body.raw;",
-									"const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
-									"pm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"transactionId\": \"abc-123\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"webhooks",
-								"celcoin",
-								"pix-recebimento"
-							]
-						},
-						"description": "Esperado: 400 via `ValidacaoException` (`WHK-400-002`)."
-					}
-				},
-				{
-					"name": "POST /webhooks/celcoin/pix-recebimento (assinatura inválida) — 401",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Idempotency-Key",
-								"value": "evt-bad-signature"
-							},
-							{
-								"key": "X-Webhook-Signature",
-								"value": "0000000000000000000000000000000000000000000000000000000000000000"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"transactionId\": \"abc-123\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"webhooks",
-								"celcoin",
-								"pix-recebimento"
-							]
-						},
-						"description": "Esperado: 401 (BadCredentialsException via HMAC mismatch). `MessageDigest.isEqual` constant-time."
-					}
-				}
-			]
-		},
-		{
-			"name": "Onboarding KYC PF (Sprint 6)",
-			"description": "Modulo `onboarding` — KYC Pessoa Fisica via Provider Pattern (Celcoin). CMN 4.656/2018 Art. 8.\n\n**Endpoints REST** (`/api/v1/onboarding/pessoa`):\n- POST `/` — iniciar solicitacao (autenticado)\n- POST `/{id}/documentos` — multipart upload (owner ou ADMIN)\n- POST `/{id}/verificar` — disparar verificacao (owner ou ADMIN)\n- GET `/{id}` — consultar status (owner ou ADMIN)\n\n**Webhook**: `POST /api/v1/webhooks/celcoin/kyc` com HMAC SHA-256 + Idempotency-Key.\n\n**Provider**: `app.kyc.provider=fake` (default) usa `FakeKycProvider` que devolve `Finalizado(APROVADO)` quando o callback simulado e enviado com `verification_id=\"fake-<solicitacaoId>\"`.\n\n**Variaveis adicionais**:\n- `onboardingSolicitacaoId` — capturado do POST de criacao\n- `kycWebhookSecret` — `dev-kyc-webhook-secret-change-me` (env `APP_WEBHOOK_SECRET_CELCOIN_KYC`)",
-			"item": [
-				{
-					"name": "POST /onboarding/pessoa — 201",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 201', () => pm.response.to.have.status(201));",
-									"const json = pm.response.json();",
-									"if (json.id) pm.collectionVariables.set('onboardingSolicitacaoId', json.id);",
-									"pm.test('Status INICIADO', () => pm.expect(json.status).to.eql('INICIADO'));"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"cpf\": \"52998224725\",\n  \"nomeCompleto\": \"Joao da Silva\",\n  \"dataNascimento\": \"1990-01-15\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"onboarding",
-								"pessoa"
-							]
-						},
-						"description": "Cria solicitacao KYC PF. CPF duplicado em status ativo retorna 409 (`ONB-409-001`). CPF nulo/branco/invalido retorna 400 (`ONB-400-002`)."
-					}
-				},
-				{
-					"name": "POST /onboarding/pessoa/{id}/documentos — RG (204)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "tipo",
-									"value": "RG",
-									"type": "text"
-								},
-								{
-									"key": "arquivo",
-									"type": "file",
-									"src": []
-								}
-							]
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/documentos",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"onboarding",
-								"pessoa",
-								"{{onboardingSolicitacaoId}}",
-								"documentos"
-							]
-						},
-						"description": "Anexa documento RG. Selecione arquivo JPEG/PNG/PDF (<= 10MB) no campo `arquivo`. Validacoes: MIME (`ONB-400-003`), tamanho (`ONB-400-004`), status (`ONB-400-001`), ownership (403 — exceto ADMIN). SHA-256 calculado server-side."
-					}
-				},
-				{
-					"name": "POST /onboarding/pessoa/{id}/documentos — SELFIE (204)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "tipo",
-									"value": "SELFIE",
-									"type": "text"
-								},
-								{
-									"key": "arquivo",
-									"type": "file",
-									"src": []
-								}
-							]
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/documentos",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"onboarding",
-								"pessoa",
-								"{{onboardingSolicitacaoId}}",
-								"documentos"
-							]
-						},
-						"description": "Anexa SELFIE — combinacao RG/CNH/PASSAPORTE + SELFIE eh requisito minimo para disparar verificacao."
-					}
-				},
-				{
-					"name": "POST /onboarding/pessoa/{id}/verificar — 202",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/verificar",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"onboarding",
-								"pessoa",
-								"{{onboardingSolicitacaoId}}",
-								"verificar"
-							]
-						},
-						"description": "Dispara verificacao no KycProvider. Idempotency-Key deterministica `solicitacaoId:revisaoDocumentos` propagada via MDC. Documentos minimos ausentes retorna 400 (`ONB-400-005`). Status fora de DOCUMENTOS_RECEBIDOS retorna 400 (`ONB-400-001`) ANTES da chamada externa."
-					}
-				},
-				{
-					"name": "GET /onboarding/pessoa/{id} — 200",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{clienteToken}}"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"onboarding",
-								"pessoa",
-								"{{onboardingSolicitacaoId}}"
-							]
-						},
-						"description": "Status atual + documentos enviados + resultado quando ja existir. Cliente le apenas a propria; ADMIN le qualquer."
-					}
-				},
-				{
-					"name": "POST /webhooks/celcoin/kyc — APPROVED (202)",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"const secret = pm.collectionVariables.get('kycWebhookSecret');",
-									"const body = pm.request.body.raw;",
-									"const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
-									"pm.request.headers.upsert({ key: 'X-Webhook-Signature', value: hmac });",
-									"console.log('kyc signature:', hmac);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Idempotency-Key",
-								"value": "kyc-{{$timestamp}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"verification_id\": \"fake-{{onboardingSolicitacaoId}}\",\n  \"status\": \"APPROVED\",\n  \"reason\": null\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/kyc",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"webhooks",
-								"celcoin",
-								"kyc"
-							]
-						},
-						"description": "Simula callback Celcoin com FakeKycProvider. Status mapeados: APPROVED -> APROVADO, REJECTED -> REPROVADO, PENDING -> PENDENCIA, PROCESSING/desconhecido -> EmAndamento (nao finaliza). 202 sempre (incluindo duplicado idempotente). Header alias `X-Celcoin-Signature` aceito quando `X-Webhook-Signature` ausente."
-					}
-				},
-				{
-					"name": "POST /webhooks/celcoin/kyc (assinatura invalida) — 401",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Idempotency-Key",
-								"value": "kyc-bad-{{$timestamp}}"
-							},
-							{
-								"key": "X-Webhook-Signature",
-								"value": "0000000000000000000000000000000000000000000000000000000000000000"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"verification_id\": \"fake-xyz\",\n  \"status\": \"APPROVED\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/webhooks/celcoin/kyc",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"webhooks",
-								"celcoin",
-								"kyc"
-							]
-						},
-						"description": "Esperado: 401 via `BadCredentialsException` (HMAC nao bate com `app.webhooks.secrets.celcoin-kyc`). `MessageDigest.isEqual` constant-time."
-					}
-				}
-			]
-		},
-		{
-			"name": "Actuator",
-			"description": "Endpoints de observabilidade do Spring Boot Actuator. Liberados publicamente (sem JWT) para monitoramento.",
-			"item": [
-				{
-					"name": "GET /actuator/health",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/actuator/health",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"actuator",
-								"health"
-							]
-						},
-						"description": "Healthcheck. Espera `{\"status\": \"UP\"}`."
-					}
-				},
-				{
-					"name": "GET /actuator/info",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/actuator/info",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"actuator",
-								"info"
-							]
-						}
-					}
-				},
-				{
-					"name": "GET /actuator/metrics",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/actuator/metrics",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"actuator",
-								"metrics"
-							]
-						}
-					}
-				},
-				{
-					"name": "GET /actuator/prometheus",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/actuator/prometheus",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"actuator",
-								"prometheus"
-							]
-						},
-						"description": "Métricas em formato Prometheus (Micrometer)."
-					}
-				}
-			]
-		},
-		{
-			"name": "OpenAPI / Swagger",
-			"description": "Documentação Springdoc.",
-			"item": [
-				{
-					"name": "GET /v3/api-docs",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/v3/api-docs",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"v3",
-								"api-docs"
-							]
-						},
-						"description": "OpenAPI spec JSON com todos os endpoints, schemas e SecurityScheme `bearerAuth`."
-					}
-				},
-				{
-					"name": "GET /swagger-ui/index.html (browser)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/swagger-ui/index.html",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"swagger-ui",
-								"index.html"
-							]
-						},
-						"description": "Swagger UI no browser. Botão Authorize aceita JWT Bearer."
-					}
-				}
-			]
-		}
-	],
-	"variable": [
-		{
-			"key": "baseUrl",
-			"value": "http://localhost:8080",
-			"type": "string"
-		},
-		{
-			"key": "adminToken",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "clienteToken",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "adminRefreshToken",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "clienteRefreshToken",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "adminId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "clienteId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "mfaChallengeId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "stepUpChallengeId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "stepUpToken",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "webhookSecret",
-			"value": "dev-webhook-secret-change-me",
-			"type": "string"
-		},
-		{
-			"key": "kycWebhookSecret",
-			"value": "dev-kyc-webhook-secret-change-me",
-			"type": "string"
-		},
-		{
-			"key": "onboardingSolicitacaoId",
-			"value": "",
-			"type": "string"
-		}
-	]
+  "info": {
+    "_postman_id": "8f3a2c1e-4b5d-4e8a-9f2c-1234567890ab",
+    "name": "SEP API",
+    "description": "Colecao Postman da SEP API (Java 21 + Spring Boot 3.5).\n\n**Endpoints cobertos:**\n- Auth Sprint 5 (login, refresh token rotativo, logout, logout-all, /me)\n- MFA TOTP (setup, confirm, verify, disable)\n- Step-up authentication\n- Usuarios (cadastro publico CLIENTE, cadastro interno ADMIN, consulta, listagem, alteracao de senha)\n- Webhooks (Pix/Celcoin com HMAC-SHA256 + Idempotency-Key)\n- Actuator\n- OpenAPI / Swagger\n\n**Variaveis de ambiente esperadas** (collection variables abaixo, sobrescreviveis em environment):\n- baseUrl — http://localhost:8080\n- adminToken / clienteToken — JWTs de acesso\n- adminRefreshToken / clienteRefreshToken — refresh tokens retornados no body no contrato atual\n- adminId / clienteId — UUIDs dos usuarios\n- mfaChallengeId — challenge retornado por /auth/login quando MFA esta ativo\n- stepUpChallengeId / stepUpToken — dados do fluxo step-up\n- webhookSecret — secret HMAC do provider\n\n**Ordem sugerida de execucao local:**\n1. POST /usuarios (criar cliente publico)\n2. Obter/criar admin via seed ou POST /admin/usuarios usando adminToken existente\n3. POST /auth/login (admin/cliente)\n4. Fluxos de MFA/step-up conforme necessidade\n5. Demais requests autenticados\n\n**Nota Sprint 5:** a politica de senha agora e 12+ caracteres OU passphrase; cadastro publico cria sempre CLIENTE. Criacao de ADMIN fica em endpoint autenticado.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Autenticacao Sprint 5: access token curto, refresh token rotativo, logout e usuario autenticado.",
+      "item": [
+        {
+          "name": "POST /auth/login (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.mfaRequired && json.mfaChallengeId) { pm.collectionVariables.set('mfaChallengeId', json.mfaChallengeId); }",
+                  "if (json.accessToken) pm.collectionVariables.set('adminToken', json.accessToken);",
+                  "if (json.refreshToken) pm.collectionVariables.set('adminRefreshToken', json.refreshToken);",
+                  "if (json.usuario?.id) pm.collectionVariables.set('adminId', json.usuario.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+            },
+            "description": "Login do admin. Se MFA nao estiver ativo, salva adminToken/adminRefreshToken/adminId. Se MFA estiver ativo, salva mfaChallengeId."
+          }
+        },
+        {
+          "name": "POST /auth/login (cliente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.mfaRequired && json.mfaChallengeId) { pm.collectionVariables.set('mfaChallengeId', json.mfaChallengeId); }",
+                  "if (json.accessToken) pm.collectionVariables.set('clienteToken', json.accessToken);",
+                  "if (json.refreshToken) pm.collectionVariables.set('clienteRefreshToken', json.refreshToken);",
+                  "if (json.usuario?.id) pm.collectionVariables.set('clienteId', json.usuario.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+            },
+            "description": "Login do cliente. Salva clienteToken/clienteRefreshToken/clienteId quando nao exige MFA."
+          }
+        },
+        {
+          "name": "POST /auth/login (senha invalida) — 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"wrong-password\"\n}"
+            },
+            "description": "Cenario de erro: deve retornar 401 Unauthorized com ErrorResponseDto."
+          }
+        },
+        {
+          "name": "POST /auth/refresh (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('adminToken', json.accessToken);",
+                  "if (json.refreshToken) pm.collectionVariables.set('adminRefreshToken', json.refreshToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{adminRefreshToken}}\"\n}"
+            },
+            "description": "Rotaciona refresh token do admin. Salva novo access e novo refresh."
+          }
+        },
+        {
+          "name": "POST /auth/refresh (cliente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('clienteToken', json.accessToken);",
+                  "if (json.refreshToken) pm.collectionVariables.set('clienteRefreshToken', json.refreshToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{clienteRefreshToken}}\"\n}"
+            },
+            "description": "Rotaciona refresh token do cliente. Salva novo access e novo refresh."
+          }
+        },
+        {
+          "name": "POST /auth/logout (admin) — 204",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{adminRefreshToken}}\"\n}"
+            },
+            "description": "Revoga refresh token atual do admin. Idempotente."
+          }
+        },
+        {
+          "name": "POST /auth/logout-all (admin) — 204",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout-all"
+              ]
+            },
+            "description": "Revoga todos os refresh tokens do usuario autenticado."
+          }
+        },
+        {
+          "name": "GET /auth/me (admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Retorna UsuarioResponseDto do admin autenticado."
+          }
+        },
+        {
+          "name": "GET /auth/me (cliente)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Retorna UsuarioResponseDto do cliente autenticado."
+          }
+        },
+        {
+          "name": "GET /auth/me (sem token) — 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Cenario de erro: deve retornar 401 Unauthorized."
+          }
+        }
+      ]
+    },
+    {
+      "name": "MFA TOTP (Sprint 5)",
+      "description": "Setup, confirmacao, verify de login e disable de TOTP. Backup codes tambem sao aceitos nos campos codigo.",
+      "item": [
+        {
+          "name": "POST /auth/totp/setup (admin) — 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/totp/setup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "totp",
+                "setup"
+              ]
+            },
+            "description": "Gera secret, otpauth URI, QR code data URL e backup codes. Exibir backup codes uma unica vez."
+          }
+        },
+        {
+          "name": "POST /auth/totp/confirm (admin) — 204",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/totp/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "totp",
+                "confirm"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"123456\"\n}"
+            },
+            "description": "Confirma primeiro codigo TOTP e ativa MFA. Substituir codigo pelo gerado no app autenticador."
+          }
+        },
+        {
+          "name": "POST /auth/totp/verify — 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.usuario?.role === 'ADMIN') { pm.collectionVariables.set('adminToken', json.accessToken); pm.collectionVariables.set('adminRefreshToken', json.refreshToken); pm.collectionVariables.set('adminId', json.usuario.id); }",
+                  "if (json.usuario?.role === 'CLIENTE') { pm.collectionVariables.set('clienteToken', json.accessToken); pm.collectionVariables.set('clienteRefreshToken', json.refreshToken); pm.collectionVariables.set('clienteId', json.usuario.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/totp/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "totp",
+                "verify"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mfaChallengeId\": \"{{mfaChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
+            },
+            "description": "Conclui login com mfaChallengeId retornado por /auth/login. Salva tokens conforme usuario retornado."
+          }
+        },
+        {
+          "name": "POST /auth/totp/disable (admin) — 204",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/totp/disable",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "totp",
+                "disable"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\"\n}"
+            },
+            "description": "Desabilita TOTP. Exige senha atual e X-Step-Up-Token valido."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Step-up (Sprint 5)",
+      "description": "Step-up authentication para operacoes sensiveis. O token emitido deve ser enviado em X-Step-Up-Token na proxima request sensivel.",
+      "item": [
+        {
+          "name": "POST /auth/step-up/initiate (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.stepUpChallengeId) pm.collectionVariables.set('stepUpChallengeId', json.stepUpChallengeId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/step-up/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "step-up",
+                "initiate"
+              ]
+            },
+            "description": "Inicia challenge de step-up para admin."
+          }
+        },
+        {
+          "name": "POST /auth/step-up/complete (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.stepUpToken) pm.collectionVariables.set('stepUpToken', json.stepUpToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/step-up/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "step-up",
+                "complete"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stepUpChallengeId\": \"{{stepUpChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
+            },
+            "description": "Conclui step-up com codigo TOTP ou backup code e salva stepUpToken."
+          }
+        },
+        {
+          "name": "POST /auth/step-up/initiate (cliente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.stepUpChallengeId) pm.collectionVariables.set('stepUpChallengeId', json.stepUpChallengeId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/step-up/initiate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "step-up",
+                "initiate"
+              ]
+            },
+            "description": "Inicia challenge de step-up para cliente."
+          }
+        },
+        {
+          "name": "POST /auth/step-up/complete (cliente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.stepUpToken) pm.collectionVariables.set('stepUpToken', json.stepUpToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/step-up/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "step-up",
+                "complete"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stepUpChallengeId\": \"{{stepUpChallengeId}}\",\n  \"codigo\": \"123456\"\n}"
+            },
+            "description": "Conclui step-up do cliente e salva stepUpToken."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "description": "Recursos de usuario. Cadastro publico cria sempre CLIENTE; criacao de ADMIN fica em /api/v1/admin/usuarios com token ADMIN.",
+      "item": [
+        {
+          "name": "POST /usuarios (criar cliente publico) — 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('clienteId', json.id);",
+                  "pm.test('senha nao exposta', () => pm.expect(json).to.not.have.property('password'));",
+                  "pm.test('role CLIENTE', () => pm.expect(json.role).to.eql('CLIENTE'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+            },
+            "description": "Cadastro publico. Sempre cria role CLIENTE; campo role nao existe mais no DTO publico."
+          }
+        },
+        {
+          "name": "POST /admin/usuarios (criar admin interno) — 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test('senha nao exposta', () => pm.expect(json).to.not.have.property('password'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin2@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "description": "Cadastro autenticado de usuario interno. Requer token ADMIN."
+          }
+        },
+        {
+          "name": "POST /admin/usuarios (cliente tenta criar admin) — 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin-negado@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "description": "CLIENTE nao pode criar usuario interno. Espera 403."
+          }
+        },
+        {
+          "name": "POST /usuarios (email invalido) — 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"nao-eh-email\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+            },
+            "description": "Bean Validation deve rejeitar email invalido."
+          }
+        },
+        {
+          "name": "POST /usuarios (senha fraca) — 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"fraca@empresa.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "description": "Politica Sprint 5 deve rejeitar senha curta/fraca."
+          }
+        },
+        {
+          "name": "POST /usuarios (email duplicado) — 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+            },
+            "description": "Esperado: 409 Conflict para username duplicado."
+          }
+        },
+        {
+          "name": "GET /usuarios/{id} (admin -> qualquer) — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{clienteId}}"
+              ]
+            },
+            "description": "Admin pode consultar qualquer usuario."
+          }
+        },
+        {
+          "name": "GET /usuarios/{id} (cliente -> proprio) — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{clienteId}}"
+              ]
+            },
+            "description": "Cliente consulta apenas o proprio usuario."
+          }
+        },
+        {
+          "name": "GET /usuarios/{id} (cliente -> alheio) — 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{adminId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{adminId}}"
+              ]
+            },
+            "description": "Cliente nao pode consultar outro usuario."
+          }
+        },
+        {
+          "name": "GET /usuarios/{id} (id inexistente) — 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            },
+            "description": "Usuario inexistente deve retornar 404."
+          }
+        },
+        {
+          "name": "GET /usuarios (admin -> lista) — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "description": "Listagem restrita a ADMIN."
+          }
+        },
+        {
+          "name": "GET /usuarios (cliente -> lista) — 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios"
+              ]
+            },
+            "description": "Cliente nao pode listar usuarios."
+          }
+        },
+        {
+          "name": "PATCH /usuarios/{id}/senha (proprio cliente) — 204",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{clienteId}}",
+                "senha"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+            },
+            "description": "Altera propria senha. Se MFA estiver ativo, exige X-Step-Up-Token; se MFA nao estiver ativo, backend faz bypass temporario."
+          }
+        },
+        {
+          "name": "PATCH /usuarios/{id}/senha (senha atual errada) — 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{clienteId}}",
+                "senha"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordAtual\": \"senha-errada\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+            },
+            "description": "Senha atual incorreta deve retornar 400."
+          }
+        },
+        {
+          "name": "PATCH /usuarios/{id}/senha (admin sobre cliente) — 403",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{clienteId}}/senha",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{clienteId}}",
+                "senha"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+            },
+            "description": "Mesmo ADMIN nao troca senha de outro usuario."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks (Sprint 4)",
+      "description": "Webhook Receiver Pattern (`POST /api/v1/webhooks/{provider}/{event}`) com HMAC-SHA256 + `Idempotency-Key` + Outbox stub. Preparação para Epic 15 (Pix) e Epic 5 (KYC callbacks Celcoin).\n\n**Headers obrigatórios:**\n- `Idempotency-Key`: UUID/string única por evento\n- `X-Webhook-Signature`: hex lowercase do HMAC-SHA256(secret, payload)\n\n**Como gerar a assinatura no Postman (Pre-request Script):**\n```js\nconst secret = pm.collectionVariables.get('webhookSecret');\nconst body = pm.request.body.raw;\nconst hmac = CryptoJS.HmacSHA256(body, secret).toString();\npm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});\n```",
+      "item": [
+        {
+          "name": "POST /webhooks/celcoin/pix-recebimento — 202",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const secret = pm.collectionVariables.get('webhookSecret');",
+                  "const body = pm.request.body.raw;",
+                  "const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
+                  "pm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});",
+                  "console.log('signature:', hmac);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "evt-{{$timestamp}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"abc-123\",\n  \"valor\": 1500.50,\n  \"chavePix\": \"00000000000\",\n  \"status\": \"LIQUIDADO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "pix-recebimento"
+              ]
+            },
+            "description": "Evento novo: 202 Accepted, persiste em `webhook_event_log` com status PENDENTE."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/pix-recebimento (mesma idempotency) — 202",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const secret = pm.collectionVariables.get('webhookSecret');",
+                  "const body = pm.request.body.raw;",
+                  "const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
+                  "pm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "evt-fixed-id-12345"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"abc-123\",\n  \"valor\": 1500.50,\n  \"chavePix\": \"00000000000\",\n  \"status\": \"LIQUIDADO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "pix-recebimento"
+              ]
+            },
+            "description": "Reenvio com mesmo `Idempotency-Key`: 202 Accepted (idempotente, NÃO duplica registro). Rodar 2× para validar."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/pix-recebimento (sem Idempotency-Key) — 400",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const secret = pm.collectionVariables.get('webhookSecret');",
+                  "const body = pm.request.body.raw;",
+                  "const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
+                  "pm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"abc-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "pix-recebimento"
+              ]
+            },
+            "description": "Esperado: 400 via `ValidacaoException` (`WHK-400-002`)."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/pix-recebimento (assinatura inválida) — 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "evt-bad-signature"
+              },
+              {
+                "key": "X-Webhook-Signature",
+                "value": "0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"abc-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix-recebimento",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "pix-recebimento"
+              ]
+            },
+            "description": "Esperado: 401 (BadCredentialsException via HMAC mismatch). `MessageDigest.isEqual` constant-time."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Onboarding KYC PF (Sprint 6)",
+      "description": "Modulo `onboarding` — KYC Pessoa Fisica via Provider Pattern (Celcoin). CMN 4.656/2018 Art. 8.\n\n**Endpoints REST** (`/api/v1/onboarding/pessoa`):\n- POST `/` — iniciar solicitacao (autenticado)\n- POST `/{id}/documentos` — multipart upload (owner ou ADMIN)\n- POST `/{id}/verificar` — disparar verificacao (owner ou ADMIN)\n- GET `/{id}` — consultar status (owner ou ADMIN)\n\n**Webhook**: `POST /api/v1/webhooks/celcoin/kyc` com HMAC SHA-256 + Idempotency-Key.\n\n**Provider**: `app.kyc.provider=fake` (default) usa `FakeKycProvider` que devolve `Finalizado(APROVADO)` quando o callback simulado e enviado com `verification_id=\"fake-<solicitacaoId>\"`.\n\n**Variaveis adicionais**:\n- `onboardingSolicitacaoId` — capturado do POST de criacao\n- `kycWebhookSecret` — `dev-kyc-webhook-secret-change-me` (env `APP_WEBHOOK_SECRET_CELCOIN_KYC`)",
+      "item": [
+        {
+          "name": "POST /onboarding/pessoa — 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('onboardingSolicitacaoId', json.id);",
+                  "pm.test('Status INICIADO', () => pm.expect(json.status).to.eql('INICIADO'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cpf\": \"52998224725\",\n  \"nomeCompleto\": \"Joao da Silva\",\n  \"dataNascimento\": \"1990-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/pessoa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "pessoa"
+              ]
+            },
+            "description": "Cria solicitacao KYC PF. CPF duplicado em status ativo retorna 409 (`ONB-409-001`). CPF nulo/branco/invalido retorna 400 (`ONB-400-002`)."
+          }
+        },
+        {
+          "name": "POST /onboarding/pessoa/{id}/documentos — RG (204)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "tipo",
+                  "value": "RG",
+                  "type": "text"
+                },
+                {
+                  "key": "arquivo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/documentos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "pessoa",
+                "{{onboardingSolicitacaoId}}",
+                "documentos"
+              ]
+            },
+            "description": "Anexa documento RG. Selecione arquivo JPEG/PNG/PDF (<= 10MB) no campo `arquivo`. Validacoes: MIME (`ONB-400-003`), tamanho (`ONB-400-004`), status (`ONB-400-001`), ownership (403 — exceto ADMIN). SHA-256 calculado server-side."
+          }
+        },
+        {
+          "name": "POST /onboarding/pessoa/{id}/documentos — SELFIE (204)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "tipo",
+                  "value": "SELFIE",
+                  "type": "text"
+                },
+                {
+                  "key": "arquivo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/documentos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "pessoa",
+                "{{onboardingSolicitacaoId}}",
+                "documentos"
+              ]
+            },
+            "description": "Anexa SELFIE — combinacao RG/CNH/PASSAPORTE + SELFIE eh requisito minimo para disparar verificacao."
+          }
+        },
+        {
+          "name": "POST /onboarding/pessoa/{id}/verificar — 202",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}/verificar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "pessoa",
+                "{{onboardingSolicitacaoId}}",
+                "verificar"
+              ]
+            },
+            "description": "Dispara verificacao no KycProvider. Idempotency-Key deterministica `solicitacaoId:revisaoDocumentos` propagada via MDC. Documentos minimos ausentes retorna 400 (`ONB-400-005`). Status fora de DOCUMENTOS_RECEBIDOS retorna 400 (`ONB-400-001`) ANTES da chamada externa."
+          }
+        },
+        {
+          "name": "GET /onboarding/pessoa/{id} — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/pessoa/{{onboardingSolicitacaoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "pessoa",
+                "{{onboardingSolicitacaoId}}"
+              ]
+            },
+            "description": "Status atual + documentos enviados + resultado quando ja existir. Cliente le apenas a propria; ADMIN le qualquer."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/kyc — APPROVED (202)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const secret = pm.collectionVariables.get('kycWebhookSecret');",
+                  "const body = pm.request.body.raw;",
+                  "const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
+                  "pm.request.headers.upsert({ key: 'X-Webhook-Signature', value: hmac });",
+                  "console.log('kyc signature:', hmac);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "kyc-{{$timestamp}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verification_id\": \"fake-{{onboardingSolicitacaoId}}\",\n  \"status\": \"APPROVED\",\n  \"reason\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/kyc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "kyc"
+              ]
+            },
+            "description": "Simula callback Celcoin com FakeKycProvider. Status mapeados: APPROVED -> APROVADO, REJECTED -> REPROVADO, PENDING -> PENDENCIA, PROCESSING/desconhecido -> EmAndamento (nao finaliza). 202 sempre (incluindo duplicado idempotente). Header alias `X-Celcoin-Signature` aceito quando `X-Webhook-Signature` ausente."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/kyc (assinatura invalida) — 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "kyc-bad-{{$timestamp}}"
+              },
+              {
+                "key": "X-Webhook-Signature",
+                "value": "0000000000000000000000000000000000000000000000000000000000000000"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verification_id\": \"fake-xyz\",\n  \"status\": \"APPROVED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/kyc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "kyc"
+              ]
+            },
+            "description": "Esperado: 401 via `BadCredentialsException` (HMAC nao bate com `app.webhooks.secrets.celcoin-kyc`). `MessageDigest.isEqual` constant-time."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Onboarding KYB PJ + PLD (Sprint 7)",
+      "item": [
+        {
+          "name": "POST /onboarding/empresa — 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('onboardingEmpresaId', json.id);",
+                  "pm.test('Status INICIADO', () => pm.expect(json.status).to.eql('INICIADO'));",
+                  "pm.test('CNPJ formatado', () => pm.expect(json.cnpj).to.match(/^\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}-\\d{2}$/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cnpj\": \"11222333000181\",\n  \"razaoSocial\": \"ACME LTDA\",\n  \"nomeFantasia\": \"Acme\",\n  \"tipoSocietario\": \"LTDA\",\n  \"porte\": \"ME\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/empresa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "empresa"
+              ]
+            },
+            "description": "Cria solicitacao KYB PJ. CNPJ duplicado em status ativo retorna 409 (`ONB-409-002`). CNPJ invalido/nulo retorna 400 (`ONB-400-006`)."
+          }
+        },
+        {
+          "name": "POST /onboarding/empresa/{id}/documentos — CONTRATO_SOCIAL (204)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "tipo",
+                  "value": "CONTRATO_SOCIAL",
+                  "type": "text"
+                },
+                {
+                  "key": "arquivo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/empresa/{{onboardingEmpresaId}}/documentos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "empresa",
+                "{{onboardingEmpresaId}}",
+                "documentos"
+              ]
+            },
+            "description": "Anexa contrato social PJ. Aceita CONTRATO_SOCIAL ou CCMEI como identificacao societaria. Tipos PF (RG/CNH/PASSAPORTE/SELFIE) rejeitados com `ONB-400-016`. SHA-256 server-side."
+          }
+        },
+        {
+          "name": "POST /onboarding/empresa/{id}/documentos — COMPROVANTE_ENDERECO (204)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "tipo",
+                  "value": "COMPROVANTE_ENDERECO",
+                  "type": "text"
+                },
+                {
+                  "key": "arquivo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/empresa/{{onboardingEmpresaId}}/documentos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "empresa",
+                "{{onboardingEmpresaId}}",
+                "documentos"
+              ]
+            },
+            "description": "Anexa comprovante de endereco PJ — obrigatorio junto com 1 documento societario antes de disparar verificacao."
+          }
+        },
+        {
+          "name": "POST /onboarding/empresa/{id}/verificar — 202",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/empresa/{{onboardingEmpresaId}}/verificar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "empresa",
+                "{{onboardingEmpresaId}}",
+                "verificar"
+              ]
+            },
+            "description": "Dispara verificacao KYB sincrona no Celcoin/Fake. Situacao `ATIVA` -> APROVADO (e dispara PLD automatico via PldOrchestrationListener); demais situacoes -> REPROVADO sem PLD. Documentos minimos exigidos (`ONB-400-013`). Ownership obrigatorio (403 ou ADMIN)."
+          }
+        },
+        {
+          "name": "GET /onboarding/empresa/{id} — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/empresa/{{onboardingEmpresaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "empresa",
+                "{{onboardingEmpresaId}}"
+              ]
+            },
+            "description": "Status consolidado PJ + dados KYB permitidos + documentos + representantes (CPF mascarado) + resultado. Apos KYB sync + PLD followup com Fake limpo: status = APROVADO_FINAL. PLD details (motivo/severidade/dataInclusao) NUNCA expostos."
+          }
+        },
+        {
+          "name": "GET /onboarding/empresa/{id}/representantes — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/onboarding/empresa/{{onboardingEmpresaId}}/representantes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "onboarding",
+                "empresa",
+                "{{onboardingEmpresaId}}",
+                "representantes"
+              ]
+            },
+            "description": "Lista representantes legais da empresa com CPF mascarado e resumo PLD publico (`statusPld` + `dataConsulta`). Owner ou ADMIN."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/kyb — APROVADO tardio (202)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const secret = pm.collectionVariables.get('kybWebhookSecret');",
+                  "const body = pm.request.body.raw;",
+                  "const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
+                  "pm.request.headers.upsert({ key: 'X-Webhook-Signature', value: hmac });",
+                  "console.log('kyb signature:', hmac);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "kyb-{{$timestamp}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"external_id\": \"{{onboardingEmpresaId}}\",\n  \"registration_status\": \"ACTIVE\",\n  \"tax_id\": \"11222333000181\",\n  \"company_name\": \"ACME LTDA\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/kyb",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "kyb"
+              ]
+            },
+            "description": "Callback Celcoin KYB tardio. Sprint 7 implementa KYB sync via provider; webhook existe pra correcoes manuais. HMAC SHA-256 hex obrigatorio com `kybWebhookSecret`. Resposta 202 (idempotente). Body alinhado ao `CelcoinKybCallbackRequest`."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/kyb (assinatura invalida) — 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "kyb-bad-{{$timestamp}}"
+              },
+              {
+                "key": "X-Webhook-Signature",
+                "value": "deadbeef"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"external_id\": \"{{onboardingEmpresaId}}\",\n  \"registration_status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/kyb",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "kyb"
+              ]
+            },
+            "description": "HMAC invalido devolve 401 sem consumir Idempotency-Key (nada gravado no outbox)."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/pld — LIMPO consolidado (202)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const secret = pm.collectionVariables.get('pldWebhookSecret');",
+                  "const body = pm.request.body.raw;",
+                  "const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
+                  "pm.request.headers.upsert({ key: 'X-Webhook-Signature', value: hmac });",
+                  "console.log('pld signature:', hmac);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "pld-{{$timestamp}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"external_id\": \"{{onboardingEmpresaId}}\",\n  \"results\": [\n    {\n      \"target_type\": \"EMPRESA\",\n      \"document_number\": \"11222333000181\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": false },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pld",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "pld"
+              ]
+            },
+            "description": "Callback PLD consolidado — payload precisa cobrir TODOS os alvos esperados (PF: 1; PJ: empresa + 1 por representante) com TODAS as 4 bases obrigatorias. Validacao rejeita payload incompleto. Qualquer hit em qualquer base -> REPROVADO_PLD. Todos limpos -> APROVADO_FINAL."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/pld (assinatura invalida) — 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "pld-bad-{{$timestamp}}"
+              },
+              {
+                "key": "X-Webhook-Signature",
+                "value": "deadbeef"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"external_id\": \"{{onboardingEmpresaId}}\",\n  \"results\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pld",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "pld"
+              ]
+            },
+            "description": "HMAC invalido devolve 401 sem consumir Idempotency-Key."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Actuator",
+      "description": "Endpoints de observabilidade do Spring Boot Actuator. Liberados publicamente (sem JWT) para monitoramento.",
+      "item": [
+        {
+          "name": "GET /actuator/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            },
+            "description": "Healthcheck. Espera `{\"status\": \"UP\"}`."
+          }
+        },
+        {
+          "name": "GET /actuator/info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/info",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "info"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /actuator/metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "metrics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /actuator/prometheus",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/prometheus",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "prometheus"
+              ]
+            },
+            "description": "Métricas em formato Prometheus (Micrometer)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "OpenAPI / Swagger",
+      "description": "Documentação Springdoc.",
+      "item": [
+        {
+          "name": "GET /v3/api-docs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v3/api-docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v3",
+                "api-docs"
+              ]
+            },
+            "description": "OpenAPI spec JSON com todos os endpoints, schemas e SecurityScheme `bearerAuth`."
+          }
+        },
+        {
+          "name": "GET /swagger-ui/index.html (browser)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/swagger-ui/index.html",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "swagger-ui",
+                "index.html"
+              ]
+            },
+            "description": "Swagger UI no browser. Botão Authorize aceita JWT Bearer."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clienteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminRefreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clienteRefreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clienteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mfaChallengeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stepUpChallengeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stepUpToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "webhookSecret",
+      "value": "dev-webhook-secret-change-me",
+      "type": "string"
+    },
+    {
+      "key": "kycWebhookSecret",
+      "value": "dev-kyc-webhook-secret-change-me",
+      "type": "string"
+    },
+    {
+      "key": "onboardingSolicitacaoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "onboardingEmpresaId",
+      "value": ""
+    },
+    {
+      "key": "kybWebhookSecret",
+      "value": "dev-kyb-webhook-secret-change-me"
+    },
+    {
+      "key": "pldWebhookSecret",
+      "value": "dev-pld-webhook-secret-change-me"
+    }
+  ]
 }
