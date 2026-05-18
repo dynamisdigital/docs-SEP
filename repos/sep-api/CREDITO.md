@@ -187,6 +187,19 @@ Em outro terminal — com Bruno/Postman ou curl:
 - **Sem UI**: apenas backend (decisao 2026-05-04 — Frontend/Mobile da Fase 2 aguarda contratos estaveis)
 - **Sem desembolso**: contratos formalizados na Sprint 10/11; desembolso Pix na Sprint 15
 
+## Evolucao planejada: Open Finance (Sprint 9)
+
+A Sprint 9 complementa este modulo com consentimento Open Finance opcional via
+Celcoin/Finansystech. O objetivo e enriquecer o `ScoreInterno` com movimentacao
+bancaria consolidada do tomador, sem substituir o parecer manual do operador
+`FINANCEIRO`.
+
+Artefatos preparatorios:
+- [`OPEN-FINANCE.md`](OPEN-FINANCE.md) — fluxo operacional, endpoints previstos,
+  auditoria e limites LGPD.
+- [`steps-fase-2/backend/009-sprint-9-steps.md`](../../steps-fase-2/backend/009-sprint-9-steps.md)
+  — plano de execucao detalhado da Sprint 9.
+
 ## Migrations
 
 | Versao | Conteudo |
