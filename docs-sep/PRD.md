@@ -1204,7 +1204,7 @@ Detalhamento das tasks:
 
 ### Trilha Fase 2 (Sprints 5-14)
 
-Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-14 seguem como **backend-only** nesta etapa — Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-8 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD e o nucleo inicial de credito. As Sprints 9-14 seguem como **backend-only** nesta etapa — Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 Mapeamento Sprint → Epic:
 
@@ -1308,7 +1308,7 @@ Status de execucao (concluida em 2026-05-15, PR #43 -> `develop`, merge `main` -
 - Testes: `OnboardingEmpresaIT` (E2E PJ feliz com 8 consultas PLD validadas + hit em representante + KYB SUSPENSA + 409/403/401), `PldFollowupIT` (PF KYC -> PLD orquestrado com 3 cenarios), `CelcoinKybProviderIT`/`CelcoinBackgroundCheckProviderIT` (WireMock — OAuth, retry 5xx, 4 bases obrigatorias, headers), `*UseCaseTest` mockito puro com idempotencia tardia, `OnboardingAuditListenerTest` com sanitizacao, `Celcoin*WebhookControllerTest` com HMAC invalido + idempotente. `./gradlew check` verde com JaCoCo gate 70% + Spotless.
 - Documentacao: `docs-SEP/repos/sep-api/ONBOARDING.md` consolidado PF + PJ + PLD (state machine ampliada, endpoints PJ, webhooks KYB/PLD, smoke PJ), `docs-SEP/repos/sep-api/PLD.md` novo (politica regulatoria — 4 bases, bloqueio em qualquer hit, retencao 5 anos LGPD, checklist juridico marcado como **PENDENTE revisao formal antes de producao**), `docs-SEP/repos/sep-api/SPRINT-7-PR.md` (descricao PR), README atualizado com env vars dos 3 providers e WireMock IT estendido. Postman `docs-SEP/docs-sep/sep-api.postman_collection.json` ganhou pasta "Onboarding KYB PJ + PLD (Sprint 7)" com 10 requests + 3 vars novas (`onboardingEmpresaId`, `kybWebhookSecret`, `pldWebhookSecret`).
 
-### Sprint 8
+### Sprint 8 (executada — 2026-05-18)
 
 Objetivo de planejamento:
 - entregar o nucleo de analise de credito interno: criar modulo `credito`, modelar `PropostaCredito`, `ParecerCredito`, `ScoreInterno` e `DecisaoCredito`, implementar motor de regras simples (heuristicas declarativas, sem ML) e esteira de aprovacao manual a ser consumida pelo backoffice na Sprint 14
@@ -1329,6 +1329,16 @@ Responsavel principal:
 Detalhamento das tasks:
 - consultar: [`specs/fase-2/008-sprint-8-credito-regras-parecer.md`](../specs/fase-2/008-sprint-8-credito-regras-parecer.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+Status de execucao (concluida em 2026-05-18):
+- Modulo `credito` criado em DDD + Hexagonal: dominio (`PropostaCredito`, `ScoreInterno`, `RegraCreditoAvaliada`, `ParecerCredito`, `DecisaoCredito`), VOs (`StatusProposta`, `TipoOperacao`, `Money`, `ResultadoRegra`, `DecisaoParecer`, `OrigemDecisao`) e migrations `V14` a `V16`.
+- Motor de regras interno em Java puro (ADR 0012) com 5 regras (`onboarding aprovado`, idade minima PF, tempo minimo PJ, valor maximo e prazo maximo), thresholds em `app.credito.motor.*` e trilha persistida por score + regras avaliadas.
+- Use cases de criacao, avaliacao, consulta/listagem e parecer manual. Criacao exige onboarding `APROVADO_FINAL`; cliente opera apenas suas propostas; `FINANCEIRO`/`ADMIN` consultam qualquer proposta conforme contrato; parecer manual usa lock pessimista para serializar versoes concorrentes.
+- Role `FINANCEIRO` adicionada com promocao apenas por `POST /api/v1/usuarios/{id}/role` (`ADMIN + step-up`), bloqueando criacao direta por cadastro publico/admin. `ROLE_ALTERADO` auditado por listener `AFTER_COMMIT + REQUIRES_NEW`.
+- 5 endpoints REST em `/api/v1/credito`: criar proposta, consultar por id, listar, registrar parecer e listar regras avaliadas. OpenAPI e testes web cobrem autorizacao, ownership, role `FINANCEIRO` e step-up.
+- Auditoria reforcada em `audit_log_seguranca`: `PROPOSTA_CRIADA`, `PROPOSTA_AVALIADA_MOTOR`, `PARECER_REGISTRADO`, `PROPOSTA_APROVADA`, `PROPOSTA_REJEITADA` e `ROLE_ALTERADO`. `PROPOSTA_AVALIADA_MOTOR` e gravado de forma sincrona dentro da transacao do motor; falha de auditoria move a proposta para `PENDENCIA` pelo fallback transacional.
+- Testes: unitarios de dominio, regras, use cases, repositories, listeners, controller e `CreditoIT` com banco `sep_test`, cobrindo fluxo feliz proposta -> motor -> parecer -> auditoria, negativos de onboarding/ownership/step-up/role e rejeicao manual. `./gradlew check` verde com JaCoCo e Spotless.
+- Documentacao: `docs-SEP/repos/sep-api/CREDITO.md`, ADR 0012, `SPRINT-8-PR.md`, Postman e Insomnia com endpoints de credito + promocao de role.
 
 ### Sprint 9
 
@@ -1880,16 +1890,17 @@ Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14)
 | 13 | Epic 8 (parte 2) | Cobranca — inadimplencia e recuperacao | [`013`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md) | `cobranca` |
 | 14 | Epic 9 | Backoffice operacional | [`014`](../specs/fase-2/014-sprint-14-backoffice-operacional.md) | `backoffice` |
 
-**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-14 sao novas). Dependencia linear (cada sprint exige a anterior pronta). A partir da Sprint 6, a trilha e exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-8 ja foram concluidas no backend; Sprints 9-14 seguem planejadas). Dependencia linear (cada sprint exige a anterior pronta). A partir da Sprint 6, a trilha e exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 **Decisoes de planejamento**:
 - **Granularidade**: cada Epic 5-8 foi dividida em 2 sprints (parte 1 + parte 2) para reduzir risco de entrega; Epic 9 ficou em 1 sprint unica.
 - **Trilhas Web/Mobile**: nao planejadas nesta etapa. Decisao motivada por dois fatores: (1) os contratos da API sao definidos pelo backend e ainda podem evoluir durante as Epics 5-9; (2) o frontend de jornadas (Epic 13) e o mobile (Epic 14 fase 2+) so podem comecar de forma estavel quando esses contratos estiverem fechados.
 - **Sprint 5**: concluida em 2026-05-11; foi reposicionada como gate de abertura da Fase 2 (e nao mais fechamento da Fase 1) por exigir MFA/refresh token/lockout antes de qualquer integracao real com Celcoin.
+- **Sprint 8**: concluida em 2026-05-18; entregou o primeiro nucleo de credito interno, sem Open Finance, sem precificacao financeira e sem formalizacao/desembolso.
 
 **ADRs candidatos durante a Fase 2** (criados just-in-time quando cada decisao for tomada):
-- ADR 0011 — Motor de regras de credito interno (Sprint 8)
-- ADR 0012 — Provedor de assinatura digital (Sprint 11) — gate da Sprint 11
-- ADR 0013 — Estrategia de notificacoes transacionais (Sprint 13) — gate da Sprint 13
+- ADR 0012 — Motor de regras de credito interno (Sprint 8, aceito em 2026-05-18; 0011 ja estava ocupado)
+- ADR 0013 — Provedor de assinatura digital (Sprint 11) — gate da Sprint 11
+- ADR 0014 — Estrategia de notificacoes transacionais (Sprint 13) — gate da Sprint 13
 
 **Steps**: continuam sendo gerados just-in-time, antes da execucao de cada sprint (regra do `AGENT.md`). A Fase 2 nao gera steps em massa.

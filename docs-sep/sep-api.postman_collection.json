@@ -2088,7 +2088,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{financeiroToken}}"
+                "value": "Bearer {{financeiroAccessToken}}"
               }
             ],
             "url": {
@@ -2140,7 +2140,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{financeiroToken}}"
+                "value": "Bearer {{financeiroAccessToken}}"
               },
               {
                 "key": "Content-Type",
@@ -2179,7 +2179,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{financeiroToken}}"
+                "value": "Bearer {{financeiroAccessToken}}"
               }
             ],
             "url": {
@@ -2447,7 +2447,7 @@
       "type": "string"
     },
     {
-      "key": "financeiroToken",
+      "key": "financeiroAccessToken",
       "value": "",
       "type": "string"
     },

@@ -171,7 +171,7 @@ Em outro terminal — com Bruno/Postman ou curl:
 3. Promover ADMIN (manual via SQL ou seed): roles validas: `ADMIN`, `CLIENTE`, `FINANCEIRO`
 4. Iniciar onboarding KYC PF e levar ate `APROVADO_FINAL` (ver `ONBOARDING.md` + `PLD.md`)
 5. Criar proposta: `POST /api/v1/credito/propostas` com `solicitacaoOnboardingId` da etapa 4
-6. Aguardar evento `PROPOSTA_AVALIADA_MOTOR` (listener AFTER_COMMIT — alguns ms)
+6. Aguardar gravacao de `PROPOSTA_AVALIADA_MOTOR` (sincrona na transacao do motor)
 7. Consultar: `GET /api/v1/credito/propostas/{id}` — status deve estar `PRE_APROVADA`/`EM_ANALISE`/`REJEITADA`
 8. Promover usuario a FINANCEIRO: `POST /api/v1/usuarios/{id}/role` (ADMIN + step-up)
 9. Step-up tokens: completar TOTP em `POST /api/v1/auth/totp/verify` ou usar usuario com MFA desabilitado (bypass documentado)
