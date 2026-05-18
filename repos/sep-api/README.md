@@ -8,8 +8,11 @@ Documentacao especifica do backend/API SEP.
   providers, smoke manual e profile `local-wiremock`.
 - [PLD.md](PLD.md) - politica PLD, bases consultadas, criterio de bloqueio, retencao
   LGPD e checklist juridico.
+- [CREDITO.md](CREDITO.md) - modulo `credito` (Sprint 8): estados da proposta, motor
+  de regras, parecer manual, role FINANCEIRO, endpoints, auditoria e smoke local.
 - [SPRINT-6-PR.md](SPRINT-6-PR.md) - descricao consolidada do PR da Sprint 6.
 - [SPRINT-7-PR.md](SPRINT-7-PR.md) - descricao consolidada do PR da Sprint 7.
+- [SPRINT-8-PR.md](SPRINT-8-PR.md) - descricao consolidada do PR da Sprint 8.
 
 ## Orientacao
 

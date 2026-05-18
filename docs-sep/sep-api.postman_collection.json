@@ -2006,6 +2006,240 @@
       ]
     },
     {
+      "name": "Credito (Sprint 8)",
+      "description": "Modulo credito: propostas, motor de regras, parecer manual + promocao FINANCEIRO. Ver CREDITO.md em docs-SEP/repos/sep-api/.",
+      "item": [
+        {
+          "name": "POST /credito/propostas — 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('propostaCreditoId', json.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"solicitacaoOnboardingId\": \"{{onboardingSolicitacaoId}}\",\n  \"tipoOperacao\": \"OUTROS\",\n  \"valorSolicitado\": 10000.00,\n  \"prazoMeses\": 12\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credito/propostas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "credito",
+                "propostas"
+              ]
+            },
+            "description": "Cria proposta de credito (CLIENTE-only). Onboarding deve estar APROVADO_FINAL. 422 se nao aprovado; 403 se onboarding pertence a outro tomador (CRD-403-001)."
+          }
+        },
+        {
+          "name": "GET /credito/propostas/{id} — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credito/propostas/{{propostaCreditoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "credito",
+                "propostas",
+                "{{propostaCreditoId}}"
+              ]
+            },
+            "description": "Consulta proposta. Ownership (CLIENTE) ou FINANCEIRO/ADMIN bypass."
+          }
+        },
+        {
+          "name": "GET /credito/propostas — 200 (lista)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{financeiroToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credito/propostas?status=PRE_APROVADA&page=0&size=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "credito",
+                "propostas"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PRE_APROVADA"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "CLIENTE lista proprias propostas; FINANCEIRO/ADMIN filtra por status/tomadorId/page/size."
+          }
+        },
+        {
+          "name": "POST /credito/propostas/{id}/parecer — 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.id) pm.collectionVariables.set('parecerCreditoId', json.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{financeiroToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decisao\": \"APROVAR\",\n  \"justificativa\": \"Cliente com bom historico interno e capacidade de pagamento adequada.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credito/propostas/{{propostaCreditoId}}/parecer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "credito",
+                "propostas",
+                "{{propostaCreditoId}}",
+                "parecer"
+              ]
+            },
+            "description": "Registra parecer manual. Restrito a FINANCEIRO + step-up (X-Step-Up-Token). APROVAR/REJEITAR finalizam a proposta; PENDENCIA mantem aberta. Decisao manual sobrepoe sugestao do motor."
+          }
+        },
+        {
+          "name": "GET /credito/propostas/{id}/regras — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{financeiroToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credito/propostas/{{propostaCreditoId}}/regras",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "credito",
+                "propostas",
+                "{{propostaCreditoId}}",
+                "regras"
+              ]
+            },
+            "description": "Lista trilha auditavel de regras avaliadas pelo motor. Restrito a FINANCEIRO/ADMIN."
+          }
+        },
+        {
+          "name": "POST /usuarios/{id}/role — 200 (promove FINANCEIRO)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"FINANCEIRO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/{{financeiroId}}/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "{{financeiroId}}",
+                "role"
+              ]
+            },
+            "description": "Promove usuario a FINANCEIRO. Restrito a ADMIN + step-up. ADMIN nao pode alterar a propria role (USR-403-001). Cadastros publicos nao aceitam FINANCEIRO (USR-400-002)."
+          }
+        }
+      ]
+    },
+    {
       "name": "Actuator",
       "description": "Endpoints de observabilidade do Spring Boot Actuator. Liberados publicamente (sem JWT) para monitoramento.",
       "item": [
@@ -2201,6 +2435,31 @@
     {
       "key": "pldWebhookSecret",
       "value": "dev-pld-webhook-secret-change-me"
+    },
+    {
+      "key": "propostaCreditoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "parecerCreditoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "financeiroToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "financeiroRefreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "financeiroId",
+      "value": "",
+      "type": "string"
     }
   ]
 }

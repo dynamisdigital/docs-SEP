@@ -34,7 +34,12 @@
         "celcoinKybSignature": "sha256=PLACEHOLDER",
         "celcoinPldSignature": "sha256=PLACEHOLDER",
         "celcoinPixSignature": "sha256=PLACEHOLDER",
-        "idempotencyKey": "11111111-1111-1111-1111-111111111111"
+        "idempotencyKey": "11111111-1111-1111-1111-111111111111",
+        "propostaCreditoId": "",
+        "parecerCreditoId": "",
+        "financeiroAccessToken": "",
+        "financeiroRefreshToken": "",
+        "financeiroId": ""
       },
       "color": null,
       "isPrivate": false,
@@ -46,24 +51,88 @@
       "parentId": "env_base",
       "name": "local-dev",
       "data": {
-        "baseUrl": "http://localhost:8080"
+        "baseUrl": "http://localhost:8080",
+        "propostaCreditoId": "",
+        "parecerCreditoId": "",
+        "financeiroAccessToken": "",
+        "financeiroRefreshToken": "",
+        "financeiroId": ""
       },
       "color": "#7d3cff",
       "isPrivate": false,
       "metaSortKey": 2
     },
-
-    { "_id": "fld_auth", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Auth", "description": "Login, refresh, logout, /me", "metaSortKey": -10 },
-    { "_id": "fld_mfa", "_type": "request_group", "parentId": "wrk_sep_api", "name": "MFA TOTP (Sprint 5)", "metaSortKey": -9 },
-    { "_id": "fld_stepup", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Step-up (Sprint 5)", "metaSortKey": -8 },
-    { "_id": "fld_usuarios", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Usuários", "metaSortKey": -7 },
-    { "_id": "fld_webhooks_pix", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Webhooks Pix (Sprint 4)", "metaSortKey": -6 },
-    { "_id": "fld_onb_pf", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Onboarding KYC PF (Sprint 6)", "metaSortKey": -5 },
-    { "_id": "fld_onb_pj", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Onboarding KYB PJ (Sprint 7)", "metaSortKey": -4.5 },
-    { "_id": "fld_webhooks_kyb_pld", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Webhooks KYB/PLD (Sprint 7)", "metaSortKey": -4 },
-    { "_id": "fld_actuator", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Actuator", "metaSortKey": -3 },
-    { "_id": "fld_openapi", "_type": "request_group", "parentId": "wrk_sep_api", "name": "OpenAPI / Swagger", "metaSortKey": -2 },
-
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Auth",
+      "description": "Login, refresh, logout, /me",
+      "metaSortKey": -10
+    },
+    {
+      "_id": "fld_mfa",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "MFA TOTP (Sprint 5)",
+      "metaSortKey": -9
+    },
+    {
+      "_id": "fld_stepup",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Step-up (Sprint 5)",
+      "metaSortKey": -8
+    },
+    {
+      "_id": "fld_usuarios",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Usuários",
+      "metaSortKey": -7
+    },
+    {
+      "_id": "fld_webhooks_pix",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Webhooks Pix (Sprint 4)",
+      "metaSortKey": -6
+    },
+    {
+      "_id": "fld_onb_pf",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Onboarding KYC PF (Sprint 6)",
+      "metaSortKey": -5
+    },
+    {
+      "_id": "fld_onb_pj",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Onboarding KYB PJ (Sprint 7)",
+      "metaSortKey": -4.5
+    },
+    {
+      "_id": "fld_webhooks_kyb_pld",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Webhooks KYB/PLD (Sprint 7)",
+      "metaSortKey": -4
+    },
+    {
+      "_id": "fld_actuator",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Actuator",
+      "metaSortKey": -3
+    },
+    {
+      "_id": "fld_openapi",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "OpenAPI / Swagger",
+      "metaSortKey": -2
+    },
     {
       "_id": "req_login_admin",
       "_type": "request",
@@ -71,7 +140,12 @@
       "name": "POST /auth/login (admin)",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/login",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
@@ -85,7 +159,12 @@
       "name": "POST /auth/login (cliente)",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/login",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
@@ -99,7 +178,12 @@
       "name": "POST /auth/login (senha inválida) — 401",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/login",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"wrong-password\"\n}"
@@ -113,7 +197,12 @@
       "name": "POST /auth/refresh (admin)",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/refresh",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"refreshToken\": \"{{ adminRefreshToken }}\"\n}"
@@ -127,7 +216,12 @@
       "name": "POST /auth/refresh (cliente)",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/refresh",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"refreshToken\": \"{{ clienteRefreshToken }}\"\n}"
@@ -142,8 +236,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/logout",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -158,7 +258,12 @@
       "name": "POST /auth/logout-all (admin) — 204",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/logout-all",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
+      ],
       "metaSortKey": 7
     },
     {
@@ -168,7 +273,12 @@
       "name": "GET /auth/me (admin)",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/auth/me",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
+      ],
       "metaSortKey": 8
     },
     {
@@ -178,7 +288,12 @@
       "name": "GET /auth/me (cliente)",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/auth/me",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 9
     },
     {
@@ -191,7 +306,6 @@
       "headers": [],
       "metaSortKey": 10
     },
-
     {
       "_id": "req_totp_setup",
       "_type": "request",
@@ -199,7 +313,12 @@
       "name": "POST /auth/totp/setup (admin) — 200",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/totp/setup",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
+      ],
       "metaSortKey": 1
     },
     {
@@ -210,8 +329,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/totp/confirm",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -226,7 +351,12 @@
       "name": "POST /auth/totp/verify — 200",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/totp/verify",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"mfaChallengeId\": \"{{ mfaChallengeId }}\",\n  \"codigo\": \"123456\"\n}"
@@ -241,9 +371,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/totp/disable",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" },
-        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -251,7 +390,6 @@
       },
       "metaSortKey": 4
     },
-
     {
       "_id": "req_stepup_init_admin",
       "_type": "request",
@@ -259,7 +397,12 @@
       "name": "POST /auth/step-up/initiate (admin)",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/step-up/initiate",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
+      ],
       "metaSortKey": 1
     },
     {
@@ -270,8 +413,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/step-up/complete",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -286,7 +435,12 @@
       "name": "POST /auth/step-up/initiate (cliente)",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/step-up/initiate",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 3
     },
     {
@@ -297,8 +451,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/auth/step-up/complete",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -306,7 +466,6 @@
       },
       "metaSortKey": 4
     },
-
     {
       "_id": "req_usr_create_publico",
       "_type": "request",
@@ -314,7 +473,12 @@
       "name": "POST /usuarios (criar cliente público) — 201",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
@@ -329,8 +493,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/admin/usuarios",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -346,8 +516,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/admin/usuarios",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -362,7 +538,12 @@
       "name": "POST /usuarios (email inválido) — 400",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"username\": \"nao-eh-email\",\n  \"password\": \"senha-passphrase-segura\"\n}"
@@ -376,7 +557,12 @@
       "name": "POST /usuarios (senha fraca) — 400",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"username\": \"fraca@empresa.com\",\n  \"password\": \"123456\"\n}"
@@ -390,7 +576,12 @@
       "name": "POST /usuarios (email duplicado) — 409",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [{ "name": "Content-Type", "value": "application/json" }],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
@@ -404,7 +595,12 @@
       "name": "GET /usuarios/{id} (admin -> qualquer) — 200",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
+      ],
       "metaSortKey": 7
     },
     {
@@ -414,7 +610,12 @@
       "name": "GET /usuarios/{id} (cliente -> próprio) — 200",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 8
     },
     {
@@ -424,7 +625,12 @@
       "name": "GET /usuarios/{id} (cliente -> alheio) — 403",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ adminId }}",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 9
     },
     {
@@ -434,7 +640,12 @@
       "name": "GET /usuarios/{id} (id inexistente) — 404",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/usuarios/00000000-0000-0000-0000-000000000000",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
+      ],
       "metaSortKey": 10
     },
     {
@@ -444,7 +655,12 @@
       "name": "GET /usuarios (admin -> lista) — 200",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        }
+      ],
       "metaSortKey": 11
     },
     {
@@ -454,7 +670,12 @@
       "name": "GET /usuarios (cliente -> lista) — 403",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 12
     },
     {
@@ -465,9 +686,18 @@
       "method": "PATCH",
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" },
-        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -483,9 +713,18 @@
       "method": "PATCH",
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" },
-        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -501,9 +740,18 @@
       "method": "PATCH",
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" },
-        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -511,7 +759,6 @@
       },
       "metaSortKey": 15
     },
-
     {
       "_id": "req_wh_pix_ok",
       "_type": "request",
@@ -520,9 +767,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinPixSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinPixSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -538,9 +794,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinPixSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinPixSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -556,8 +821,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinPixSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinPixSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -573,9 +844,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "sha256=INVALIDA" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "sha256=INVALIDA"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -583,7 +863,6 @@
       },
       "metaSortKey": 4
     },
-
     {
       "_id": "req_onb_iniciar",
       "_type": "request",
@@ -592,8 +871,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/pessoa",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -609,13 +894,23 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/documentos",
       "headers": [
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "multipart/form-data",
         "params": [
-          { "name": "tipo", "value": "RG" },
-          { "name": "arquivo", "type": "file", "fileName": "" }
+          {
+            "name": "tipo",
+            "value": "RG"
+          },
+          {
+            "name": "arquivo",
+            "type": "file",
+            "fileName": ""
+          }
         ]
       },
       "metaSortKey": 2
@@ -628,13 +923,23 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/documentos",
       "headers": [
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "multipart/form-data",
         "params": [
-          { "name": "tipo", "value": "SELFIE" },
-          { "name": "arquivo", "type": "file", "fileName": "" }
+          {
+            "name": "tipo",
+            "value": "SELFIE"
+          },
+          {
+            "name": "arquivo",
+            "type": "file",
+            "fileName": ""
+          }
         ]
       },
       "metaSortKey": 3
@@ -646,7 +951,12 @@
       "name": "POST /onboarding/pessoa/{id}/verificar — 202",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/verificar",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 4
     },
     {
@@ -656,7 +966,12 @@
       "name": "GET /onboarding/pessoa/{id} — 200",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 5
     },
     {
@@ -667,9 +982,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyc",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinKycSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinKycSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -685,9 +1009,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyc",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "sha256=INVALIDA" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "sha256=INVALIDA"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -695,7 +1028,6 @@
       },
       "metaSortKey": 7
     },
-
     {
       "_id": "req_onb_empresa_iniciar",
       "_type": "request",
@@ -704,8 +1036,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/empresa",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -720,12 +1058,24 @@
       "name": "POST /onboarding/empresa/{id}/documentos — CONTRATO_SOCIAL (204)",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/documentos",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "body": {
         "mimeType": "multipart/form-data",
         "params": [
-          { "name": "tipo", "value": "CONTRATO_SOCIAL" },
-          { "name": "arquivo", "type": "file", "fileName": "" }
+          {
+            "name": "tipo",
+            "value": "CONTRATO_SOCIAL"
+          },
+          {
+            "name": "arquivo",
+            "type": "file",
+            "fileName": ""
+          }
         ]
       },
       "metaSortKey": 2
@@ -737,12 +1087,24 @@
       "name": "POST /onboarding/empresa/{id}/documentos — COMPROVANTE_ENDERECO (204)",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/documentos",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "body": {
         "mimeType": "multipart/form-data",
         "params": [
-          { "name": "tipo", "value": "COMPROVANTE_ENDERECO" },
-          { "name": "arquivo", "type": "file", "fileName": "" }
+          {
+            "name": "tipo",
+            "value": "COMPROVANTE_ENDERECO"
+          },
+          {
+            "name": "arquivo",
+            "type": "file",
+            "fileName": ""
+          }
         ]
       },
       "metaSortKey": 3
@@ -754,7 +1116,12 @@
       "name": "POST /onboarding/empresa/{id}/verificar — 202",
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/verificar",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 4
     },
     {
@@ -764,7 +1131,12 @@
       "name": "GET /onboarding/empresa/{id} — 200",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 5
     },
     {
@@ -774,10 +1146,14 @@
       "name": "GET /onboarding/empresa/{id}/representantes — 200",
       "method": "GET",
       "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/representantes",
-      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
       "metaSortKey": 6
     },
-
     {
       "_id": "req_wh_kyb_ativa",
       "_type": "request",
@@ -786,9 +1162,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinKybSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinKybSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -804,9 +1189,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinKybSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinKybSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -822,8 +1216,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinKybSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinKybSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -839,9 +1239,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "sha256=INVALIDA" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "sha256=INVALIDA"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -857,9 +1266,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinPldSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinPldSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -875,9 +1293,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinPldSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinPldSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -893,8 +1320,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "X-Webhook-Signature", "value": "{{ celcoinPldSignature }}" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinPldSignature }}"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -910,9 +1343,18 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
-        { "name": "Idempotency-Key", "value": "{{ idempotencyKey }}" },
-        { "name": "X-Webhook-Signature", "value": "sha256=INVALIDA" }
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ idempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "sha256=INVALIDA"
+        }
       ],
       "body": {
         "mimeType": "application/json",
@@ -920,7 +1362,6 @@
       },
       "metaSortKey": 8
     },
-
     {
       "_id": "req_act_health",
       "_type": "request",
@@ -961,7 +1402,6 @@
       "headers": [],
       "metaSortKey": 4
     },
-
     {
       "_id": "req_openapi_json",
       "_type": "request",
@@ -981,6 +1421,136 @@
       "url": "{{ baseUrl }}/swagger-ui/index.html",
       "headers": [],
       "metaSortKey": 2
+    },
+    {
+      "_id": "fld_credito",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Credito (Sprint 8)",
+      "description": "Modulo credito: propostas, motor de regras, parecer manual + promocao FINANCEIRO. Ver CREDITO.md em docs-SEP/repos/sep-api/.",
+      "metaSortKey": -1750000000000
+    },
+    {
+      "_id": "req_credito_post_proposta",
+      "_type": "request",
+      "parentId": "fld_credito",
+      "name": "POST /credito/propostas (cliente)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/credito/propostas",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "metaSortKey": -1750000000000,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"solicitacaoOnboardingId\": \"{{ onboardingSolicitacaoId }}\",\n  \"tipoOperacao\": \"OUTROS\",\n  \"valorSolicitado\": 10000.00,\n  \"prazoMeses\": 12\n}"
+      }
+    },
+    {
+      "_id": "req_credito_get_proposta",
+      "_type": "request",
+      "parentId": "fld_credito",
+      "name": "GET /credito/propostas/{id}",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
+      "metaSortKey": -1749999000000
+    },
+    {
+      "_id": "req_credito_list",
+      "_type": "request",
+      "parentId": "fld_credito",
+      "name": "GET /credito/propostas (financeiro)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/credito/propostas?status=PRE_APROVADA&page=0&size=20",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ financeiroAccessToken }}"
+        }
+      ],
+      "metaSortKey": -1749998000000
+    },
+    {
+      "_id": "req_credito_parecer",
+      "_type": "request",
+      "parentId": "fld_credito",
+      "name": "POST /credito/propostas/{id}/parecer (FINANCEIRO + step-up)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/parecer",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ financeiroAccessToken }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        }
+      ],
+      "metaSortKey": -1749997000000,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"decisao\": \"APROVAR\",\n  \"justificativa\": \"Cliente com bom historico interno e capacidade de pagamento adequada.\"\n}"
+      }
+    },
+    {
+      "_id": "req_credito_regras",
+      "_type": "request",
+      "parentId": "fld_credito",
+      "name": "GET /credito/propostas/{id}/regras (FINANCEIRO/ADMIN)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/regras",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ financeiroAccessToken }}"
+        }
+      ],
+      "metaSortKey": -1749996000000
+    },
+    {
+      "_id": "req_usuarios_role",
+      "_type": "request",
+      "parentId": "fld_usuarios",
+      "name": "POST /usuarios/{id}/role (ADMIN + step-up promove FINANCEIRO)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/usuarios/{{ financeiroId }}/role",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ adminAccessToken }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        }
+      ],
+      "metaSortKey": -1749995000000,
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"role\": \"FINANCEIRO\"\n}"
+      }
     }
   ]
 }
