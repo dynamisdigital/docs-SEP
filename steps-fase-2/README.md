@@ -21,7 +21,7 @@ steps-fase-2/
 | Sprint 5 - Follow-ups de Seguranca | [`backend/005-sprint-5-followups-seguranca-steps.md`](./backend/005-sprint-5-followups-seguranca-steps.md) | A implementar |
 | Sprint 6 - Onboarding KYC Pessoa Fisica | [`backend/006-sprint-6-steps.md`](./backend/006-sprint-6-steps.md) | A implementar |
 | Sprint 7 - Onboarding KYB Empresa + PLD | [`backend/007-sprint-7-steps.md`](./backend/007-sprint-7-steps.md) | A implementar |
-| Sprint 8 - Credito Regras + Parecer | `backend/008-sprint-8-steps.md` | A criar antes da Sprint 8 |
+| Sprint 8 - Credito Regras + Parecer | [`backend/008-sprint-8-steps.md`](./backend/008-sprint-8-steps.md) | A implementar |
 | Sprint 9 - Credito Open Finance | `backend/009-sprint-9-steps.md` | A criar antes da Sprint 9 |
 | Sprint 10 - Formalizacao Geracao de Contrato | `backend/010-sprint-10-steps.md` | A criar antes da Sprint 10 |
 | Sprint 11 - Formalizacao Assinatura Digital | `backend/011-sprint-11-steps.md` | A criar antes da Sprint 11 |

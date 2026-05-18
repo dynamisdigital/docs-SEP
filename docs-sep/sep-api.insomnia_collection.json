@@ -29,6 +29,7 @@
         "adminId": "",
         "clienteId": "",
         "onboardingSolicitacaoId": "",
+        "onboardingEmpresaId": "",
         "celcoinKycSignature": "sha256=PLACEHOLDER",
         "celcoinKybSignature": "sha256=PLACEHOLDER",
         "celcoinPldSignature": "sha256=PLACEHOLDER",
@@ -58,6 +59,7 @@
     { "_id": "fld_usuarios", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Usuários", "metaSortKey": -7 },
     { "_id": "fld_webhooks_pix", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Webhooks Pix (Sprint 4)", "metaSortKey": -6 },
     { "_id": "fld_onb_pf", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Onboarding KYC PF (Sprint 6)", "metaSortKey": -5 },
+    { "_id": "fld_onb_pj", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Onboarding KYB PJ (Sprint 7)", "metaSortKey": -4.5 },
     { "_id": "fld_webhooks_kyb_pld", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Webhooks KYB/PLD (Sprint 7)", "metaSortKey": -4 },
     { "_id": "fld_actuator", "_type": "request_group", "parentId": "wrk_sep_api", "name": "Actuator", "metaSortKey": -3 },
     { "_id": "fld_openapi", "_type": "request_group", "parentId": "wrk_sep_api", "name": "OpenAPI / Swagger", "metaSortKey": -2 },
@@ -240,7 +242,8 @@
       "url": "{{ baseUrl }}/api/v1/auth/totp/disable",
       "headers": [
         { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }
+        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" },
+        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
       ],
       "body": {
         "mimeType": "application/json",
@@ -327,8 +330,7 @@
       "url": "{{ baseUrl }}/api/v1/admin/usuarios",
       "headers": [
         { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" },
-        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
+        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }
       ],
       "body": {
         "mimeType": "application/json",
@@ -464,7 +466,8 @@
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
       "headers": [
         { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" },
+        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
       ],
       "body": {
         "mimeType": "application/json",
@@ -481,7 +484,8 @@
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
       "headers": [
         { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" },
+        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
       ],
       "body": {
         "mimeType": "application/json",
@@ -498,7 +502,8 @@
       "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
       "headers": [
         { "name": "Content-Type", "value": "application/json" },
-        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" }
+        { "name": "Authorization", "value": "Bearer {{ adminAccessToken }}" },
+        { "name": "X-Step-Up-Token", "value": "{{ stepUpToken }}" }
       ],
       "body": {
         "mimeType": "application/json",
@@ -604,12 +609,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/documentos",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
         { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
       ],
       "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"tipo\": \"RG\",\n  \"hashConteudo\": \"sha256:rg-hash\",\n  \"nomeArquivo\": \"rg-frente.jpg\"\n}"
+        "mimeType": "multipart/form-data",
+        "params": [
+          { "name": "tipo", "value": "RG" },
+          { "name": "arquivo", "type": "file", "fileName": "" }
+        ]
       },
       "metaSortKey": 2
     },
@@ -621,12 +628,14 @@
       "method": "POST",
       "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/documentos",
       "headers": [
-        { "name": "Content-Type", "value": "application/json" },
         { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
       ],
       "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"tipo\": \"SELFIE\",\n  \"hashConteudo\": \"sha256:selfie-hash\",\n  \"nomeArquivo\": \"selfie.jpg\"\n}"
+        "mimeType": "multipart/form-data",
+        "params": [
+          { "name": "tipo", "value": "SELFIE" },
+          { "name": "arquivo", "type": "file", "fileName": "" }
+        ]
       },
       "metaSortKey": 3
     },
@@ -688,6 +697,88 @@
     },
 
     {
+      "_id": "req_onb_empresa_iniciar",
+      "_type": "request",
+      "parentId": "fld_onb_pj",
+      "name": "POST /onboarding/empresa — 201",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/onboarding/empresa",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"cnpj\": \"11222333000181\",\n  \"razaoSocial\": \"ACME LTDA\",\n  \"nomeFantasia\": \"Acme\",\n  \"tipoSocietario\": \"LTDA\",\n  \"porte\": \"ME\"\n}"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "req_onb_empresa_doc_contrato",
+      "_type": "request",
+      "parentId": "fld_onb_pj",
+      "name": "POST /onboarding/empresa/{id}/documentos — CONTRATO_SOCIAL (204)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/documentos",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          { "name": "tipo", "value": "CONTRATO_SOCIAL" },
+          { "name": "arquivo", "type": "file", "fileName": "" }
+        ]
+      },
+      "metaSortKey": 2
+    },
+    {
+      "_id": "req_onb_empresa_doc_endereco",
+      "_type": "request",
+      "parentId": "fld_onb_pj",
+      "name": "POST /onboarding/empresa/{id}/documentos — COMPROVANTE_ENDERECO (204)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/documentos",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          { "name": "tipo", "value": "COMPROVANTE_ENDERECO" },
+          { "name": "arquivo", "type": "file", "fileName": "" }
+        ]
+      },
+      "metaSortKey": 3
+    },
+    {
+      "_id": "req_onb_empresa_verificar",
+      "_type": "request",
+      "parentId": "fld_onb_pj",
+      "name": "POST /onboarding/empresa/{id}/verificar — 202",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/verificar",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "metaSortKey": 4
+    },
+    {
+      "_id": "req_onb_empresa_get",
+      "_type": "request",
+      "parentId": "fld_onb_pj",
+      "name": "GET /onboarding/empresa/{id} — 200",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "metaSortKey": 5
+    },
+    {
+      "_id": "req_onb_empresa_representantes",
+      "_type": "request",
+      "parentId": "fld_onb_pj",
+      "name": "GET /onboarding/empresa/{id}/representantes — 200",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/representantes",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ clienteAccessToken }}" }],
+      "metaSortKey": 6
+    },
+
+    {
       "_id": "req_wh_kyb_ativa",
       "_type": "request",
       "parentId": "fld_webhooks_kyb_pld",
@@ -701,7 +792,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingSolicitacaoId }}\",\n  \"registration_status\": \"ATIVA\",\n  \"legal_name\": \"Dynamis Tecnologia LTDA\",\n  \"trade_name\": \"Dynamis\",\n  \"primary_cnae\": \"6201-5/01\",\n  \"secondary_cnaes\": \"6203-1/00\",\n  \"share_capital\": 100000.00,\n  \"opening_date\": \"2018-05-10\",\n  \"legal_representatives\": [\n    { \"full_name\": \"Joao da Silva\", \"document_number\": \"52998224725\", \"role\": \"SOCIO_ADMINISTRADOR\" }\n  ]\n}"
+        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\",\n  \"tax_id\": \"11222333000181\",\n  \"company_name\": \"ACME LTDA\"\n}"
       },
       "metaSortKey": 1
     },
@@ -719,7 +810,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingSolicitacaoId }}\",\n  \"registration_status\": \"INATIVA\",\n  \"legal_name\": \"Empresa Encerrada LTDA\"\n}"
+        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"INACTIVE\",\n  \"company_name\": \"Empresa Encerrada LTDA\"\n}"
       },
       "metaSortKey": 2
     },
@@ -736,7 +827,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingSolicitacaoId }}\",\n  \"registration_status\": \"ATIVA\"\n}"
+        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\"\n}"
       },
       "metaSortKey": 3
     },
@@ -754,7 +845,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingSolicitacaoId }}\",\n  \"registration_status\": \"ATIVA\"\n}"
+        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\"\n}"
       },
       "metaSortKey": 4
     },
@@ -772,7 +863,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingSolicitacaoId }}\",\n  \"results\": [\n    {\n      \"target_type\": \"EMPRESA\",\n      \"document_number\": \"12345678000199\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": false },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    },\n    {\n      \"target_type\": \"REPRESENTANTE\",\n      \"document_number\": \"52998224725\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": false },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
+        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": [\n    {\n      \"target_type\": \"EMPRESA\",\n      \"document_number\": \"11222333000181\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": false },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
       },
       "metaSortKey": 5
     },
@@ -790,7 +881,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingSolicitacaoId }}\",\n  \"results\": [\n    {\n      \"target_type\": \"REPRESENTANTE\",\n      \"document_number\": \"52998224725\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": true, \"reason\": \"sancao\", \"severity\": \"ALTA\", \"inclusion_date\": \"2023-04-12\" },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
+        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": [\n    {\n      \"target_type\": \"EMPRESA\",\n      \"document_number\": \"11222333000181\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": true, \"reason\": \"sancao\", \"severity\": \"ALTA\", \"inclusion_date\": \"2023-04-12\" },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
       },
       "metaSortKey": 6
     },
@@ -807,7 +898,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingSolicitacaoId }}\",\n  \"results\": []\n}"
+        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": []\n}"
       },
       "metaSortKey": 7
     },
@@ -825,7 +916,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingSolicitacaoId }}\",\n  \"results\": []\n}"
+        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": []\n}"
       },
       "metaSortKey": 8
     },
