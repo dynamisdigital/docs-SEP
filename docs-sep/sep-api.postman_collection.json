@@ -2200,6 +2200,107 @@
           }
         },
         {
+          "name": "POST /credito/propostas/{id}/open-finance/consentimento — 201 (Sprint 9)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cpfCnpjTomador\": \"52998224725\",\n  \"redirectUri\": \"https://app.sep/auth/callback\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credito/propostas/{{propostaCreditoId}}/open-finance/consentimento",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "credito",
+                "propostas",
+                "{{propostaCreditoId}}",
+                "open-finance",
+                "consentimento"
+              ]
+            },
+            "description": "Inicia consentimento Open Finance Brasil. Apenas CLIENTE dono. Persistencia local PENDENTE antes do provider (anti-orphan). 409 se ja existe PENDENTE; 422 se proposta APROVADA/REJEITADA."
+          }
+        },
+        {
+          "name": "GET /credito/propostas/{id}/open-finance — 200 (Sprint 9)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/credito/propostas/{{propostaCreditoId}}/open-finance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "credito",
+                "propostas",
+                "{{propostaCreditoId}}",
+                "open-finance"
+              ]
+            },
+            "description": "Consulta status do consentimento Open Finance + ultima movimentacao consolidada. CLIENTE dono ou FINANCEIRO/ADMIN."
+          }
+        },
+        {
+          "name": "POST /webhooks/celcoin/open-finance — 202 (Sprint 9)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{openFinanceIdempotencyKey}}"
+              },
+              {
+                "key": "X-Webhook-Signature",
+                "value": "{{openFinanceWebhookSignature}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"consent.authorized\",\n  \"consent_id\": \"{{openFinanceExternalId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/open-finance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "open-finance"
+              ]
+            },
+            "description": "Webhook Celcoin Open Finance. HMAC-SHA256 hex + Idempotency-Key obrigatorios. Tipos: consent.authorized/denied/expired/movement.data. 202 sempre (novo ou duplicado idempotente); 401 HMAC invalido; 400 sem idem-key."
+          }
+        },
+        {
           "name": "POST /usuarios/{id}/role — 200 (promove FINANCEIRO)",
           "request": {
             "method": "POST",

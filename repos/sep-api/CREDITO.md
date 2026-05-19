@@ -200,6 +200,47 @@ Artefatos preparatorios:
 - [`steps-fase-2/backend/009-sprint-9-steps.md`](../../steps-fase-2/backend/009-sprint-9-steps.md)
   — plano de execucao detalhado da Sprint 9.
 
+## Open Finance (Sprint 9)
+
+Enriquecimento opt-in da analise de credito com Open Finance Brasil via Celcoin/Finansystech.
+Adiciona `RegraOpenFinanceMovimentacao` ao motor (bonus/penalidade por padrao de movimentacao
+bancaria) e reavaliacao automatica pos-AUTORIZADO. Detalhes operacionais em
+[`OPEN-FINANCE.md`](./OPEN-FINANCE.md).
+
+Componentes novos no modulo `credito`:
+
+- `domain/model`: `ConsentimentoOpenFinance`, `MovimentacaoOpenFinance`
+- `application/port/out`: `OpenFinanceProvider` (Fake + Celcoin adapters)
+- `application/usecase`: `IniciarConsentimento`, `ProcessarCallback`, `ConsultarMovimentacao`,
+  `ReavaliarPropostaComOpenFinance`, `ProcessarWebhookOpenFinance`
+- `application/listener`: `OpenFinanceAutorizadoListener` (dispara consulta),
+  `OpenFinanceDadosRecebidosListener` (dispara reavaliacao), `OpenFinanceAuditListener`
+- `application/service`: `OpenFinancePayloadSanitizer` (LGPD fail-closed)
+- `application/service/regras`: `RegraOpenFinanceMovimentacao` (bonus +200/+100, penalidade -150)
+- `web/controller`: `OpenFinanceController` (2 endpoints) + `CelcoinOpenFinanceWebhookController`
+
+Tabela de regras do motor atualizada:
+
+| Regra | Aplica a | Adicionado em | Logica |
+| ----- | -------- | ------------- | ------ |
+| (regras Sprint 8 acima) | | Sprint 8 | (idem) |
+| `RegraOpenFinanceMovimentacao` | PF + PJ | Sprint 9 | Bonus ate +200 se entradas mensais cobrem parcela com folga; penalidade -150 se saldo medio < 0; PASSOU neutro sem snapshot (opt-in) |
+
+`RegraResultado` ganha campo `ajusteScore` (Sprint 9 Task 9.4) — factories `passouComBonus` e
+`falhouComPenalidadeExtra`. Motor soma `ajusteTotal` ao score base e clampa `[0, 1000]`.
+
+Endpoints REST adicionados:
+
+| Metodo | Path | Auth |
+| ------ | ---- | ---- |
+| `POST` | `/api/v1/credito/propostas/{id}/open-finance/consentimento` | CLIENTE dono |
+| `GET` | `/api/v1/credito/propostas/{id}/open-finance` | CLIENTE dono ou FINANCEIRO/ADMIN |
+| `POST` | `/api/v1/webhooks/celcoin/open-finance` | HMAC + Idempotency-Key |
+
+Auditoria reforcada (V19): 5 tipos novos no `audit_log_seguranca` —
+`OPEN_FINANCE_CONSENTIMENTO_INICIADO`, `OPEN_FINANCE_AUTORIZADO`, `OPEN_FINANCE_NEGADO`,
+`OPEN_FINANCE_DADOS_RECEBIDOS`, `OPEN_FINANCE_REAVALIACAO`.
+
 ## Migrations
 
 | Versao | Conteudo |
@@ -207,6 +248,9 @@ Artefatos preparatorios:
 | `V14__criar_tabelas_credito.sql` | 5 tabelas: `proposta_credito`, `score_interno` (1:1), `regra_credito_avaliada` (N:1), `parecer_credito` (N:1 versionado), `decisao_credito` (1:1) + indices + check constraints. FKs sem `ON DELETE CASCADE` (CMN + LGPD — retencao auditavel). |
 | `V15__adicionar_role_financeiro_e_audit_role_alterado.sql` | `usuario.role` aceita `FINANCEIRO`; `ROLE_ALTERADO` em `chk_audit_seguranca_tipo`. |
 | `V16__ampliar_audit_seguranca_tipo_credito.sql` | 5 tipos em `chk_audit_seguranca_tipo`: `PROPOSTA_CRIADA`, `PROPOSTA_AVALIADA_MOTOR`, `PARECER_REGISTRADO`, `PROPOSTA_APROVADA`, `PROPOSTA_REJEITADA`. |
+| `V17__criar_tabelas_open_finance.sql` | 2 tabelas: `consentimento_open_finance` (unique parcial WHERE status='PENDENTE' garante 1 ativo por proposta) + `movimentacao_open_finance` (snapshot consolidado JSONB sanitizado). FKs sem `ON DELETE CASCADE`. |
+| `V18__unique_movimentacao_open_finance.sql` | `uq_movimentacao_of_consentimento` UNIQUE pra garantir 1 snapshot por consentimento + idempotencia ponta-a-ponta sob corrida. |
+| `V19__ampliar_audit_seguranca_tipo_open_finance.sql` | 5 tipos novos em `chk_audit_seguranca_tipo`: `OPEN_FINANCE_CONSENTIMENTO_INICIADO`, `OPEN_FINANCE_AUTORIZADO`, `OPEN_FINANCE_NEGADO`, `OPEN_FINANCE_DADOS_RECEBIDOS`, `OPEN_FINANCE_REAVALIACAO`. |
 
 ## Referencias
 
@@ -217,3 +261,5 @@ Artefatos preparatorios:
 - Resolucao CMN 4.656/2018 Art. 9 — analise de credito
 - `ONBOARDING.md` — fluxo KYC/KYB que produz APROVADO_FINAL
 - `PLD.md` — bases obrigatorias COAF/OFAC/INTERPOL/MTE
+- `OPEN-FINANCE.md` — ciclo Open Finance Brasil completo (Sprint 9)
+- Spec 009 — Sprint 9 credito Open Finance

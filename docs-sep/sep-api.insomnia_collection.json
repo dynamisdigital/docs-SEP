@@ -1526,6 +1526,71 @@
       "metaSortKey": -1749996000000
     },
     {
+      "_id": "req_of_consentimento",
+      "_type": "request",
+      "parentId": "fld_credito",
+      "name": "POST /credito/propostas/{id}/open-finance/consentimento (Sprint 9 — CLIENTE dono)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/open-finance/consentimento",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"cpfCnpjTomador\": \"52998224725\",\n  \"redirectUri\": \"https://app.sep/auth/callback\"\n}"
+      },
+      "metaSortKey": -1749995900000
+    },
+    {
+      "_id": "req_of_status",
+      "_type": "request",
+      "parentId": "fld_credito",
+      "name": "GET /credito/propostas/{id}/open-finance (Sprint 9 — status + snapshot)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/open-finance",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ clienteAccessToken }}"
+        }
+      ],
+      "metaSortKey": -1749995800000
+    },
+    {
+      "_id": "req_of_webhook",
+      "_type": "request",
+      "parentId": "fld_webhooks",
+      "name": "POST /webhooks/celcoin/open-finance (Sprint 9 — consent.authorized)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/open-finance",
+      "headers": [
+        {
+          "name": "Idempotency-Key",
+          "value": "{{ openFinanceIdempotencyKey }}"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ openFinanceWebhookSignature }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"type\": \"consent.authorized\",\n  \"consent_id\": \"{{ openFinanceExternalId }}\"\n}"
+      },
+      "metaSortKey": -1749995700000
+    },
+    {
       "_id": "req_usuarios_role",
       "_type": "request",
       "parentId": "fld_usuarios",
