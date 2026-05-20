@@ -1204,7 +1204,7 @@ Detalhamento das tasks:
 
 ### Trilha Fase 2 (Sprints 5-14)
 
-Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-8 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD e o nucleo inicial de credito. As Sprints 9-14 seguem como **backend-only** nesta etapa — Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-9 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD, o nucleo de credito interno e a integracao Open Finance. As Sprints 10-14 seguem como **backend-only** nesta etapa — Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 Mapeamento Sprint → Epic:
 
@@ -1340,7 +1340,7 @@ Status de execucao (concluida em 2026-05-18):
 - Testes: unitarios de dominio, regras, use cases, repositories, listeners, controller e `CreditoIT` com banco `sep_test`, cobrindo fluxo feliz proposta -> motor -> parecer -> auditoria, negativos de onboarding/ownership/step-up/role e rejeicao manual. `./gradlew check` verde com JaCoCo e Spotless.
 - Documentacao: `docs-SEP/repos/sep-api/CREDITO.md`, ADR 0012, `SPRINT-8-PR.md`, Postman e Insomnia com endpoints de credito + promocao de role.
 
-### Sprint 9
+### Sprint 9 (executada — 2026-05-19)
 
 Objetivo de planejamento:
 - enriquecer a analise de credito com dados de Open Finance: expor `OpenFinanceProvider` com `CelcoinOpenFinanceProvider` (via Finansystech), consumir movimentacao bancaria do tomador para enriquecer o `ScoreInterno` e processar respostas assincronas via Webhook
@@ -1361,6 +1361,18 @@ Responsavel principal:
 Detalhamento das tasks:
 - consultar: [`specs/fase-2/009-sprint-9-credito-open-finance.md`](../specs/fase-2/009-sprint-9-credito-open-finance.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+Status de execucao (concluida em 2026-05-19, PR #51 -> `develop`, squash `faec439`):
+- Dominio Open Finance no modulo `credito`: `ConsentimentoOpenFinance` (factories `iniciarLocal` + `vincularExterno` — pattern anti-orphan 2-fase: save local PENDENTE antes da chamada ao provider), `MovimentacaoOpenFinance` (snapshot consolidado JSONB 1:1 por consentimento) e `StatusConsentimento` (`PENDENTE`/`AUTORIZADO`/`NEGADO`/`EXPIRADO`) com transicoes unidirecionais. Migrations `V17` (tabelas + unique parcial `WHERE status='PENDENTE'` + FKs sem CASCADE), `V18` (UNIQUE `consentimento_id` em movimentacao) e `V19` (`chk_audit_seguranca_tipo` += 5 valores `OPEN_FINANCE_*`).
+- `OpenFinanceProvider` (porta) com `FakeOpenFinanceProvider` (default `app.open-finance.provider=fake`; idExterno UUID v6 por chamada preserva historico NEGADO/EXPIRADO no unique parcial) e `CelcoinOpenFinanceProvider` (adapter HTTP) + `CelcoinOpenFinanceOAuthTokenProvider` proprio do modulo `credito` (sem cross-import com `onboarding` — preserva DDD). Resilience4j `celcoin-open-finance` (retry 3x em 5xx/IO + circuit breaker + timeout 30s) + WireMock IT cobrindo OAuth, idempotencia e parsing.
+- 5 use cases: `IniciarConsentimentoOpenFinanceUseCase` (Idempotency-Key estavel `open-finance:consent:<id>` + 409 race), `ProcessarCallbackConsentimentoUseCase`, `ConsultarMovimentacaoOpenFinanceUseCase` (`@Transactional(REQUIRES_NEW)`; race via `DataIntegrityViolation` -> fallback `findByConsentimentoId`), `ReavaliarPropostaComOpenFinanceUseCase` (`REQUIRES_NEW`; `scoreRepository.flush()` antes do save evita unique violation no delete+insert) e `ProcessarWebhookOpenFinanceUseCase` (outbox idempotente). Listeners `OpenFinanceAutorizadoListener` e `OpenFinanceDadosRecebidosListener` em `AFTER_COMMIT + REQUIRES_NEW` (REQUIRED se junta a tx fantasma e perde saves silenciosamente, conforme licao da Sprint 7).
+- Reavaliacao **conservadora**: motor pode promover `EM_ANALISE -> PRE_APROVADA`, mas **nao rejeita automaticamente** — parecer manual preserva discricionariedade quando Open Finance piora score. `RegraResultado` ganhou `ajusteScore` (factories `passouComBonus` + `falhouComPenalidadeExtra`); `MotorRegrasCredito.calcularScore` soma `ajusteTotal` e clampa `[0, 1000]`. `RegraOpenFinanceMovimentacao`: bonus +200 (entradas >= 3x parcela), +100 (>= 1x); penalidade -150 saldo medio negativo; `PASSOU` neutro sem snapshot (opt-in).
+- LGPD defesa em profundidade: `OpenFinancePayloadSanitizer` filtra recursivamente 13 campos sensiveis (`account_id`/`number`, `agency_number`, `branch_code`, `transactions`, `raw_transactions`, `transaction_list`, `extrato`, `cpf`, `cnpj`, `document_number`, `holder_name`, `holder_document`); fail-closed devolve placeholder `{"_sanitizer_error":"non-json","_size":N}` em vez do bruto. Audit log carrega APENAS IDs + agregados, NUNCA payload bruto.
+- 2 endpoints REST em `/api/v1/credito/propostas/{id}/open-finance` (consentimento + consulta) + webhook `POST /api/v1/webhooks/celcoin/open-finance` (HMAC + `Idempotency-Key` obrigatorios). Validacao defensiva `@Pattern` no DTO (CPF/CNPJ 11/14 digitos puros; `redirectUri` regex `^https?://[^\s]+$` bloqueia SSRF/open-redirect).
+- 5 tipos novos de audit em `OpenFinanceAuditListener` (`AFTER_COMMIT + REQUIRES_NEW`): `OPEN_FINANCE_CONSENTIMENTO_INICIADO`, `OPEN_FINANCE_AUTORIZADO`, `OPEN_FINANCE_NEGADO`, `OPEN_FINANCE_DADOS_RECEBIDOS`, `OPEN_FINANCE_REAVALIACAO`.
+- Testes: `OpenFinanceIT` E2E (`sep_test`) — fluxo feliz `PRE_APROVADA -> consentimento -> webhook AUTORIZADO -> snapshot -> reavaliacao -> 4 eventos audit`; cenarios `NEGADO` (score nao muda), cliente alheio 403, HMAC invalido 401, sem `Idempotency-Key` 400, idempotencia 2x mesma key, proposta `APROVADA` nao reavalia. WireMock IT para adapter + sanitizer unit tests. `./gradlew check` verde com JaCoCo gate 70% + Spotless.
+- Documentacao: `docs-SEP/repos/sep-api/OPEN-FINANCE.md` (novo), `docs-SEP/repos/sep-api/CREDITO.md` atualizado com secao Sprint 9, `SPRINT-9-PR.md`, README sep-api atualizado, Postman + Insomnia ganharam pasta "Open Finance (Sprint 9)".
+- Pendencias para sprints futuras: revogacao tardia (`consent.denied` apos `authorized` hoje apenas WARN); thresholds bonus/penalidade hardcoded -> migrar pra `CreditoMotorProperties`; multiplos provedores Open Finance; renovacao automatica de consentimento; UI web/mobile (Sprint 9 backend-only).
 
 ### Sprint 10
 
@@ -1890,13 +1902,14 @@ Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14)
 | 13 | Epic 8 (parte 2) | Cobranca — inadimplencia e recuperacao | [`013`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md) | `cobranca` |
 | 14 | Epic 9 | Backoffice operacional | [`014`](../specs/fase-2/014-sprint-14-backoffice-operacional.md) | `backoffice` |
 
-**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-8 ja foram concluidas no backend; Sprints 9-14 seguem planejadas). Dependencia linear (cada sprint exige a anterior pronta). A partir da Sprint 6, a trilha e exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-9 ja foram concluidas no backend; Sprints 10-14 seguem planejadas). Dependencia linear (cada sprint exige a anterior pronta). A partir da Sprint 6, a trilha e exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 **Decisoes de planejamento**:
 - **Granularidade**: cada Epic 5-8 foi dividida em 2 sprints (parte 1 + parte 2) para reduzir risco de entrega; Epic 9 ficou em 1 sprint unica.
 - **Trilhas Web/Mobile**: nao planejadas nesta etapa. Decisao motivada por dois fatores: (1) os contratos da API sao definidos pelo backend e ainda podem evoluir durante as Epics 5-9; (2) o frontend de jornadas (Epic 13) e o mobile (Epic 14 fase 2+) so podem comecar de forma estavel quando esses contratos estiverem fechados.
 - **Sprint 5**: concluida em 2026-05-11; foi reposicionada como gate de abertura da Fase 2 (e nao mais fechamento da Fase 1) por exigir MFA/refresh token/lockout antes de qualquer integracao real com Celcoin.
 - **Sprint 8**: concluida em 2026-05-18; entregou o primeiro nucleo de credito interno, sem Open Finance, sem precificacao financeira e sem formalizacao/desembolso.
+- **Sprint 9**: concluida em 2026-05-19; entregou integracao Open Finance Brasil via Celcoin/Finansystech (consentimento + reavaliacao + auditoria). Pattern anti-orphan 2-fase no consentimento, listeners `AFTER_COMMIT + REQUIRES_NEW` reaproveitando licao da Sprint 7, motor de credito ganhou `ajusteScore` (bonus/penalidade Open Finance), 5 tipos novos de audit `OPEN_FINANCE_*` (V19) e sanitizer LGPD fail-closed. Reavaliacao **conservadora**: promove apenas `EM_ANALISE -> PRE_APROVADA`; nao rejeita automaticamente. Sem ADR proprio — decisao arquitetural coberta por ADR 0004 (Provider Pattern) + ADR 0008 (WireMock).
 
 **ADRs candidatos durante a Fase 2** (criados just-in-time quando cada decisao for tomada):
 - ADR 0012 — Motor de regras de credito interno (Sprint 8, aceito em 2026-05-18; 0011 ja estava ocupado)
