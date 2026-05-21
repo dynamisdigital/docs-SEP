@@ -8,15 +8,20 @@ Este arquivo consolida a orientacao para os agentes de IA que assumem trabalho n
   1. [`docs-sep/PRD.md`](docs-sep/PRD.md)
   2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md)
   3. Este arquivo (`AGENT.md`), pelo menos a secao do agente em uso
-  4. O spec relevante em `specs/`
-  5. O step correspondente em `steps-fase-1/{backend,web,mobile}/` ou `steps-fase-2/{backend,web,mobile}/`, quando existir
-  6. ADRs relevantes em `adr/`
+  4. [`AI-SESSION-PROMPT.md`](AI-SESSION-PROMPT.md), como prompt curto reutilizavel de inicio de sessao
+  5. [`AI-ROADMAP.md`](AI-ROADMAP.md), para localizar rapidamente os documentos certos por tipo de tarefa
+  6. O spec relevante em `specs/`
+  7. O step correspondente em `steps-fase-1/{backend,web,mobile}/` ou `steps-fase-2/{backend,web,mobile}/`, quando existir
+  8. ADRs relevantes em `adr/`
+- O `AI-SESSION-PROMPT.md` e [`AI-ROADMAP.md`](AI-ROADMAP.md) sao artefatos obrigatorios de orientacao para agentes; o roadmap e o indice operacional obrigatorio dos agentes. Ele deve estar sempre atualizado: toda mudanca que criar, mover, remover ou alterar a finalidade de documentacao, specs, steps, ADRs, docs de modulo, collections ou estrutura de repos deve atualizar o roadmap no mesmo ciclo. Toda sprint concluida deve revisar o roadmap antes do fechamento.
 - O conteudo esta organizado em **tres secoes**, uma por agente: Claude, Codex e Copilot. As secoes tem sobreposicao (estado do projeto, stack, arquitetura, marco regulatorio, convencoes), mas cada uma foi escrita com o tom e os detalhes que fazem sentido para o agente correspondente.
 - Quando houver conflito aparente entre as secoes, **prevalece o PRD** (`docs-sep/PRD.md`) e os ADRs (`adr/`). As secoes deste arquivo nao reescrevem o PRD; complementam-no.
 
 ## Indice
 
 - [Repositorios do projeto](#repositorios-do-projeto)
+- [AI-SESSION-PROMPT.md](AI-SESSION-PROMPT.md)
+- [AI-ROADMAP.md](AI-ROADMAP.md)
 - [Secao Claude](#secao-claude)
 - [Secao Codex](#secao-codex)
 - [Secao Copilot](#secao-copilot)
