@@ -151,7 +151,7 @@ REQUIRES_NEW (eventually-consistent).
 | Evento | Quando | Consumidor previsto |
 | ------ | ------ | ------------------- |
 | `PropostaCriadaEvent` | Apos `CriarPropostaCreditoUseCase` | `PropostaAvaliacaoListener` dispara motor; `CreditoAuditListener` |
-| `PropostaAprovadaEvent` | Apos parecer manual `APROVAR` (final) | **Sprint 10** (Formalizacao) iniciara contrato; `CreditoAuditListener` |
+| `PropostaAprovadaEvent` | Apos parecer manual `APROVAR` (final) | `PropostaAprovadaListener` do modulo `contratos` (Sprint 10) gera contrato em `AGUARDANDO_ACEITE` — ver [`CONTRATOS.md`](./CONTRATOS.md); `CreditoAuditListener` |
 | `PropostaRejeitadaEvent` | Apos rejeicao (motor ou parecer manual) | `CreditoAuditListener` |
 | `ParecerRegistradoEvent` | Sempre que parecer eh persistido | `CreditoAuditListener` |
 | `RoleAlteradaEvent` | `AlterarRoleUsuarioUseCase` | `UsuariosAuditListener` |
@@ -181,11 +181,11 @@ Em outro terminal — com Bruno/Postman ou curl:
 ## Limitacoes desta Sprint
 
 - **Sem Open Finance**: enriquecimento via movimentacao bancaria entra na Sprint 9
-- **Sem calculo financeiro**: juros, taxas, IOF, CET entram na Sprint 10 (Formalizacao) ou Sprint 12 (Cobranca)
+- **Sem calculo financeiro**: juros, taxas, IOF, CET ainda nao calculados; Sprint 10 entregou contrato textual sem calculo definitivo, Sprint 12 (Cobranca) calcula parcelas/encargos
 - **Limites estaticos por perfil**: nao ha campanha por linha de produto nesta sprint
 - **Sem ML / bureau externo**: motor 100% interno + heuristicas declarativas (ADR 0012)
 - **Sem UI**: apenas backend (decisao 2026-05-04 — Frontend/Mobile da Fase 2 aguarda contratos estaveis)
-- **Sem desembolso**: contratos formalizados na Sprint 10/11; desembolso Pix na Sprint 15
+- **Sem desembolso**: contratos formalizados na Sprint 10 (ate `ACEITO`) e Sprint 11 (`ASSINADO` via provider externo — ver [`CONTRATOS.md`](./CONTRATOS.md)); desembolso Pix na Sprint 15
 
 ## Evolucao planejada: Open Finance (Sprint 9)
 

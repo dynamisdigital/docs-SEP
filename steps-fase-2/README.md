@@ -23,7 +23,7 @@ steps-fase-2/
 | Sprint 7 - Onboarding KYB Empresa + PLD | [`backend/007-sprint-7-steps.md`](./backend/007-sprint-7-steps.md) | A implementar |
 | Sprint 8 - Credito Regras + Parecer | [`backend/008-sprint-8-steps.md`](./backend/008-sprint-8-steps.md) | A implementar |
 | Sprint 9 - Credito Open Finance | [`backend/009-sprint-9-steps.md`](./backend/009-sprint-9-steps.md) | A implementar |
-| Sprint 10 - Formalizacao Geracao de Contrato | `backend/010-sprint-10-steps.md` | A criar antes da Sprint 10 |
+| Sprint 10 - Formalizacao Geracao de Contrato | [`backend/010-sprint-10-steps.md`](./backend/010-sprint-10-steps.md) | A implementar |
 | Sprint 11 - Formalizacao Assinatura Digital | `backend/011-sprint-11-steps.md` | A criar antes da Sprint 11 |
 | Sprint 12 - Cobranca Parcelas + Agenda | `backend/012-sprint-12-steps.md` | A criar antes da Sprint 12 |
 | Sprint 13 - Cobranca Inadimplencia | `backend/013-sprint-13-steps.md` | A criar antes da Sprint 13 |

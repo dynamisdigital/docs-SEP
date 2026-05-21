@@ -120,6 +120,13 @@
       "metaSortKey": -4
     },
     {
+      "_id": "fld_contratos",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Contratos (Sprint 10)",
+      "metaSortKey": -3.5
+    },
+    {
       "_id": "fld_actuator",
       "_type": "request_group",
       "parentId": "wrk_sep_api",
@@ -1616,6 +1623,105 @@
         "mimeType": "application/json",
         "text": "{\n  \"role\": \"FINANCEIRO\"\n}"
       }
+    },
+    {
+      "_id": "req_contrato_por_proposta",
+      "_type": "request",
+      "parentId": "fld_contratos",
+      "name": "GET /contratos/proposta/{propostaId} — consulta contrato vigente",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/contratos/proposta/{{ propostaCreditoId }}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ accessToken }}"
+        }
+      ],
+      "metaSortKey": -1749994000000
+    },
+    {
+      "_id": "req_contrato_por_id",
+      "_type": "request",
+      "parentId": "fld_contratos",
+      "name": "GET /contratos/{id} — consulta por id",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ accessToken }}"
+        }
+      ],
+      "metaSortKey": -1749993000000
+    },
+    {
+      "_id": "req_contrato_versoes",
+      "_type": "request",
+      "parentId": "fld_contratos",
+      "name": "GET /contratos/{id}/versoes — lista versoes",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/versoes",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ accessToken }}"
+        }
+      ],
+      "metaSortKey": -1749992000000
+    },
+    {
+      "_id": "req_contrato_aceite",
+      "_type": "request",
+      "parentId": "fld_contratos",
+      "name": "PATCH /contratos/{id}/aceite — CLIENTE dono + step-up",
+      "method": "PATCH",
+      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/aceite",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ accessToken }}"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{}"
+      },
+      "metaSortKey": -1749991000000
+    },
+    {
+      "_id": "req_contrato_cancelar",
+      "_type": "request",
+      "parentId": "fld_contratos",
+      "name": "POST /contratos/{id}/cancelar — FINANCEIRO/ADMIN + step-up + justificativa",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/cancelar",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ financeiroAccessToken }}"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"justificativa\": \"Contrato cancelado por divergencia operacional antes do aceite.\"\n}"
+      },
+      "metaSortKey": -1749990000000
     }
   ]
 }

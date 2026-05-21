@@ -2341,6 +2341,126 @@
       ]
     },
     {
+      "name": "Contratos (Sprint 10)",
+      "description": "Formalizacao contratual — geracao automatica via PropostaAprovadaEvent (Sprint 8), aceite com step-up + ip/user-agent (CMN 4.656/2018), cancelamento pre-aceite por FINANCEIRO/ADMIN.",
+      "item": [
+        {
+          "name": "GET /contratos/proposta/{propostaId} — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contratos/proposta/{{propostaCreditoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contratos", "proposta", "{{propostaCreditoId}}"]
+            },
+            "description": "Consulta contrato pela proposta. Ownership (CLIENTE titular) ou FINANCEIRO/ADMIN. 404 se proposta nao tem contrato gerado."
+          }
+        },
+        {
+          "name": "GET /contratos/{id} — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contratos/{{contratoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contratos", "{{contratoId}}"]
+            },
+            "description": "Consulta contrato por id. Ownership ou FINANCEIRO/ADMIN."
+          }
+        },
+        {
+          "name": "GET /contratos/{id}/versoes — 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contratos/{{contratoId}}/versoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contratos", "{{contratoId}}", "versoes"]
+            },
+            "description": "Lista versoes do contrato em ordem ascendente. Ownership ou FINANCEIRO/ADMIN."
+          }
+        },
+        {
+          "name": "PATCH /contratos/{id}/aceite — 200 (CLIENTE + step-up)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contratos/{{contratoId}}/aceite",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contratos", "{{contratoId}}", "aceite"]
+            },
+            "description": "Registra aceite do tomador sobre a versao vigente. CLIENTE titular + step-up obrigatorio. Captura ip + user-agent. 403 sem ownership/step-up; 409 se contrato ja ACEITO."
+          }
+        },
+        {
+          "name": "POST /contratos/{id}/cancelar — 200 (FINANCEIRO/ADMIN + step-up)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{financeiroAccessToken}}"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"justificativa\": \"Contrato cancelado por divergencia operacional antes do aceite.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contratos/{{contratoId}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contratos", "{{contratoId}}", "cancelar"]
+            },
+            "description": "Cancela contrato em GERADO/AGUARDANDO_ACEITE. FINANCEIRO/ADMIN + step-up + justificativa 10-500 chars (apos trim). 409 se ACEITO+."
+          }
+        }
+      ]
+    },
+    {
       "name": "Actuator",
       "description": "Endpoints de observabilidade do Spring Boot Actuator. Liberados publicamente (sem JWT) para monitoramento.",
       "item": [
@@ -2559,6 +2679,11 @@
     },
     {
       "key": "financeiroId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "contratoId",
       "value": "",
       "type": "string"
     }
