@@ -31,8 +31,7 @@ Leitura base para qualquer agente:
 1. [`docs-sep/PRD.md`](docs-sep/PRD.md)
 2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md)
 3. [`AGENT.md`](AGENT.md)
-4. [`AI-SESSION-PROMPT.md`](AI-SESSION-PROMPT.md)
-5. Este arquivo (`AI-ROADMAP.md`)
+4. Este arquivo (`AI-ROADMAP.md`)
 
 ## Pacotes de leitura por tarefa
 
@@ -43,7 +42,7 @@ Leitura base para qualquer agente:
 | Implementacao mobile | Base -> spec/step mobile -> `docs-sep/MOBILE-SCREENS-PLAN.md` -> `docs-sep/DESIGN-notion.md` -> `repos/sep-mobile/` |
 | Code review | Base -> spec da sprint -> step da task -> doc operacional do modulo -> diff/codigo -> testes existentes |
 | Criar nova sprint/steps | Base -> PRD secao da sprint -> spec correspondente -> steps anteriores similares -> ADRs relevantes |
-| Atualizacao documental | Base -> documento alvo -> documentos que apontam para ele -> este roadmap; se for orientacao de agentes, atualizar tambem `AI-SESSION-PROMPT.md` quando necessario |
+| Atualizacao documental | Base -> documento alvo -> documentos que apontam para ele -> este roadmap |
 | Duvida de produto/regra | `docs-sep/PRD.md` -> `docs-sep/CONTEXT.md` -> doc operacional do modulo -> spec da sprint |
 | Integracao externa | Base -> ADR 0004 -> ADR 0008 quando houver WireMock -> doc operacional do modulo -> specs/steps da integracao |
 | Seguranca/auth/step-up/auditoria | Base -> `docs-sep/SEGURANCA.md` -> specs/steps da Sprint 5 -> docs do modulo afetado |
@@ -59,7 +58,7 @@ Leitura base para qualquer agente:
 | PLD | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) | Sprint 7 | 0004, 0007, 0008 |
 | `credito` | [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) | Sprints 8 e 9 | 0007, 0012 |
 | Open Finance | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) | Sprint 9 | 0004, 0008 |
-| `contratos` | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) | Sprints 10 e 11 | 0004, 0006, 0007 |
+| `contratos` | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) | [`010`](steps-fase-2/backend/010-sprint-10-steps.md), [`011`](steps-fase-2/backend/011-sprint-11-steps.md) | 0004, 0006, 0007 |
 | `cobranca` | Futuro `repos/sep-api/COBRANCA.md` | Sprints 12 e 13 | 0001, 0007 |
 | `backoffice` | Futuro `repos/sep-api/BACKOFFICE.md` | Sprint 14 | 0001, 0007 |
 | `escrow` / financeiro / Pix | PRD + specs futuras | Sprints futuras | 0005, 0007 |
