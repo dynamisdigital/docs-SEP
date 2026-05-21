@@ -1204,7 +1204,7 @@ Detalhamento das tasks:
 
 ### Trilha Fase 2 (Sprints 5-14)
 
-Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-9 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD, o nucleo de credito interno e a integracao Open Finance. As Sprints 10-14 seguem como **backend-only** nesta etapa — Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-10 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD, credito interno, Open Finance e formalizacao contratual ate aceite. As Sprints 11-14 seguem como **backend-only** nesta etapa — Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 Mapeamento Sprint → Epic:
 
@@ -1374,7 +1374,7 @@ Status de execucao (concluida em 2026-05-19, PR #51 -> `develop`, squash `faec43
 - Documentacao: `docs-SEP/repos/sep-api/OPEN-FINANCE.md` (novo), `docs-SEP/repos/sep-api/CREDITO.md` atualizado com secao Sprint 9, `SPRINT-9-PR.md`, README sep-api atualizado, Postman + Insomnia ganharam pasta "Open Finance (Sprint 9)".
 - Pendencias para sprints futuras: revogacao tardia (`consent.denied` apos `authorized` hoje apenas WARN); thresholds bonus/penalidade hardcoded -> migrar pra `CreditoMotorProperties`; multiplos provedores Open Finance; renovacao automatica de consentimento; UI web/mobile (Sprint 9 backend-only).
 
-### Sprint 10
+### Sprint 10 (executada - 2026-05-20)
 
 Objetivo de planejamento:
 - iniciar a formalizacao contratual: criar modulo `contratos`, modelar `Contrato`, `ClausulaContratual`, `VersaoContrato` e `StatusFormalizacao`, gerar contrato a partir de templates por tipo de operacao (texto inicial; PDF/HTML estruturado em sprint posterior), implementar fluxo de aceite e bloquear desembolso sem formalizacao concluida
@@ -1395,6 +1395,14 @@ Responsavel principal:
 Detalhamento das tasks:
 - consultar: [`specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md`](../specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+Status de execucao (concluida em 2026-05-20):
+- Modulo `contratos` criado em DDD + Hexagonal com `Contrato`, `VersaoContrato`, `ClausulaContratual`, `AceiteContrato`, estados de formalizacao e migrations V20-V22.
+- Geracao automatica a partir de `PropostaAprovadaEvent`, template Thymeleaf texto, versionamento por hash SHA-256 e idempotencia por `parecerOrigemId`.
+- Aceite do tomador com ownership, evidencia tecnica e step-up; cancelamento pre-aceite por `FINANCEIRO`/`ADMIN`; 5 endpoints REST em `/api/v1/contratos`.
+- Auditoria reforcada com eventos `CONTRATO_GERADO`, `CONTRATO_NOVA_VERSAO`, `CONTRATO_ACEITO` e `CONTRATO_CANCELADO`, sem gravar conteudo integral do contrato no audit log.
+- Documentacao operacional: [`docs-SEP/repos/sep-api/CONTRATOS.md`](../repos/sep-api/CONTRATOS.md), [`SPRINT-10-PR.md`](../repos/sep-api/SPRINT-10-PR.md), Postman e Insomnia atualizados.
+- Pendencias futuras: assinatura digital, CCB juridicamente completa, PDF/HTML rico e hardening de step-up estrito para operacoes legais.
 
 ### Sprint 11
 
@@ -1887,7 +1895,7 @@ As tres secoes tem sobreposicao intencional (estado, stack, arquitetura, marco r
 
 ## 29. Mapeamento Fase 2: Epics × Sprints
 
-Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14). Util para PO/PM acompanhar a Fase 2 sem precisar ler a §22 inteira. Sprint 5 ja esta concluida como gate cross-stack; Sprints 6-14 seguem backend-only ate estabilizacao dos contratos da API.
+Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14). Util para PO/PM acompanhar a Fase 2 sem precisar ler a §22 inteira. Sprint 5 ja esta concluida como gate cross-stack; Sprints 6-10 concluidas e Sprints 11-14 seguem backend-only ate estabilizacao dos contratos da API.
 
 | Sprint | Epic | Tema | Spec | Modulo dominio |
 |--------|------|------|------|----------------|
@@ -1902,7 +1910,7 @@ Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14)
 | 13 | Epic 8 (parte 2) | Cobranca — inadimplencia e recuperacao | [`013`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md) | `cobranca` |
 | 14 | Epic 9 | Backoffice operacional | [`014`](../specs/fase-2/014-sprint-14-backoffice-operacional.md) | `backoffice` |
 
-**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-9 ja foram concluidas no backend; Sprints 10-14 seguem planejadas). Dependencia linear (cada sprint exige a anterior pronta). A partir da Sprint 6, a trilha e exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-10 ja foram concluidas no backend; Sprints 11-14 seguem planejadas). Dependencia linear (cada sprint exige a anterior pronta). A partir da Sprint 6, a trilha e exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 **Decisoes de planejamento**:
 - **Granularidade**: cada Epic 5-8 foi dividida em 2 sprints (parte 1 + parte 2) para reduzir risco de entrega; Epic 9 ficou em 1 sprint unica.
@@ -1910,6 +1918,7 @@ Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14)
 - **Sprint 5**: concluida em 2026-05-11; foi reposicionada como gate de abertura da Fase 2 (e nao mais fechamento da Fase 1) por exigir MFA/refresh token/lockout antes de qualquer integracao real com Celcoin.
 - **Sprint 8**: concluida em 2026-05-18; entregou o primeiro nucleo de credito interno, sem Open Finance, sem precificacao financeira e sem formalizacao/desembolso.
 - **Sprint 9**: concluida em 2026-05-19; entregou integracao Open Finance Brasil via Celcoin/Finansystech (consentimento + reavaliacao + auditoria). Pattern anti-orphan 2-fase no consentimento, listeners `AFTER_COMMIT + REQUIRES_NEW` reaproveitando licao da Sprint 7, motor de credito ganhou `ajusteScore` (bonus/penalidade Open Finance), 5 tipos novos de audit `OPEN_FINANCE_*` (V19) e sanitizer LGPD fail-closed. Reavaliacao **conservadora**: promove apenas `EM_ANALISE -> PRE_APROVADA`; nao rejeita automaticamente. Sem ADR proprio — decisao arquitetural coberta por ADR 0004 (Provider Pattern) + ADR 0008 (WireMock).
+- **Sprint 10**: concluida em 2026-05-20; entregou formalizacao contratual ate `ACEITO`: modulo `contratos`, templates texto, versionamento com SHA-256, aceite/cancelamento com step-up, 5 endpoints REST, migrations V20-V22 e auditoria `CONTRATO_*`. Assinatura digital, CCB completa e artefatos ricos ficam para Sprint 11.
 
 **ADRs candidatos durante a Fase 2** (criados just-in-time quando cada decisao for tomada):
 - ADR 0012 — Motor de regras de credito interno (Sprint 8, aceito em 2026-05-18; 0011 ja estava ocupado)

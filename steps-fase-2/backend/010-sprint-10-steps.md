@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md`](../../specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md)
 
-**Status**: a implementar.
+**Status**: concluida em 2026-05-20 no backend (`sep-api`).
 
 **Objetivo geral**: criar o modulo `contratos` para gerar contrato textual a partir de proposta de credito `APROVADA`, versionar o conteudo gerado, registrar aceite explicito do tomador com step-up e evidencia tecnica, permitir cancelamento antes do aceite e preparar o contrato para assinatura digital da Sprint 11.
 
@@ -70,7 +70,7 @@
 - 10.4 e 10.5 dependem do agregado com transicoes fechadas.
 - 10.6 so deve expor endpoints depois dos use cases estabilizados.
 - 10.7 deve estar pronta antes do IT para validar audit log.
-- 10.9 so marca PRD como executado apos implementacao/merge.
+- 10.9 marca PRD como executado apos implementacao validada.
 
 ---
 
@@ -961,12 +961,12 @@ Validar via Swagger/collection:
 - Validar cancelamento em contrato ainda nao aceito.
 
 ### Definicao de pronto da Task 10.9
-- [ ] `CONTRATOS.md` atualizado com implementacao real.
-- [ ] `CREDITO.md` atualizado.
-- [ ] Collections atualizadas.
-- [ ] PR description criada apenas no final.
-- [ ] Build/test final verde.
-- [ ] PRD atualizado apenas quando a sprint estiver concluida/mergeada, nao antes.
+- [x] `CONTRATOS.md` atualizado com implementacao real.
+- [x] `CREDITO.md` atualizado.
+- [x] Collections atualizadas.
+- [x] PR description criada apenas no final.
+- [x] Build/test final verde.
+- [x] PRD atualizado com Sprint 10 concluida.
 
 ### Checkpoint pre-commit obrigatorio
 No fim da sprint, apresentar checkpoint consolidado antes de qualquer staging:
@@ -980,19 +980,19 @@ No fim da sprint, apresentar checkpoint consolidado antes de qualquer staging:
 
 ## Definition of Done da Sprint 10
 
-- [ ] Modulo `contratos` criado com estrutura DDD + Hexagonal.
-- [ ] Tabelas `contrato`, `versao_contrato`, `clausula_contratual`, `aceite_contrato` criadas por Flyway.
-- [ ] Template engine operacional com templates `MUTUO` e `CCB` esqueleto.
-- [ ] Contrato gerado automaticamente a partir de `PropostaAprovadaEvent`.
-- [ ] Versionamento com hash SHA-256 funcional.
-- [ ] Aceite com step-up, ownership, ip e user-agent.
-- [ ] Cancelamento pre-aceite por `FINANCEIRO`/`ADMIN` com step-up.
-- [ ] 5 endpoints REST documentados no Swagger.
-- [ ] Auditoria reforcada com eventos `CONTRATO_*`.
-- [ ] Suite E2E de contratos passando.
-- [ ] Cobertura JaCoCo do modulo `contratos` >= 70%.
-- [ ] `CONTRATOS.md` atualizado em `docs-SEP/repos/sep-api/`.
-- [ ] Collections Postman/Insomnia atualizadas.
+- [x] Modulo `contratos` criado com estrutura DDD + Hexagonal.
+- [x] Tabelas `contrato`, `versao_contrato`, `clausula_contratual`, `aceite_contrato` criadas por Flyway.
+- [x] Template engine operacional com templates `MUTUO` e `CCB` esqueleto.
+- [x] Contrato gerado automaticamente a partir de `PropostaAprovadaEvent`.
+- [x] Versionamento com hash SHA-256 funcional.
+- [x] Aceite com step-up, ownership, ip e user-agent.
+- [x] Cancelamento pre-aceite por `FINANCEIRO`/`ADMIN` com step-up.
+- [x] 5 endpoints REST documentados no Swagger.
+- [x] Auditoria reforcada com eventos `CONTRATO_*`.
+- [x] Suite E2E de contratos passando.
+- [x] Cobertura JaCoCo do modulo `contratos` >= 70%.
+- [x] `CONTRATOS.md` atualizado em `docs-SEP/repos/sep-api/`.
+- [x] Collections Postman/Insomnia atualizadas.
 
 ---
 
