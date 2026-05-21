@@ -39,7 +39,11 @@
         "parecerCreditoId": "",
         "financeiroAccessToken": "",
         "financeiroRefreshToken": "",
-        "financeiroId": ""
+        "financeiroId": "",
+        "contratoId": "",
+        "idEnvelopeExterno": "",
+        "clicksignWebhookSecret": "dev-clicksign-webhook-secret-change-me",
+        "clicksignSignature": "sha256=PLACEHOLDER"
       },
       "color": null,
       "isPrivate": false,
@@ -123,8 +127,15 @@
       "_id": "fld_contratos",
       "_type": "request_group",
       "parentId": "wrk_sep_api",
-      "name": "Contratos (Sprint 10)",
+      "name": "Contratos (Sprints 10 + 11)",
       "metaSortKey": -3.5
+    },
+    {
+      "_id": "fld_webhook_assinatura",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Webhook Assinatura Digital (Sprint 11)",
+      "metaSortKey": -3.4
     },
     {
       "_id": "fld_actuator",
@@ -1722,6 +1733,162 @@
         "text": "{\n  \"justificativa\": \"Contrato cancelado por divergencia operacional antes do aceite.\"\n}"
       },
       "metaSortKey": -1749990000000
+    },
+    {
+      "_id": "req_contrato_assinar",
+      "_type": "request",
+      "parentId": "fld_contratos",
+      "name": "POST /contratos/{id}/assinar — FINANCEIRO/ADMIN + step-up (Sprint 11; idempotente)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/assinar",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ financeiroAccessToken }}"
+        },
+        {
+          "name": "X-Step-Up-Token",
+          "value": "{{ stepUpToken }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{}"
+      },
+      "description": "Reprocessamento manual idempotente do envio para assinatura. Envelope ja existente eh devolvido sem chamar provider novamente. 202 + StatusAssinaturaResponse. Erros: 422 (CCB falha ou provider 4xx), 502 (provider erro generico), 503 (provider 5xx).",
+      "metaSortKey": -1749989000000
+    },
+    {
+      "_id": "req_contrato_assinatura_status",
+      "_type": "request",
+      "parentId": "fld_contratos",
+      "name": "GET /contratos/{id}/assinatura/status — ownership ou FINANCEIRO/ADMIN (Sprint 11)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/assinatura/status",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ accessToken }}"
+        }
+      ],
+      "description": "Snapshot do envelope (statusEnvelope + idEnvelopeExterno + dataAtualizacaoProvider) + status do contrato. Fonte: estado local; webhook eh fonte de verdade operacional.",
+      "metaSortKey": -1749988000000
+    },
+    {
+      "_id": "req_contrato_documento_assinado",
+      "_type": "request",
+      "parentId": "fld_contratos",
+      "name": "GET /contratos/{id}/documento-assinado — ownership ou FINANCEIRO/ADMIN (Sprint 11)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/documento-assinado",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ accessToken }}"
+        }
+      ],
+      "description": "Download do PDF assinado. Exige contrato ASSINADO; 409 se indisponivel. Retorna application/pdf + Content-Disposition + X-Document-Hash-Sha256 (integridade local). Cada download grava audit DOCUMENTO_ASSINADO_BAIXADO com ip + user-agent (LGPD).",
+      "metaSortKey": -1749987000000
+    },
+    {
+      "_id": "req_webhook_assinatura_sign",
+      "_type": "request",
+      "parentId": "fld_webhook_assinatura",
+      "name": "POST /webhooks/assinatura/clicksign — sign (202)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Hmac",
+          "value": "{{ clicksignSignature }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": { \"name\": \"sign\", \"occurred_at\": \"2026-05-21T15:00:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
+      },
+      "description": "Callback ASSINADO. Substitua {{ clicksignSignature }} por sha256=<hex> calculado com HMAC-SHA256(clicksignWebhookSecret, body). Transiciona Contrato.ASSINADO + cria DocumentoAssinado + publica ContratoAssinadoEvent. Audit log: ASSINATURA_ASSINADA.",
+      "metaSortKey": -1749986000000
+    },
+    {
+      "_id": "req_webhook_assinatura_refuse",
+      "_type": "request",
+      "parentId": "fld_webhook_assinatura",
+      "name": "POST /webhooks/assinatura/clicksign — refuse (202)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Hmac",
+          "value": "{{ clicksignSignature }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": { \"name\": \"refuse\", \"occurred_at\": \"2026-05-21T15:30:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
+      },
+      "description": "Callback RECUSADO. Transiciona Contrato.RECUSADO + publica ContratoRecusadoEvent. Audit log: ASSINATURA_RECUSADA.",
+      "metaSortKey": -1749985000000
+    },
+    {
+      "_id": "req_webhook_assinatura_view",
+      "_type": "request",
+      "parentId": "fld_webhook_assinatura",
+      "name": "POST /webhooks/assinatura/clicksign — view (202 informativo)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Hmac",
+          "value": "{{ clicksignSignature }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": { \"name\": \"view\", \"occurred_at\": \"2026-05-21T14:45:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
+      },
+      "description": "Callback VISUALIZADO (informativo). Marca envelope VISUALIZADO; contrato preserva EM_ASSINATURA. Audit log: ASSINATURA_VISUALIZADA.",
+      "metaSortKey": -1749984000000
+    },
+    {
+      "_id": "req_webhook_assinatura_hmac_invalido",
+      "_type": "request",
+      "parentId": "fld_webhook_assinatura",
+      "name": "POST /webhooks/assinatura/clicksign (HMAC invalido) — 401",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Hmac",
+          "value": "sha256=deadbeef0000000000000000000000000000000000000000000000000000dead"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": { \"name\": \"sign\", \"occurred_at\": \"2026-05-21T15:00:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
+      },
+      "description": "HMAC hardcoded invalido. Esperado: 401 via BadCredentialsException. Contrato preserva EM_ASSINATURA — nada processado.",
+      "metaSortKey": -1749983000000
     }
   ]
 }

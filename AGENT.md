@@ -16,6 +16,47 @@ Antes de implementar, revisar codigo ou responder duvidas, leia:
 
 Hierarquia em caso de conflito: PRD + ADRs prevalecem; depois specs; depois steps; depois docs operacionais em `repos/`; por fim `AI-ROADMAP.md` e este arquivo.
 
+## Skills obrigatorias
+
+Toda implementacao, refactor, code review ou bugfix nos repos de codigo (`sep-api`, `sep-app`, `sep-mobile`) deve aplicar tres skills de qualidade:
+
+1. **`coding-guidelines`** — 4 regras base:
+   - Pensar antes de codar (estado de suposicoes; perguntar quando incerto; surface tradeoffs; discordar com honestidade).
+   - Simplicidade primeiro (codigo minimo; sem feature/abstracao especulativa; sem error handling para cenarios impossiveis).
+   - Mudancas cirurgicas (tocar apenas o necessario; nao "melhorar" codigo adjacente; respeitar estilo existente).
+   - Execucao orientada a meta (criterios verificaveis; teste falha→passa; loop ate verificar).
+
+2. **`clean-code`** — Robert C. Martin:
+   - Nomes significativos (classes = substantivo; metodos = verbo; revelar intencao).
+   - Funcoes pequenas, fazem uma coisa, nivel de abstracao unico, args minimos, sem efeitos colaterais.
+   - Codigo autoexplicativo > comentario; eliminar ruido (comentarios obsoletos, codigo comentado).
+   - Metafora do jornal (alto nivel topo, detalhes abaixo); afinidade vertical; Regra do Escoteiro.
+   - Excecoes > codigos de erro; nao retornar null (Optional ou caso especial); Lei de Demeter.
+   - Testes F.I.R.S.T. (Fast, Independent, Repeatable, Self-validating, Timely).
+   - Detectar code smells: rigidez, fragilidade, imobilidade, complexidade desnecessaria.
+
+3. **`design-patterns-java`** — padroes GoF aplicados a Java:
+   - Catalogo: Abstract Factory/Factory Method/Singleton; Adapter/Composite/Facade/Proxy; Command/Observer/Strategy/Template Method/Visitor.
+   - Programar para interface, nao para implementacao.
+   - Composicao > heranca.
+   - Triangulacao: aplicar padrao apenas apos 2+ exemplos reais; nao aplicar para problema simples (recusar pattern-itis explicitamente).
+   - Preferir recursos Java modernos (interfaces funcionais, `enum` Singleton, `sealed`, `record`) antes de classe-heavy GoF classico.
+   - Documentar o *porque* (nao o nome) quando padrao nao for obvio.
+
+### Carregamento por agente
+
+Cada agente carrega as skills da sua propria infra:
+
+- **Claude Code** (Anthropic): skills vivem em `~/.claude/skills/<skill-name>/SKILL.md` (user-level) ou `.claude/skills/<skill-name>/SKILL.md` (repo-level). Invocar via tool `Skill` quando reconhecida; caso contrario, ler o `SKILL.md` diretamente e aplicar como guideline ativa da sessao. Persistir como `feedback` memory para sessoes futuras quando aplicavel.
+- **Codex CLI / Codex Cloud** (OpenAI): carregar via mecanismo nativo (custom instructions, arquivo de prompt do usuario, ou equivalente). As tres skills devem estar replicadas no setup do Codex com conteudo equivalente ao deste documento.
+
+Aplicabilidade:
+- **Codigo (Java/TypeScript/etc nos 3 repos)**: aplicar as tres skills.
+- **`docs-SEP`**: aplicar `clean-code` para clareza textual (nomes claros, sem ruido, secoes objetivas). `design-patterns-java` nao se aplica a documentacao.
+- **Excecao**: nao aplicar `design-patterns-java` para scripts triviais, configuracao YAML/JSON ou comandos pontuais — `coding-guidelines` + `clean-code` bastam.
+
+Conflito entre as skills: prevalece `coding-guidelines` (simplicidade + cirurgico vence padrao GoF teorico).
+
 ## Repositorios
 
 O projeto opera com repos independentes:

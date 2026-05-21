@@ -2341,8 +2341,8 @@
       ]
     },
     {
-      "name": "Contratos (Sprint 10)",
-      "description": "Formalizacao contratual — geracao automatica via PropostaAprovadaEvent (Sprint 8), aceite com step-up + ip/user-agent (CMN 4.656/2018), cancelamento pre-aceite por FINANCEIRO/ADMIN.",
+      "name": "Contratos (Sprints 10 + 11)",
+      "description": "Formalizacao contratual — geracao automatica via PropostaAprovadaEvent (Sprint 8), aceite com step-up + ip/user-agent (CMN 4.656/2018), cancelamento pre-aceite por FINANCEIRO/ADMIN. Sprint 11: envio automatico para assinatura digital (Clicksign via Provider Pattern), webhook callback, consulta de status, download do PDF assinado. Audit log: CCB_GERADA, ASSINATURA_*, DOCUMENTO_ASSINADO_BAIXADO.",
       "item": [
         {
           "name": "GET /contratos/proposta/{propostaId} — 200",
@@ -2456,6 +2456,170 @@
               "path": ["api", "v1", "contratos", "{{contratoId}}", "cancelar"]
             },
             "description": "Cancela contrato em GERADO/AGUARDANDO_ACEITE. FINANCEIRO/ADMIN + step-up + justificativa 10-500 chars (apos trim). 409 se ACEITO+."
+          }
+        },
+        {
+          "name": "POST /contratos/{id}/assinar — 202 (FINANCEIRO/ADMIN + step-up) [Sprint 11]",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{financeiroAccessToken}}"
+              },
+              {
+                "key": "X-Step-Up-Token",
+                "value": "{{stepUpToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contratos/{{contratoId}}/assinar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contratos", "{{contratoId}}", "assinar"]
+            },
+            "description": "Reprocessamento manual idempotente do envio para assinatura. FINANCEIRO/ADMIN + step-up. Envelope ja existente eh devolvido sem chamar provider novamente. 202 + StatusAssinaturaResponse. Disparo automatico apos aceite ocorre via ContratoAceitoListener — este endpoint serve para reprocessamento quando o auto-envio falhar. Erros: 422 (CCB falha ou provider 4xx), 502 (provider erro generico), 503 (provider 5xx)."
+          }
+        },
+        {
+          "name": "GET /contratos/{id}/assinatura/status — 200 [Sprint 11]",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contratos/{{contratoId}}/assinatura/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contratos", "{{contratoId}}", "assinatura", "status"]
+            },
+            "description": "Snapshot do envelope (statusEnvelope + idEnvelopeExterno + dataAtualizacaoProvider) + status do contrato. Ownership (CLIENTE titular) ou FINANCEIRO/ADMIN. Fonte: estado local; webhook eh fonte de verdade operacional."
+          }
+        },
+        {
+          "name": "GET /contratos/{id}/documento-assinado — 200 application/pdf [Sprint 11]",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contratos/{{contratoId}}/documento-assinado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contratos", "{{contratoId}}", "documento-assinado"]
+            },
+            "description": "Download do PDF assinado. Ownership ou FINANCEIRO/ADMIN. Retorna application/pdf + Content-Disposition (attachment; filename=contrato-<id>-assinado.pdf) + X-Document-Hash-Sha256 (integridade local). Exige contrato em ASSINADO; 409 se indisponivel. Cada download grava audit DOCUMENTO_ASSINADO_BAIXADO com ip + user-agent (LGPD)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhook Assinatura Digital (Sprint 11)",
+      "description": "Webhook publico (sem JWT) do provider de assinatura digital. Path param `{provider}` aceita `clicksign` (whitelist). HMAC SHA-256 via header `Content-Hmac: sha256=<hex>` (Clicksign) ou alias `X-Webhook-Signature: <hex>` (formato generico). Idempotency-Key opcional — quando ausente, derivado via SHA-256(provider:payload). Body max 64KB (defesa DoS). Outbox compartilhado da Sprint 4 (`webhook_event_log`) + UNIQUE `(envelope_id, id_evento_externo)` na `evento_assinatura` garantem dedup natural.\n\n**Secret HMAC**: variavel `clicksignWebhookSecret` (default `dev-clicksign-webhook-secret-change-me`, env `APP_WEBHOOK_SECRET_CLICKSIGN`).\n\n**Pre-request script** (gera Content-Hmac):\n```js\nconst secret = pm.collectionVariables.get('clicksignWebhookSecret');\nconst body = pm.request.body.raw;\nconst hmac = CryptoJS.HmacSHA256(body, secret).toString();\npm.request.headers.upsert({key: 'Content-Hmac', value: 'sha256=' + hmac});\n```",
+      "item": [
+        {
+          "name": "POST /webhooks/assinatura/clicksign — sign 202",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": { \"name\": \"sign\", \"occurred_at\": \"2026-05-21T15:00:00Z\" },\n  \"document\": { \"key\": \"{{idEnvelopeExterno}}\" }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/assinatura/clicksign",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "webhooks", "assinatura", "clicksign"]
+            },
+            "description": "Callback de assinatura confirmada. Transiciona Contrato.ASSINADO + cria DocumentoAssinado + publica ContratoAssinadoEvent (consumido pela Sprint 12 Cobranca). Audit log: ASSINATURA_ASSINADA."
+          }
+        },
+        {
+          "name": "POST /webhooks/assinatura/clicksign — refuse 202",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": { \"name\": \"refuse\", \"occurred_at\": \"2026-05-21T15:30:00Z\" },\n  \"document\": { \"key\": \"{{idEnvelopeExterno}}\" }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/assinatura/clicksign",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "webhooks", "assinatura", "clicksign"]
+            },
+            "description": "Callback de recusa. Transiciona Contrato.RECUSADO. Audit log: ASSINATURA_RECUSADA."
+          }
+        },
+        {
+          "name": "POST /webhooks/assinatura/clicksign — view 202",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": { \"name\": \"view\", \"occurred_at\": \"2026-05-21T14:45:00Z\" },\n  \"document\": { \"key\": \"{{idEnvelopeExterno}}\" }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/assinatura/clicksign",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "webhooks", "assinatura", "clicksign"]
+            },
+            "description": "Callback informativo (tomador abriu link). Marca envelope VISUALIZADO; contrato preserva EM_ASSINATURA. Audit log: ASSINATURA_VISUALIZADA."
+          }
+        },
+        {
+          "name": "POST /webhooks/assinatura/clicksign (HMAC invalido) — 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Hmac",
+                "value": "sha256=deadbeef0000000000000000000000000000000000000000000000000000dead"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": { \"name\": \"sign\", \"occurred_at\": \"2026-05-21T15:00:00Z\" },\n  \"document\": { \"key\": \"{{idEnvelopeExterno}}\" }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/assinatura/clicksign",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "webhooks", "assinatura", "clicksign"]
+            },
+            "description": "Hardcoded HMAC invalido (sem pre-request script). Esperado: 401 via BadCredentialsException. Contrato preserva EM_ASSINATURA — nada processado."
           }
         }
       ]
@@ -2684,6 +2848,15 @@
     },
     {
       "key": "contratoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clicksignWebhookSecret",
+      "value": "dev-clicksign-webhook-secret-change-me"
+    },
+    {
+      "key": "idEnvelopeExterno",
       "value": "",
       "type": "string"
     }

@@ -58,7 +58,7 @@ Leitura base para qualquer agente:
 | PLD | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) | Sprint 7 | 0004, 0007, 0008 |
 | `credito` | [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) | Sprints 8 e 9 | 0007, 0012 |
 | Open Finance | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) | Sprint 9 | 0004, 0008 |
-| `contratos` | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) | [`010`](steps-fase-2/backend/010-sprint-10-steps.md), [`011`](steps-fase-2/backend/011-sprint-11-steps.md) | 0004, 0006, 0007 |
+| `contratos` | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) + [`CCB.md`](repos/sep-api/CCB.md) | [`010`](steps-fase-2/backend/010-sprint-10-steps.md), [`011`](steps-fase-2/backend/011-sprint-11-steps.md) | 0004, 0006, 0007, 0013 |
 | `cobranca` | Futuro `repos/sep-api/COBRANCA.md` | Sprints 12 e 13 | 0001, 0007 |
 | `backoffice` | Futuro `repos/sep-api/BACKOFFICE.md` | Sprint 14 | 0001, 0007 |
 | `escrow` / financeiro / Pix | PRD + specs futuras | Sprints futuras | 0005, 0007 |
@@ -69,7 +69,8 @@ Leitura base para qualquer agente:
 
 | Termo na tarefa | Comece por |
 |-----------------|------------|
-| contrato, aceite, formalizacao, CCB | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) |
+| contrato, aceite, formalizacao | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) |
+| CCB, assinatura digital, Clicksign, PDF assinado | [`repos/sep-api/CCB.md`](repos/sep-api/CCB.md) + [`CONTRATOS.md` §Sprint 11](repos/sep-api/CONTRATOS.md) |
 | proposta, parecer, score, motor de credito | [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) |
 | Open Finance, consentimento, movimentacao | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) |
 | KYC, KYB, documentos, Celcoin onboarding | [`repos/sep-api/ONBOARDING.md`](repos/sep-api/ONBOARDING.md) |
