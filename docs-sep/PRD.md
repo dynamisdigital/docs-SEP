@@ -1404,17 +1404,17 @@ Status de execucao (concluida em 2026-05-20):
 - Documentacao operacional: [`docs-SEP/repos/sep-api/CONTRATOS.md`](../repos/sep-api/CONTRATOS.md), [`SPRINT-10-PR.md`](../repos/sep-api/SPRINT-10-PR.md), Postman e Insomnia atualizados.
 - Pendencias futuras: assinatura digital, CCB juridicamente completa, PDF/HTML rico e hardening de step-up estrito para operacoes legais.
 
-### Sprint 11
+### Sprint 11 (executada - 2026-05-21)
 
 Objetivo de planejamento:
-- completar a formalizacao com assinatura digital: expor `AssinaturaDigitalProvider` (provedor a definir via ADR 0012), gerar `CCB` (Cedula de Credito Bancario) automaticamente, processar webhook de confirmacao de assinatura e registrar trilha auditavel reforcada do ato
+- completar a formalizacao com assinatura digital: expor `AssinaturaDigitalProvider` (provedor a definir via ADR), gerar `CCB` (Cedula de Credito Bancario) automaticamente, processar webhook de confirmacao de assinatura e registrar trilha auditavel reforcada do ato
 
 Tema:
 - Formalizacao — assinatura digital + CCB (Epic 7 parte 2)
 
 Pre-requisitos de entrada:
 - Sprint 10 concluida
-- ADR 0012 (escolha do provedor de assinatura digital) aceito antes do inicio da sprint
+- ADR de provedor de assinatura digital aceito antes do inicio da sprint
 - credenciais sandbox do provedor de assinatura disponiveis
 
 Dependencias externas:
@@ -1426,6 +1426,20 @@ Responsavel principal:
 Detalhamento das tasks:
 - consultar: [`specs/fase-2/011-sprint-11-formalizacao-assinatura-digital.md`](../specs/fase-2/011-sprint-11-formalizacao-assinatura-digital.md)
 - o PRD mantem apenas o planejamento de alto nivel desta sprint; a execucao e governada pelo spec correspondente
+
+Status de execucao (concluida em 2026-05-21):
+- [ADR 0013](../adr/0013-provedor-de-assinatura-digital.md) aceito — provedor Clicksign via Provider Pattern (spec 011 citava `ADR 0012` ja ocupado por motor de credito; numeracao ajustada).
+- 3 entidades novas (`EnvelopeAssinatura`, `EventoAssinatura`, `DocumentoAssinado`) + storage isolado `documento_assinado_blob` (BYTEA) via port `DocumentoAssinadoStorage`; Epic 16 troca por S3/MinIO sem mexer no dominio. Migrations V23 + V24.
+- `AssinaturaDigitalProvider` (port em `application.port.out`) com `FakeAssinaturaDigitalProvider` (dev/test) + `ClicksignAssinaturaDigitalProvider` (RestClient + Resilience4j `clicksign-assinatura` CB+retry+timeLimiter); hierarquia `AssinaturaProviderException`/`AssinaturaProviderHttpException`/`EnvelopeNaoEncontradoException` mapeada em `ApiExceptionHandler` -> 503/422/502.
+- `CcbGenerator` com Apache PDFBox 3.0.x deterministico (metadata zerada); `CcbGeracaoException extends OperacaoNaoProcessavelException` (CTR-422-CCB-001).
+- `ContratoAceitoListener` AFTER_COMMIT + REQUIRES_NEW dispara `EnviarParaAssinaturaUseCase` automaticamente (desligavel via `app.assinatura.auto-envio-pos-aceite=false`); idempotencia por `contratoId:vN`; runbook documentado em `CONTRATOS.md` para reprocessamento manual em silent failure.
+- Webhook `POST /api/v1/webhooks/assinatura/{provider}` (Clicksign): HMAC SHA-256 via `Content-Hmac: sha256=<hex>` + outbox compartilhado da Sprint 4; idempotency-key derivado de `SHA-256(payload)` quando ausente; body max 64KB.
+- 3 endpoints REST novos em `/api/v1/contratos/{id}/`: `POST assinar` (FINANCEIRO/ADMIN + step-up), `GET assinatura/status` (ownership ou FINANCEIRO/ADMIN), `GET documento-assinado` (application/pdf + `Content-Disposition` + `X-Document-Hash-Sha256`).
+- Auditoria reforcada com 6 tipos novos em `audit_log_seguranca` (V24): `CCB_GERADA`, `ASSINATURA_ENVIADA`, `ASSINATURA_VISUALIZADA`, `ASSINATURA_ASSINADA`, `ASSINATURA_RECUSADA`, `DOCUMENTO_ASSINADO_BAIXADO` (este ultimo grava ip + user-agent em colunas dedicadas). Payload JSON apenas com IDs tecnicos + hash + timestamp do provider; conteudo integral do PDF/CCB jamais entra no audit (teste defensivo bloqueia `%PDF`/`JVByR` base64).
+- `ApiExceptionHandler` ampliado: `MethodArgumentTypeMismatchException` -> 400 (UUID invalido em path param); `ContratoAssinaturaIndisponivelException extends ConflitoException` -> 409.
+- Suite E2E `AssinaturaIT` com 8 cenarios (fluxo feliz, recusado, idempotencia webhook, HMAC invalido, ownership download, FINANCEIRO download, reenvio idempotente) alem de `ClicksignAssinaturaDigitalProviderIT` (WireMock HTTP wiring isolado, Task 11.4).
+- Documentacao operacional: [`docs-SEP/repos/sep-api/CONTRATOS.md`](../repos/sep-api/CONTRATOS.md) ampliado, [`CCB.md`](../repos/sep-api/CCB.md) novo (estrutura + base legal Lei 10.931/2004 + Lei 14.063/2020 + retencao 10 anos + revisao juridica pendente), [`SPRINT-11-PR.md`](../repos/sep-api/SPRINT-11-PR.md), Postman e Insomnia atualizados com 7 requests Sprint 11 + secao `Webhook Assinatura Digital`, [`AGENT.md`](../AGENT.md) ganhou §Skills obrigatorias (`coding-guidelines` + `clean-code` + `design-patterns-java`).
+- Pendencias futuras: revisao juridica do `CCB.md` antes do go-live; modulo `onboarding` (Epic 5) expor dados cadastrais reais do tomador (hoje placeholder UUID+email); WireMock E2E completo com `app.assinatura.provider=clicksign` + stubs HTTP (hoje split entre IT do adapter + AssinaturaIT via Fake); Resilience4j 4xx via Java predicate (hoje retenta tambem por limitacao YAML); contador Micrometer `sep_contratos_auto_envio_falhas_total`; hardening `@RequireStepUpEstrita` sem bypass MFA; renegociacao/aditivos contratuais; multiplos signatarios (avalistas/garantidores); storage S3/MinIO (Epic 16); Sprint 12 (Cobranca) consome `ContratoAssinadoEvent` para gerar `AgendaPagamento`.
 
 ### Sprint 12
 
@@ -1922,7 +1936,7 @@ Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14)
 
 **ADRs candidatos durante a Fase 2** (criados just-in-time quando cada decisao for tomada):
 - ADR 0012 — Motor de regras de credito interno (Sprint 8, aceito em 2026-05-18; 0011 ja estava ocupado)
-- ADR 0013 — Provedor de assinatura digital (Sprint 11) — gate da Sprint 11
+- ADR 0013 — Provedor de assinatura digital (Sprint 11; Clicksign; aceito em 2026-05-21)
 - ADR 0014 — Estrategia de notificacoes transacionais (Sprint 13) — gate da Sprint 13
 
 **Steps**: continuam sendo gerados just-in-time, antes da execucao de cada sprint (regra do `AGENT.md`). A Fase 2 nao gera steps em massa.
