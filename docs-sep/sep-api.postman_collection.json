@@ -2625,6 +2625,85 @@
       ]
     },
     {
+      "name": "Cobranca (Sprint 12)",
+      "description": "Agenda, parcelas, recebimento manual e listagem (Sprint 12 — Epic 8 parte 1).",
+      "item": [
+        {
+          "name": "GET /cobranca/contratos/{contratoId}/agenda",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{clienteToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cobranca/contratos/{{contratoId}}/agenda",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cobranca", "contratos", "{{contratoId}}", "agenda"]
+            },
+            "description": "Owner (CLIENTE) ou FINANCEIRO/ADMIN. Retorna AgendaPagamentoResponse com parcelas. 403 se cliente alheio; 404 se contrato sem agenda gerada."
+          }
+        },
+        {
+          "name": "GET /cobranca/parcelas/{id}",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{clienteToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cobranca/parcelas/{{parcelaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cobranca", "parcelas", "{{parcelaId}}"]
+            },
+            "description": "Retorna ValorAtualizadoParcelaResponse com mora + multa pro-rata calculadas contra Clock. Cliente alheio recebe 403 unificado mesmo se parcela inexistir (anti-enumeracao)."
+          }
+        },
+        {
+          "name": "POST /cobranca/parcelas/{id}/recebimentos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 ou 409', () => pm.expect([200, 409]).to.include(pm.response.code));",
+                  "const json = pm.response.json();",
+                  "if (json.recebimentoId) pm.collectionVariables.set('recebimentoId', json.recebimentoId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{financeiroToken}}"},
+              {"key": "Idempotency-Key", "value": "{{idempotencyKey}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valorRecebido\": 1000.00,\n  \"dataRecebimento\": \"2026-05-22T10:00:00-03:00\",\n  \"meioPagamento\": \"TRANSFERENCIA\",\n  \"identificadorExterno\": \"comp-2026-05-22-001\",\n  \"observacao\": \"Recebido via TED do tomador\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cobranca/parcelas/{{parcelaId}}/recebimentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cobranca", "parcelas", "{{parcelaId}}", "recebimentos"]
+            },
+            "description": "FINANCEIRO/ADMIN + Idempotency-Key obrigatoria (pattern [A-Za-z0-9._-]{1,100}). Idempotente: mesma key retorna o recebimento existente (novo=false). Nova key em parcela PAGA -> 409. Header ausente -> 400."
+          }
+        },
+        {
+          "name": "GET /cobranca/recebimentos",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{financeiroToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cobranca/recebimentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cobranca", "recebimentos"]
+            },
+            "description": "FINANCEIRO/ADMIN. Lista todos ordenados por dataRecebimento DESC. Sem paginacao na Sprint 12 (Sprint 13 ou Epic 15 adicionara Pageable + filtros)."
+          }
+        }
+      ]
+    },
+    {
       "name": "Actuator",
       "description": "Endpoints de observabilidade do Spring Boot Actuator. Liberados publicamente (sem JWT) para monitoramento.",
       "item": [
@@ -2858,6 +2937,26 @@
     {
       "key": "idEnvelopeExterno",
       "value": "",
+      "type": "string"
+    },
+    {
+      "key": "financeiroToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "parcelaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "recebimentoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "cob-2026-05-22-001",
       "type": "string"
     }
   ]

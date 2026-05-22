@@ -43,7 +43,10 @@
         "contratoId": "",
         "idEnvelopeExterno": "",
         "clicksignWebhookSecret": "dev-clicksign-webhook-secret-change-me",
-        "clicksignSignature": "sha256=PLACEHOLDER"
+        "clicksignSignature": "sha256=PLACEHOLDER",
+        "financeiroToken": "",
+        "parcelaId": "",
+        "recebimentoId": ""
       },
       "color": null,
       "isPrivate": false,
@@ -136,6 +139,13 @@
       "parentId": "wrk_sep_api",
       "name": "Webhook Assinatura Digital (Sprint 11)",
       "metaSortKey": -3.4
+    },
+    {
+      "_id": "fld_cobranca",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Cobranca (Sprint 12)",
+      "metaSortKey": -3.2
     },
     {
       "_id": "fld_actuator",
@@ -1889,6 +1899,58 @@
       },
       "description": "HMAC hardcoded invalido. Esperado: 401 via BadCredentialsException. Contrato preserva EM_ASSINATURA — nada processado.",
       "metaSortKey": -1749983000000
+    },
+    {
+      "_id": "req_cob_agenda",
+      "_type": "request",
+      "parentId": "fld_cobranca",
+      "name": "GET /cobranca/contratos/{contratoId}/agenda",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/cobranca/contratos/{{ contratoId }}/agenda",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ clienteToken }}"}],
+      "description": "Owner (CLIENTE) ou FINANCEIRO/ADMIN. Retorna AgendaPagamentoResponse com parcelas. 403 se cliente alheio; 404 se sem agenda.",
+      "metaSortKey": -1749982900000
+    },
+    {
+      "_id": "req_cob_parcela",
+      "_type": "request",
+      "parentId": "fld_cobranca",
+      "name": "GET /cobranca/parcelas/{id}",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ clienteToken }}"}],
+      "description": "Retorna ValorAtualizadoParcelaResponse com mora + multa pro-rata. Cliente alheio recebe 403 unificado mesmo se parcela inexistir (anti-enumeracao).",
+      "metaSortKey": -1749982800000
+    },
+    {
+      "_id": "req_cob_recebimento_post",
+      "_type": "request",
+      "parentId": "fld_cobranca",
+      "name": "POST /cobranca/parcelas/{id}/recebimentos",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/recebimentos",
+      "headers": [
+        {"name": "Content-Type", "value": "application/json"},
+        {"name": "Authorization", "value": "Bearer {{ financeiroToken }}"},
+        {"name": "Idempotency-Key", "value": "{{ idempotencyKey }}"}
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"valorRecebido\": 1000.00,\n  \"dataRecebimento\": \"2026-05-22T10:00:00-03:00\",\n  \"meioPagamento\": \"TRANSFERENCIA\",\n  \"identificadorExterno\": \"comp-2026-05-22-001\",\n  \"observacao\": \"Recebido via TED do tomador\"\n}"
+      },
+      "description": "FINANCEIRO/ADMIN + Idempotency-Key obrigatoria (pattern [A-Za-z0-9._-]{1,100}). Idempotente: mesma key retorna novo=false. Nova key em parcela PAGA -> 409. Header ausente -> 400.",
+      "metaSortKey": -1749982700000
+    },
+    {
+      "_id": "req_cob_recebimentos_list",
+      "_type": "request",
+      "parentId": "fld_cobranca",
+      "name": "GET /cobranca/recebimentos",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/cobranca/recebimentos",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ financeiroToken }}"}],
+      "description": "FINANCEIRO/ADMIN. Lista ordenada dataRecebimento DESC. Sem paginacao na Sprint 12.",
+      "metaSortKey": -1749982600000
     }
   ]
 }
