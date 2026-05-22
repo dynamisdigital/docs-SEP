@@ -1441,7 +1441,7 @@ Status de execucao (concluida em 2026-05-21):
 - Documentacao operacional: [`docs-SEP/repos/sep-api/CONTRATOS.md`](../repos/sep-api/CONTRATOS.md) ampliado, [`CCB.md`](../repos/sep-api/CCB.md) novo (estrutura + base legal Lei 10.931/2004 + Lei 14.063/2020 + retencao 10 anos + revisao juridica pendente), [`SPRINT-11-PR.md`](../repos/sep-api/SPRINT-11-PR.md), Postman e Insomnia atualizados com 7 requests Sprint 11 + secao `Webhook Assinatura Digital`, [`AGENT.md`](../AGENT.md) ganhou §Skills obrigatorias (`coding-guidelines` + `clean-code` + `design-patterns-java`).
 - Pendencias futuras: revisao juridica do `CCB.md` antes do go-live; modulo `onboarding` (Epic 5) expor dados cadastrais reais do tomador (hoje placeholder UUID+email); WireMock E2E completo com `app.assinatura.provider=clicksign` + stubs HTTP (hoje split entre IT do adapter + AssinaturaIT via Fake); Resilience4j 4xx via Java predicate (hoje retenta tambem por limitacao YAML); contador Micrometer `sep_contratos_auto_envio_falhas_total`; hardening `@RequireStepUpEstrita` sem bypass MFA; renegociacao/aditivos contratuais; multiplos signatarios (avalistas/garantidores); storage S3/MinIO (Epic 16); Sprint 12 (Cobranca) consome `ContratoAssinadoEvent` para gerar `AgendaPagamento`.
 
-### Sprint 12
+### Sprint 12 (executada - 2026-05-22)
 
 Objetivo de planejamento:
 - entregar a estrutura inicial de cobranca pos-formalizacao: criar modulo `cobranca`, modelar `ParcelaCobranca`, `AgendaPagamento` e `Recebimento`, gerar parcelas automaticamente apos formalizacao, calcular juros/multas/encargos e consumir o modulo `escrow` (modelado desde Sprint 1) para registrar recebimentos na conta segregada
@@ -1458,6 +1458,17 @@ Dependencias externas:
 
 Responsavel principal:
 - Dev Senior
+
+Status de execucao:
+- mergeada em `origin/develop` via PR #59 (squash `d9e3a59`, 2026-05-22)
+- 18 commits no sep-api absorvidos pelo squash; ~5500 linhas adicionadas
+- 5 migrations Flyway: `V25__criar_tabelas_cobranca` (agenda + parcelas + recebimentos com FKs sem CASCADE, UNIQUE contrato/idempotency, CHECK principal > 0), `V26__adicionar_taxa_juros_proposta_credito` (coluna nullable como placeholder), `V27__adicionar_external_reference_movimentacao_escrow` (correlaciona movimentacao com recebimento.id), `V28__unique_constraints_escrow` (UNIQUE conta_escrow.titular + UNIQUE PARCIAL wallet(proposta_id)), `V29__ampliar_audit_seguranca_tipo_cobranca` (6 tipos novos)
+- modulo `cobranca` completo: dominio (`AgendaPagamento`, `ParcelaCobranca`, `Recebimento`, `StatusParcela`, `ComposicaoValor`), 5 use cases (`GerarAgendaPagamentoUseCase`, `RegistrarRecebimentoUseCase`, `CalcularValorAtualizadoParcelaUseCase`, `ConsultarParcelasUseCase`, `ConsultarAgendaPorContratoUseCase`), 4 calculadoras (Price/SAC/JurosMora/Multa com `AmortizacaoDispatcher` Strategy), 4 endpoints REST + DTOs + OpenAPI, 2 listeners (`ContratoAssinadoListener` AFTER_COMMIT + `CobrancaAuditListener` 5 handlers), `MarcarParcelaAtrasadaJob` @Scheduled, integracao via porta com `escrow.RegistrarMovimentacaoEscrowUseCase` (lazy create conta+wallet com sub-tx REQUIRES_NEW pra resolver corrida UNIQUE)
+- idempotencia em 3 camadas no recebimento (pre-lock + pos-lock + UNIQUE DB) + validacao consistencia (parcelaId + valor) com `ChaveIdempotenciaConflitanteException`
+- 5 audit types: `AGENDA_GERADA`/`PARCELA_CRIADA`/`RECEBIMENTO_REGISTRADO`/`PARCELA_PAGA`/`PARCELA_ATRASADA`/`MOVIMENTACAO_ESCROW_CRIADA` (V29)
+- 100+ testes (dominio + calculadoras + use cases + listeners + job + `CobrancaControllerTest` @WebMvcTest + `CobrancaIT` @SpringBootTest com 10 cenarios E2E incluindo audit log)
+- pendencias registradas em `repos/sep-api/COBRANCA.md`: taxa_juros_mensal proposta precisa ser populada explicitamente em sprint futura (hoje usa fallback config); job single-instance (Epic 15 AWS multi-instance requer ShedLock); `GET /recebimentos` sem paginacao (Sprint 13 ou Epic 15)
+- documentacao consolidada em [`repos/sep-api/COBRANCA.md`](../repos/sep-api/COBRANCA.md) + [`repos/sep-api/SPRINT-12-PR.md`](../repos/sep-api/SPRINT-12-PR.md)
 
 Detalhamento das tasks:
 - consultar: [`specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md`](../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md)
