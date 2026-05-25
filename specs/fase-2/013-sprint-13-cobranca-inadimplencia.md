@@ -4,27 +4,29 @@
 
 - **ID da Spec**: 013
 - **Titulo**: Sprint 13 - Inadimplencia + workflows de cobranca + renegociacao basica + `NotificationProvider`
-- **Status**: aprovada para execucao (apos conclusao da Sprint 12 e ADR 0013 aceito)
+- **Status**: aprovada para execucao (apos conclusao da Sprint 12 e ADR 0014 aceito)
 - **Fase do produto**: Fase 2 — Epic 8 (parte 2)
 - **Origem**: PRD §11 (Modulo cobranca + Provider Pattern), §22 (Sprint 13), §25 (Epic 8); ADRs 0004, 0008
-- **Depende de**: [`012-sprint-12-cobranca-parcelas-agenda.md`](./012-sprint-12-cobranca-parcelas-agenda.md), ADR 0013 (estrategia de notificacoes — gate)
+- **Depende de**: [`012-sprint-12-cobranca-parcelas-agenda.md`](./012-sprint-12-cobranca-parcelas-agenda.md), ADR 0014 (estrategia de notificacoes — gate)
 - **Responsavel principal**: Dev Senior
+
+> **Nota de numeracao:** esta sprint usa ADR 0014 para notificacoes transacionais porque ADR 0013 ja esta ocupado por assinatura digital.
 
 ## Objetivo
 
 Estender o modulo `cobranca` (Sprint 12) para tratar inadimplencia: detectar atrasos, escalonar workflows de cobranca, permitir renegociacao basica de parcelas atrasadas e notificar tomador/financeiro via email e SMS atraves do `NotificationProvider`.
 
-A sprint introduz o `NotificationProvider` (Provider Pattern com adapter SMTP inicial e SMS via provedor a definir) e implementa um motor simples de workflow de cobranca configuravel: dia X de atraso → notificacao Y. Renegociacao basica permite gerar nova `AgendaPagamento` substituta para parcelas inadimplentes apos negociacao com o tomador.
+A sprint introduz o `NotificationProvider` (Provider Pattern com adapter SMTP inicial e SMS via Zenvia) e implementa um motor simples de workflow de cobranca configuravel: dia X de atraso → notificacao Y. Renegociacao basica permite gerar nova `AgendaPagamento` substituta para parcelas inadimplentes apos negociacao com o tomador.
 
 ## Escopo
 
 ### Em escopo (apenas backend)
 
-- **ADR 0013** — estrategia de notificacoes transacionais (gate da sprint)
+- **ADR 0014** — estrategia de notificacoes transacionais (gate da sprint)
 - **Provider Pattern** (ADR 0004):
   - `NotificationProvider` (port em `cobranca.application.port.out` — possivelmente promovido para `shared` em sprint futura se outros modulos consumirem)
   - `SmtpNotificationProvider` (adapter inicial via JavaMail/Spring Mail) — email
-  - `<Provedor>SmsNotificationProvider` (adapter para SMS — definido pelo ADR 0013)
+  - `ZenviaSmsNotificationProvider` (adapter para SMS — definido pelo ADR 0014)
   - `LogNotificationProvider` (fake; loga mensagens para dev/testes)
 - Entidades novas no modulo `cobranca`:
   - `WorkflowCobranca` (define os passos de escalonamento por dia de atraso)
@@ -64,22 +66,22 @@ A sprint introduz o `NotificationProvider` (Provider Pattern com adapter SMTP in
 ## Pre-requisitos globais
 
 - Sprint 12 concluida (modulo `cobranca` com agenda + parcelas + recebimentos + job de atraso)
-- **ADR 0013 aceito antes do inicio da sprint** — define provedor SMS + estrategia de templates
+- **ADR 0014 aceito antes do inicio da sprint** — define provedor SMS + estrategia de templates
 - Credenciais SMTP funcionais (`spring.mail.*`)
-- Credenciais sandbox do provedor SMS escolhido
+- Credenciais sandbox Zenvia
 - Step-up authentication (Sprint 5) operacional
 
 ## Tasks
 
-### Task 13.1 — ADR 0013: estrategia de notificacoes transacionais (GATE)
+### Task 13.1 — ADR 0014: estrategia de notificacoes transacionais (GATE)
 
 **Arquivos esperados**
-- `adr/0013-estrategia-de-notificacoes-transacionais.md`
+- `adr/0014-estrategia-de-notificacoes-transacionais.md`
 
 **Conteudo**
 - Contexto: necessidade de email + SMS transacionais para cobranca
 - Alternativas: SMTP proprio (email) + Twilio/Zenvia/TotalVoice (SMS); ou SES + SNS AWS; ou Sendgrid + similar
-- Decisao: SMTP via Spring Mail (email) + <provedor> (SMS)
+- Decisao: SMTP via Spring Mail (email) + Zenvia (SMS)
 - Templates: gerenciados via Thymeleaf (ja em uso na Sprint 10)
 - Consequencias: custo por SMS, throughput, retries, opt-out
 
@@ -98,7 +100,7 @@ A sprint introduz o `NotificationProvider` (Provider Pattern com adapter SMTP in
 - update `cobranca/domain/vo/StatusRenegociacao.java` (sealed: `PROPOSTA`, `ACEITA`, `RECUSADA`, `EXPIRADA`)
 - `src/main/resources/db/migration/V<n>__criar_tabelas_inadimplencia.sql`
 
-**Pre-requisitos**: ADR 0013 aceito.
+**Pre-requisitos**: ADR 0014 aceito.
 **Responsavel**: Dev Senior.
 
 ---
@@ -110,7 +112,7 @@ A sprint introduz o `NotificationProvider` (Provider Pattern com adapter SMTP in
 - `cobranca/application/port/out/dto/Notificacao.java` (record com `canal`, `destinatario`, `template`, `variaveis`)
 - `cobranca/application/port/out/dto/Canal.java` (sealed: `EMAIL`, `SMS`)
 - `cobranca/infrastructure/adapter/notification/SmtpNotificationProvider.java`
-- `cobranca/infrastructure/adapter/notification/<Provedor>SmsNotificationProvider.java`
+- `cobranca/infrastructure/adapter/notification/ZenviaSmsNotificationProvider.java`
 - `cobranca/infrastructure/adapter/notification/LogNotificationProvider.java`
 - `cobranca/infrastructure/adapter/notification/TemplateNotificacaoEngine.java` (Thymeleaf reusado da Sprint 10)
 - templates em `src/main/resources/templates/notificacoes/`:
@@ -124,7 +126,7 @@ A sprint introduz o `NotificationProvider` (Provider Pattern com adapter SMTP in
 
 **Testes obrigatorios**
 - `LogNotificationProviderTest`
-- `<Provedor>SmsNotificationProviderIT` (WireMock)
+- `ZenviaSmsNotificationProviderIT` (WireMock)
 - `TemplateNotificacaoEngineTest`
 
 **Pre-requisitos**: Tasks 13.1, 13.2.
@@ -291,7 +293,7 @@ app:
 Sprint 12 concluida
         |
         v
-Task 13.1 (ADR 0013 — gate)
+Task 13.1 (ADR 0014 — gate)
         |
         v
 Task 13.2 (entidades + migrations)
@@ -317,7 +319,7 @@ Task 13.2 (entidades + migrations)
 
 ## Definicao de pronto da Sprint 13
 
-- ADR 0013 aceito (provedor SMS + estrategia de templates)
+- ADR 0014 aceito (provedor SMS + estrategia de templates)
 - Modulo `cobranca` estendido com entidades de inadimplencia
 - `NotificationProvider` com SMTP + SMS + Log adapters
 - Workflow de cobranca operacional (configuravel via yaml)
@@ -338,7 +340,7 @@ Task 13.2 (entidades + migrations)
 ## Restricoes e regras de execucao
 
 - **Notificacoes seguem LGPD** — opt-out obrigatorio em todas as comunicacoes (excecao para inadimplencia critica conforme parecer juridico)
-- ADR 0013 e gate inviolavel
+- ADR 0014 e gate inviolavel
 - Provider Pattern obrigatorio
 - Sem F-Sprint 13 / M-Sprint 13 — apenas backend (decisao 2026-05-04)
 
@@ -349,7 +351,7 @@ Task 13.2 (entidades + migrations)
 - [PRD §25 (Epic 8)](../../docs-sep/PRD.md)
 - [PRD §29](../../docs-sep/PRD.md)
 - [ADR 0004](../../adr/0004-provider-pattern-para-integracoes-externas.md)
-- ADR 0013 (criado nesta sprint, gate)
+- [ADR 0014](../../adr/0014-estrategia-de-notificacoes-transacionais.md) (criado nesta sprint, gate)
 - [Spec 012 - Sprint 12 (dependencia)](./012-sprint-12-cobranca-parcelas-agenda.md)
 - [Spec 014 - Sprint 14 (proxima — Backoffice)](./014-sprint-14-backoffice-operacional.md)
 - LGPD Lei 13.709/2018 (consentimento + opt-out)
