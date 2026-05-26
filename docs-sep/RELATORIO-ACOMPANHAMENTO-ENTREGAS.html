@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relatorio de Acompanhamento de Entregas - SEP</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f7f5;
+      --surface: #ffffff;
+      --surface-muted: #f0efec;
+      --text: #242320;
+      --muted: #66625c;
+      --border: #d8d5cf;
+      --accent: #2563eb;
+      --ok: #147a3d;
+      --warn: #946200;
+      --risk: #b42318;
+      --info: #315a94;
+      --radius: 8px;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 32px max(24px, calc((100vw - 1120px) / 2));
+    }
+
+    main {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 24px auto 56px;
+    }
+
+    h1, h2, h3 { line-height: 1.2; margin: 0; }
+    h1 { font-size: 32px; letter-spacing: 0; }
+    h2 { font-size: 22px; margin: 32px 0 12px; }
+    h3 { font-size: 17px; margin: 20px 0 8px; }
+    p { margin: 8px 0; color: var(--muted); }
+
+    .subtitle { margin-top: 8px; max-width: 760px; }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 4px;
+    }
+
+    .metric strong { font-size: 18px; }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      background: var(--surface-muted);
+      font-weight: 650;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .ok { background: #e8f6ee; color: var(--ok); }
+    .warn { background: #fff3d8; color: var(--warn); }
+    .risk { background: #fee4e2; color: var(--risk); }
+    .info { background: #e8f0fe; color: var(--info); }
+    .neutral { background: #eeece8; color: var(--muted); }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    ul, ol { margin: 10px 0 0 20px; padding: 0; }
+    li { margin: 5px 0; }
+    code { background: var(--surface-muted); padding: 2px 5px; border-radius: 4px; }
+
+    @media (max-width: 780px) {
+      header { padding: 24px 16px; }
+      main { width: calc(100vw - 20px); margin-top: 12px; }
+      section { padding: 14px; overflow-x: auto; }
+      .two-col { grid-template-columns: 1fr; }
+      h1 { font-size: 26px; }
+      table { min-width: 720px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Relatorio de Acompanhamento de Entregas - SEP</h1>
+    <p class="subtitle">Painel executivo para acompanhar entregas, validacoes, reviews, riscos e proximos passos do projeto SEP.</p>
+    <div class="meta-grid">
+      <div class="metric"><span>Fase</span><strong>Fase 2</strong></div>
+      <div class="metric"><span>Sprint atual</span><strong>Sprint 14</strong></div>
+      <div class="metric"><span>Repo principal</span><strong>sep-api</strong></div>
+      <div class="metric"><span>Status geral</span><strong>Em andamento</strong></div>
+      <div class="metric"><span>Ultima atualizacao</span><strong>2026-05-26 (Task 14.10 PAUSA #1 — docs working tree: BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP linha 63 + collections; PRD §22/§29 + CONTEXT pos-merge)</strong></div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>Objetivo</h2>
+      <p>Centralizar o acompanhamento das entregas do projeto SEP para que PO, PM, lideranca tecnica e stakeholders vejam rapidamente o que esta em andamento, o que foi entregue, quais validacoes foram feitas e quais riscos ainda estao abertos.</p>
+    </section>
+
+    <section>
+      <h2>Legenda</h2>
+      <table>
+        <thead><tr><th>Status</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge neutral">Planejado</span></td><td>Escopo definido, ainda nao iniciado.</td></tr>
+          <tr><td><span class="badge info">Em andamento</span></td><td>Implementacao ou documentacao em curso.</td></tr>
+          <tr><td><span class="badge warn">Em review</span></td><td>Entrega pronta para revisao tecnica/humana.</td></tr>
+          <tr><td><span class="badge warn">Ajustes</span></td><td>Review encontrou pontos que exigem hotfix ou correcao.</td></tr>
+          <tr><td><span class="badge ok">Concluido</span></td><td>DoD atendido e entrega aprovada.</td></tr>
+          <tr><td><span class="badge risk">Bloqueado</span></td><td>Nao avanca sem decisao, dependencia externa ou correcao de base.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Indicadores executivos</h2>
+      <table>
+        <thead><tr><th>Indicador</th><th>Atual</th><th>Meta/criterio</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Tasks planejadas na sprint</td><td>14.0 a 14.10</td><td>Todas avaliadas no fechamento</td><td><span class="badge info">Em andamento</span></td></tr>
+          <tr><td>Tasks concluidas</td><td>14.0..14.9 (10/11)</td><td>DoD da task atendido</td><td><span class="badge info">Em andamento</span></td></tr>
+          <tr><td>Tasks em review</td><td>14.10 (docs working tree criados; aguardando review manual + commit manual docs-SEP)</td><td>Review sem P0/P1 aberto</td><td><span class="badge info">Em andamento</span></td></tr>
+          <tr><td>Hotfixes de review</td><td>8 ciclos hotfix subagente + 6 ciclos fixes manuais</td><td>Causa registrada</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>Testes executados</td><td>~118 testes backoffice; suite global ~1340 verde</td><td>Proporcionais ao risco</td><td><span class="badge ok">Verde</span></td></tr>
+          <tr><td>Pendencias criticas</td><td>0 P0/P1; 3 itens adiados/aceitos documentados</td><td>P0/P1 zerados antes de PR</td><td><span class="badge ok">OK</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Entregas concluidas</h2>
+      <table>
+        <thead><tr><th>Data</th><th>Sprint/Task</th><th>Entrega</th><th>Repo</th><th>Evidencia</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>2026-05-26</td><td>14.1</td><td>Modulo backoffice, entidades, VOs, eventos, repositories e migration V33</td><td><code>sep-api</code></td><td><code>dba550c</code> + <code>373e17b</code> + <code>f2f4e3e</code>; 31 testes verdes</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-26</td><td>14.2</td><td>Listeners, job consolidador, idempotencia, ports cross-module, scheduling isolado</td><td><code>sep-api</code></td><td><code>4262b30</code> + <code>df25305</code> + <code>ede065f</code>; +18 testes</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-26</td><td>14.3</td><td>Use cases de fila + 5 strategies de objeto original + Specification clamp/sort default</td><td><code>sep-api</code></td><td><code>1f2e4c7</code> + <code>d1e9b84</code> + <code>23d3db7</code>; lock pessimista; +21 testes</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-26</td><td>14.4</td><td>Reprocesso webhook + provider + anti-abuso 3/24h + Strategy GoF (5 stubs)</td><td><code>sep-api</code></td><td><code>3fb646f</code> + <code>1e7a915</code>; tx outer unica; +17 testes</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-26</td><td>14.5</td><td>Dashboard de visao consolidada (Facade GoF) + ports cobranca/credito + 4 queries agregadas</td><td><code>sep-api</code></td><td><code>2121d60</code> + <code>220674e</code> + <code>815a5a5</code>; timezone full ponta-a-ponta + 4 properties + test serializacao JSON; +14 testes</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-26</td><td>14.6</td><td>Role BACKOFFICE + migration V34 + bloqueio criacao direta</td><td><code>sep-api</code></td><td><code>be33afe</code> + <code>e0e1207</code>; single-role (cumulatividade adiada); promotion-only; +5 testes</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-26</td><td>14.7</td><td>9 endpoints REST (fila/reprocesso/dashboard) + 10 DTOs + OpenAPI + step-up em 4 endpoints</td><td><code>sep-api</code></td><td><code>be237b9</code> + <code>875f4ce</code> + <code>155147a</code>; strip sort prioridade; TipoReprocessoNaoSuportadoException dedicada; +28 testes (incluindo cobertura FINANCEIRO/ADMIN/CLIENTE/401)</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-26</td><td>14.8</td><td>Auditoria reforcada — BackofficeAuditListener + 6 novos TipoEventoSeguranca + V35</td><td><code>sep-api</code></td><td><code>0096629</code> + <code>4d5617b</code> + <code>8805234</code>; AFTER_COMMIT + REQUIRES_NEW; mask CPF/CNPJ + truncamento + try/catch + payload completo (ReprocessoDisparadoEvent expandido); +13 testes</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-26</td><td>14.9</td><td>Testes E2E (BackofficeIT 7 cenarios + ReprocessoIT 2 cenarios)</td><td><code>sep-api</code></td><td><code>3101077</code> + <code>15b3a45</code> + <code>014c5d2</code>; auth real + step-up real + cleanup sep_test; audit completo (4 tipos) + Outbox PROCESSADO + dashboard com massa</td><td><span class="badge ok">Concluido</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Em andamento</h2>
+      <table>
+        <thead><tr><th>Sprint/Task</th><th>Objetivo</th><th>Arquivos/modulos principais</th><th>Progresso</th><th>Pendencias</th></tr></thead>
+        <tbody>
+          <tr><td>14.10</td><td>Documentacao e collections</td><td><code>BACKOFFICE.md</code>, <code>SPRINT-14-PR.md</code>, <code>AI-ROADMAP.md</code>, collections Postman/Insomnia, PRD §22/§29, CONTEXT.md</td><td>Working tree: BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP linha 63 + 9 endpoints Postman/Insomnia. PAUSA #1 aguardando review manual. PRD §22/§29 + CONTEXT pos-merge.</td><td>Em review</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="two-col">
+      <section>
+        <h2>Validacao tecnica</h2>
+        <table>
+          <thead><tr><th>Task</th><th>Comando/teste</th><th>Resultado</th></tr></thead>
+          <tbody>
+            <tr><td>14.1</td><td><code>./gradlew test --tests '*backoffice*' --rerun-tasks</code></td><td><span class="badge ok">Verde</span></td></tr>
+            <tr><td>14.2</td><td><code>./gradlew test --tests '*backoffice.application*' --rerun-tasks</code></td><td><span class="badge ok">Verde</span></td></tr>
+            <tr><td>14.3</td><td><code>./gradlew test --tests '*backoffice*'</code></td><td><span class="badge ok">Verde</span></td></tr>
+            <tr><td>14.4</td><td><code>./gradlew test --tests '*backoffice*'</code> (full suite tem OOM pre-existente em PldFollowupIT)</td><td><span class="badge ok">Verde</span></td></tr>
+            <tr><td>14.5</td><td><code>./gradlew test --tests '*backoffice*'</code></td><td><span class="badge ok">Verde</span></td></tr>
+            <tr><td>14.6</td><td><code>./gradlew test --tests "AlterarRoleUsuarioUseCaseTest" --tests "RoleTest" --tests "CriarUsuarioUseCaseTest"</code></td><td><span class="badge ok">Verde</span></td></tr>
+            <tr><td>14.7</td><td><code>./gradlew test --tests "*backoffice.web.controller*"</code></td><td><span class="badge ok">Verde</span></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Code reviews</h2>
+        <table>
+          <thead><tr><th>Task</th><th>Resumo</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>14.1</td><td>Transicao 409 + peso prioridade + descricao length + ordem assumir.</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.2</td><td>Corrida transacional + scheduling + ports cross-module + isolamento exception.</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.3</td><td>Lock pessimista nas transicoes + strategies do objeto original + clamp/sort default.</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.4</td><td>Nested tx (REQUIRES_NEW); race anti-abuso documentado como residual.</td><td><span class="badge ok">Concluido (aguarda review manual)</span></td></tr>
+            <tr><td>14.5</td><td>Timezone full ponta-a-ponta (port recebe intervalo) + 4 properties configuraveis + test serializacao JSON.</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.6 (subagente)</td><td>BACKOFFICE bloqueada na criacao direta (promotion-only como FINANCEIRO).</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.6 (manual)</td><td>Single-role nao atende cumulatividade; V34 nao idempotente; OpenAPI desatualizado — skip (riscos adiados).</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.7 (subagente)</td><td>Sort prioridade lexicografico via Pageable + falta test enum invalido — fix aplicado.</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.7 (manual)</td><td>UnsupportedOperationException generico mascarando bugs + cobertura seguranca incompleta — TipoReprocessoNaoSuportadoException dedicada + 8 testes seguranca.</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.8 (subagente)</td><td>Sanitizacao depende de contrato implicito upstream — guard defensivo truncamento 80 chars no listener.</td><td><span class="badge ok">Concluido</span></td></tr>
+            <tr><td>14.8 (manual)</td><td>CPF/CNPJ podem vazar + excecao audit pode propagar + payload reprocesso incompleto — mask documentos + try/catch + ReprocessoDisparadoEvent expandido + 5 testes.</td><td><span class="badge ok">Concluido</span></td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <section>
+      <h2>Riscos e pendencias</h2>
+      <table>
+        <thead><tr><th>Item</th><th>Impacto</th><th>Acao recomendada</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Resolver objeto original da fila</td><td>Risco mitigado em Task 14.3 fixes manuais (5 strategies registradas).</td><td>—</td><td><span class="badge ok">Resolvido</span></td></tr>
+          <tr><td>Ordenacao/paginacao da fila</td><td>Risco mitigado — clamp 100 + sort default via CASE em Task 14.3 fixes.</td><td>—</td><td><span class="badge ok">Resolvido</span></td></tr>
+          <tr><td>Strategies de reprocesso de provider sao stubs</td><td>5 strategies registram intent mas nao chamam use case real.</td><td>Modulos donos plugam logica real em sprints futuras (Epic 13).</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+          <tr><td>WebhookReprocessadorAdapter sem handler real</td><td>Adapter forca status PROCESSADO sem invocar processador especifico.</td><td>Sprints futuras (Epic 5/15).</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+          <tr><td>Race residual anti-abuso 3/24h</td><td>2 threads simultaneas podem permitir 4o reprocesso (best effort).</td><td><code>pg_advisory_xact_lock</code> se virar problema.</td><td><span class="badge info">Aceito</span></td></tr>
+          <tr><td>OOM no PldFollowupIT no full run</td><td>Pre-existente; isolado passa.</td><td>Ajustar <code>-Xmx2g</code> fora do escopo Sprint 14.</td><td><span class="badge warn">Aberto (pre-existente)</span></td></tr>
+          <tr><td>Role BACKOFFICE</td><td>Risco mitigado em Task 14.6 — enum + V34 + promotion-only.</td><td>—</td><td><span class="badge ok">Resolvido</span></td></tr>
+          <tr><td>Cumulatividade FINANCEIRO + BACKOFFICE nao implementada</td><td>Single-role atual; promover BACKOFFICE remove FINANCEIRO.</td><td>Refactor multi-role em sprint futura (Epic 11).</td><td><span class="badge warn">Aceito/adiado</span></td></tr>
+          <tr><td>V34 nao idempotente</td><td><code>DROP CONSTRAINT</code> sem <code>IF EXISTS</code>; falha em banco sem a constraint.</td><td><code>IF EXISTS</code> em hotfix futuro.</td><td><span class="badge warn">Aceito/adiado</span></td></tr>
+          <tr><td>OpenAPI dos DTOs de role desatualizado</td><td>BACKOFFICE ausente do JavaDoc de UsuarioRoleUpdateDto/UsuarioInternoCreateDto.</td><td>Atualizar JavaDoc em hotfix futuro.</td><td><span class="badge warn">Aceito/adiado</span></td></tr>
+          <tr><td>Auditoria da fila</td><td>Risco mitigado em Task 14.8 — BackofficeAuditListener + 6 TipoEventoSeguranca + V35.</td><td>—</td><td><span class="badge ok">Resolvido</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Proximos passos</h2>
+      <ol>
+        <li>Iniciar Task 14.10 (docs — BACKOFFICE.md + PRD §22/§29 Fase 2 concluida + CONTEXT + AI-ROADMAP + collections + SPRINT-14-PR.md) com autorizacao. <strong>docs-SEP eh manual</strong> — agente edita working tree, dev humano commita.</li>
+        <li>Atualizar este relatorio (md + html) a cada breakpoint do protocolo.</li>
+        <li>Ao fechar a Sprint 14, consolidar indicadores finais, BACKOFFICE.md e collections.</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

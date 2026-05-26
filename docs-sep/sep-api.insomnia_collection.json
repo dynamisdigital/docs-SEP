@@ -148,6 +148,13 @@
       "metaSortKey": -3.2
     },
     {
+      "_id": "fld_backoffice",
+      "_type": "request_group",
+      "parentId": "wrk_sep_api",
+      "name": "Backoffice (Sprint 14)",
+      "metaSortKey": -3.1
+    },
+    {
       "_id": "fld_actuator",
       "_type": "request_group",
       "parentId": "wrk_sep_api",
@@ -1951,6 +1958,134 @@
       "headers": [{"name": "Authorization", "value": "Bearer {{ financeiroToken }}"}],
       "description": "FINANCEIRO/ADMIN. Lista ordenada dataRecebimento DESC. Sem paginacao na Sprint 12.",
       "metaSortKey": -1749982600000
+    },
+    {
+      "_id": "req_bof_fila_list",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "GET /backoffice/fila",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/backoffice/fila?status=ABERTO&prioridade=ALTA&page=0&size=20",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}],
+      "description": "FINANCEIRO/BACKOFFICE/ADMIN. Filtros: tipo, prioridade, status, dataAberturaDe/Ate, atribuidoA. Paginacao Spring; clamp 100. Sort default prioridade DESC, dataAbertura ASC.",
+      "metaSortKey": -1749982500000
+    },
+    {
+      "_id": "req_bof_fila_get",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "GET /backoffice/fila/{id}",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}],
+      "description": "Detalhe + comentarios paginados + objeto original resolvido via Strategy (ResolvedorObjetoOriginalDispatcher) pelo tipoEntidade.",
+      "metaSortKey": -1749982400000
+    },
+    {
+      "_id": "req_bof_fila_assumir",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "POST /backoffice/fila/{id}/assumir",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/assumir",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}],
+      "description": "Lock pessimista. Transiciona ABERTO -> EM_TRATAMENTO. 409 se ja em estado final ou EM_TRATAMENTO.",
+      "metaSortKey": -1749982300000
+    },
+    {
+      "_id": "req_bof_fila_comentario",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "POST /backoffice/fila/{id}/comentarios",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/comentarios",
+      "headers": [
+        {"name": "Content-Type", "value": "application/json"},
+        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"conteudo\": \"Tomador contactado por telefone; aguardando comprovante por email ate amanha 18h.\"\n}"
+      },
+      "description": "Registra ComentarioInterno (ate 10000 chars). Sem step-up.",
+      "metaSortKey": -1749982200000
+    },
+    {
+      "_id": "req_bof_fila_resolver",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "PATCH /backoffice/fila/{id}/resolver",
+      "method": "PATCH",
+      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/resolver",
+      "headers": [
+        {"name": "Content-Type", "value": "application/json"},
+        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"},
+        {"name": "X-Step-Up-Token", "value": "{{ stepUpToken }}"}
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"justificativa\": \"Pendencia resolvida apos confirmacao manual com tomador.\"\n}"
+      },
+      "description": "Step-up obrigatorio. Justificativa >= 20 chars (400 BOF-400-001). Transiciona EM_TRATAMENTO -> RESOLVIDO. Justificativa registrada tambem como comentario interno.",
+      "metaSortKey": -1749982100000
+    },
+    {
+      "_id": "req_bof_fila_ignorar",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "PATCH /backoffice/fila/{id}/ignorar",
+      "method": "PATCH",
+      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/ignorar",
+      "headers": [
+        {"name": "Content-Type", "value": "application/json"},
+        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"},
+        {"name": "X-Step-Up-Token", "value": "{{ stepUpToken }}"}
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"justificativa\": \"Falso positivo: tomador ja regularizou via outro canal manualmente.\"\n}"
+      },
+      "description": "Step-up obrigatorio. Justificativa >= 20 chars. Transiciona EM_TRATAMENTO -> IGNORADO.",
+      "metaSortKey": -1749982000000
+    },
+    {
+      "_id": "req_bof_reproc_webhook",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "POST /backoffice/reprocessos/webhook/{webhookEventId}",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/backoffice/reprocessos/webhook/{{ webhookEventId }}",
+      "headers": [
+        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"},
+        {"name": "X-Step-Up-Token", "value": "{{ stepUpToken }}"}
+      ],
+      "description": "Re-dispara webhook (forca WebhookEventLog.status = PROCESSADO). Anti-abuso 3/24h por identificadorExterno -> 429 BOF-429-001.",
+      "metaSortKey": -1749981900000
+    },
+    {
+      "_id": "req_bof_reproc_provider",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "POST /backoffice/reprocessos/provider/{tipoChamada}/{idEntidade}",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/backoffice/reprocessos/provider/KYC/{{ entidadeId }}",
+      "headers": [
+        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"},
+        {"name": "X-Step-Up-Token", "value": "{{ stepUpToken }}"}
+      ],
+      "description": "tipoChamada in {KYC, KYB, PLD, OPEN_FINANCE, ASSINATURA_DIGITAL}. Tipo desconhecido -> 400 BOF-400-002. Anti-abuso 3/24h -> 429. Strategies stub.",
+      "metaSortKey": -1749981800000
+    },
+    {
+      "_id": "req_bof_dashboard",
+      "_type": "request",
+      "parentId": "fld_backoffice",
+      "name": "GET /backoffice/dashboard",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/backoffice/dashboard",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}],
+      "description": "Visao consolidada (Facade): contadores fila + tempo medio 30d + criticos > 48h + top 5 tipos + recebimentos do dia + inadimplencia + propostas por status. Cache-Control: no-store. Resiliente a falha parcial.",
+      "metaSortKey": -1749981700000
     }
   ]
 }

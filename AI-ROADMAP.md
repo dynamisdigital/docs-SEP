@@ -46,6 +46,8 @@ Leitura base para qualquer agente:
 | Duvida de produto/regra | `docs-sep/PRD.md` -> `docs-sep/CONTEXT.md` -> doc operacional do modulo -> spec da sprint |
 | Integracao externa | Base -> ADR 0004 -> ADR 0008 quando houver WireMock -> doc operacional do modulo -> specs/steps da integracao |
 | Seguranca/auth/step-up/auditoria | Base -> `docs-sep/SEGURANCA.md` -> specs/steps da Sprint 5 -> docs do modulo afetado |
+| Metricas de implementacao | Base -> [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) -> step da sprint -> relatorios/testes do repo |
+| Acompanhamento de entregas | Base -> [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) -> [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) -> step da sprint |
 | Fechamento de sprint | Step da sprint -> doc operacional do modulo -> PR description em `repos/<repo>/SPRINT-*-PR.md` -> PRD -> collections -> este roadmap |
 
 ## Mapa por modulo
@@ -60,7 +62,7 @@ Leitura base para qualquer agente:
 | Open Finance | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) | Sprint 9 | 0004, 0008 |
 | `contratos` | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) + [`CCB.md`](repos/sep-api/CCB.md) | [`010`](steps-fase-2/backend/010-sprint-10-steps.md), [`011`](steps-fase-2/backend/011-sprint-11-steps.md) | 0004, 0006, 0007, 0013 |
 | `cobranca` | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) | [`012`](steps-fase-2/backend/012-sprint-12-steps.md) (implementada) + [`013`](steps-fase-2/backend/013-sprint-13-steps.md) | 0001, 0005, 0007, 0014 |
-| `backoffice` | Futuro `repos/sep-api/BACKOFFICE.md` | Sprint 14 | 0001, 0007 |
+| `backoffice` | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) | [`014`](steps-fase-2/backend/014-sprint-14-steps.md) | 0001, 0007 |
 | `escrow` | [`repos/sep-api/COBRANCA.md` §escrow](repos/sep-api/COBRANCA.md) (use case publico Sprint 12) + specs futuras | Sprint 12 (parte local) e Epic 15 (Celcoin) | 0005, 0007 |
 | `financeiro` / Pix | PRD + specs futuras | Sprints futuras | 0005, 0007 |
 | Web | [`repos/sep-app/README.md`](repos/sep-app/README.md) | `specs/fase-1/100-*` a `104-*`; `steps-fase-1/web/` | 0002, 0003, 0011 |
@@ -82,6 +84,8 @@ Leitura base para qualquer agente:
 | tela web, Angular, design Apple/Notion | [`docs-sep/WEB-SCREENS-PLAN.md`](docs-sep/WEB-SCREENS-PLAN.md) |
 | mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) |
 | pipeline, CI, deploy | [`docs-sep/ci-pipelines/README.md`](docs-sep/ci-pipelines/README.md) |
+| metricas, produtividade, progresso, DORA, SPACE, dashboard da sprint | [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |
+| relatorio de entregas, acompanhamento, status report, indicadores para stakeholders | [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) + [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) |
 
 ## Checklists rapidos
 

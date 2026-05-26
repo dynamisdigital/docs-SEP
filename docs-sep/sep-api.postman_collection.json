@@ -2704,6 +2704,164 @@
       ]
     },
     {
+      "name": "Backoffice (Sprint 14)",
+      "description": "Fila operacional unificada, comentarios internos, reprocessos manuais (webhook + provider) e dashboard consolidado (Sprint 14 — Epic 9). Step-up obrigatorio em resolver/ignorar/reprocessar. Anti-abuso 3/24h em reprocessos.",
+      "item": [
+        {
+          "name": "GET /backoffice/fila",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{backofficeToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/fila?status=ABERTO&prioridade=ALTA&page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "fila"],
+              "query": [
+                {"key": "status", "value": "ABERTO"},
+                {"key": "prioridade", "value": "ALTA"},
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "20"}
+              ]
+            },
+            "description": "FINANCEIRO/BACKOFFICE/ADMIN. Filtros: tipo, prioridade, status, dataAberturaDe/Ate, atribuidoA. Paginacao Spring; clamp 100. Sort default prioridade DESC, dataAbertura ASC."
+          }
+        },
+        {
+          "name": "GET /backoffice/fila/{id}",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{backofficeToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/fila/{{itemFilaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "fila", "{{itemFilaId}}"]
+            },
+            "description": "Detalhe + comentarios paginados + objeto original resolvido via Strategy (ResolvedorObjetoOriginalDispatcher) pelo tipoEntidade."
+          }
+        },
+        {
+          "name": "POST /backoffice/fila/{id}/assumir",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{backofficeToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/fila/{{itemFilaId}}/assumir",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "fila", "{{itemFilaId}}", "assumir"]
+            },
+            "description": "Lock pessimista (findByIdForUpdate). Transiciona ABERTO -> EM_TRATAMENTO. 409 se ja em estado final ou EM_TRATAMENTO."
+          }
+        },
+        {
+          "name": "POST /backoffice/fila/{id}/comentarios",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{backofficeToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conteudo\": \"Tomador contactado por telefone; aguardando envio de comprovante por email ate amanha 18h.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/fila/{{itemFilaId}}/comentarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "fila", "{{itemFilaId}}", "comentarios"]
+            },
+            "description": "Registra ComentarioInterno (ate 10000 chars). Sem step-up."
+          }
+        },
+        {
+          "name": "PATCH /backoffice/fila/{id}/resolver",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{backofficeToken}}"},
+              {"key": "X-Step-Up-Token", "value": "{{stepUpToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"justificativa\": \"Pendencia resolvida apos confirmacao manual com tomador.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/fila/{{itemFilaId}}/resolver",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "fila", "{{itemFilaId}}", "resolver"]
+            },
+            "description": "Step-up obrigatorio. Justificativa >= 20 chars (400 BOF-400-001 caso menor). Transiciona EM_TRATAMENTO -> RESOLVIDO. Justificativa tambem registrada como comentario interno."
+          }
+        },
+        {
+          "name": "PATCH /backoffice/fila/{id}/ignorar",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{backofficeToken}}"},
+              {"key": "X-Step-Up-Token", "value": "{{stepUpToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"justificativa\": \"Falso positivo: tomador ja regularizou via outro canal manualmente.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/fila/{{itemFilaId}}/ignorar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "fila", "{{itemFilaId}}", "ignorar"]
+            },
+            "description": "Step-up obrigatorio. Justificativa >= 20 chars. Transiciona EM_TRATAMENTO -> IGNORADO."
+          }
+        },
+        {
+          "name": "POST /backoffice/reprocessos/webhook/{webhookEventId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{backofficeToken}}"},
+              {"key": "X-Step-Up-Token", "value": "{{stepUpToken}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/reprocessos/webhook/{{webhookEventId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "reprocessos", "webhook", "{{webhookEventId}}"]
+            },
+            "description": "Re-dispara webhook que falhou (forca WebhookEventLog.status = PROCESSADO). Anti-abuso 3/24h por identificadorExterno -> 429 BOF-429-001."
+          }
+        },
+        {
+          "name": "POST /backoffice/reprocessos/provider/{tipoChamada}/{idEntidade}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{backofficeToken}}"},
+              {"key": "X-Step-Up-Token", "value": "{{stepUpToken}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/reprocessos/provider/KYC/{{entidadeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "reprocessos", "provider", "KYC", "{{entidadeId}}"]
+            },
+            "description": "tipoChamada in {KYC, KYB, PLD, OPEN_FINANCE, ASSINATURA_DIGITAL}. Tipo desconhecido -> 400 BOF-400-002. Anti-abuso 3/24h -> 429. Strategies stub (integracao real fica para sprint dedicada)."
+          }
+        },
+        {
+          "name": "GET /backoffice/dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{backofficeToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/backoffice/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "backoffice", "dashboard"]
+            },
+            "description": "Visao consolidada (Facade GoF): contadores por tipo/prioridade/status, tempo medio resolucao 30d, criticos > 48h, top 5 tipos, recebimentos do dia (timezone-aware), inadimplencia, propostas por status. Cache-Control: no-store. Falha em uma agregacao nao derruba o dashboard (resiliente)."
+          }
+        }
+      ]
+    },
+    {
       "name": "Actuator",
       "description": "Endpoints de observabilidade do Spring Boot Actuator. Liberados publicamente (sem JWT) para monitoramento.",
       "item": [
