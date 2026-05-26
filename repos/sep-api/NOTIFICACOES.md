@@ -60,11 +60,13 @@ Email:
 - `cobranca-amigavel-email.html`
 - `cobranca-firme-email.html`
 - `cobranca-final-email.html`
+- `renegociacao-proposta-email.html`
 
 SMS:
 
 - `cobranca-lembrete-sms.txt`
 - `cobranca-firme-sms.txt`
+- `renegociacao-proposta-sms.txt`
 
 Variaveis permitidas:
 
@@ -72,6 +74,10 @@ Variaveis permitidas:
 - `diasAtraso`
 - `dataVencimento`
 - `valorEmAberto`
+- `numeroParcela`
+- `valor`
+- `novoVencimento`
+- `numeroParcelas`
 - `linkPortal`
 - `codigoReferencia`
 
@@ -104,10 +110,13 @@ Ambientes esperados:
 
 Variaveis planejadas:
 
+- `APP_NOTIFICACOES_PROVIDER` (`log` ou `smtp-zenvia`)
 - `APP_NOTIFICACOES_REMETENTE_EMAIL`
-- `ZENVIA_BASE_URL`
-- `ZENVIA_API_TOKEN`
-- `ZENVIA_SMS_FROM`
+- `APP_NOTIFICACOES_ZENVIA_BASE_URL`
+- `APP_NOTIFICACOES_ZENVIA_API_TOKEN`
+- `APP_NOTIFICACOES_ZENVIA_FROM`
+- `APP_NOTIFICACOES_ZENVIA_TIMEOUT_MS`
+- `APP_COBRANCA_FINANCEIRO_EMAIL` (copia final para financeiro; vazio desabilita)
 
 ## Auditoria e retencao
 
@@ -119,6 +128,7 @@ Eventos da Sprint 13:
 - `RENEGOCIACAO_PROPOSTA`
 - `RENEGOCIACAO_ACEITA`
 - `RENEGOCIACAO_RECUSADA`
+- `RENEGOCIACAO_EXPIRADA`
 
 Payload permitido no audit:
 
@@ -151,5 +161,6 @@ Payload proibido:
 - [ ] Opt-out revisado pelo juridico.
 - [ ] Credenciais SMTP e Zenvia em secret manager do ambiente.
 - [ ] WireMock cobrindo adapter Zenvia.
+- [ ] `APP_NOTIFICACOES_PROVIDER=smtp-zenvia` validado em homologacao com SMTP e Zenvia reais.
 - [ ] Logs sem corpo completo de mensagem sensivel.
 - [ ] Auditoria sem CPF/CNPJ ou dados bancarios.

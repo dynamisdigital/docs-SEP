@@ -1131,6 +1131,14 @@ Dependencias externas:
 Responsavel principal:
 - Dev Senior
 
+Status de execucao:
+- implementada na branch `feature/sprint-13-cobranca-inadimplencia`; pendente PR/merge para `develop`
+- 3 migrations Flyway: `V30__criar_tabelas_inadimplencia` (`workflow_cobranca`, `evento_cobranca`, `renegociacao`, unique parcial de idempotencia de notificacao), `V31__suportar_agenda_substituta` (self-FK `agenda_substituida_id`), `V32__ampliar_audit_seguranca_tipo_inadimplencia`
+- modulo `cobranca` estendido com workflow configuravel por yaml, providers SMTP/Zenvia/Log, listeners de atraso/auditoria/renegociacao, jobs de escalonamento, inadimplencia e expiracao de renegociacao
+- endpoints REST novos: `GET /api/v1/cobranca/inadimplencia`, `POST /api/v1/cobranca/parcelas/{id}/contato`, `POST /api/v1/cobranca/parcelas/{id}/renegociacao`, `PATCH /api/v1/cobranca/renegociacoes/{id}/aceite`, `PATCH /api/v1/cobranca/renegociacoes/{id}/recusa`
+- auditoria reforcada com `NOTIFICACAO_ENVIADA`, `EVENTO_COBRANCA_REGISTRADO`, `PARCELA_INADIMPLENTE`, `RENEGOCIACAO_PROPOSTA`, `RENEGOCIACAO_ACEITA`, `RENEGOCIACAO_RECUSADA`, `RENEGOCIACAO_EXPIRADA`
+- documentacao consolidada em [`repos/sep-api/COBRANCA.md`](../repos/sep-api/COBRANCA.md) e [`repos/sep-api/NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md); revisao juridica de `NOTIFICACOES.md` segue pendente antes de producao
+
 Detalhamento das tasks:
 - o detalhamento de tasks, arquivos esperados, verificacao, dependencias internas e criterios de pronto foi extraido do PRD e passa a ser tratado como artefato de especificacao proprio
 - consultar: [`specs/fase-1/001-sprint-1-fundacao-tecnica.md`](../specs/fase-1/001-sprint-1-fundacao-tecnica.md)
@@ -1477,20 +1485,28 @@ Detalhamento das tasks:
 ### Sprint 13
 
 Objetivo de planejamento:
-- tratar inadimplencia e recuperacao: deteccao automatica de atraso, estados `EM_ATRASO`/`EM_NEGOCIACAO`/`INADIMPLENTE`, workflows de cobranca com escalonamento, renegociacao basica, expor `NotificationProvider` (email/SMS — adapter inicial via SMTP) e historico auditavel de tentativas
+- tratar inadimplencia e recuperacao: deteccao automatica de atraso, estados `ATRASADA`/`EM_NEGOCIACAO`/`INADIMPLENTE`/`RENEGOCIADA`, workflows de cobranca com escalonamento, renegociacao basica, `NotificationProvider` (email/SMS via SMTP + Zenvia; `log` em dev/test) e historico auditavel de tentativas
 
 Tema:
 - Cobranca — inadimplencia e recuperacao (Epic 8 parte 2)
 
 Pre-requisitos de entrada:
 - Sprint 12 concluida
-- ADR 0013 (estrategia de notificacoes transacionais) aceito antes do inicio da sprint
+- ADR 0014 (estrategia de notificacoes transacionais) aceito antes do inicio da sprint
 
 Dependencias externas:
 - depende da conclusao da Sprint 12
 
 Responsavel principal:
 - Dev Senior
+
+Status de execucao:
+- implementada na branch `feature/sprint-13-cobranca-inadimplencia`; pendente PR/merge para `develop`
+- 3 migrations Flyway: `V30__criar_tabelas_inadimplencia`, `V31__suportar_agenda_substituta`, `V32__ampliar_audit_seguranca_tipo_inadimplencia`
+- modulo `cobranca` estendido com workflow configuravel por yaml, providers SMTP/Zenvia/Log, listeners de atraso/auditoria/renegociacao, jobs de escalonamento, inadimplencia e expiracao de renegociacao
+- endpoints REST novos: `GET /api/v1/cobranca/inadimplencia`, `POST /api/v1/cobranca/parcelas/{id}/contato`, `POST /api/v1/cobranca/parcelas/{id}/renegociacao`, `PATCH /api/v1/cobranca/renegociacoes/{id}/aceite`, `PATCH /api/v1/cobranca/renegociacoes/{id}/recusa`
+- auditoria reforcada com `NOTIFICACAO_ENVIADA`, `EVENTO_COBRANCA_REGISTRADO`, `PARCELA_INADIMPLENTE`, `RENEGOCIACAO_PROPOSTA`, `RENEGOCIACAO_ACEITA`, `RENEGOCIACAO_RECUSADA`, `RENEGOCIACAO_EXPIRADA`
+- documentacao consolidada em [`repos/sep-api/COBRANCA.md`](../repos/sep-api/COBRANCA.md) e [`repos/sep-api/NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md); revisao juridica segue pendente antes de producao
 
 Detalhamento das tasks:
 - consultar: [`specs/fase-2/013-sprint-13-cobranca-inadimplencia.md`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md)

@@ -1,17 +1,18 @@
 # COBRANCA - sep-api
 
-Documento operacional do modulo `cobranca` (Epic 8 parte 1).
+Documento operacional do modulo `cobranca` (Epic 8).
 Sprint 12 — implementada: parcelas, agenda, recebimento manual, escrow, job de atraso e audit reforcado.
+Sprint 13 — implementada na branch: inadimplencia, workflow de cobranca, notificacoes, renegociacao basica e auditoria reforcada.
 
-> Spec: [`012-sprint-12-cobranca-parcelas-agenda.md`](../../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md).
-> Steps: [`012-sprint-12-steps.md`](../../steps-fase-2/backend/012-sprint-12-steps.md).
+> Specs: [`012-sprint-12-cobranca-parcelas-agenda.md`](../../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md) e [`013-sprint-13-cobranca-inadimplencia.md`](../../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md).
+> Steps: [`012-sprint-12-steps.md`](../../steps-fase-2/backend/012-sprint-12-steps.md) e [`013-sprint-13-steps.md`](../../steps-fase-2/backend/013-sprint-13-steps.md).
 > Dependencia: [`CONTRATOS.md`](./CONTRATOS.md), especialmente `ContratoAssinadoEvent`.
 
 ## Objetivo
 
-Pos-formalizacao (contrato `ASSINADO`), o sistema gera uma agenda de pagamento, persiste parcelas planejadas, registra recebimento manual via API REST pelo financeiro, atualiza status da parcela, registra entrada segregada no `escrow` (Resolucao CMN 4.656/2018), publica eventos consumidos pelo audit log e expoe a base que Sprint 13 (inadimplencia) consumira.
+Pos-formalizacao (contrato `ASSINADO`), o sistema gera agenda de pagamento, persiste parcelas planejadas, registra recebimento manual via API REST pelo financeiro, atualiza status da parcela, registra entrada segregada no `escrow` (Resolucao CMN 4.656/2018), trata atraso/inadimplencia, executa workflow de cobranca, registra contatos manuais e permite renegociacao basica com agenda substituta.
 
-Pix, boleto e conciliacao automatica nao entram. Recebimento eh manual por API, usado pelo financeiro apos confirmacao off-band do pagamento.
+Pix, boleto e conciliacao automatica nao entram. Recebimento eh manual por API, usado pelo financeiro apos confirmacao off-band do pagamento. Comunicacoes de cobranca usam Provider Pattern com SMTP/Zenvia em ambientes reais e `LogNotificationProvider` em dev/test.
 
 ## Fluxo end-to-end implementado
 
@@ -70,12 +71,14 @@ MarcarParcelaAtrasadaJob
 ```text
 PENDENTE          -> PARCIALMENTE_PAGA | PAGA | ATRASADA
 PARCIALMENTE_PAGA -> PARCIALMENTE_PAGA | PAGA
-ATRASADA          -> PARCIALMENTE_PAGA | PAGA | INADIMPLENTE (Sprint 13)
+ATRASADA          -> PARCIALMENTE_PAGA | PAGA | EM_NEGOCIACAO | INADIMPLENTE
+EM_NEGOCIACAO     -> RENEGOCIADA | ATRASADA | INADIMPLENTE
 PAGA              = final
-INADIMPLENTE      = reservado Sprint 13 — nao permite recebimento nesta sprint
+INADIMPLENTE      -> EM_NEGOCIACAO
+RENEGOCIADA       = final operacional da parcela substituida
 ```
 
-Helpers em `StatusParcela`: `isFinal()`, `permiteRecebimento()` (PAGA e INADIMPLENTE retornam false), `permiteMarcarAtrasada()` (so PENDENTE).
+Helpers em `StatusParcela`: `isFinal()`, `permiteRecebimento()` (PAGA, INADIMPLENTE, EM_NEGOCIACAO e RENEGOCIADA retornam false), `permiteMarcarAtrasada()` (so PENDENTE) e validacoes de renegociacao/inadimplencia nos use cases.
 
 ## Calculadoras e parametros
 
@@ -125,6 +128,82 @@ Endpoint `POST /api/v1/cobranca/parcelas/{id}/recebimentos`:
 - Overpayment: parcela vira `PAGA`; excedente fica no `observacao`; tratamento financeiro detalhado fica pra Sprint futura.
 - Nova key em parcela `PAGA` -> 409 (`ParcelaEstadoInvalidoException` COB-409-001).
 
+## Inadimplencia e workflow de cobranca
+
+Sprint 13 consome `ParcelaAtrasouEvent` publicado pelo job da Sprint 12 e aplica um workflow configuravel por `app.cobranca.workflow.dias-atraso`. Cada etapa pode emitir notificacoes por canal/template e sinalizar flags operacionais.
+
+Fluxo operacional:
+
+```text
+MarcarParcelaAtrasadaJob
+  -> PENDENTE vencida vira ATRASADA
+  -> publica ParcelaAtrasouEvent
+  -> ParcelaAtrasouListener chama EscalarCobrancaUseCase no dia 0
+
+EscaladorCobrancaJob
+  -> @Scheduled cron default 03:00 America/Sao_Paulo
+  -> reavalia parcelas ATRASADA
+  -> executa etapa exata do workflow para dias de atraso 5, 15, 30, 60, 90
+
+MarcarParcelaInadimplenteJob
+  -> @Scheduled cron default 02:30 America/Sao_Paulo
+  -> ATRASADA com 90+ dias vira INADIMPLENTE
+  -> publica ParcelaInadimplenteEvent e registra EventoCobranca
+```
+
+Workflow default:
+
+| Dia | Acoes | Flags |
+|-----|-------|-------|
+| 0 | `email-amigavel` | - |
+| 5 | `email-amigavel`, `sms-lembrete` | - |
+| 15 | `email-firme`, `sms-firme` | - |
+| 30 | `email-firme`, `sms-firme` | `flag-contato-manual=true` |
+| 60 | `email-final` | `escalonar-backoffice=true` |
+| 90 | `email-final`, `sms-firme` | `marcar-inadimplente=true` |
+
+Idempotencia de notificacao: `EventoCobrancaRepository.existsByParcelaIdAndDiasAtrasoAndCanalAndTemplate` evita reenvio da mesma notificacao; a migration V30 adiciona unique parcial para reforco no banco. Cada tentativa gera `EventoCobranca` com `canal`, `template`, `status`, `diasAtraso` e mensagem tecnica sem corpo sensivel.
+
+## Eventos de cobranca
+
+`EventoCobranca` representa historico operacional, nao mensagem completa. Tipos atuais:
+
+- `NOTIFICACAO_AUTOMATICA`: tentativa de envio por workflow.
+- `CONTATO_MANUAL`: registro feito por financeiro/admin via API.
+- `PARCELA_INADIMPLENTE`: marco de transicao para inadimplencia.
+
+O endpoint `POST /api/v1/cobranca/parcelas/{id}/contato` nao altera status da parcela. Ele registra descricao operacional limitada e publica evento para auditoria.
+
+## Renegociacao basica
+
+Renegociacao nasce a partir de parcela `ATRASADA` ou `INADIMPLENTE`. O fluxo eh:
+
+```text
+FINANCEIRO/ADMIN + step-up
+  -> POST /parcelas/{id}/renegociacao
+  -> cria Renegociacao(PROPOSTA)
+  -> parcela original vira EM_NEGOCIACAO
+  -> notifica tomador por email/SMS
+
+Tomador + ownership + step-up
+  -> PATCH /renegociacoes/{id}/aceite
+  -> Renegociacao(ACEITA)
+  -> parcela original vira RENEGOCIADA
+  -> cria AgendaPagamento substituta ativa
+  -> agenda original fica inativa
+
+Tomador + ownership
+  -> PATCH /renegociacoes/{id}/recusa
+  -> Renegociacao(RECUSADA)
+  -> parcela volta ao status anterior (ATRASADA ou INADIMPLENTE)
+
+ExpirarRenegociacaoJob
+  -> PROPOSTA vencida apos 7 dias vira EXPIRADA
+  -> parcela volta ao status anterior
+```
+
+Aceite exige step-up porque cria nova obrigacao financeira. Recusa nao exige step-up porque apenas rejeita a proposta e reverte status. A agenda substituta usa `agenda_substituida_id` (V31) para manter a cadeia auditavel.
+
 ## Integracao com escrow
 
 Sprint 12 entrega versao local da segregacao patrimonial (CMN 4.656/2018 + ADR 0005). Sprint Epic 15 substituira por Celcoin via `EscrowProvider`.
@@ -147,25 +226,37 @@ Arquitetura (ADR 0007):
 | `GET` | `/api/v1/cobranca/contratos/{contratoId}/agenda` | owner ou `ROLE_FINANCEIRO/ADMIN` | resolve tomadorId via `ContratoCobrancaQueryPort` |
 | `GET` | `/api/v1/cobranca/parcelas/{id}` | owner ou `ROLE_FINANCEIRO/ADMIN` | retorna valor atualizado com mora/multa pro-rata contra Clock; CLIENTE alheio 403 unificado mesmo se parcela inexistir |
 | `POST` | `/api/v1/cobranca/parcelas/{id}/recebimentos` | `ROLE_FINANCEIRO/ADMIN` | `Idempotency-Key` pattern obrigatorio |
-| `GET` | `/api/v1/cobranca/recebimentos` | `ROLE_FINANCEIRO/ADMIN` | listagem `dataRecebimento DESC` com `@EntityGraph` (anti N+1); sem paginacao na Sprint 12 |
+| `GET` | `/api/v1/cobranca/recebimentos` | `ROLE_FINANCEIRO/ADMIN` | listagem `dataRecebimento DESC` com `@EntityGraph` (anti N+1); sem paginacao |
+| `GET` | `/api/v1/cobranca/inadimplencia` | `ROLE_FINANCEIRO/ADMIN` | filtros `dias_atraso_min`, `dias_atraso_max`, `status`; retorna ATRASADA/INADIMPLENTE |
+| `POST` | `/api/v1/cobranca/parcelas/{id}/contato` | `ROLE_FINANCEIRO/ADMIN` | registra `EventoCobranca CONTATO_MANUAL`; nao muda status |
+| `POST` | `/api/v1/cobranca/parcelas/{id}/renegociacao` | `ROLE_FINANCEIRO/ADMIN` + step-up | cria proposta, parcela vira EM_NEGOCIACAO; conflito se proposta ativa |
+| `PATCH` | `/api/v1/cobranca/renegociacoes/{id}/aceite` | tomador owner + step-up | aceita proposta, cria agenda substituta, parcela vira RENEGOCIADA |
+| `PATCH` | `/api/v1/cobranca/renegociacoes/{id}/recusa` | tomador owner | recusa proposta, parcela volta ao status anterior |
 
-OpenAPI completo: `@Tag(cobranca)` + `@Operation`/`@ApiResponses`/`@Schema` em todos. `ApiExceptionHandler` shared estendido com `MissingRequestHeaderException` -> 400.
+OpenAPI/Swagger UI: tag `cobranca` atualizada para Sprints 12/13, DTOs com `@Schema` e endpoints documentados com `@Operation`/`@ApiResponses`. `ApiExceptionHandler` shared cobre header ausente, ownership, validacao, conflitos e entidades nao encontradas.
 
 ## Auditoria implementada
 
-`CobrancaAuditListener` (`@TransactionalEventListener AFTER_COMMIT + @Transactional REQUIRES_NEW`) grava `audit_log_seguranca` com 6 tipos (V29):
+`CobrancaAuditListener` (`@TransactionalEventListener AFTER_COMMIT` + `@Transactional REQUIRES_NEW`) grava `audit_log_seguranca` com tipos da Sprint 12 (V29) e Sprint 13 (V32):
 
 ```text
-AGENDA_GERADA              — 1x por agenda nova (tomadorId)
-PARCELA_CRIADA             — N x por agenda (uma por parcela; tomadorId)
-RECEBIMENTO_REGISTRADO     — 1x por recebimento (registradoPor)
-PARCELA_PAGA               — quando parcela transiciona pra PAGA
-PARCELA_ATRASADA           — quando job marca PENDENTE -> ATRASADA
-MOVIMENTACAO_ESCROW_CRIADA — escrow registra entrada segregada
+AGENDA_GERADA                  - 1x por agenda nova (tomadorId)
+PARCELA_CRIADA                 - N x por agenda (uma por parcela; tomadorId)
+RECEBIMENTO_REGISTRADO         - 1x por recebimento (registradoPor)
+PARCELA_PAGA                   - quando parcela transiciona pra PAGA
+PARCELA_ATRASADA               - quando job marca PENDENTE -> ATRASADA
+MOVIMENTACAO_ESCROW_CRIADA     - escrow registra entrada segregada
+NOTIFICACAO_ENVIADA            - tentativa de notificacao entregue/registrada
+EVENTO_COBRANCA_REGISTRADO     - evento operacional de cobranca
+PARCELA_INADIMPLENTE           - transicao para INADIMPLENTE
+RENEGOCIACAO_PROPOSTA          - financeiro/admin criou proposta
+RENEGOCIACAO_ACEITA            - tomador aceitou proposta
+RENEGOCIACAO_RECUSADA          - tomador recusou proposta
+RENEGOCIACAO_EXPIRADA          - job expirou proposta vencida
 ```
 
-Dados permitidos: IDs, valor, status, datas, meioPagamento (string controlada).
-Dados proibidos: dados bancarios (conta, agencia), documento pessoal (CPF/CNPJ), payload bruto de provider futuro.
+Dados permitidos: IDs, valor, status, datas, meioPagamento (string controlada), canal, template, status tecnico e dias de atraso.
+Dados proibidos: dados bancarios (conta, agencia), documento pessoal (CPF/CNPJ), payload bruto de provider e corpo completo de notificacao.
 
 Retencao alinhada com contratos (10 anos — CMN 4.656/2018 + LGPD).
 
@@ -177,36 +268,46 @@ Retencao alinhada com contratos (10 anos — CMN 4.656/2018 + LGPD).
 | V26 | Adiciona `proposta_credito.taxa_juros_mensal NUMERIC(8,6) NULL` + CHECK `>= 0`. Placeholder ate sprint futura popular explicitamente. |
 | V27 | Adiciona `movimentacao_escrow.external_reference_id UUID NULL` + index parcial. Correlaciona movimentacao com `recebimento.id`. |
 | V28 | UNIQUE em `conta_escrow.titular` + UNIQUE PARCIAL em `wallet(proposta_id) WHERE proposta_id IS NOT NULL`. Resolve race em criacao lazy concorrente. |
-| V29 | DROP+ADD `chk_audit_seguranca_tipo` com 6 tipos da cobranca. |
+| V29 | DROP+ADD `chk_audit_seguranca_tipo` com 6 tipos da cobranca Sprint 12. |
+| V30 | Cria `workflow_cobranca`, `evento_cobranca`, `renegociacao`, indices e unique parcial para idempotencia de notificacoes. |
+| V31 | Adiciona `agenda_pagamento.agenda_substituida_id` para agenda substituta de renegociacao. |
+| V32 | Amplia `chk_audit_seguranca_tipo` com tipos de inadimplencia e renegociacao. |
 
 ## Testes
 
-100+ testes na sprint:
+Suite de cobranca/inadimplencia:
 
 - **Dominio**: `AgendaPagamentoTest`, `ParcelaCobrancaTest`, `RecebimentoTest`, `StatusParcelaTest`, `ComposicaoValorTest`.
-- **Calculadoras**: `CalculadoraPriceTest` (7), `CalculadoraSACTest` (6), `CalculadoraJurosMoraTest` (6), `CalculadoraMultaTest` (4), `AmortizacaoDispatcherTest` (3).
-- **Use cases**: `GerarAgendaPagamentoUseCaseTest` (4), `RegistrarRecebimentoUseCaseTest` (10), `CalcularValorAtualizadoParcelaUseCaseTest` (5), `ConsultarParcelasUseCaseTest` (4), `RegistrarMovimentacaoEscrowUseCaseTest` (3 — escrow).
-- **Listeners**: `ContratoAssinadoListenerTest` (4), `CobrancaAuditListenerTest` (6).
-- **Job**: `MarcarParcelaAtrasadaJobTest` (3).
-- **Web**: `CobrancaControllerTest` `@WebMvcTest` (14 cenarios).
-- **IT**: `CobrancaIT` `@SpringBootTest` RANDOM_PORT (10 cenarios E2E incluindo audit log).
+- **Calculadoras**: `CalculadoraPriceTest`, `CalculadoraSACTest`, `CalculadoraJurosMoraTest`, `CalculadoraMultaTest`, `AmortizacaoDispatcherTest`.
+- **Use cases Sprint 12**: `GerarAgendaPagamentoUseCaseTest`, `RegistrarRecebimentoUseCaseTest`, `CalcularValorAtualizadoParcelaUseCaseTest`, `ConsultarParcelasUseCaseTest`, `RegistrarMovimentacaoEscrowUseCaseTest`.
+- **Use cases/jobs Sprint 13**: `EscalarCobrancaUseCaseTest`, `EscaladorCobrancaJobTest`, `MarcarParcelaInadimplenteJobTest`, `IniciarRenegociacaoUseCaseTest`, `AceitarRenegociacaoUseCaseTest`, `RecusarRenegociacaoUseCaseTest`, `ExpirarRenegociacaoJobTest`.
+- **Listeners**: `ContratoAssinadoListenerTest`, `ParcelaAtrasouListenerTest`, `RenegociacaoPropostaListenerTest`, `CobrancaAuditListenerTest`.
+- **Web**: `CobrancaControllerTest`, `CobrancaInadimplenciaControllerTest`.
+- **IT**: `CobrancaIT`, `InadimplenciaIT`, `RenegociacaoIT`.
+
+Validacoes focadas usadas na Task 13.9: `./gradlew test --tests "*InadimplenciaIT" --tests "*RenegociacaoIT"` e `./gradlew test --tests "*Cobranca*"`.
 
 ## Limitacoes conhecidas / pendencias futuras
 
 - **Recebimento manual** apenas. Automacao por Pix fica pra Epic 15 (Celcoin).
-- **Sem boleto**, sem renegociacao, sem cobranca ativa. Sprint 13 consome `ParcelaAtrasouEvent` pra inadimplencia.
+- **Sem boleto** e sem conciliacao automatica. Cobranca ativa da Sprint 13 cobre notificacao e contato manual, mas negativacao/juridico ficam fora do escopo.
 - **IOF/CET completo** + memoria juridica de encargos: precisam refinamento antes producao.
 - **Overpayment**: tratamento minimo (parcela vira PAGA + observacao).
 - **Taxa juros mensal** com fallback de config: PRD §22 deve registrar pendencia pra Sprint futura popular `proposta_credito.taxa_juros_mensal` explicitamente antes da assinatura.
-- **`MarcarParcelaAtrasadaJob` single-instance**: Epic 15 AWS multi-instance requer ShedLock ou advisory lock PostgreSQL.
-- **`GET /recebimentos` sem paginacao**: Sprint 13 ou Epic 15 adicionar `Pageable` + filtros (contratoId, intervalo).
+- **`GET /recebimentos` sem paginacao**: Epic 15 adicionar `Pageable` + filtros (contratoId, intervalo).
+- **Notificacoes reais dependem de credenciais**: `smtp-zenvia` deve falhar rapido sem SMTP/Zenvia configurados; default seguro permanece `log`.
+- **Opt-out/LGPD**: `NOTIFICACOES.md` precisa revisao juridica antes de producao.
+- **Jobs single-instance**: Epic 15 AWS multi-instance requer ShedLock ou advisory lock para atraso, escalonamento, inadimplencia e expiracao.
 - **`RecebimentoResponse.movimentacaoEscrowId` null** em listagem em massa (evita N+1 join). POST recebimento preenche o id.
 - **Test `payload_naoVazaDadosBancariosOuPessoais`** usa blacklist de substrings — schema validation completa em sprint de hardening.
 
 ## Referencias
 
 - [Spec 012](../../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md)
+- [Spec 013](../../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md)
 - [Steps Sprint 12](../../steps-fase-2/backend/012-sprint-12-steps.md)
+- [Steps Sprint 13](../../steps-fase-2/backend/013-sprint-13-steps.md)
+- [NOTIFICACOES.md](./NOTIFICACOES.md)
 - [CONTRATOS.md](./CONTRATOS.md)
 - [ADR 0001 - Monolito modular orientado a DDD](../../adr/0001-monolito-modular-orientado-a-ddd.md)
 - [ADR 0005 - Segregacao patrimonial via conta escrow](../../adr/0005-segregacao-patrimonial-via-conta-escrow.md)
