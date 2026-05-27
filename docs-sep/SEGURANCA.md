@@ -371,14 +371,18 @@ ADMIN, refresh em cookie HttpOnly WEB, CORS para `X-Step-Up-Token`,
 enforcement server-side de `precisaRedefinirSenha`, step-up TOTP fallback
 mobile, transicao atomica concurrency-safe do refresh. Detalhes em §16.
 
-**Em aberto**:
+**Fechados em 2026-05-27 (Sprint 15 — Hardening + Bug-Hunt):**
 
-- ADR de update reformalizando baseline mobile com Capacitor 8.3.x (herdada
-  da M-Sprint 0).
+- **Baseline mobile Capacitor 8.3.x** documentado em [ADR 0015](../adr/0015-capacitor-8-3-x-baseline-mobile.md) — status Proposto, sera Aceito quando a Sprint Mobile reabrir e plugins nativos forem re-validados.
+
+**Em aberto (follow-up de hardening / sprint dedicada):**
+
 - Migracao TOTP lib: avaliar substituir `googleauth:1.5.0` por
   `dev.samstevens.totp:totp` para eliminar dep transitiva de
   `org.apache.httpcomponents:httpclient` (Snyk follow-up; constraint atual
-  pinada em 4.5.14 ate la).
+  pinada em 4.5.14 ate la). **Sprint 15 nao migrou** — escopo de refactor
+  da camada MFA fica em sprint dedicada (impacta `GoogleAuthAdapter`, suite
+  de testes MFA Sprint 5).
 - Plugin nativo biometria: instalar
   `@capacitor-community/biometric-auth@^7.0.0` na fase Android/iOS e trocar
   stub do `BiometricService`.
@@ -386,9 +390,17 @@ mobile, transicao atomica concurrency-safe do refresh. Detalhes em §16.
 - Risk-based authentication (geo, device fingerprint avancado) — futuro.
 - Captcha — avaliar apos primeiros incidentes em producao.
 - Migrar testes do backend de Postgres local via Docker Compose para
-  Testcontainers (issue Docker Engine 28+ ainda pendente).
+  Testcontainers (issue `docker-java` em Testcontainers 1.21.3 com Docker
+  Engine 28+ ainda pendente). **Sprint 15 manteve workaround** — necessita
+  upgrade `docker-java` >= 3.5.x ou Testcontainers >= 1.22.x (sem release
+  estavel checada nesta data).
 - E2E cross-repo (web + mobile + API) — cada repo mantem suites locais ate
-  pipeline orquestrado existir.
+  pipeline orquestrado existir. **Sprint 15 nao implementou** — exige setup
+  cross-repo (Playwright + WireMock + Postgres compartilhado) fora do escopo
+  cirurgico de hardening.
+- WireMock E2E com `provider=clicksign` (15F-010): gap documentado em
+  `AssinaturaIT:75-78`. Sprint 15 mantem cobertura via `FakeAssinaturaDigitalProvider`;
+  WireMock integration test fica em sprint dedicada de cobertura adapter HTTP.
 
 ## 15. Referencias
 

@@ -186,6 +186,12 @@ Para code review:
 - Priorize bugs, regressao comportamental, seguranca, autorizacao/ownership, transacoes, migrations, falta de testes e divergencia documental.
 - Apresente findings primeiro, com arquivo/linha quando possivel.
 
+Para sprints de hardening / bug-hunt:
+
+- Use `cavecrew-investigator` em paralelo (1 invocacao por modulo critico) na fase de inventario de findings. Saida caveman-compressed cabe em contexto curto.
+- Sempre **validar findings reportados** antes de implementar — subagentes podem emitir falsos positivos. Confirmar arquivo:linha, conferir codigo atual, descartar com justificativa quando for o caso.
+- Para cleanup de tech debt (renames cross-module): prefira `sed -i` apenas com substrings literais inequivocas. Sed que envolve caracteres `/`, `\` ou escape pode esvaziar arquivos — abertura manual via `Edit` eh mais seguro pra strings complexas.
+
 ## Nao faca
 
 - Nao assuma regra de negocio sem fonte documental ou codigo atual.

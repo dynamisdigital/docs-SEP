@@ -153,6 +153,29 @@ Uso no SEP:
 - observar queda por modulo;
 - exigir teste novo quando comportamento novo altera regra, autorizacao, transacao, evento, provider, migration ou contrato REST.
 
+#### Baseline JaCoCo - sep-api - pos-Sprint 15 (2026-05-27)
+
+Primeira medicao formal por modulo. Substitui o status anterior "Em monitoramento". Coletado por `./gradlew clean test jacocoTestReport` na branch `feature/sprint-15-hardening-bughunt`, suite com 1429 testes / 0 falhas / 0 erros / 0 skipped.
+
+Tabela final pos-Task 15.10 (coverage uplift). Baseline anterior pos-Sprint 14 trazia `escrow` com 50,0% de branches; novos testes de validacao de dominio (`EscrowDomainValidationTest`) trouxeram para 100%.
+
+| Modulo | Linha % | Branch % | Gate 70% (linhas) | Gate 70% (branches) |
+|---|---:|---:|---|---|
+| backoffice | 96,5 | 82,4 | OK | OK |
+| cobranca | 94,4 | 77,7 | OK | OK |
+| contratos | 93,9 | 76,2 | OK | OK |
+| credito | 91,1 | 78,5 | OK | OK |
+| escrow | **86,4** | **100,0** | OK | OK |
+| identity | 90,8 | 78,5 | OK | OK |
+| onboarding | 92,2 | 73,9 | OK | OK |
+| shared | 93,3 | 75,3 | OK | OK |
+| usuarios | 96,4 | 90,9 | OK | OK |
+
+Notas:
+- Modulos `pix`, `financeiro` e `credores` permanecem stubs (4 arquivos cada) e nao geram cobertura mensuravel; ficam fora da tabela.
+- Todos os modulos com codigo de producao acima do gate de 70% em linhas e branches.
+- Gate atual no `build.gradle` continua `LINE COVEREDRATIO 0.70` apenas; branches nao bloqueiam build, mas a baseline acima serve como referencia pra detectar regressao.
+
 ### Achados de code review
 
 Classificar cada finding:
