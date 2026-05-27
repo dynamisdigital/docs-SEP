@@ -28,26 +28,26 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | Campo | Valor atual |
 |-------|-------------|
 | Produto | SEP |
-| Fase | Fase 2 - Jornada de contratacao do emprestimo (backend concluido) |
-| Sprint atual | Sprint 15 - Hardening + Bug-Hunt (concluida) |
-| Repo principal em execucao | `sep-api` |
-| Branch atual | `feature/sprint-15-hardening-bughunt` |
+| Fase | Fase 2 - Jornada de contratacao do emprestimo (concluida em `main`) |
+| Sprint atual | Nenhuma sprint em execucao |
+| Repo principal em execucao | N/A |
+| Branch atual | N/A |
 | Status geral | Concluido |
-| Ultima atualizacao | 2026-05-27 (Sprint 15 Hardening concluida: 27 findings triagiados, 11 P1/P2 fechados, baseline JaCoCo formal, escrow branches 50%->100%) |
+| Ultima atualizacao | 2026-05-27 (Fase 2 + Sprint 15 Hardening promovidas para `main`; `origin/main` e `origin/develop` com diff vazio em `sep-api`, `sep-app` e `sep-mobile`) |
 | Responsavel por atualizacao | Agente/Dev responsavel pela task |
 
 ## Indicadores executivos
 
 | Indicador | Atual | Meta/criterio | Status |
 |-----------|-------|---------------|--------|
-| Tasks planejadas na sprint | 14.0 a 14.10 | Todas avaliadas no fechamento | Concluido |
-| Tasks concluidas | 14.0..14.10 (11/11) | DoD da task atendido | Concluido |
+| Tasks planejadas na sprint | 15.0 a 15.11 | Todas avaliadas no fechamento | Concluido |
+| Tasks concluidas | 15.0..15.11 (12/12) | DoD da task atendido | Concluido |
 | Tasks em review | 0 | Review sem P0/P1 aberto | Concluido |
-| Hotfixes de review | 8 ciclos hotfix subagente + 6 ciclos fixes manuais | Causa registrada | Concluido |
-| Testes executados | ~118 testes backoffice + suite global verde (~1340) | Proporcionais ao risco | Verde |
-| Cobertura/gate | A medir no fechamento (alvo JaCoCo modulo >= 70%) | Gate do repo sem regressao | Em monitoramento |
-| Pendencias criticas | 0 P0/P1; 3 itens adiados/aceitos documentados | P0/P1 zerados antes de PR | OK |
-| Documentacao atualizada | BACKOFFICE.md + AI-ROADMAP + Postman + Insomnia + PRD §22/§29 + CONTEXT + relatorio MD/HTML | Docs/collections quando contrato mudar | Concluido |
+| Hotfixes de review | 6 ciclos hotfix subagente + 0 ciclos fixes manuais na Sprint 15 | Causa registrada | Concluido |
+| Testes executados | Suite global 1429 verde registrada na Sprint 15 | Proporcionais ao risco | Verde |
+| Cobertura/gate | Todos os modulos com codigo de producao acima de 70% em linha e branch | Baseline formal por modulo | OK |
+| Pendencias criticas | 0 P0; follow-ups aceitos/adiados documentados | P0/P1 zerados antes de PR | OK |
+| Documentacao atualizada | PRD, CONTEXT, AI-ROADMAP, RELATORIO MD/HTML e steps-fase-2/README atualizados pos-merge | Docs/collections quando contrato mudar | Concluido |
 
 ## Entregas concluidas
 
@@ -75,12 +75,13 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | 2026-05-27 | 15.9 | OpenAPI / role docs sync | `sep-api` | `58068f4` + hotfix `35a6fa4`; 7 endpoints backoffice ganham mencao explicita de role em @Operation.description + @ApiResponse 403; outros controllers ja conformes | Concluido |
 | 2026-05-27 | 15.10 | Coverage uplift escrow | `sep-api` | `196f5d1` (sem hotfix); `EscrowDomainValidationTest` (6 testes); escrow branches 50,0% → 100,0%; todos modulos > 70% em ambos linha+branch | Concluido |
 | 2026-05-27 | 15.11 | SPRINT-15-PR.md + relatorio + METRICAS + AGENT.md | `docs-SEP` | `SPRINT-15-PR.md` criado em `repos/sep-api/`; relatorio + METRICAS atualizados; AGENT.md ganha nota cavecrew-investigator pra sprints de hardening | Concluido |
+| 2026-05-27 | Pos-merge | Promocao `develop -> main` dos repos de codigo | `sep-api`, `sep-app`, `sep-mobile` | Merge manual realizado pelo desenvolvedor humano; verificacao com `git diff origin/main..origin/develop` retornou diff vazio nos tres repos | Concluido |
 
 ## Em andamento
 
 | Sprint/Task | Objetivo | Arquivos/modulos principais | Progresso | Pendencias |
 |-------------|----------|-----------------------------|-----------|------------|
-| — | — | — | Nenhuma task da Sprint 14 em andamento | — |
+| — | — | — | Nenhuma task em andamento | — |
 
 ## Validacao tecnica
 
@@ -153,12 +154,13 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | 2026-05-26 | Anti-abuso 3/24h eh "best effort" — race residual aceito sem `pg_advisory_xact_lock` | Operacao backoffice tem poucos operadores |
 | 2026-05-26 | Relatorio de acompanhamento atualizado a cada breakpoint do protocolo (PAUSA #1/#2/#3) | Solicitacao do usuario (working tree only) |
 | 2026-05-26 | Task 14.6 mantida em single-role; cumulatividade FINANCEIRO+BACKOFFICE adiada pra sprint futura (Epic 11) | Refactor multi-role afetaria Sprints 4-13 ja mergeadas — risco alto vs escopo Sprint 14 |
+| 2026-05-27 | `develop` promovida manualmente para `main` em `sep-api`, `sep-app` e `sep-mobile`; criterio de fechamento passa a ser conteudo equivalente entre branches remotas | Verificacao local apos `git fetch --all --prune`: `git diff origin/main..origin/develop` vazio nos tres repos |
 
 ## Proximos passos
 
-1. Revisar diff documental final da Sprint 14/Fase 2 em `docs-SEP`.
-2. Commit manual de `docs-SEP`, conforme regra operacional do projeto.
-3. Planejar a proxima frente a partir da Fase 2 backend concluida: Epic 13 web, Epic 14 mobile, Epic 15/Pix ou hardening operacional adiado.
+1. Planejar a proxima frente a partir da Fase 2 concluida em `main`: Epic 13 web, Epic 14 mobile, Epic 15/Pix ou uma sprint dedicada de follow-ups aceitos.
+2. Configurar branch protection nos tres repos, se ainda estiver pendente: proteger `develop`, exigir PR/status checks e ajustar estrategia de merge em `main`.
+3. Revisar a lista de follow-ups em "Riscos e pendencias" antes de abrir a proxima fase.
 
 ## Template para nova atualizacao
 

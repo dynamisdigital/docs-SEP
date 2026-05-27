@@ -6,7 +6,7 @@ Esta pasta contem os **steps** detalhados das sprints da Fase 2, alinhados aos s
 
 ```
 steps-fase-2/
-+-- backend/   # Sprints backend 005-014
++-- backend/   # Sprints backend 005-014 + hardening operacional 015
 +-- web/       # Steps web futuros da Fase 2, quando planejados
 +-- mobile/    # Steps mobile futuros da Fase 2, quando planejados
 ```
@@ -28,9 +28,11 @@ steps-fase-2/
 | Sprint 12 - Cobranca Parcelas + Agenda | [`backend/012-sprint-12-steps.md`](./backend/012-sprint-12-steps.md) | Concluida em 2026-05-22 |
 | Sprint 13 - Cobranca Inadimplencia | [`backend/013-sprint-13-steps.md`](./backend/013-sprint-13-steps.md) | Concluida em 2026-05-26 |
 | Sprint 14 - Backoffice Operacional | [`backend/014-sprint-14-steps.md`](./backend/014-sprint-14-steps.md) | Concluida em 2026-05-26 |
+| Sprint 15 - Hardening e Bug-Hunt | [`backend/015-sprint-15-hardening-steps.md`](./backend/015-sprint-15-hardening-steps.md) | Concluida em 2026-05-27 (pos-Fase-2, sem spec formal) |
 
 ## Regras
 
 - Steps continuam sendo criados just-in-time.
 - A Sprint 5 foi cross-stack, mas fica em `backend/` porque o backend foi o owner principal e concentra os contratos de seguranca.
+- A Sprint 15 foi uma sprint operacional de hardening pos-Fase-2; por isso possui step detalhado, mas nao possui spec formal em `specs/fase-2/`.
 - Quando uma sprint da Fase 2 tiver trilha web/mobile propria, criar subpasta/arquivo correspondente apenas quando o spec estiver aprovado.

@@ -1052,7 +1052,7 @@ steps-fase-1/
 +-- mobile/    # M-Sprints 2XX (specs/fase-1/200-204)
 
 steps-fase-2/
-+-- backend/   # Sprints backend 005-014
++-- backend/   # Sprints backend 005-014 + hardening operacional 015
 +-- web/       # Steps web futuros da Fase 2, quando planejados
 +-- mobile/    # Steps mobile futuros da Fase 2, quando planejados
 ```
@@ -1212,7 +1212,7 @@ Detalhamento das tasks:
 
 ### Trilha Fase 2 (Sprints 5-14)
 
-Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-14 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD, credito interno, Open Finance, formalizacao contratual, cobranca, inadimplencia e backoffice operacional. A Fase 2 backend foi concluida em 2026-05-26 com a Sprint 14 (`backoffice`) mergeada em `develop` via PR #63. Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois da estabilizacao dos contratos da API (decisao tomada em 2026-05-04).
+Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-14 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD, credito interno, Open Finance, formalizacao contratual, cobranca, inadimplencia e backoffice operacional. A Fase 2 backend foi concluida em 2026-05-26 com a Sprint 14 (`backoffice`) mergeada em `develop` via PR #63. Em 2026-05-27, a Sprint 15 de hardening/bug-hunt pos-Fase-2 foi concluida e os repos `sep-api`, `sep-app` e `sep-mobile` tiveram `develop` promovida para `main` manualmente, com conteudo equivalente entre as branches remotas. Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois da estabilizacao dos contratos da API (decisao tomada em 2026-05-04).
 
 Mapeamento Sprint → Epic:
 
@@ -1958,7 +1958,7 @@ Tabela executiva consolidando o planejamento e execucao da Fase 2 (Epics 5-9, Sp
 | 13 | Epic 8 (parte 2) | Cobranca — inadimplencia e recuperacao | [`013`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md) | `cobranca` |
 | 14 | Epic 9 | Backoffice operacional | [`014`](../specs/fase-2/014-sprint-14-backoffice-operacional.md) | `backoffice` |
 
-**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-14 foram concluidas no backend, encerrando a Fase 2 backend em 2026-05-26 com a Sprint 14). Dependencia linear mantida (cada sprint exigiu a anterior pronta). A partir da Sprint 6, a trilha foi exclusivamente backend nesta etapa; Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-14 foram concluidas no backend, encerrando a Fase 2 backend em 2026-05-26 com a Sprint 14). A Sprint 15 foi executada depois do fechamento funcional como hardening/bug-hunt pos-Fase-2, concluida em 2026-05-27. Na mesma data, `develop` foi promovida manualmente para `main` nos repos `sep-api`, `sep-app` e `sep-mobile`; a verificacao posterior mostrou diff vazio entre `origin/main` e `origin/develop` nos tres repos. Dependencia linear mantida (cada sprint exigiu a anterior pronta). A partir da Sprint 6, a trilha foi exclusivamente backend nesta etapa; Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 **Decisoes de planejamento**:
 - **Granularidade**: cada Epic 5-8 foi dividida em 2 sprints (parte 1 + parte 2) para reduzir risco de entrega; Epic 9 ficou em 1 sprint unica.

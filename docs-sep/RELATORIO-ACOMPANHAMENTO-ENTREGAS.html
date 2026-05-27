@@ -148,11 +148,11 @@
     <h1>Relatorio de Acompanhamento de Entregas - SEP</h1>
     <p class="subtitle">Painel executivo para acompanhar entregas, validacoes, reviews, riscos e proximos passos do projeto SEP.</p>
     <div class="meta-grid">
-      <div class="metric"><span>Fase</span><strong>Fase 2 backend concluida</strong></div>
-      <div class="metric"><span>Sprint atual</span><strong>Sprint 15 - Hardening + Bug-Hunt (concluida)</strong></div>
-      <div class="metric"><span>Repo principal</span><strong>sep-api</strong></div>
+      <div class="metric"><span>Fase</span><strong>Fase 2 concluida em main</strong></div>
+      <div class="metric"><span>Sprint atual</span><strong>Nenhuma sprint em execucao</strong></div>
+      <div class="metric"><span>Repo principal</span><strong>N/A</strong></div>
       <div class="metric"><span>Status geral</span><strong>Concluido</strong></div>
-      <div class="metric"><span>Ultima atualizacao</span><strong>2026-05-27 (Sprint 15 concluida: 27 findings triagiados, 11 P1/P2 fechados, baseline JaCoCo formal, escrow branches 50%-&gt;100%)</strong></div>
+      <div class="metric"><span>Ultima atualizacao</span><strong>2026-05-27 (Fase 2 + Sprint 15 promovidas para main; diff vazio entre origin/main e origin/develop nos 3 repos)</strong></div>
     </div>
   </header>
 
@@ -220,6 +220,7 @@
           <tr><td>2026-05-27</td><td>15.9</td><td>OpenAPI / role docs sync</td><td><code>sep-api</code></td><td><code>58068f4</code> + hotfix <code>35a6fa4</code>; 7 endpoints backoffice ganham mencao explicita de role em @Operation/@ApiResponse 403</td><td><span class="badge ok">Concluido</span></td></tr>
           <tr><td>2026-05-27</td><td>15.10</td><td>Coverage uplift escrow</td><td><code>sep-api</code></td><td><code>196f5d1</code> (sem hotfix); EscrowDomainValidationTest (6 testes); escrow branches 50% -&gt; 100%; todos modulos &gt; 70%</td><td><span class="badge ok">Concluido</span></td></tr>
           <tr><td>2026-05-27</td><td>15.11</td><td>SPRINT-15-PR + relatorio + METRICAS + AGENT.md</td><td><code>docs-SEP</code></td><td><code>7703eb2</code>; SPRINT-15-PR.md, ADR 0015, step file 015 + relatorio MD/HTML, METRICAS, SEGURANCA §14, AGENT.md</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-27</td><td>Pos-merge</td><td>Promocao develop -&gt; main dos repos de codigo</td><td><code>sep-api</code>, <code>sep-app</code>, <code>sep-mobile</code></td><td>Merge manual realizado pelo desenvolvedor humano; verificacao com <code>git diff origin/main..origin/develop</code> retornou diff vazio nos tres repos</td><td><span class="badge ok">Concluido</span></td></tr>
         </tbody>
       </table>
     </section>
@@ -229,7 +230,7 @@
       <table>
         <thead><tr><th>Sprint/Task</th><th>Objetivo</th><th>Arquivos/modulos principais</th><th>Progresso</th><th>Pendencias</th></tr></thead>
         <tbody>
-          <tr><td>—</td><td>—</td><td>—</td><td>Nenhuma task da Sprint 15 em andamento.</td><td>—</td></tr>
+          <tr><td>—</td><td>—</td><td>—</td><td>Nenhuma task em andamento.</td><td>—</td></tr>
         </tbody>
       </table>
     </section>
@@ -316,9 +317,9 @@
     <section>
       <h2>Proximos passos</h2>
       <ol>
-        <li>Aguardar merge do PR Sprint 15 (<code>feature/sprint-15-hardening-bughunt</code>) em <code>develop</code> via push/PR manuais do desenvolvedor humano.</li>
-        <li>Apos merge: planejar a proxima frente — Epic 13 (frontend de jornadas web), Epic 14 (Mobile SEP), Epic 15 (Pix/AWS) ou sprint dedicada de followups (observabilidade, samstevens, Testcontainers).</li>
-        <li>Revisar lista de 13 followups documentados em "Riscos e pendencias" antes do planejamento da proxima sprint.</li>
+        <li>Planejar a proxima frente a partir da Fase 2 concluida em <code>main</code>: Epic 13 web, Epic 14 mobile, Epic 15/Pix ou uma sprint dedicada de follow-ups aceitos.</li>
+        <li>Configurar branch protection nos tres repos, se ainda estiver pendente: proteger <code>develop</code>, exigir PR/status checks e ajustar estrategia de merge em <code>main</code>.</li>
+        <li>Revisar lista de follow-ups documentados em "Riscos e pendencias" antes do planejamento da proxima fase.</li>
       </ol>
     </section>
   </main>
