@@ -896,6 +896,12 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
 - refactor de `AuthController.me()` consumindo `ConsultarUsuarioUseCase` (atualmente injeta `UsuarioRepository` direto) — pode entrar como ajuste pequeno ou follow-up
 - detalhar a epic de Pix em artefatos proprios agora que a fundacao backend esta concluida (Sprint 4 entregou Webhook Receiver Pattern + Outbox stub; Sprint 5 entregou MFA + step-up que liberam transacoes sensiveis)
 - follow-ups especificos da Sprint 5 (nao bloqueantes): ADR de update Capacitor 8.3.x; migrar TOTP lib pra eliminar dep transitiva httpclient (Snyk); instalar plugin biometria nativo na fase Android/iOS; WebAuthn/Passkeys (Nivel 3 do ADR 0010) — futuro
+- **Planejamento inicial da Fase 3 criado em 2026-05-27** em `specs/fase-3/`, separado por projeto:
+  - backend `sep-api`: Sprints 16-21 (credora foundation, oportunidades/carteira, governanca, Pix foundation, Pix desembolso e Pix recebimento/conciliacao)
+  - web `sep-app`: F-Sprints 6-13 (onboarding, credito/Open Finance, formalizacao, cobranca, backoffice/financeiro, credora, governanca e Pix)
+  - mobile `sep-mobile`: M-Sprints 6-11 (tomador onboarding, credito, formalizacao, cobranca, credora e Pix visivel ao usuario)
+  - cada sprint possui no maximo 6 tasks de implementacao; precheck, E2E/smoke e docs nao contam nessa regra
+  - steps continuam just-in-time, criados somente quando a sprint for aprovada para execucao
 
 ## Observacao importante para outro agente
 

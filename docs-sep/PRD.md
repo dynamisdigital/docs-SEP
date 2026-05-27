@@ -1975,3 +1975,49 @@ Tabela executiva consolidando o planejamento e execucao da Fase 2 (Epics 5-9, Sp
 - ADR 0014 — Estrategia de notificacoes transacionais (Sprint 13) — gate da Sprint 13
 
 **Steps**: continuam sendo gerados just-in-time, antes da execucao de cada sprint (regra do `AGENT.md`). A Fase 2 nao gera steps em massa.
+
+## 30. Mapeamento Fase 3: Projetos × Sprints
+
+Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte da Fase 2 concluida em `main` e separa sprints por projeto (`sep-api`, `sep-app`, `sep-mobile`). Cada sprint foi planejada com no maximo 6 tasks de implementacao; precheck, E2E/smoke e documentacao nao entram nessa contagem.
+
+### Backend (`sep-api`)
+
+| Sprint | Epic/frente | Tema | Spec | Tasks impl. |
+|--------|-------------|------|------|-------------|
+| 16 | Epic 10 | Jornada credora foundation | [`016`](../specs/fase-3/016-sprint-16-credora-foundation.md) | 6 |
+| 17 | Epic 10 | Oportunidades e carteira da credora | [`017`](../specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) | 6 |
+| 18 | Epic 11 | Administracao e governanca avancada | [`018`](../specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) | 6 |
+| 19 | Epic 15 | Pix foundation + EscrowProvider | [`019`](../specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) | 6 |
+| 20 | Epic 15 | Pix desembolso assistido | [`020`](../specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) | 5 |
+| 21 | Epic 15 | Pix recebimento e conciliacao | [`021`](../specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 6 |
+
+### Web (`sep-app`)
+
+| Sprint | Epic/frente | Tema | Spec | Tasks impl. |
+|--------|-------------|------|------|-------------|
+| F-6 | Epic 13 | Jornada onboarding PF/PJ | [`106`](../specs/fase-3/106-fsprint-6-onboarding-web.md) | 6 |
+| F-7 | Epic 13 | Propostas, credito e Open Finance | [`107`](../specs/fase-3/107-fsprint-7-credito-open-finance-web.md) | 6 |
+| F-8 | Epic 13 | Formalizacao, assinatura e CCB | [`108`](../specs/fase-3/108-fsprint-8-formalizacao-web.md) | 5 |
+| F-9 | Epic 13 | Cobranca, parcelas e inadimplencia | [`109`](../specs/fase-3/109-fsprint-9-cobranca-web.md) | 6 |
+| F-10 | Epic 13 | Backoffice e financeiro operacional | [`110`](../specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md) | 6 |
+| F-11 | Epic 10/13 | Jornada empresa credora | [`111`](../specs/fase-3/111-fsprint-11-credora-web.md) | 6 |
+| F-12 | Epic 11/13 | Administracao e governanca avancada | [`112`](../specs/fase-3/112-fsprint-12-governanca-web.md) | 5 |
+| F-13 | Epic 13/15 | Pix operacional no web | [`113`](../specs/fase-3/113-fsprint-13-pix-web.md) | 5 |
+
+### Mobile (`sep-mobile`)
+
+| Sprint | Epic/frente | Tema | Spec | Tasks impl. |
+|--------|-------------|------|------|-------------|
+| M-6 | Epic 14 | Tomador: onboarding mobile | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) | 6 |
+| M-7 | Epic 14 | Tomador: proposta, credito e Open Finance | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) | 6 |
+| M-8 | Epic 14 | Tomador: formalizacao e contrato | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) | 5 |
+| M-9 | Epic 14 | Tomador: parcelas e cobranca | [`209`](../specs/fase-3/209-msprint-9-cobranca-mobile.md) | 6 |
+| M-10 | Epic 14 | Empresa credora mobile | [`210`](../specs/fase-3/210-msprint-10-credora-mobile.md) | 6 |
+| M-11 | Epic 14/15 | Pix visivel ao usuario | [`211`](../specs/fase-3/211-msprint-11-pix-mobile.md) | 5 |
+
+**Decisoes de planejamento**:
+- **Separacao por projeto**: backend, web e mobile possuem specs proprios e podem evoluir com dependencias explicitas.
+- **Granularidade menor**: quando um tema exigiria mais de 6 tasks de implementacao, ele foi dividido em sprints separadas.
+- **Steps just-in-time**: esta secao cria o mapa de specs; os steps continuam sendo criados apenas antes da execucao de cada sprint.
+- **Mobile restrito**: mobile cobre tomador e empresa credora; financeiro interno, backoffice operacional, administracao completa e auditoria continuam fora do app.
+- **Infraestrutura AWS**: permanece trilha paralela candidata, nao mapeada como sprint funcional nesta tabela.

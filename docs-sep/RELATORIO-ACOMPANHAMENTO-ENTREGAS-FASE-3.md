@@ -12,7 +12,7 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 |-------|-------------|
 | Produto | SEP |
 | Fase | Fase 3 - Jornadas e capacidades pos-Fase-2 |
-| Status | Planejamento pausado |
+| Status | Specs planejados; steps ainda just-in-time |
 | Data de abertura | 2026-05-27 |
 | Base de entrada | Fase 2 concluida em `main` nos repos `sep-api`, `sep-app` e `sep-mobile` |
 | Fonte de fechamento anterior | [`RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](./RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) |
@@ -100,13 +100,14 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 | 2026-05-27 | Planejamento da Fase 3 foi pausado para confirmar fechamento da Fase 2 | Conversa operacional |
 | 2026-05-27 | Fase 2 foi considerada concluida em `main` apos merge manual e diff vazio entre `origin/main` e `origin/develop` nos tres repos de codigo | Verificacao local |
 | 2026-05-27 | Este relatorio passa a ser o painel exclusivo de acompanhamento da Fase 3 | Solicitacao do usuario |
+| 2026-05-27 | Specs da Fase 3 criados por projeto: 6 backend, 8 web e 6 mobile, todos com ate 6 tasks de implementacao | `specs/fase-3/README.md` |
 
 ## Proximos passos
 
-1. Definir se a primeira frente da Fase 3 sera Epic 13 web, Epic 14 mobile, Epic 15/Pix, Epic 10 credora ou Epic 11 governanca.
-2. Criar specs em `specs/fase-3/` somente apos confirmacao do escopo.
-3. Criar steps just-in-time para a primeira sprint aprovada, respeitando o limite de ate 6 tasks de implementacao por sprint.
-4. Reclassificar os itens adiados acima como `entra na Fase 3`, `continua adiado`, `descartado` ou `dependencia externa`.
+1. Escolher qual sprint da Fase 3 sera executada primeiro.
+2. Criar o step just-in-time da primeira sprint aprovada.
+3. Reclassificar os itens adiados acima como `entra na Fase 3`, `continua adiado`, `descartado` ou `dependencia externa`.
+4. Atualizar este relatorio quando a primeira sprint entrar em execucao.
 
 ## Template para atualizacao
 

@@ -5,7 +5,8 @@ Os specs do projeto SEP estao organizados em subpastas por fase do produto:
 ```
 specs/
 ├── fase-1/   # Fundacao tecnica (Sprints 0-4 backend, F-Sprints 0-4 web, M-Sprints 0-4 mobile)
-└── fase-2/   # Jornada de contratacao do emprestimo (Sprints 5-14, apenas backend)
+├── fase-2/   # Jornada de contratacao do emprestimo (Sprints 5-14, apenas backend)
+└── fase-3/   # Jornadas e capacidades pos-Fase-2 (backend, web e mobile)
 ```
 
 ## Fase 1 — Fundacao Tecnica (15 specs)
@@ -58,6 +59,44 @@ Apenas backend. Web e Mobile da Fase 2 entram em planejamento separado depois qu
 
 Ver tambem: [PRD §22 (Backlog Tecnico)](../docs-sep/PRD.md), [PRD §29 (Mapeamento Fase 2)](../docs-sep/PRD.md).
 
+## Fase 3 — Jornadas e capacidades pos-Fase-2 (20 specs)
+
+Specs separados por projeto, com ate 6 tasks de implementacao por sprint. Precheck, E2E/smoke e docs nao contam no limite.
+
+Ver indice completo em [`fase-3/README.md`](./fase-3/README.md).
+
+### Backend (6 specs)
+| Sprint | Arquivo | Tema |
+|--------|---------|------|
+| 16 | [`fase-3/016-sprint-16-credora-foundation.md`](./fase-3/016-sprint-16-credora-foundation.md) | Jornada credora foundation |
+| 17 | [`fase-3/017-sprint-17-credora-oportunidades-carteira.md`](./fase-3/017-sprint-17-credora-oportunidades-carteira.md) | Oportunidades e carteira da credora |
+| 18 | [`fase-3/018-sprint-18-governanca-rbac-parametros.md`](./fase-3/018-sprint-18-governanca-rbac-parametros.md) | Administracao e governanca avancada |
+| 19 | [`fase-3/019-sprint-19-pix-foundation-escrow-provider.md`](./fase-3/019-sprint-19-pix-foundation-escrow-provider.md) | Pix foundation + EscrowProvider |
+| 20 | [`fase-3/020-sprint-20-pix-desembolso-assistido.md`](./fase-3/020-sprint-20-pix-desembolso-assistido.md) | Pix desembolso assistido |
+| 21 | [`fase-3/021-sprint-21-pix-recebimento-conciliacao.md`](./fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | Pix recebimento e conciliacao |
+
+### Web (8 specs)
+| Sprint | Arquivo | Tema |
+|--------|---------|------|
+| F-6 | [`fase-3/106-fsprint-6-onboarding-web.md`](./fase-3/106-fsprint-6-onboarding-web.md) | Jornada onboarding PF/PJ |
+| F-7 | [`fase-3/107-fsprint-7-credito-open-finance-web.md`](./fase-3/107-fsprint-7-credito-open-finance-web.md) | Propostas, credito e Open Finance |
+| F-8 | [`fase-3/108-fsprint-8-formalizacao-web.md`](./fase-3/108-fsprint-8-formalizacao-web.md) | Formalizacao, assinatura e CCB |
+| F-9 | [`fase-3/109-fsprint-9-cobranca-web.md`](./fase-3/109-fsprint-9-cobranca-web.md) | Cobranca, parcelas e inadimplencia |
+| F-10 | [`fase-3/110-fsprint-10-backoffice-financeiro-web.md`](./fase-3/110-fsprint-10-backoffice-financeiro-web.md) | Backoffice e financeiro operacional |
+| F-11 | [`fase-3/111-fsprint-11-credora-web.md`](./fase-3/111-fsprint-11-credora-web.md) | Jornada empresa credora |
+| F-12 | [`fase-3/112-fsprint-12-governanca-web.md`](./fase-3/112-fsprint-12-governanca-web.md) | Administracao e governanca avancada |
+| F-13 | [`fase-3/113-fsprint-13-pix-web.md`](./fase-3/113-fsprint-13-pix-web.md) | Pix operacional no web |
+
+### Mobile (6 specs)
+| Sprint | Arquivo | Tema |
+|--------|---------|------|
+| M-6 | [`fase-3/206-msprint-6-onboarding-mobile.md`](./fase-3/206-msprint-6-onboarding-mobile.md) | Tomador: onboarding mobile |
+| M-7 | [`fase-3/207-msprint-7-credito-mobile.md`](./fase-3/207-msprint-7-credito-mobile.md) | Tomador: proposta, credito e Open Finance |
+| M-8 | [`fase-3/208-msprint-8-formalizacao-mobile.md`](./fase-3/208-msprint-8-formalizacao-mobile.md) | Tomador: formalizacao e contrato |
+| M-9 | [`fase-3/209-msprint-9-cobranca-mobile.md`](./fase-3/209-msprint-9-cobranca-mobile.md) | Tomador: parcelas e cobranca |
+| M-10 | [`fase-3/210-msprint-10-credora-mobile.md`](./fase-3/210-msprint-10-credora-mobile.md) | Empresa credora mobile |
+| M-11 | [`fase-3/211-msprint-11-pix-mobile.md`](./fase-3/211-msprint-11-pix-mobile.md) | Pix visivel ao usuario |
+
 ## Convencoes de numeracao
 
 - `0XX-` → backend
@@ -67,4 +106,4 @@ Ver tambem: [PRD §22 (Backlog Tecnico)](../docs-sep/PRD.md), [PRD §29 (Mapeame
 
 ## Fases futuras
 
-Quando uma Fase 3 ou superior for planejada, criar nova subpasta `fase-3/` (e assim por diante) seguindo o mesmo padrao.
+Quando uma Fase 4 ou superior for planejada, criar nova subpasta `fase-4/` (e assim por diante) seguindo o mesmo padrao.

@@ -67,10 +67,11 @@ Leitura base para qualquer agente:
 | `cobranca` | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) | [`012`](steps-fase-2/backend/012-sprint-12-steps.md) (implementada) + [`013`](steps-fase-2/backend/013-sprint-13-steps.md) | 0001, 0005, 0007, 0014 |
 | `backoffice` | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) | [`014`](steps-fase-2/backend/014-sprint-14-steps.md) | 0001, 0007 |
 | Hardening pos-Fase-2 | [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) + [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) | [`015`](steps-fase-2/backend/015-sprint-15-hardening-steps.md) | 0001, 0007, 0015 |
-| `escrow` | [`repos/sep-api/COBRANCA.md` §escrow](repos/sep-api/COBRANCA.md) (use case publico Sprint 12) + specs futuras | Sprint 12 (parte local) e Epic 15 (Celcoin) | 0005, 0007 |
-| `financeiro` / Pix | PRD + specs futuras | Sprints futuras | 0005, 0007 |
-| Web | [`repos/sep-app/README.md`](repos/sep-app/README.md) | `specs/fase-1/100-*` a `104-*`; `steps-fase-1/web/` | 0002, 0003, 0011 |
-| Mobile | [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) | `specs/fase-1/200-*` a `204-*`; `steps-fase-1/mobile/` | 0003, 0009, 0010, 0011 |
+| `credores` | PRD Epic 10 + [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) | [`016`](specs/fase-3/016-sprint-16-credora-foundation.md), [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) | 0001, 0007 |
+| `escrow` | [`repos/sep-api/COBRANCA.md` §escrow](repos/sep-api/COBRANCA.md) (use case publico Sprint 12) + specs Fase 3 | Sprint 12 (parte local), [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0005, 0007 |
+| `financeiro` / Pix | PRD Epic 15 + [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) | [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md), [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0005, 0007 |
+| Web | [`repos/sep-app/README.md`](repos/sep-app/README.md) | `specs/fase-1/100-*` a `104-*`; `specs/fase-3/106-*` a `113-*`; `steps-fase-1/web/` | 0002, 0003, 0011 |
+| Mobile | [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) | `specs/fase-1/200-*` a `204-*`; `specs/fase-3/206-*` a `211-*`; `steps-fase-1/mobile/` | 0003, 0009, 0010, 0011, 0015 |
 
 ## Se a tarefa menciona...
 
@@ -83,6 +84,8 @@ Leitura base para qualquer agente:
 | cobranca, parcelas, agenda, recebimento, idempotency-key, escrow movimentacao | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`012-sprint-12-steps.md`](steps-fase-2/backend/012-sprint-12-steps.md) |
 | inadimplencia, renegociacao, notificacao de cobranca, Zenvia, SMS | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`repos/sep-api/NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) + [`013-sprint-13-steps.md`](steps-fase-2/backend/013-sprint-13-steps.md) |
 | fila operacional, backoffice, reprocesso, dashboard interno | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) + [`014-sprint-14-steps.md`](steps-fase-2/backend/014-sprint-14-steps.md) |
+| empresa credora, oportunidades, carteira, aportes | [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) + [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) + [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) |
+| Pix, desembolso, recebimento Pix, conciliacao Pix | [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) + [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) + [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) |
 | KYC, KYB, documentos, Celcoin onboarding | [`repos/sep-api/ONBOARDING.md`](repos/sep-api/ONBOARDING.md) |
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |
 | MFA, TOTP, refresh, step-up, auditoria de seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) |
