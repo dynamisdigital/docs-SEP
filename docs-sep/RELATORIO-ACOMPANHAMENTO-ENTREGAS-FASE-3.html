@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relatorio de Acompanhamento de Entregas - Fase 3</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f5f4;
+      --surface: #ffffff;
+      --text: #242424;
+      --muted: #66615d;
+      --border: #dedbd7;
+      --accent: #2563eb;
+      --ok: #116329;
+      --warn: #8a4b00;
+      --risk: #9f1239;
+      --info: #075985;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    header,
+    main {
+      width: min(1180px, calc(100vw - 48px));
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 36px 0 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.15;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 22px;
+    }
+
+    h3 {
+      margin: 24px 0 12px;
+      font-size: 17px;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--muted);
+    }
+
+    section {
+      margin: 0 0 20px;
+      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .subtitle {
+      max-width: 920px;
+      font-size: 16px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .metric {
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 15px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      background: #fbfaf9;
+    }
+
+    code {
+      padding: 1px 4px;
+      background: #f0efed;
+      border-radius: 4px;
+      font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.92em;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid currentColor;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .risk { color: var(--risk); }
+    .info { color: var(--info); }
+
+    ol {
+      margin: 0;
+      padding-left: 22px;
+    }
+
+    li + li {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 900px) {
+      header,
+      main {
+        width: min(100vw - 24px, 1180px);
+      }
+
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Relatorio de Acompanhamento de Entregas - Fase 3</h1>
+    <p class="subtitle">Painel executivo exclusivo para acompanhar a Fase 3 do SEP, seus candidatos de escopo, pendencias herdadas e proximos passos.</p>
+    <div class="meta-grid">
+      <div class="metric"><span>Produto</span><strong>SEP</strong></div>
+      <div class="metric"><span>Fase</span><strong>Fase 3 - Jornadas e capacidades pos-Fase-2</strong></div>
+      <div class="metric"><span>Status</span><strong>Planejamento pausado</strong></div>
+      <div class="metric"><span>Base</span><strong>Fase 2 concluida em main</strong></div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>Objetivo</h2>
+      <p>Consolidar o que ficou pronto nas Fases 1 e 2, o que foi adiado para depois delas e os candidatos de escopo para as proximas sprints da Fase 3.</p>
+      <p>Este relatorio nao substitui PRD, specs, steps, ADRs ou docs operacionais.</p>
+    </section>
+
+    <section>
+      <h2>Baseline de entrada</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Frente</th><th>Estado ao entrar na Fase 3</th><th>Evidencia</th></tr></thead>
+          <tbody>
+            <tr><td>Backend Fase 2</td><td>Concluido em <code>main</code>; APIs de onboarding, credito, Open Finance, contratos, CCB, cobranca, inadimplencia e backoffice estabilizadas.</td><td>PRD §29, CONTEXT, relatorio geral.</td></tr>
+            <tr><td>Sprint 15 hardening</td><td>Concluida; 27 findings triagiados, 11 P1/P2 corrigidos, baseline JaCoCo formal, <code>escrow</code> branch coverage 50% -&gt; 100%.</td><td><code>steps-fase-2/backend/015-sprint-15-hardening-steps.md</code>.</td></tr>
+            <tr><td>Web foundation</td><td>F-Sprints 0-5 concluidas; shell autenticado Notion, auth real, MFA/refresh/step-up e telas iniciais prontas.</td><td>PRD Epic 12, specs 100-104, CONTEXT.</td></tr>
+            <tr><td>Mobile foundation</td><td>M-Sprints 0-5 concluidas; shell mobile, auth real, MFA/refresh e cascas tomador/credora prontas.</td><td>PRD Epic 14, specs 200-204, CONTEXT.</td></tr>
+            <tr><td>Repos de codigo</td><td><code>develop</code> promovida para <code>main</code>; diff vazio entre <code>origin/main</code> e <code>origin/develop</code> nos tres repos.</td><td>Verificacao 2026-05-27 apos <code>git fetch --all --prune</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Escopo candidato</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Prioridade</th><th>Epic/frente</th><th>Objetivo</th><th>Observacao</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Epic 13 - Frontend de Jornadas</td><td>Implementar jornadas web consumindo APIs da Fase 2.</td><td><span class="badge info">Candidata natural</span></td></tr>
+            <tr><td>2</td><td>Epic 14 - Mobile SEP Fase 2+</td><td>Implementar jornadas mobile do tomador e empresa credora.</td><td>Exclui financeiro, backoffice, admin completo e auditoria.</td></tr>
+            <tr><td>3</td><td>Epic 10 - Jornada da empresa credora</td><td>Modelar e expor capacidades da empresa que aporta recursos.</td><td>Pode exigir backend novo.</td></tr>
+            <tr><td>4</td><td>Epic 11 - Administracao e governanca</td><td>Evoluir RBAC, parametros, cadastros mestres e auditoria administrativa.</td><td>Carrega pendencia de multi-role.</td></tr>
+            <tr><td>5</td><td>Epic 15 - Pix</td><td>Automatizar desembolso, recebimento e conciliacao via Pix/Celcoin.</td><td>Iniciar por recorte assistido.</td></tr>
+            <tr><td>Paralela</td><td>Epic 16 - Infraestrutura AWS</td><td>Planejar ambientes remotos, RDS, EC2, deploy e observabilidade.</td><td>Nao precisa bloquear jornadas locais.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Itens adiados</h2>
+      <h3>Produto e jornadas</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Acao recomendada</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Web das jornadas funcionais</td><td>Planejar F-Sprints da Epic 13 a partir dos contratos estabilizados.</td><td><span class="badge info">Candidato</span></td></tr>
+            <tr><td>Mobile das jornadas funcionais</td><td>Planejar M-Sprints para tomador e credora, sem backoffice/admin mobile.</td><td><span class="badge info">Candidato</span></td></tr>
+            <tr><td>Jornada da empresa credora</td><td>Definir contratos de oportunidades, carteira, aportes e operacoes financiadas.</td><td><span class="badge info">Candidato</span></td></tr>
+            <tr><td>Governanca avancada</td><td>Definir RBAC evoluido, parametros e auditoria administrativa.</td><td><span class="badge info">Candidato</span></td></tr>
+            <tr><td>Pix assistido</td><td>Detalhar providers, entidades, endpoints e webhooks antes da implementacao.</td><td><span class="badge info">Candidato</span></td></tr>
+            <tr><td>Infraestrutura AWS</td><td>Planejar separadamente se houver necessidade de ambiente remoto.</td><td><span class="badge info">Candidato paralelo</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Backend e integracoes</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Acao recomendada</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Strategies reais de reprocesso de provider</td><td>Conectar strategies aos use cases reais dos modulos donos.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Handler real por provider/event no reprocesso webhook</td><td>Substituir processamento generico por roteamento real dos eventos suportados.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Multi-role FINANCEIRO + BACKOFFICE</td><td>Refatorar modelo de roles/permissoes antes de governanca avancada.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Retry/DLQ tecnico em listeners</td><td>Escalar falhas para backoffice ou fila tecnica em sprint de observabilidade.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Step-up estrito sem bypass MFA</td><td>Decidir ADR ou annotation <code>@RequireStepUpEstrita</code> antes de operacoes mais sensiveis.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Schema validation de audit payload</td><td>Criar <code>AuditPayloadSchema</code> e migration futura se necessario.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Refactor AuthController.me()</td><td>Trocar acesso direto a repository por <code>ConsultarUsuarioUseCase</code>.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Qualidade, testes e operacao</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Acao recomendada</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>OOM em PldFollowupIT no full run</td><td>Ajustar <code>org.gradle.jvmargs=-Xmx2g</code> ou isolar suite pesada.</td><td><span class="badge warn">Aberto/pre-existente</span></td></tr>
+            <tr><td>Testcontainers + Docker Engine 28+</td><td>Aguardar compatibilidade ou fixar estrategia alternativa.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>E2E cross-repo</td><td>Planejar pipeline orquestrado em infra/observabilidade.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Branch protection</td><td>Proteger <code>develop</code>, exigir PR/status checks e alinhar estrategia de merge.</td><td><span class="badge warn">Aberto/operacional</span></td></tr>
+            <tr><td>Smoke real Celcoin sandbox</td><td>Executar quando houver credenciais e alinhamento com contratos reais.</td><td><span class="badge warn">Dependencia externa</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Seguranca e mobile</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Acao recomendada</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Migrar lib TOTP samstevens</td><td>Eliminar dependencia transitiva <code>httpclient</code> quando houver sprint de seguranca.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Plugin de biometria nativo</td><td>Instalar e validar na fase Android/iOS, nao no PWA.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>WebAuthn/Passkeys</td><td>Manter como evolucao posterior de autenticacao forte.</td><td><span class="badge info">Futuro</span></td></tr>
+            <tr><td>ADR 0015 Capacitor 8.3.x</td><td>Aceitar/formalizar quando a trilha mobile reabrir.</td><td><span class="badge info">Proposto</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Decisoes de entrada</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Data</th><th>Decisao</th><th>Fonte</th></tr></thead>
+          <tbody>
+            <tr><td>2026-05-27</td><td>Planejamento da Fase 3 foi pausado para confirmar fechamento da Fase 2.</td><td>Conversa operacional.</td></tr>
+            <tr><td>2026-05-27</td><td>Fase 2 foi considerada concluida em <code>main</code> apos merge manual e diff vazio entre <code>origin/main</code> e <code>origin/develop</code> nos tres repos.</td><td>Verificacao local.</td></tr>
+            <tr><td>2026-05-27</td><td>Este relatorio passa a ser o painel exclusivo de acompanhamento da Fase 3.</td><td>Solicitacao do usuario.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Proximos passos</h2>
+      <ol>
+        <li>Definir se a primeira frente da Fase 3 sera Epic 13 web, Epic 14 mobile, Epic 15/Pix, Epic 10 credora ou Epic 11 governanca.</li>
+        <li>Criar specs em <code>specs/fase-3/</code> somente apos confirmacao do escopo.</li>
+        <li>Criar steps just-in-time para a primeira sprint aprovada, respeitando o limite de ate 6 tasks de implementacao por sprint.</li>
+        <li>Reclassificar os itens adiados como entra na Fase 3, continua adiado, descartado ou dependencia externa.</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

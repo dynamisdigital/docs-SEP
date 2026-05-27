@@ -49,7 +49,7 @@ Leitura base para qualquer agente:
 | Integracao externa | Base -> ADR 0004 -> ADR 0008 quando houver WireMock -> doc operacional do modulo -> specs/steps da integracao |
 | Seguranca/auth/step-up/auditoria | Base -> `docs-sep/SEGURANCA.md` -> specs/steps da Sprint 5 -> docs do modulo afetado |
 | Metricas de implementacao | Base -> [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) -> step da sprint -> relatorios/testes do repo |
-| Acompanhamento de entregas | Base -> [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) -> [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) -> step da sprint |
+| Acompanhamento de entregas | Base -> [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) -> [`Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) -> [`Fase 3 HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.html) -> [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) -> step da sprint |
 | Fechamento de sprint | Step da sprint -> doc operacional do modulo -> PR description temporaria, se o PR real precisar -> PRD -> collections -> este roadmap |
 | Melhoria de fim de fase / bug hunt | Base -> PRD/CONTEXT da fase -> relatorio de acompanhamento -> steps/specs da fase -> docs operacionais -> [`TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`](docs-sep/TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md) |
 
@@ -90,7 +90,7 @@ Leitura base para qualquer agente:
 | mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) |
 | pipeline, CI, deploy | [`docs-sep/ci-pipelines/README.md`](docs-sep/ci-pipelines/README.md) |
 | metricas, produtividade, progresso, DORA, SPACE, dashboard da sprint | [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |
-| relatorio de entregas, acompanhamento, status report, indicadores para stakeholders | [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) + [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) |
+| relatorio de entregas, acompanhamento, status report, indicadores para stakeholders | [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) + [`Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) + [`Fase 3 HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.html) + [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) |
 
 ## Checklists rapidos
 
