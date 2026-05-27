@@ -11,6 +11,8 @@ O `AI-ROADMAP.md` deve estar sempre atualizado.
 - Toda mudanca que criar, mover, remover ou alterar a finalidade de documentacao relevante
   deve atualizar este roadmap no mesmo ciclo.
 - Toda sprint concluida deve revisar este roadmap antes do fechamento.
+- Todo fim de fase que disparar melhoria de codigo/bug hunt deve gerar um plano Markdown
+  de tasks antes de qualquer implementacao.
 - Todo novo modulo, doc operacional, spec, step, ADR, collection ou template relevante deve
   ser linkado aqui.
 - Se este roadmap divergir da estrutura real, o agente deve corrigir a documentacao ou
@@ -49,6 +51,7 @@ Leitura base para qualquer agente:
 | Metricas de implementacao | Base -> [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) -> step da sprint -> relatorios/testes do repo |
 | Acompanhamento de entregas | Base -> [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) -> [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) -> step da sprint |
 | Fechamento de sprint | Step da sprint -> doc operacional do modulo -> PR description temporaria, se o PR real precisar -> PRD -> collections -> este roadmap |
+| Melhoria de fim de fase / bug hunt | Base -> PRD/CONTEXT da fase -> relatorio de acompanhamento -> steps/specs da fase -> docs operacionais -> [`TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`](docs-sep/TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md) |
 
 ## Mapa por modulo
 
@@ -97,6 +100,7 @@ Leitura base para qualquer agente:
 - Confirmar doc operacional do modulo, se existir.
 - Verificar se a mudanca altera contrato REST, migration, evento, provider, collection ou regra de seguranca.
 - Planejar atualizacao documental junto da implementacao quando houver mudanca de comportamento.
+- Se a tarefa vier de melhoria de fim de fase, confirmar que existe plano Markdown aprovado pelo usuario.
 
 ### Antes de fazer code review
 
@@ -121,6 +125,13 @@ Leitura base para qualquer agente:
 - Atualizar PRD quando a sprint for concluida.
 - Atualizar collections Postman/Insomnia se endpoints mudaram.
 - Revisar este roadmap.
+
+### Antes de iniciar nova fase
+
+- Verificar se a fase anterior foi marcada como concluida no PRD/CONTEXT e no relatorio de acompanhamento.
+- Se o usuario solicitar melhoria de fim de fase, trabalhar em modo plano e criar um arquivo `docs-sep/PLANO-MELHORIA-FIM-FASE-<N>.md` baseado no template.
+- Classificar achados em bugs P0/P1, melhorias pequenas, dividas aceitas e backlog adiado.
+- Aguardar aprovacao explicita antes de implementar qualquer task do plano.
 
 ## Nao faca
 

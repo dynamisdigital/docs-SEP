@@ -105,6 +105,15 @@ Arquivos de PR description:
 - Ao iniciar uma nova sprint, apagar os `SPRINT-*-PR.md` da sprint anterior que ja foram usados no PR. O historico definitivo deve permanecer no PR do GitHub, no step da sprint, no doc operacional do modulo, no PRD/CONTEXT e no relatorio de acompanhamento.
 - Nao manter links permanentes para `SPRINT-*-PR.md` em docs operacionais, PRD, CONTEXT ou AI-ROADMAP.
 
+Melhoria de fim de fase:
+
+- Ao encerrar uma fase, antes de iniciar a fase seguinte, executar uma rotina de melhoria de codigo e busca de bugs quando o usuario solicitar.
+- Esta rotina deve comecar obrigatoriamente em modo plano. O agente nao implementa correcoes nessa etapa inicial.
+- O agente deve revisar PRD, CONTEXT, relatorio de acompanhamento, specs/steps da fase encerrada, docs operacionais, status dos repos, diffs entre branches relevantes e resultados de testes/CI disponiveis.
+- O resultado deve ser um arquivo Markdown de plano com tasks, usando como base `docs-sep/TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`. O arquivo concreto deve usar nome claro, por exemplo `docs-sep/PLANO-MELHORIA-FIM-FASE-2.md`.
+- O plano deve separar bugs P0/P1, melhorias de baixo risco, dividas tecnicas aceitas, itens adiados e validacoes necessarias.
+- Implementacao de qualquer task desse plano so pode ocorrer apos aprovacao explicita do usuario.
+
 ## Arquitetura e stack
 
 Backend:
