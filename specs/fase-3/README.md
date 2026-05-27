@@ -48,10 +48,11 @@ Fase 3 cobre as jornadas e capacidades posteriores ao fechamento da Fase 2 em `m
 
 ## Dependencias gerais
 
-- Web F-6 a F-10 dependem das APIs backend da Fase 2.
-- Web F-11 depende das Sprints backend 16-17.
+- Web F-6 a F-10 dependem das APIs backend da Fase 2; reprocessos da F-10 exigem handler real backend por provider/event.
+- Web F-11 depende das Sprints backend 16-17 e do contrato de autorizacao/ownership da credora, entregue na Sprint 16 ou complementado pela Sprint 18.
 - Web F-12 depende da Sprint backend 18.
 - Web F-13 depende das Sprints backend 19-21.
 - Mobile M-6 a M-9 dependem das APIs backend da Fase 2.
-- Mobile M-10 depende das Sprints backend 16-17.
+- Mobile M-10 depende das Sprints backend 16-17 e do contrato de autorizacao/ownership da credora, entregue na Sprint 16 ou complementado pela Sprint 18.
 - Mobile M-11 depende das Sprints backend 19-21.
+- Backend Sprint 20 depende da decisao de step-up estrito sem bypass MFA antes de qualquer desembolso assistido.

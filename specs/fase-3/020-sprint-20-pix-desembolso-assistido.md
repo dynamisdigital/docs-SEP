@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 15
 - **Trilha**: Backend (`sep-api`)
 - **Origem**: PRD Epic 15
-- **Depende de**: [`019-sprint-19-pix-foundation-escrow-provider.md`](./019-sprint-19-pix-foundation-escrow-provider.md)
+- **Depende de**: [`019-sprint-19-pix-foundation-escrow-provider.md`](./019-sprint-19-pix-foundation-escrow-provider.md) + decisao de step-up estrito sem bypass MFA resolvida na Sprint 18 ou em precheck bloqueante
 - **Responsavel principal**: Dev Senior
 
 ## Objetivo
@@ -22,7 +22,7 @@ Permitir desembolso Pix assistido apos contrato assinado e validacoes operaciona
 - Validar contrato assinado, agenda criada e ausencia de desembolso duplicado.
 - Enviar transferencia via `PixProvider`.
 - Consultar status e registrar eventos de liquidacao/falha.
-- Reprocesso operacional via backoffice.
+- Reprocesso operacional via backoffice, apenas se os handlers reais de provider/event estiverem disponiveis.
 
 ### Fora de escopo
 - Desembolso automatico sem operador.
@@ -39,7 +39,7 @@ Permitir desembolso Pix assistido apos contrato assinado e validacoes operaciona
 
 ## Gates que nao contam como task
 
-- Precheck de dados de contrato assinado.
+- Precheck de dados de contrato assinado e decisao de step-up estrito sem bypass MFA.
 - Smoke REST desembolso pendente -> liquidado/falhou via Fake.
 - Documentacao e collections.
 

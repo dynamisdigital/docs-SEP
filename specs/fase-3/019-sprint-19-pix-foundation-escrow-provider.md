@@ -13,14 +13,14 @@
 
 ## Objetivo
 
-Preparar o modulo `pix` e plugar a abstracao real de `EscrowProvider`, mantendo Celcoin isolado por ports/adapters e Fake provider para ambiente local.
+Preparar o modulo `pix` e evoluir o `EscrowProvider` ja existente no modulo `escrow` com adapter Celcoin, mantendo Celcoin isolado por ports/adapters e Fake provider para ambiente local.
 
 ## Escopo
 
 ### Em escopo
 - Modulo `pix` com entidades base e estados operacionais.
 - Port `PixProvider` e adapters Fake/Celcoin skeleton.
-- Port `EscrowProvider` funcional para criar/consultar conta e wallet.
+- Adapter Celcoin para o `EscrowProvider` existente no modulo `escrow`, funcional para criar/consultar conta e wallet.
 - Webhook receiver dedicado para eventos Pix/Celcoin.
 - Idempotencia e auditoria reforcada.
 
@@ -33,8 +33,8 @@ Preparar o modulo `pix` e plugar a abstracao real de `EscrowProvider`, mantendo 
 
 1. Modelar `PixTransferencia`, `PixRecebimento`, `PixWebhookEvent` e estados.
 2. Criar migrations, repositories e constraints de idempotencia.
-3. Definir ports `PixProvider` e `EscrowProvider` orientados ao dominio.
-4. Implementar adapters Fake e skeleton Celcoin com RestClient/Resilience4j/WireMock.
+3. Definir port `PixProvider` orientado ao dominio e revisar o contrato existente de `EscrowProvider`.
+4. Implementar adapters Fake/Celcoin para Pix e adapter Celcoin do `EscrowProvider` com RestClient/Resilience4j/WireMock.
 5. Criar processamento inicial de webhook Pix com HMAC e outbox/idempotencia.
 6. Criar OpenAPI, auditoria e testes de provider/webhook.
 
@@ -48,4 +48,4 @@ Preparar o modulo `pix` e plugar a abstracao real de `EscrowProvider`, mantendo 
 
 - Dominio Pix nasce isolado de detalhes Celcoin.
 - Ambiente local funciona com Fake provider.
-- Adapter Celcoin tem testes WireMock para contrato HTTP basico.
+- Adapters Celcoin de Pix e Escrow tem testes WireMock para contrato HTTP basico.

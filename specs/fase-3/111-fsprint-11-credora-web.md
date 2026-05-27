@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 13 + Epic 10
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epics 10 e 13
-- **Depende de**: backend Sprints 16-17
+- **Depende de**: backend Sprints 16-17; contrato de autorizacao/ownership da credora entregue na Sprint 16 ou RBAC cumulativo da Sprint 18 quando necessario
 - **Responsavel principal**: Devs Plenos Frontend
 
 ## Objetivo
@@ -40,7 +40,7 @@ Implementar a experiencia web da empresa credora: perfil, elegibilidade, oportun
 
 ## Gates que nao contam como task
 
-- Precheck dos contratos backend 16-17.
+- Precheck dos contratos backend 16-17 e do contrato de autorizacao/ownership da credora.
 - Smoke E2E credora -> oportunidade -> interesse -> carteira.
 - Docs e relatório Fase 3.
 

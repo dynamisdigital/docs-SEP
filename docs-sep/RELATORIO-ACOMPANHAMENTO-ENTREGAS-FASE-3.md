@@ -56,15 +56,15 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 
 | Item | Origem | Acao recomendada na Fase 3 | Status |
 |------|--------|-----------------------------|--------|
-| Strategies reais de reprocesso de provider | Sprint 14 | Conectar strategies aos use cases reais dos modulos donos | Aberto/adiado |
-| Handler real por provider/event no reprocesso webhook | Sprint 14 | Substituir processamento generico por roteamento real dos eventos suportados | Aberto/adiado |
+| Strategies reais de reprocesso de provider | Sprint 14 | Conectar strategies aos use cases reais dos modulos donos antes de expor acao de reprocesso no web | Entra como precheck da F-Sprint 10 quando houver reprocesso |
+| Handler real por provider/event no reprocesso webhook | Sprint 14 | Substituir processamento generico por roteamento real dos eventos suportados antes de liberar reprocesso operacional | Entra como precheck da F-Sprint 10 quando houver reprocesso |
 | Race residual no anti-abuso de reprocesso | Sprint 14 | Avaliar `pg_advisory_xact_lock` se houver concorrencia operacional real | Aceito/documentado |
 | Multi-role `FINANCEIRO + BACKOFFICE` | Sprint 14 / Epic 11 | Refatorar modelo de roles/permissoes antes de governanca avancada | Aberto/adiado |
 | V34 nao idempotente | Sprint 14 | Criar hotfix de migration defensiva apenas se houver necessidade operacional | Aceito/adiado |
 | OpenAPI/JavaDoc dos DTOs de role | Sprint 14 | Atualizar DTOs de role quando a governanca avancada entrar | Aberto/adiado |
 | IT concorrente de recebimento | Sprint 15 | Criar teste explicito de concorrencia para `RegistrarRecebimentoUseCase` | Aberto/adiado |
 | Retry/DLQ tecnico em listeners | Sprint 15 | Escalar falhas para backoffice ou fila tecnica em sprint de observabilidade | Aberto/adiado |
-| Step-up estrito sem bypass MFA | Sprint 15 | Decidir ADR ou annotation `@RequireStepUpEstrita` antes de operacoes mais sensiveis | Aberto/adiado |
+| Step-up estrito sem bypass MFA | Sprint 15 | Decidir ADR ou annotation `@RequireStepUpEstrita` antes do desembolso Pix assistido | Entra como precheck bloqueante da Sprint 20 |
 | PDFBox `Standard14Fonts` deprecated | Sprint 15 | Migrar antes de upgrade PDFBox 3.1+ | Aberto/adiado |
 | Truncamento auditavel de payload de assinatura | Sprint 15 | Refatorar `EventoAssinatura.truncar()` ou ampliar coluna com migration | Aberto/adiado |
 | Retry de listeners Open Finance | Sprint 15 | Escalar falha pos-Resilience4j para fila/backoffice | Aberto/adiado |
@@ -101,6 +101,7 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 | 2026-05-27 | Fase 2 foi considerada concluida em `main` apos merge manual e diff vazio entre `origin/main` e `origin/develop` nos tres repos de codigo | Verificacao local |
 | 2026-05-27 | Este relatorio passa a ser o painel exclusivo de acompanhamento da Fase 3 | Solicitacao do usuario |
 | 2026-05-27 | Specs da Fase 3 criados por projeto: 6 backend, 8 web e 6 mobile, todos com ate 6 tasks de implementacao | `specs/fase-3/README.md` |
+| 2026-05-27 | Revisao documental da Fase 3 incorporada: step-up estrito virou precheck da Sprint 20, reprocessos web dependem de handlers reais, jornada credora explicita contrato de autorizacao e Sprint 19 evolui `EscrowProvider` existente | Revisao com subagent |
 
 ## Proximos passos
 

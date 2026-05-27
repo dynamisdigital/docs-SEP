@@ -248,11 +248,19 @@
         <table>
           <thead><tr><th>Item</th><th>Acao recomendada</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>Strategies reais de reprocesso de provider</td><td>Conectar strategies aos use cases reais dos modulos donos.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
-            <tr><td>Handler real por provider/event no reprocesso webhook</td><td>Substituir processamento generico por roteamento real dos eventos suportados.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Strategies reais de reprocesso de provider</td><td>Conectar strategies aos use cases reais dos modulos donos antes de expor acao de reprocesso no web.</td><td><span class="badge warn">Precheck F-Sprint 10</span></td></tr>
+            <tr><td>Handler real por provider/event no reprocesso webhook</td><td>Substituir processamento generico por roteamento real dos eventos suportados antes de liberar reprocesso operacional.</td><td><span class="badge warn">Precheck F-Sprint 10</span></td></tr>
+            <tr><td>Race residual no anti-abuso de reprocesso</td><td>Avaliar <code>pg_advisory_xact_lock</code> se houver concorrencia operacional real.</td><td><span class="badge info">Aceito/documentado</span></td></tr>
             <tr><td>Multi-role FINANCEIRO + BACKOFFICE</td><td>Refatorar modelo de roles/permissoes antes de governanca avancada.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>V34 nao idempotente</td><td>Criar hotfix de migration defensiva apenas se houver necessidade operacional.</td><td><span class="badge info">Aceito/adiado</span></td></tr>
+            <tr><td>OpenAPI/JavaDoc dos DTOs de role</td><td>Atualizar DTOs de role quando a governanca avancada entrar.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>IT concorrente de recebimento</td><td>Criar teste explicito de concorrencia para <code>RegistrarRecebimentoUseCase</code>.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
             <tr><td>Retry/DLQ tecnico em listeners</td><td>Escalar falhas para backoffice ou fila tecnica em sprint de observabilidade.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
-            <tr><td>Step-up estrito sem bypass MFA</td><td>Decidir ADR ou annotation <code>@RequireStepUpEstrita</code> antes de operacoes mais sensiveis.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Step-up estrito sem bypass MFA</td><td>Decidir ADR ou annotation <code>@RequireStepUpEstrita</code> antes do desembolso Pix assistido.</td><td><span class="badge warn">Precheck Sprint 20</span></td></tr>
+            <tr><td>PDFBox Standard14Fonts deprecated</td><td>Migrar antes de upgrade PDFBox 3.1+.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Truncamento auditavel de payload de assinatura</td><td>Refatorar <code>EventoAssinatura.truncar()</code> ou ampliar coluna com migration.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Retry de listeners Open Finance</td><td>Escalar falha pos-Resilience4j para fila/backoffice.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Auditoria de thresholds do motor de credito</td><td>Criar trilha de mudanca para parametros de score/risco.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
             <tr><td>Schema validation de audit payload</td><td>Criar <code>AuditPayloadSchema</code> e migration futura se necessario.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
             <tr><td>Refactor AuthController.me()</td><td>Trocar acesso direto a repository por <code>ConsultarUsuarioUseCase</code>.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
           </tbody>
@@ -266,7 +274,9 @@
           <tbody>
             <tr><td>OOM em PldFollowupIT no full run</td><td>Ajustar <code>org.gradle.jvmargs=-Xmx2g</code> ou isolar suite pesada.</td><td><span class="badge warn">Aberto/pre-existente</span></td></tr>
             <tr><td>Testcontainers + Docker Engine 28+</td><td>Aguardar compatibilidade ou fixar estrategia alternativa.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>WireMock E2E com provider Clicksign</td><td>Criar cobertura adapter/fake mais completa quando assinatura evoluir.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
             <tr><td>E2E cross-repo</td><td>Planejar pipeline orquestrado em infra/observabilidade.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Refresh de collections Postman/Insomnia nao-backoffice</td><td>Fazer auditoria dedicada quando endpoints da Fase 3 forem planejados.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
             <tr><td>Branch protection</td><td>Proteger <code>develop</code>, exigir PR/status checks e alinhar estrategia de merge.</td><td><span class="badge warn">Aberto/operacional</span></td></tr>
             <tr><td>Smoke real Celcoin sandbox</td><td>Executar quando houver credenciais e alinhamento com contratos reais.</td><td><span class="badge warn">Dependencia externa</span></td></tr>
           </tbody>
@@ -299,6 +309,7 @@
             <tr><td>2026-05-27</td><td>Fase 2 foi considerada concluida em <code>main</code> apos merge manual e diff vazio entre <code>origin/main</code> e <code>origin/develop</code> nos tres repos.</td><td>Verificacao local.</td></tr>
             <tr><td>2026-05-27</td><td>Este relatorio passa a ser o painel exclusivo de acompanhamento da Fase 3.</td><td>Solicitacao do usuario.</td></tr>
             <tr><td>2026-05-27</td><td>Specs da Fase 3 criados por projeto: 6 backend, 8 web e 6 mobile, todos com ate 6 tasks de implementacao.</td><td><code>specs/fase-3/README.md</code>.</td></tr>
+            <tr><td>2026-05-27</td><td>Revisao documental da Fase 3 incorporada: step-up estrito virou precheck da Sprint 20, reprocessos web dependem de handlers reais, jornada credora explicita contrato de autorizacao e Sprint 19 evolui <code>EscrowProvider</code> existente.</td><td>Revisao com subagent.</td></tr>
           </tbody>
         </table>
       </div>

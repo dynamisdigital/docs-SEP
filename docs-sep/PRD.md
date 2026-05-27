@@ -2021,3 +2021,4 @@ Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte d
 - **Steps just-in-time**: esta secao cria o mapa de specs; os steps continuam sendo criados apenas antes da execucao de cada sprint.
 - **Mobile restrito**: mobile cobre tomador e empresa credora; financeiro interno, backoffice operacional, administracao completa e auditoria continuam fora do app.
 - **Infraestrutura AWS**: permanece trilha paralela candidata, nao mapeada como sprint funcional nesta tabela.
+- **Gates de seguranca e operacao**: desembolso Pix assistido depende da decisao de step-up estrito sem bypass MFA; reprocessos web dependem de handlers reais backend por provider/event; jornadas credora web/mobile dependem de contrato explicito de autorizacao/ownership.

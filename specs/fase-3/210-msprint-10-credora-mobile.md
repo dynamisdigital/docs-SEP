@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 3
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; backend Sprints 16-17
-- **Depende de**: backend Sprints 16-17
+- **Depende de**: backend Sprints 16-17; contrato de autorizacao/ownership da credora entregue na Sprint 16 ou RBAC cumulativo da Sprint 18 quando necessario
 - **Responsavel principal**: Dev Mobile
 
 ## Objetivo
@@ -40,7 +40,7 @@ Implementar a experiencia mobile simplificada da empresa credora: status, oportu
 
 ## Gates que nao contam como task
 
-- Precheck backend credora.
+- Precheck backend credora e contrato de autorizacao/ownership da credora.
 - Smoke PWA credora -> oportunidade -> carteira.
 - Docs e relatório Fase 3.
 
