@@ -6,7 +6,6 @@ Sprint 11 — parte 2 (assinatura digital + CCB), executada 2026-05-21.
 
 > Specs: [`010-sprint-10-formalizacao-geracao-contrato.md`](../../specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md), [`011-sprint-11-formalizacao-assinatura-digital.md`](../../specs/fase-2/011-sprint-11-formalizacao-assinatura-digital.md).
 > Steps: [`010-sprint-10-steps.md`](../../steps-fase-2/backend/010-sprint-10-steps.md), [`011-sprint-11-steps.md`](../../steps-fase-2/backend/011-sprint-11-steps.md).
-> PRs: [`SPRINT-10-PR.md`](./SPRINT-10-PR.md), [`SPRINT-11-PR.md`](./SPRINT-11-PR.md).
 > CCB: [`CCB.md`](./CCB.md) (estrutura, base legal, retencao do documento legal).
 
 ## Objetivo

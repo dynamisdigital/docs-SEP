@@ -864,15 +864,15 @@ Sugestao de commit: `test(contratos): cobrir formalizacao em IT`.
 
 **Esforco**: 0.5-1 dia.
 
-**Decisao sobre `SPRINT-10-PR.md`**:
-- Nao criar `docs-SEP/repos/sep-api/SPRINT-10-PR.md` no inicio da Sprint 10.
+**Decisao sobre PR description temporaria da Sprint 10**:
+- Nao criar PR description temporaria da Sprint 10 no inicio da Sprint 10.
 - Criar este arquivo somente no final da implementacao, dentro da Task 10.9, depois que migrations, endpoints, testes, auditoria e documentacao estiverem estabilizados.
-- Motivo: `SPRINT-10-PR.md` e uma descricao consolidada do PR real, nao um plano preliminar.
+- Motivo: PR description temporaria da Sprint 10 e uma descricao consolidada do PR real, nao um plano preliminar.
 
 **Arquivos esperados**:
 - `docs-SEP/repos/sep-api/CONTRATOS.md`
 - update `docs-SEP/repos/sep-api/CREDITO.md`
-- `docs-SEP/repos/sep-api/SPRINT-10-PR.md` somente no final.
+- PR description temporaria da Sprint 10 somente no final.
 - `docs-SEP/docs-sep/sep-api.postman_collection.json`
 - `docs-SEP/docs-sep/sep-api.insomnia_collection.json`
 - `sep-api/README.md` se houver novas instrucoes locais.
@@ -923,7 +923,7 @@ jq empty docs-sep/sep-api.insomnia_collection.json
 ### Step 010.9.3 - Criar descricao de PR no final
 
 **Arquivo sugerido**:
-- `docs-SEP/repos/sep-api/SPRINT-10-PR.md`
+- PR description temporaria da Sprint 10
 
 **Conteudo minimo**:
 - Titulo sugerido.
@@ -1027,7 +1027,7 @@ git status --short
 - Listener de `PropostaAprovadaEvent` roda apos commit; falhas devem ser observaveis e nao podem corromper a proposta ja aprovada.
 - Dados cadastrais incompletos nao devem ser inventados no template.
 - Sprint 11 depende do estado `ACEITO` para iniciar assinatura digital.
-- `SPRINT-10-PR.md` so deve ser criado no final da implementacao, nao no inicio.
+- PR description temporaria da Sprint 10 so deve ser criado no final da implementacao, nao no inicio.
 
 ---
 

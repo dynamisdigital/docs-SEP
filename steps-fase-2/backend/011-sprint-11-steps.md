@@ -851,7 +851,7 @@ cd <sep-api-root>
 **Arquivos principais**:
 - `docs-SEP/repos/sep-api/CONTRATOS.md`
 - `docs-SEP/repos/sep-api/CCB.md`
-- `docs-SEP/repos/sep-api/SPRINT-11-PR.md`
+- PR description temporaria da Sprint 11
 - `docs-SEP/docs-sep/PRD.md`, apenas apos sprint concluida/mergeada.
 - Collections Postman/Insomnia, se existirem endpoints novos nelas.
 - `docs-SEP/AI-ROADMAP.md`, se novos docs/caminhos precisarem ser indexados.
@@ -888,7 +888,7 @@ cd <sep-api-root>
 ### Step 011.10.4 - Criar descricao de PR
 
 **Arquivo sugerido**:
-- `docs-SEP/repos/sep-api/SPRINT-11-PR.md`
+- PR description temporaria da Sprint 11
 
 **Conteudo**:
 - Titulo sugerido.
@@ -908,7 +908,7 @@ cd <sep-api-root>
 - [ ] `CONTRATOS.md` atualizado.
 - [ ] `CCB.md` criado e marcado para revisao juridica.
 - [ ] Collections atualizadas quando aplicavel.
-- [ ] `SPRINT-11-PR.md` criado.
+- [ ] PR description temporaria da Sprint 11 criado.
 - [ ] `AI-ROADMAP.md` revisado/atualizado se necessario.
 - [ ] PRD atualizado somente no fechamento real da sprint.
 

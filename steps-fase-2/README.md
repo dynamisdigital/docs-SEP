@@ -18,16 +18,16 @@ steps-fase-2/
 | Sprint | Arquivo | Status |
 |--------|---------|--------|
 | Sprint 5 - Endurecimento de Seguranca | [`backend/005-sprint-5-steps.md`](./backend/005-sprint-5-steps.md) | Concluida em 2026-05-11 |
-| Sprint 5 - Follow-ups de Seguranca | [`backend/005-sprint-5-followups-seguranca-steps.md`](./backend/005-sprint-5-followups-seguranca-steps.md) | A implementar |
+| Sprint 5 - Follow-ups de Seguranca | [`backend/005-sprint-5-followups-seguranca-steps.md`](./backend/005-sprint-5-followups-seguranca-steps.md) | Concluida em 2026-05-12 |
 | Sprint 6 - Onboarding KYC Pessoa Fisica | [`backend/006-sprint-6-steps.md`](./backend/006-sprint-6-steps.md) | Concluida em 2026-05-13 |
 | Sprint 7 - Onboarding KYB Empresa + PLD | [`backend/007-sprint-7-steps.md`](./backend/007-sprint-7-steps.md) | Concluida em 2026-05-15 |
 | Sprint 8 - Credito Regras + Parecer | [`backend/008-sprint-8-steps.md`](./backend/008-sprint-8-steps.md) | Concluida em 2026-05-18 |
 | Sprint 9 - Credito Open Finance | [`backend/009-sprint-9-steps.md`](./backend/009-sprint-9-steps.md) | Concluida em 2026-05-19 |
 | Sprint 10 - Formalizacao Geracao de Contrato | [`backend/010-sprint-10-steps.md`](./backend/010-sprint-10-steps.md) | Concluida em 2026-05-20 |
-| Sprint 11 - Formalizacao Assinatura Digital | [`backend/011-sprint-11-steps.md`](./backend/011-sprint-11-steps.md) | A implementar |
-| Sprint 12 - Cobranca Parcelas + Agenda | [`backend/012-sprint-12-steps.md`](./backend/012-sprint-12-steps.md) | A implementar |
-| Sprint 13 - Cobranca Inadimplencia | [`backend/013-sprint-13-steps.md`](./backend/013-sprint-13-steps.md) | A implementar |
-| Sprint 14 - Backoffice Operacional | `backend/014-sprint-14-steps.md` | A criar antes da Sprint 14 |
+| Sprint 11 - Formalizacao Assinatura Digital | [`backend/011-sprint-11-steps.md`](./backend/011-sprint-11-steps.md) | Concluida em 2026-05-21 |
+| Sprint 12 - Cobranca Parcelas + Agenda | [`backend/012-sprint-12-steps.md`](./backend/012-sprint-12-steps.md) | Concluida em 2026-05-22 |
+| Sprint 13 - Cobranca Inadimplencia | [`backend/013-sprint-13-steps.md`](./backend/013-sprint-13-steps.md) | Concluida em 2026-05-26 |
+| Sprint 14 - Backoffice Operacional | [`backend/014-sprint-14-steps.md`](./backend/014-sprint-14-steps.md) | Concluida em 2026-05-26 |
 
 ## Regras
 

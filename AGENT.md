@@ -98,6 +98,13 @@ No repo `docs-SEP`:
 - O agente pode editar arquivos no working tree, mas nao cria branch, nao comita, nao faz push e nao faz reset/rebase/merge.
 - Sempre preservar mudancas existentes do usuario. Se houver arquivos modificados fora do escopo, ignorar.
 
+Arquivos de PR description:
+
+- `repos/<repo>/SPRINT-*-PR.md` sao artefatos temporarios para apoiar a abertura/revisao do PR da sprint.
+- Eles podem ser criados no fechamento da sprint, quando o PR real precisar de uma descricao consolidada.
+- Ao iniciar uma nova sprint, apagar os `SPRINT-*-PR.md` da sprint anterior que ja foram usados no PR. O historico definitivo deve permanecer no PR do GitHub, no step da sprint, no doc operacional do modulo, no PRD/CONTEXT e no relatorio de acompanhamento.
+- Nao manter links permanentes para `SPRINT-*-PR.md` em docs operacionais, PRD, CONTEXT ou AI-ROADMAP.
+
 ## Arquitetura e stack
 
 Backend:

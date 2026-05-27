@@ -876,16 +876,16 @@ Sugestao de commit: `test(credito): cobrir ciclo open finance em IT`.
 
 **Esforco**: 0.5-1 dia.
 
-**Decisao sobre `SPRINT-9-PR.md`**:
-- Nao criar `docs-SEP/repos/sep-api/SPRINT-9-PR.md` no inicio da Sprint 9.
+**Decisao sobre PR description temporaria da Sprint 9**:
+- Nao criar PR description temporaria da Sprint 9 no inicio da Sprint 9.
 - Criar este arquivo somente no final da implementacao, dentro da Task 9.9, depois que migrations, endpoints, webhook, testes, auditoria e documentacao estiverem estabilizados.
-- Motivo: `SPRINT-9-PR.md` e uma descricao consolidada do PR real, nao um plano preliminar.
+- Motivo: PR description temporaria da Sprint 9 e uma descricao consolidada do PR real, nao um plano preliminar.
 - Quando criado, atualizar tambem `docs-SEP/repos/sep-api/README.md` para incluir o link do novo arquivo.
 
 **Arquivos esperados**:
 - `docs-SEP/repos/sep-api/OPEN-FINANCE.md`
 - update `docs-SEP/repos/sep-api/CREDITO.md`
-- `docs-SEP/repos/sep-api/SPRINT-9-PR.md` somente no final.
+- PR description temporaria da Sprint 9 somente no final.
 - `docs-SEP/docs-sep/sep-api.postman_collection.json`
 - `docs-SEP/docs-sep/sep-api.insomnia_collection.json`
 - `sep-api/README.md` se houver novas instrucoes locais.
@@ -937,7 +937,7 @@ jq empty docs-sep/sep-api.insomnia_collection.json
 ### Step 009.9.3 - Criar descricao de PR no final
 
 **Arquivo sugerido**:
-- `docs-SEP/repos/sep-api/SPRINT-9-PR.md`
+- PR description temporaria da Sprint 9
 
 **Conteudo minimo**:
 - Titulo sugerido.
@@ -1041,7 +1041,7 @@ git status --short
 - HMAC de Open Finance deve ter secret proprio, nao reusar secret KYC/KYB/PLD.
 - Adapter Celcoin nao deve vazar DTO externo para dominio/use cases.
 - WireMock stubs podem divergir da Celcoin real; smoke sandbox manual recomendado antes de release.
-- `SPRINT-9-PR.md` so deve ser criado no final da implementacao, nao no inicio.
+- PR description temporaria da Sprint 9 so deve ser criado no final da implementacao, nao no inicio.
 
 ---
 

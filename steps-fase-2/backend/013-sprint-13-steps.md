@@ -796,7 +796,7 @@ cd <sep-api-root>
 **Arquivos principais**:
 - `docs-SEP/repos/sep-api/COBRANCA.md`
 - `docs-SEP/repos/sep-api/NOTIFICACOES.md`
-- `docs-SEP/repos/sep-api/SPRINT-13-PR.md`
+- PR description temporaria da Sprint 13
 - `docs-SEP/docs-sep/sep-api.postman_collection.json`
 - `docs-SEP/docs-sep/PRD.md`
 - `docs-SEP/AI-ROADMAP.md`
@@ -832,7 +832,7 @@ cd <sep-api-root>
 ### Step 013.10.4 - Criar PR description
 
 **Arquivo**:
-- `docs-SEP/repos/sep-api/SPRINT-13-PR.md`
+- PR description temporaria da Sprint 13
 
 **Conteudo**:
 - Resumo tecnico.

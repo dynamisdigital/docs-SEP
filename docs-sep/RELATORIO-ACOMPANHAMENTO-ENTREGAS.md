@@ -8,7 +8,7 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 
 - Atualizar ao final de cada task relevante ou fechamento de sprint.
 - Registrar apenas fatos verificaveis: branch, commit, teste, finding, pendencia e decisao.
-- Manter o detalhe tecnico profundo nos specs, steps, PR descriptions e docs operacionais.
+- Manter o detalhe tecnico profundo nos specs, steps, docs operacionais e, enquanto existirem, PR descriptions temporarias.
 - Usar este relatorio como painel executivo e historico resumido.
 
 ## Legenda de status
@@ -47,7 +47,7 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | Testes executados | ~118 testes backoffice + suite global verde (~1340) | Proporcionais ao risco | Verde |
 | Cobertura/gate | A medir no fechamento (alvo JaCoCo modulo >= 70%) | Gate do repo sem regressao | Em monitoramento |
 | Pendencias criticas | 0 P0/P1; 3 itens adiados/aceitos documentados | P0/P1 zerados antes de PR | OK |
-| Documentacao atualizada | BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP + Postman + Insomnia + PRD §22/§29 + CONTEXT + relatorio MD/HTML | Docs/collections quando contrato mudar | Concluido |
+| Documentacao atualizada | BACKOFFICE.md + AI-ROADMAP + Postman + Insomnia + PRD §22/§29 + CONTEXT + relatorio MD/HTML | Docs/collections quando contrato mudar | Concluido |
 
 ## Entregas concluidas
 
@@ -62,7 +62,7 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | 2026-05-26 | 14.7 | 9 endpoints REST (fila/reprocesso/dashboard) + 10 DTOs + OpenAPI + step-up em 4 endpoints | `sep-api` | `be237b9` + `875f4ce` + `155147a`; strip sort prioridade; TipoReprocessoNaoSuportadoException dedicada; +28 testes (incluindo cobertura FINANCEIRO/ADMIN/CLIENTE/401) | Concluido |
 | 2026-05-26 | 14.8 | Auditoria reforcada — BackofficeAuditListener + 6 novos TipoEventoSeguranca + V35 | `sep-api` | `0096629` + `4d5617b` + `8805234`; AFTER_COMMIT + REQUIRES_NEW; mask CPF/CNPJ + truncamento + try/catch + payload completo (ReprocessoDisparadoEvent expandido); +13 testes | Concluido |
 | 2026-05-26 | 14.9 | Testes E2E (`BackofficeIT` 7 cenarios + `ReprocessoIT` 2 cenarios) | `sep-api` | `3101077` + `15b3a45` + `014c5d2`; auth real + step-up real + cleanup sep_test; assertions estritas + audit completo (4 tipos) + Outbox PROCESSADO + dashboard com massa | Concluido |
-| 2026-05-27 | 14.10 | Documentacao, collections e fechamento da Fase 2 backend | `docs-SEP` | `BACKOFFICE.md`, `SPRINT-14-PR.md`, PRD §22/§29, CONTEXT, AI-ROADMAP, Postman/Insomnia e relatorio MD/HTML atualizados | Concluido |
+| 2026-05-27 | 14.10 | Documentacao, collections e fechamento da Fase 2 backend | `docs-SEP` | `BACKOFFICE.md`, PRD §22/§29, CONTEXT, AI-ROADMAP, Postman/Insomnia e relatorio MD/HTML atualizados | Concluido |
 
 ## Em andamento
 

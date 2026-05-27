@@ -984,15 +984,15 @@ Sugestao de commit: `test(credito): cobrir ciclo de proposta e parecer`.
 
 **Esforco**: 0.5-1 dia.
 
-**Decisao travada sobre `SPRINT-8-PR.md`**:
-- Nao criar `docs-SEP/repos/sep-api/SPRINT-8-PR.md` no inicio da Sprint 8.
+**Decisao travada sobre PR description temporaria da Sprint 8**:
+- Nao criar PR description temporaria da Sprint 8 no inicio da Sprint 8.
 - Criar este arquivo somente no final da implementacao, dentro da Task 8.9, depois que migrations, endpoints, testes, auditoria e documentacao do modulo estiverem estabilizados.
-- Motivo: `SPRINT-8-PR.md` e uma descricao consolidada do PR real, nao um plano preliminar. Criar antes da implementacao aumenta risco de divergencia entre o documento e o codigo entregue.
+- Motivo: PR description temporaria da Sprint 8 e uma descricao consolidada do PR real, nao um plano preliminar. Criar antes da implementacao aumenta risco de divergencia entre o documento e o codigo entregue.
 - Quando criado, atualizar tambem `docs-SEP/repos/sep-api/README.md` para incluir o link do novo arquivo.
 
 **Arquivos esperados**:
 - `docs-SEP/repos/sep-api/CREDITO.md`
-- `docs-SEP/repos/sep-api/SPRINT-8-PR.md`
+- PR description temporaria da Sprint 8
 - `docs-SEP/docs-sep/sep-api.postman_collection.json` se os endpoints forem adicionados.
 - `docs-SEP/docs-sep/sep-api.insomnia_collection.json` se os endpoints forem adicionados.
 - `sep-api/README.md` se houver instrucoes locais novas.
@@ -1040,7 +1040,7 @@ jq empty docs-sep/sep-api.insomnia_collection.json
 ### Step 008.9.3 - Criar descricao de PR
 
 **Arquivo sugerido**:
-- `docs-SEP/repos/sep-api/SPRINT-8-PR.md`
+- PR description temporaria da Sprint 8
 
 **Conteudo minimo**:
 - Titulo sugerido.

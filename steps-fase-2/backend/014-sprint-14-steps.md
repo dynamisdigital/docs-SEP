@@ -1232,7 +1232,7 @@ cd <sep-api-root>
 
 **Arquivos principais (working tree de docs-SEP)**:
 - `docs-SEP/repos/sep-api/BACKOFFICE.md` (novo)
-- `docs-SEP/repos/sep-api/SPRINT-14-PR.md` (novo)
+- PR description temporaria da Sprint 14 (novo)
 - `docs-SEP/docs-sep/PRD.md` (§22 Sprint 14, §29 Fase 2 concluida)
 - `docs-SEP/docs-sep/CONTEXT.md` (registrar conclusao Fase 2)
 - `docs-SEP/AI-ROADMAP.md` (atualizar mapa por modulo)
@@ -1255,7 +1255,7 @@ cd <sep-api-root>
 - Integracao com modulos anteriores (onboarding, credito, contratos, cobranca, Outbox).
 - Limitacoes e pendencias (SLA automatico, round-robin, exportacao - fora de escopo).
 
-### Step 014.10.2 - Criar `SPRINT-14-PR.md`
+### Step 014.10.2 - Criar PR description temporaria da Sprint 14
 
 **Conteudo**:
 - Resumo tecnico (1-2 paragrafos).
@@ -1309,7 +1309,7 @@ cd <sep-api-root>
 
 **Checklist**:
 - [x] `BACKOFFICE.md` publicado e linkado no AI-ROADMAP.
-- [x] `SPRINT-14-PR.md` pronto para servir de description do PR.
+- [x] PR description temporaria da Sprint 14 pronto para servir de description do PR.
 - [x] Postman atualizado e JSON valido.
 - [x] PRD §22/§29 atualizado apenas apos merge.
 - [x] CONTEXT.md reflete conclusao Fase 2.
@@ -1317,7 +1317,7 @@ cd <sep-api-root>
 
 ### Definicao de pronto da Task 14.10
 - [x] `BACKOFFICE.md` cobre dominio, endpoints, papeis e integracoes.
-- [x] `SPRINT-14-PR.md` criado.
+- [x] PR description temporaria da Sprint 14 criado.
 - [x] Collection atualizada com 9 endpoints, JSON valido.
 - [x] AI-ROADMAP revisado e consistente.
 - [x] PRD/CONTEXT atualizados no momento correto (pos-merge).

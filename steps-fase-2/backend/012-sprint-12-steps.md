@@ -742,7 +742,7 @@ cd <sep-api-root>
 
 **Arquivos esperados**:
 - `docs-SEP/repos/sep-api/COBRANCA.md`.
-- `docs-SEP/repos/sep-api/SPRINT-12-PR.md`.
+- PR description temporaria da Sprint 12.
 - `docs-SEP/docs-sep/sep-api.postman_collection.json`.
 - `docs-SEP/docs-sep/sep-api.insomnia_collection.json`.
 - `docs-SEP/AI-ROADMAP.md`.
@@ -769,7 +769,7 @@ cd <sep-api-root>
 ### Step 012.9.2 - Criar descricao de PR
 
 **Arquivo**:
-- `docs-SEP/repos/sep-api/SPRINT-12-PR.md`
+- PR description temporaria da Sprint 12
 
 **Conteudo minimo**:
 - Titulo sugerido.
@@ -791,7 +791,7 @@ cd <sep-api-root>
 ### Definicao de pronto da Task 12.9
 - [ ] `COBRANCA.md` atualizado.
 - [ ] Collections atualizadas.
-- [ ] `SPRINT-12-PR.md` criado.
+- [ ] PR description temporaria da Sprint 12 criado.
 - [ ] `AI-ROADMAP.md` revisado.
 - [ ] PRD atualizado no momento correto.
 - [ ] Checkpoint pre-commit apresentado ao usuario.

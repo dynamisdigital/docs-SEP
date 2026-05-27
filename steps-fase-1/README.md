@@ -65,18 +65,18 @@ Regras vivem em [`AGENT.md`](../AGENT.md). Resumo:
 | F-Sprint 0 - Setup Angular | [`web/100-fsprint-0-steps.md`](./web/100-fsprint-0-steps.md) | Concluida (2026-05-04) |
 | F-Sprint 1 - Tokens + Showcase | [`web/101-fsprint-1-steps.md`](./web/101-fsprint-1-steps.md) | Concluida (2026-05-06) |
 | F-Sprint 2 - Telas Apple | [`web/102-fsprint-2-steps.md`](./web/102-fsprint-2-steps.md) | Concluida (2026-05-07) |
-| F-Sprint 3 - Shell Notion + Auth | [`web/103-fsprint-3-steps.md`](./web/103-fsprint-3-steps.md) | Concluida (2026-05-07, push/PR pendente) |
-| F-Sprint 4 - Telas Autenticadas | [`web/104-fsprint-4-steps.md`](./web/104-fsprint-4-steps.md) | Planejada para execucao |
+| F-Sprint 3 - Shell Notion + Auth | [`web/103-fsprint-3-steps.md`](./web/103-fsprint-3-steps.md) | Concluida (2026-05-07) |
+| F-Sprint 4 - Telas Autenticadas | [`web/104-fsprint-4-steps.md`](./web/104-fsprint-4-steps.md) | Concluida (2026-05-07) |
 
 ### Mobile (`mobile/`)
 
 | Sprint | Arquivo | Status |
 |--------|---------|--------|
 | M-Sprint 0 - Setup Ionic | [`mobile/200-msprint-0-steps.md`](./mobile/200-msprint-0-steps.md) | Concluida (2026-05-04) |
-| M-Sprint 1 - Tokens Notion Mobile | [`mobile/201-msprint-1-steps.md`](./mobile/201-msprint-1-steps.md) | Concluida (2026-05-05/06, push/PR pendente) |
+| M-Sprint 1 - Tokens Notion Mobile | [`mobile/201-msprint-1-steps.md`](./mobile/201-msprint-1-steps.md) | Concluida (2026-05-05/06) |
 | M-Sprint 2 - Telas Publicas | [`mobile/202-msprint-2-steps.md`](./mobile/202-msprint-2-steps.md) | Concluida (2026-05-07) |
-| M-Sprint 3 - Shell + Auth | [`mobile/203-msprint-3-steps.md`](./mobile/203-msprint-3-steps.md) | Planejada para execucao |
-| M-Sprint 4 - Telas Autenticadas | [`mobile/204-msprint-4-steps.md`](./mobile/204-msprint-4-steps.md) | Planejada para execucao |
+| M-Sprint 3 - Shell + Auth | [`mobile/203-msprint-3-steps.md`](./mobile/203-msprint-3-steps.md) | Concluida (2026-05-08) |
+| M-Sprint 4 - Telas Autenticadas | [`mobile/204-msprint-4-steps.md`](./mobile/204-msprint-4-steps.md) | Concluida (2026-05-08) |
 
 ## Quando criar steps
 

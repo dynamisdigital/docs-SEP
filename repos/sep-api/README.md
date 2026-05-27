@@ -15,13 +15,10 @@ Documentacao especifica do backend/API SEP.
   endpoints REST e auditoria.
 - [CONTRATOS.md](CONTRATOS.md) - modulo `contratos` (Sprint 10): geracao textual,
   versionamento, hash, aceite com step-up, cancelamento pre-aceite e auditoria.
-- [SPRINT-6-PR.md](SPRINT-6-PR.md) - descricao consolidada do PR da Sprint 6.
-- [SPRINT-7-PR.md](SPRINT-7-PR.md) - descricao consolidada do PR da Sprint 7.
-- [SPRINT-8-PR.md](SPRINT-8-PR.md) - descricao consolidada do PR da Sprint 8.
-- [SPRINT-9-PR.md](SPRINT-9-PR.md) - descricao consolidada do PR da Sprint 9.
-- [SPRINT-10-PR.md](SPRINT-10-PR.md) - descricao consolidada do PR da Sprint 10.
 
 ## Orientacao
 
 Crie aqui documentacao tecnica ou operacional que pertenca apenas ao repo `sep-api`.
 Documentos globais de produto/processo devem continuar em `docs-SEP/docs-sep/`.
+Arquivos `SPRINT-*-PR.md` sao temporarios: podem ser usados para montar a descricao
+do PR real, mas devem ser removidos quando a sprint seguinte iniciar.
