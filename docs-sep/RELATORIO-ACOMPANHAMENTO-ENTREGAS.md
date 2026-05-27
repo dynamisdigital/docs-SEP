@@ -28,26 +28,26 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | Campo | Valor atual |
 |-------|-------------|
 | Produto | SEP |
-| Fase | Fase 2 - Jornada de contratacao do emprestimo |
-| Sprint atual | Sprint 14 - Backoffice operacional |
+| Fase | Fase 2 - Jornada de contratacao do emprestimo (backend concluido) |
+| Sprint atual | Sprint 14 - Backoffice operacional (concluida) |
 | Repo principal em execucao | `sep-api` |
-| Branch atual | `feature/sprint-14-backoffice-operacional` |
-| Status geral | Em andamento |
-| Ultima atualizacao | 2026-05-26 (Task 14.10 PAUSA #1 — docs working tree criados: BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP linha 63 + collections Postman/Insomnia; PRD §22/§29 + CONTEXT pendentes pos-merge) |
+| Branch atual | `develop` |
+| Status geral | Concluido |
+| Ultima atualizacao | 2026-05-27 (fechamento documental pos-merge Sprint 14/Fase 2: PRD §22/§29, CONTEXT, relatorio MD/HTML, AI-ROADMAP e DoD do step) |
 | Responsavel por atualizacao | Agente/Dev responsavel pela task |
 
 ## Indicadores executivos
 
 | Indicador | Atual | Meta/criterio | Status |
 |-----------|-------|---------------|--------|
-| Tasks planejadas na sprint | 14.0 a 14.10 | Todas avaliadas no fechamento | Em andamento |
-| Tasks concluidas | 14.0..14.9 (10/11) | DoD da task atendido | Em andamento |
-| Tasks em review | 14.10 (docs working tree criados; aguardando review manual + commit manual docs-SEP) | Review sem P0/P1 aberto | Em andamento |
+| Tasks planejadas na sprint | 14.0 a 14.10 | Todas avaliadas no fechamento | Concluido |
+| Tasks concluidas | 14.0..14.10 (11/11) | DoD da task atendido | Concluido |
+| Tasks em review | 0 | Review sem P0/P1 aberto | Concluido |
 | Hotfixes de review | 8 ciclos hotfix subagente + 6 ciclos fixes manuais | Causa registrada | Concluido |
 | Testes executados | ~118 testes backoffice + suite global verde (~1340) | Proporcionais ao risco | Verde |
 | Cobertura/gate | A medir no fechamento (alvo JaCoCo modulo >= 70%) | Gate do repo sem regressao | Em monitoramento |
 | Pendencias criticas | 0 P0/P1; 3 itens adiados/aceitos documentados | P0/P1 zerados antes de PR | OK |
-| Documentacao atualizada | BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP + Postman + Insomnia atualizados (working tree); PRD §22/§29 + CONTEXT pos-merge | Docs/collections quando contrato mudar | Em andamento |
+| Documentacao atualizada | BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP + Postman + Insomnia + PRD §22/§29 + CONTEXT + relatorio MD/HTML | Docs/collections quando contrato mudar | Concluido |
 
 ## Entregas concluidas
 
@@ -62,12 +62,13 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | 2026-05-26 | 14.7 | 9 endpoints REST (fila/reprocesso/dashboard) + 10 DTOs + OpenAPI + step-up em 4 endpoints | `sep-api` | `be237b9` + `875f4ce` + `155147a`; strip sort prioridade; TipoReprocessoNaoSuportadoException dedicada; +28 testes (incluindo cobertura FINANCEIRO/ADMIN/CLIENTE/401) | Concluido |
 | 2026-05-26 | 14.8 | Auditoria reforcada — BackofficeAuditListener + 6 novos TipoEventoSeguranca + V35 | `sep-api` | `0096629` + `4d5617b` + `8805234`; AFTER_COMMIT + REQUIRES_NEW; mask CPF/CNPJ + truncamento + try/catch + payload completo (ReprocessoDisparadoEvent expandido); +13 testes | Concluido |
 | 2026-05-26 | 14.9 | Testes E2E (`BackofficeIT` 7 cenarios + `ReprocessoIT` 2 cenarios) | `sep-api` | `3101077` + `15b3a45` + `014c5d2`; auth real + step-up real + cleanup sep_test; assertions estritas + audit completo (4 tipos) + Outbox PROCESSADO + dashboard com massa | Concluido |
+| 2026-05-27 | 14.10 | Documentacao, collections e fechamento da Fase 2 backend | `docs-SEP` | `BACKOFFICE.md`, `SPRINT-14-PR.md`, PRD §22/§29, CONTEXT, AI-ROADMAP, Postman/Insomnia e relatorio MD/HTML atualizados | Concluido |
 
 ## Em andamento
 
 | Sprint/Task | Objetivo | Arquivos/modulos principais | Progresso | Pendencias |
 |-------------|----------|-----------------------------|-----------|------------|
-| 14.10 | Documentacao e collections | `docs-SEP/repos/sep-api/BACKOFFICE.md`, `SPRINT-14-PR.md`, `AI-ROADMAP.md`, collections Postman/Insomnia, PRD §22/§29, CONTEXT.md | Working tree criados (BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP linha 63 + 9 endpoints Postman/Insomnia). PAUSA #1: aguardando review manual. PRD §22/§29 + CONTEXT.md atualizacao pos-merge develop (regra do step file). | Em review |
+| — | — | — | Nenhuma task da Sprint 14 em andamento | — |
 
 ## Validacao tecnica
 
@@ -81,6 +82,7 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | 2026-05-26 | 14.6 | `./gradlew test --tests "AlterarRoleUsuarioUseCaseTest" --tests "RoleTest" --tests "CriarUsuarioUseCaseTest"` | Verde | Role BACKOFFICE + V34 + bloqueio criacao direta |
 | 2026-05-26 | 14.7 | `./gradlew test --tests "*backoffice*"` | Verde | 28 testes WebMvcTest: happy/4xx/429/sort strip + cobertura FINANCEIRO/ADMIN/CLIENTE/401 |
 | 2026-05-26 | 14.8 | `./gradlew test --tests "*BackofficeAuditListenerTest"` | Verde | 8 testes audit listener (6 handlers + sanitizacao + guard defensivo truncamento) |
+| 2026-05-27 | 14.10 | `jq empty docs-SEP/docs-sep/sep-api.postman_collection.json` + `jq empty docs-SEP/docs-sep/sep-api.insomnia_collection.json` | Verde | Collections validas e com 9 requests de backoffice |
 
 ## Code reviews
 
@@ -113,7 +115,7 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 | V34 nao idempotente (`DROP CONSTRAINT` sem `IF EXISTS`) | Migration falha em banco sem a constraint | `IF EXISTS` em hotfix futuro | Aceito/adiado |
 | OpenAPI dos DTOs de role desatualizado (BACKOFFICE ausente do JavaDoc) | Doc Swagger pode confundir consumidor; comportamento real OK | Atualizar `UsuarioRoleUpdateDto` + `UsuarioInternoCreateDto` em hotfix futuro | Aceito/adiado |
 | Auditoria da fila ainda nao implementada | Risco mitigado em Task 14.8 — BackofficeAuditListener + 6 TipoEventoSeguranca + V35 | — | Resolvido |
-| Documentacao operacional do backoffice | Stakeholders e operadores ainda sem guia de uso | Criar `repos/sep-api/BACKOFFICE.md` na Task 14.10 | Planejado |
+| Documentacao operacional do backoffice | Risco mitigado — guia publicado em `repos/sep-api/BACKOFFICE.md` | — | Resolvido |
 
 ## Decisoes registradas
 
@@ -129,9 +131,9 @@ Este documento centraliza o acompanhamento das entregas do projeto SEP. Ele deve
 
 ## Proximos passos
 
-1. Iniciar Task 14.10 (docs — BACKOFFICE.md + PRD §22/§29 Fase 2 concluida + CONTEXT + AI-ROADMAP + collections + SPRINT-14-PR.md) com autorizacao. **docs-SEP eh manual** — agente edita working tree, dev humano commita.
-2. Atualizar este relatorio (md + html) a cada breakpoint do protocolo.
-3. Ao fechar a Sprint 14, consolidar indicadores finais e merge develop.
+1. Revisar diff documental final da Sprint 14/Fase 2 em `docs-SEP`.
+2. Commit manual de `docs-SEP`, conforme regra operacional do projeto.
+3. Planejar a proxima frente a partir da Fase 2 backend concluida: Epic 13 web, Epic 14 mobile, Epic 15/Pix ou hardening operacional adiado.
 
 ## Template para nova atualizacao
 

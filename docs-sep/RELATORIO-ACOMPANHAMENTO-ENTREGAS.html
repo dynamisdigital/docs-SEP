@@ -148,11 +148,11 @@
     <h1>Relatorio de Acompanhamento de Entregas - SEP</h1>
     <p class="subtitle">Painel executivo para acompanhar entregas, validacoes, reviews, riscos e proximos passos do projeto SEP.</p>
     <div class="meta-grid">
-      <div class="metric"><span>Fase</span><strong>Fase 2</strong></div>
-      <div class="metric"><span>Sprint atual</span><strong>Sprint 14</strong></div>
+      <div class="metric"><span>Fase</span><strong>Fase 2 backend concluida</strong></div>
+      <div class="metric"><span>Sprint atual</span><strong>Sprint 14 concluida</strong></div>
       <div class="metric"><span>Repo principal</span><strong>sep-api</strong></div>
-      <div class="metric"><span>Status geral</span><strong>Em andamento</strong></div>
-      <div class="metric"><span>Ultima atualizacao</span><strong>2026-05-26 (Task 14.10 PAUSA #1 — docs working tree: BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP linha 63 + collections; PRD §22/§29 + CONTEXT pos-merge)</strong></div>
+      <div class="metric"><span>Status geral</span><strong>Concluido</strong></div>
+      <div class="metric"><span>Ultima atualizacao</span><strong>2026-05-27 (fechamento documental pos-merge Sprint 14/Fase 2: PRD §22/§29, CONTEXT, relatorio MD/HTML, AI-ROADMAP e DoD do step)</strong></div>
     </div>
   </header>
 
@@ -182,12 +182,12 @@
       <table>
         <thead><tr><th>Indicador</th><th>Atual</th><th>Meta/criterio</th><th>Status</th></tr></thead>
         <tbody>
-          <tr><td>Tasks planejadas na sprint</td><td>14.0 a 14.10</td><td>Todas avaliadas no fechamento</td><td><span class="badge info">Em andamento</span></td></tr>
-          <tr><td>Tasks concluidas</td><td>14.0..14.9 (10/11)</td><td>DoD da task atendido</td><td><span class="badge info">Em andamento</span></td></tr>
-          <tr><td>Tasks em review</td><td>14.10 (docs working tree criados; aguardando review manual + commit manual docs-SEP)</td><td>Review sem P0/P1 aberto</td><td><span class="badge info">Em andamento</span></td></tr>
+          <tr><td>Tasks planejadas na sprint</td><td>14.0 a 14.10</td><td>Todas avaliadas no fechamento</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>Tasks concluidas</td><td>14.0..14.10 (11/11)</td><td>DoD da task atendido</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>Tasks em review</td><td>0</td><td>Review sem P0/P1 aberto</td><td><span class="badge ok">Concluido</span></td></tr>
           <tr><td>Hotfixes de review</td><td>8 ciclos hotfix subagente + 6 ciclos fixes manuais</td><td>Causa registrada</td><td><span class="badge ok">Concluido</span></td></tr>
           <tr><td>Testes executados</td><td>~118 testes backoffice; suite global ~1340 verde</td><td>Proporcionais ao risco</td><td><span class="badge ok">Verde</span></td></tr>
-          <tr><td>Pendencias criticas</td><td>0 P0/P1; 3 itens adiados/aceitos documentados</td><td>P0/P1 zerados antes de PR</td><td><span class="badge ok">OK</span></td></tr>
+          <tr><td>Pendencias criticas</td><td>0 P0/P1; itens adiados/aceitos documentados</td><td>P0/P1 zerados antes de PR</td><td><span class="badge ok">OK</span></td></tr>
         </tbody>
       </table>
     </section>
@@ -206,6 +206,7 @@
           <tr><td>2026-05-26</td><td>14.7</td><td>9 endpoints REST (fila/reprocesso/dashboard) + 10 DTOs + OpenAPI + step-up em 4 endpoints</td><td><code>sep-api</code></td><td><code>be237b9</code> + <code>875f4ce</code> + <code>155147a</code>; strip sort prioridade; TipoReprocessoNaoSuportadoException dedicada; +28 testes (incluindo cobertura FINANCEIRO/ADMIN/CLIENTE/401)</td><td><span class="badge ok">Concluido</span></td></tr>
           <tr><td>2026-05-26</td><td>14.8</td><td>Auditoria reforcada — BackofficeAuditListener + 6 novos TipoEventoSeguranca + V35</td><td><code>sep-api</code></td><td><code>0096629</code> + <code>4d5617b</code> + <code>8805234</code>; AFTER_COMMIT + REQUIRES_NEW; mask CPF/CNPJ + truncamento + try/catch + payload completo (ReprocessoDisparadoEvent expandido); +13 testes</td><td><span class="badge ok">Concluido</span></td></tr>
           <tr><td>2026-05-26</td><td>14.9</td><td>Testes E2E (BackofficeIT 7 cenarios + ReprocessoIT 2 cenarios)</td><td><code>sep-api</code></td><td><code>3101077</code> + <code>15b3a45</code> + <code>014c5d2</code>; auth real + step-up real + cleanup sep_test; audit completo (4 tipos) + Outbox PROCESSADO + dashboard com massa</td><td><span class="badge ok">Concluido</span></td></tr>
+          <tr><td>2026-05-27</td><td>14.10</td><td>Documentacao, collections e fechamento da Fase 2 backend</td><td><code>docs-SEP</code></td><td><code>BACKOFFICE.md</code>, <code>SPRINT-14-PR.md</code>, PRD §22/§29, CONTEXT, AI-ROADMAP, Postman/Insomnia e relatorio MD/HTML atualizados</td><td><span class="badge ok">Concluido</span></td></tr>
         </tbody>
       </table>
     </section>
@@ -215,7 +216,7 @@
       <table>
         <thead><tr><th>Sprint/Task</th><th>Objetivo</th><th>Arquivos/modulos principais</th><th>Progresso</th><th>Pendencias</th></tr></thead>
         <tbody>
-          <tr><td>14.10</td><td>Documentacao e collections</td><td><code>BACKOFFICE.md</code>, <code>SPRINT-14-PR.md</code>, <code>AI-ROADMAP.md</code>, collections Postman/Insomnia, PRD §22/§29, CONTEXT.md</td><td>Working tree: BACKOFFICE.md + SPRINT-14-PR.md + AI-ROADMAP linha 63 + 9 endpoints Postman/Insomnia. PAUSA #1 aguardando review manual. PRD §22/§29 + CONTEXT pos-merge.</td><td>Em review</td></tr>
+          <tr><td>—</td><td>—</td><td>—</td><td>Nenhuma task da Sprint 14 em andamento.</td><td>—</td></tr>
         </tbody>
       </table>
     </section>
@@ -233,6 +234,7 @@
             <tr><td>14.5</td><td><code>./gradlew test --tests '*backoffice*'</code></td><td><span class="badge ok">Verde</span></td></tr>
             <tr><td>14.6</td><td><code>./gradlew test --tests "AlterarRoleUsuarioUseCaseTest" --tests "RoleTest" --tests "CriarUsuarioUseCaseTest"</code></td><td><span class="badge ok">Verde</span></td></tr>
             <tr><td>14.7</td><td><code>./gradlew test --tests "*backoffice.web.controller*"</code></td><td><span class="badge ok">Verde</span></td></tr>
+            <tr><td>14.10</td><td><code>jq empty sep-api.postman_collection.json</code> + <code>jq empty sep-api.insomnia_collection.json</code></td><td><span class="badge ok">Verde</span></td></tr>
           </tbody>
         </table>
       </section>
@@ -281,9 +283,9 @@
     <section>
       <h2>Proximos passos</h2>
       <ol>
-        <li>Iniciar Task 14.10 (docs — BACKOFFICE.md + PRD §22/§29 Fase 2 concluida + CONTEXT + AI-ROADMAP + collections + SPRINT-14-PR.md) com autorizacao. <strong>docs-SEP eh manual</strong> — agente edita working tree, dev humano commita.</li>
-        <li>Atualizar este relatorio (md + html) a cada breakpoint do protocolo.</li>
-        <li>Ao fechar a Sprint 14, consolidar indicadores finais, BACKOFFICE.md e collections.</li>
+        <li>Revisar diff documental final da Sprint 14/Fase 2 em <code>docs-SEP</code>.</li>
+        <li>Commit manual de <code>docs-SEP</code>, conforme regra operacional do projeto.</li>
+        <li>Planejar a proxima frente a partir da Fase 2 backend concluida: Epic 13 web, Epic 14 mobile, Epic 15/Pix ou hardening operacional adiado.</li>
       </ol>
     </section>
   </main>

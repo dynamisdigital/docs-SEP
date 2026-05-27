@@ -1132,7 +1132,7 @@ Responsavel principal:
 - Dev Senior
 
 Status de execucao:
-- implementada na branch `feature/sprint-13-cobranca-inadimplencia`; pendente PR/merge para `develop`
+- concluida em 2026-05-26; branch `feature/sprint-13-cobranca-inadimplencia` mergeada em `develop` via PR #61, commit `3bac857`
 - 3 migrations Flyway: `V30__criar_tabelas_inadimplencia` (`workflow_cobranca`, `evento_cobranca`, `renegociacao`, unique parcial de idempotencia de notificacao), `V31__suportar_agenda_substituta` (self-FK `agenda_substituida_id`), `V32__ampliar_audit_seguranca_tipo_inadimplencia`
 - modulo `cobranca` estendido com workflow configuravel por yaml, providers SMTP/Zenvia/Log, listeners de atraso/auditoria/renegociacao, jobs de escalonamento, inadimplencia e expiracao de renegociacao
 - endpoints REST novos: `GET /api/v1/cobranca/inadimplencia`, `POST /api/v1/cobranca/parcelas/{id}/contato`, `POST /api/v1/cobranca/parcelas/{id}/renegociacao`, `PATCH /api/v1/cobranca/renegociacoes/{id}/aceite`, `PATCH /api/v1/cobranca/renegociacoes/{id}/recusa`
@@ -1212,7 +1212,7 @@ Detalhamento das tasks:
 
 ### Trilha Fase 2 (Sprints 5-14)
 
-Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-10 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD, credito interno, Open Finance e formalizacao contratual ate aceite. As Sprints 11-14 seguem como **backend-only** nesta etapa — Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+Esta trilha agrupa as sprints que abrem e executam a Fase 2 do produto (jornada de contratacao do emprestimo, alinhada ao marco regulatorio CMN 4.656/2018). A Sprint 5 foi executada como gate **cross-stack** de seguranca (`sep-api`, `sep-app`, `sep-mobile`) e foi concluida em 2026-05-11. As Sprints 6-14 tambem foram concluidas no backend, estabilizando onboarding PF/PJ, PLD, credito interno, Open Finance, formalizacao contratual, cobranca, inadimplencia e backoffice operacional. A Fase 2 backend foi concluida em 2026-05-26 com a Sprint 14 (`backoffice`) mergeada em `develop` via PR #63. Web e Mobile de jornadas da Fase 2 entrarao em planejamento separado depois da estabilizacao dos contratos da API (decisao tomada em 2026-05-04).
 
 Mapeamento Sprint → Epic:
 
@@ -1501,7 +1501,7 @@ Responsavel principal:
 - Dev Senior
 
 Status de execucao:
-- implementada na branch `feature/sprint-13-cobranca-inadimplencia`; pendente PR/merge para `develop`
+- concluida em 2026-05-26; branch `feature/sprint-13-cobranca-inadimplencia` mergeada em `develop` via PR #61, commit `3bac857`
 - 3 migrations Flyway: `V30__criar_tabelas_inadimplencia`, `V31__suportar_agenda_substituta`, `V32__ampliar_audit_seguranca_tipo_inadimplencia`
 - modulo `cobranca` estendido com workflow configuravel por yaml, providers SMTP/Zenvia/Log, listeners de atraso/auditoria/renegociacao, jobs de escalonamento, inadimplencia e expiracao de renegociacao
 - endpoints REST novos: `GET /api/v1/cobranca/inadimplencia`, `POST /api/v1/cobranca/parcelas/{id}/contato`, `POST /api/v1/cobranca/parcelas/{id}/renegociacao`, `PATCH /api/v1/cobranca/renegociacoes/{id}/aceite`, `PATCH /api/v1/cobranca/renegociacoes/{id}/recusa`
@@ -1519,6 +1519,13 @@ Objetivo de planejamento:
 
 Tema:
 - Backoffice operacional (Epic 9)
+
+Status de execucao:
+- concluida em 2026-05-26; branch `feature/sprint-14-backoffice-operacional` mergeada em `develop` via PR #63, commit `30def6a`
+- modulo `backoffice` criado para operacao assistida da Fase 2 com fila operacional, comentarios internos, resolucao/ignore, reprocessos manuais e dashboard consolidado
+- 9 endpoints REST em `/api/v1/backoffice`, role `BACKOFFICE`, step-up obrigatorio nos 4 endpoints sensiveis, anti-abuso 3/24h e auditoria reforcada com 6 novos tipos
+- documentacao operacional consolidada em [`repos/sep-api/BACKOFFICE.md`](../repos/sep-api/BACKOFFICE.md), PR description em [`repos/sep-api/SPRINT-14-PR.md`](../repos/sep-api/SPRINT-14-PR.md) e collections Postman/Insomnia atualizadas
+- pendencias aceitas/adiadas: strategies reais de reprocesso provider, handler real por provider/evento no reprocesso webhook, race residual best-effort no anti-abuso, multi-role `FINANCEIRO + BACKOFFICE`, V34 idempotente e JavaDoc/OpenAPI dos DTOs de role
 
 Pre-requisitos de entrada:
 - Sprint 13 concluida
@@ -1936,7 +1943,7 @@ As tres secoes tem sobreposicao intencional (estado, stack, arquitetura, marco r
 
 ## 29. Mapeamento Fase 2: Epics × Sprints
 
-Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14). Util para PO/PM acompanhar a Fase 2 sem precisar ler a §22 inteira. Sprint 5 ja esta concluida como gate cross-stack; Sprints 6-10 concluidas e Sprints 11-14 seguem backend-only ate estabilizacao dos contratos da API.
+Tabela executiva consolidando o planejamento e execucao da Fase 2 (Epics 5-9, Sprints 5-14). Util para PO/PM acompanhar a Fase 2 sem precisar ler a §22 inteira. Sprint 5 foi concluida como gate cross-stack; Sprints 6-14 foram concluidas como trilha backend-only ate a estabilizacao dos contratos da API.
 
 | Sprint | Epic | Tema | Spec | Modulo dominio |
 |--------|------|------|------|----------------|
@@ -1951,7 +1958,7 @@ Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14)
 | 13 | Epic 8 (parte 2) | Cobranca — inadimplencia e recuperacao | [`013`](../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md) | `cobranca` |
 | 14 | Epic 9 | Backoffice operacional | [`014`](../specs/fase-2/014-sprint-14-backoffice-operacional.md) | `backoffice` |
 
-**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-10 ja foram concluidas no backend; Sprints 11-14 seguem planejadas). Dependencia linear (cada sprint exige a anterior pronta). A partir da Sprint 6, a trilha e exclusivamente backend nesta etapa — Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
+**Resumo**: 10 sprints na Fase 2 (Sprint 5 ja existia como gate de hardening e foi concluida em 2026-05-11; Sprints 6-14 foram concluidas no backend, encerrando a Fase 2 backend em 2026-05-26 com a Sprint 14). Dependencia linear mantida (cada sprint exigiu a anterior pronta). A partir da Sprint 6, a trilha foi exclusivamente backend nesta etapa; Web e Mobile da Fase 2 entrarao em planejamento separado depois que os contratos da API estabilizarem (decisao tomada em 2026-05-04).
 
 **Decisoes de planejamento**:
 - **Granularidade**: cada Epic 5-8 foi dividida em 2 sprints (parte 1 + parte 2) para reduzir risco de entrega; Epic 9 ficou em 1 sprint unica.
@@ -1960,6 +1967,7 @@ Tabela executiva consolidando o planejamento da Fase 2 (Epics 5-9, Sprints 5-14)
 - **Sprint 8**: concluida em 2026-05-18; entregou o primeiro nucleo de credito interno, sem Open Finance, sem precificacao financeira e sem formalizacao/desembolso.
 - **Sprint 9**: concluida em 2026-05-19; entregou integracao Open Finance Brasil via Celcoin/Finansystech (consentimento + reavaliacao + auditoria). Pattern anti-orphan 2-fase no consentimento, listeners `AFTER_COMMIT + REQUIRES_NEW` reaproveitando licao da Sprint 7, motor de credito ganhou `ajusteScore` (bonus/penalidade Open Finance), 5 tipos novos de audit `OPEN_FINANCE_*` (V19) e sanitizer LGPD fail-closed. Reavaliacao **conservadora**: promove apenas `EM_ANALISE -> PRE_APROVADA`; nao rejeita automaticamente. Sem ADR proprio — decisao arquitetural coberta por ADR 0004 (Provider Pattern) + ADR 0008 (WireMock).
 - **Sprint 10**: concluida em 2026-05-20; entregou formalizacao contratual ate `ACEITO`: modulo `contratos`, templates texto, versionamento com SHA-256, aceite/cancelamento com step-up, 5 endpoints REST, migrations V20-V22 e auditoria `CONTRATO_*`. Assinatura digital, CCB completa e artefatos ricos ficam para Sprint 11.
+- **Sprint 14**: concluida em 2026-05-26; entregou `backoffice` operacional com fila unificada, comentarios, resolucao/ignore, reprocessos manuais, dashboard, role `BACKOFFICE`, step-up em operacoes sensiveis e auditoria reforcada. Encerramento backend da Fase 2 registrado em `BACKOFFICE.md` e `SPRINT-14-PR.md`.
 
 **ADRs candidatos durante a Fase 2** (criados just-in-time quando cada decisao for tomada):
 - ADR 0012 — Motor de regras de credito interno (Sprint 8, aceito em 2026-05-18; 0011 ja estava ocupado)

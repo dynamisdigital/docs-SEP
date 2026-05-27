@@ -422,6 +422,7 @@ No estado atual:
   - Sprints 10, 11 → Epic 7 (Formalizacao geracao, Assinatura Digital + CCB)
   - Sprints 12, 13 → Epic 8 (Cobranca parcelas, Inadimplencia)
   - Sprint 14 → Epic 9 (Backoffice operacional — fechamento Fase 2)
+- execucao backend da Fase 2 concluida em 2026-05-26 com a Sprint 14 (`backoffice`) mergeada em `develop` via PR #63 (`30def6a`); PRD §22/§29, `BACKOFFICE.md`, `SPRINT-14-PR.md`, collections e AI-ROADMAP passaram a ser as fontes de fechamento da fase.
 - ADRs candidatos da Fase 2 (criados just-in-time durante cada sprint, nao agora):
   - ADR 0011: Motor de regras de credito interno (Sprint 8)
   - ADR 0012: Provedor de assinatura digital (Sprint 11) — gate da Sprint 11
@@ -871,17 +872,24 @@ No estado atual:
   - **Pendencias**: revogacao tardia de consentimento (`consent.denied` apos `authorized` hoje apenas WARN); thresholds bonus/penalidade hardcoded -> migrar pra `CreditoMotorProperties`; multiplos provedores Open Finance; renovacao automatica; UI web/mobile (Sprint 9 backend-only)
   - Documentacao consolidada: `docs-SEP/repos/sep-api/OPEN-FINANCE.md` (novo), `CREDITO.md` atualizado, `SPRINT-9-PR.md`, Postman + Insomnia com pasta "Open Finance (Sprint 9)"
 
+- **Sprint 14 backend concluida em 2026-05-26** (PR #63 -> `develop`, commit `30def6a`): fechamento operacional da Fase 2 com modulo `backoffice`. Entregaveis consolidados:
+  - fila operacional unificada com itens de onboarding, credito, contratos, cobranca e webhooks; comentarios internos; assumir, resolver e ignorar item com transicoes auditaveis
+  - reprocessos manuais de webhook e provider com step-up obrigatorio nos endpoints sensiveis, anti-abuso 3/24h e strategies de provider inicialmente como stubs intencionais
+  - dashboard consolidado, role `BACKOFFICE`, migration V34, auditoria reforcada com 6 tipos novos e `BackofficeAuditListener`
+  - 9 endpoints REST em `/api/v1/backoffice`, OpenAPI atualizado, Postman/Insomnia com 9 requests, `BACKOFFICE.md` e `SPRINT-14-PR.md`
+  - pendencias aceitas/adiadas: strategies reais de reprocesso provider, handler real por provider/evento no reprocesso webhook, race residual best-effort no anti-abuso, multi-role `FINANCEIRO + BACKOFFICE`, V34 idempotente, JavaDoc/OpenAPI dos DTOs de role e OOM pre-existente em full run
+
 ## Proximo passo mais natural
 
-Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1, 2, 3, 4, **5 backend** (Endurecimento de Seguranca, 2026-05-11, PR #27), **6 backend** (Onboarding KYC PF, 2026-05-13, PR #41/#42), **7 backend** (Onboarding KYB PJ + PLD, 2026-05-15, PR #43), **8 backend** (Credito regras + parecer, 2026-05-18) e **9 backend** (Credito Open Finance Brasil, 2026-05-19, PR #51 squash `faec439`) + **M-Sprints 1-5 mobile** + **F-Sprints 1-5 web** + **Follow-ups 5F-FIX-01..06** concluidas, com fluxo GitHub `feature → develop → main` estavel e documentacao consolidada (`docs-sep/SEGURANCA.md` §16; `docs-SEP/repos/sep-api/ONBOARDING.md`; `docs-SEP/repos/sep-api/CREDITO.md`; `docs-SEP/repos/sep-api/OPEN-FINANCE.md`; PRs `SPRINT-6-PR.md` ate `SPRINT-9-PR.md`), os proximos passos provaveis sao:
+Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend Sprints 5-14** (2026-05-11 a 2026-05-26) + **M-Sprints 1-5 mobile** + **F-Sprints 1-5 web** + **Follow-ups 5F-FIX-01..06** concluidas, com fluxo GitHub `feature → develop → main` estavel e documentacao consolidada (`docs-sep/SEGURANCA.md` §16; `ONBOARDING.md`; `CREDITO.md`; `OPEN-FINANCE.md`; `CONTRATOS.md`; `CCB.md`; `COBRANCA.md`; `NOTIFICACOES.md`; `BACKOFFICE.md`; PRs `SPRINT-6-PR.md` ate `SPRINT-14-PR.md`), os proximos passos provaveis sao:
 - **Configurar branch protection no GitHub**: nos 3 repos (`sep-api`, `sep-app`, `sep-mobile`) — proteger `develop` contra delecao (`allow_deletions=false`), exigir PR + status checks; em `main` desabilitar squash merge e habilitar merge commit (preserva historico das features); definir `develop` como default branch (PRs apontam pra develop por padrao). Comandos `gh api` listados em conversa do agente; usuario executa apos `gh auth login`
-- **Merge `develop -> main`** dos pacotes Sprints 7-9 (atualmente em `develop`; `main` recebeu pela ultima vez ate Sprint 6 via PR #41/#42). PR `develop -> main` com merge commit (sem squash) preserva historico individual das features
-- **Sprint 10 backend** (Epic 7 parte 1 — Formalizacao geracao de contrato, spec `specs/fase-2/010-sprint-10-formalizacao-geracao-contrato.md`) e o proximo passo natural. Antes de implementar, criar `steps-fase-2/backend/010-sprint-10-steps.md` just-in-time. Modulo `contratos` novo; consome proposta `APROVADA` da Sprint 8 como entrada do fluxo
-- **ADR 0013 (provedor de assinatura digital)** — gate da Sprint 11; pode ser elaborado em paralelo a Sprint 10
+- **Merge `develop -> main`** dos pacotes ja acumulados, quando aplicavel, preservando historico individual das features conforme politica do repositorio.
+- **Epic 13 (Frontend de Jornadas)** e **Epic 14 Fase Mobile 2+** passam a ser candidatas naturais apos a estabilizacao dos contratos backend da Fase 2. Planejar specs/steps web/mobile just-in-time antes de implementar.
+- **Epic 15/Pix e integracoes reais de provider** podem ser detalhadas agora que os modulos de contratacao, cobranca e backoffice ja existem.
 - **Smoke real Celcoin sandbox**: ainda nao executado; precisa credenciais sandbox + alinhamento dos contratos reais com o `CelcoinKycMapper` (atualmente baseado nos campos `verification_id`/`status`/`reason` da documentacao oficial)
 - **Trilha AWS / Epic 16** pode iniciar em paralelo, pois o gate minimo de seguranca foi vencido: Sprint 3 entregou auth/autorizacao e Sprint 5 entregou hardening de MFA/refresh/lockout/step-up.
 - **Integracao Celcoin sandbox real** para `KycProvider`, `EscrowProvider` e `PixProvider` esta liberada apos Sprint 5, desde que credenciais e segregacao por ambiente estejam configuradas.
-- **Epic 13 (Frontend de Jornadas)** e **Epic 14 Fase Mobile 2+** continuam aguardando contratos estaveis das Epics 5-11, mas a base web/mobile autenticada e os fluxos de seguranca ja estao prontos para consumir os proximos endpoints.
+- **Base web/mobile autenticada** e fluxos de seguranca ja estao prontos para consumir os endpoints das jornadas planejadas.
 - Validar manualmente, quando necessario, os fluxos cross-stack pos-Sprint 5 com backend `sep-api` em `:8080`: login com MFA, refresh, logout, account locked, step-up para alterar senha e setup/desativacao de TOTP; E2E cross-repo completo segue deferido.
 - migracao para Testcontainers continua como follow-up cross-sprint (issue Docker Engine 28+ precisa estabilizar) — agora atinge `SmokeBootTest`, `UsuarioRepositoryTest`, `OpenApiConfigTest`, `SmokeE2ETest` e todos os `@DataJpaTest` da Sprint 5
 - refactor de `AuthController.me()` consumindo `ConsultarUsuarioUseCase` (atualmente injeta `UsuarioRepository` direto) — pode entrar como ajuste pequeno ou follow-up

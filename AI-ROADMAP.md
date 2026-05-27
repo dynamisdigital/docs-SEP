@@ -78,6 +78,7 @@ Leitura base para qualquer agente:
 | Open Finance, consentimento, movimentacao | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) |
 | cobranca, parcelas, agenda, recebimento, idempotency-key, escrow movimentacao | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`012-sprint-12-steps.md`](steps-fase-2/backend/012-sprint-12-steps.md) + [`SPRINT-12-PR.md`](repos/sep-api/SPRINT-12-PR.md) |
 | inadimplencia, renegociacao, notificacao de cobranca, Zenvia, SMS | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`repos/sep-api/NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) + [`013-sprint-13-steps.md`](steps-fase-2/backend/013-sprint-13-steps.md) |
+| fila operacional, backoffice, reprocesso, dashboard interno | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) + [`014-sprint-14-steps.md`](steps-fase-2/backend/014-sprint-14-steps.md) + [`SPRINT-14-PR.md`](repos/sep-api/SPRINT-14-PR.md) |
 | KYC, KYB, documentos, Celcoin onboarding | [`repos/sep-api/ONBOARDING.md`](repos/sep-api/ONBOARDING.md) |
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |
 | MFA, TOTP, refresh, step-up, auditoria de seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) |
