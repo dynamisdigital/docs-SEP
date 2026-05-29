@@ -795,6 +795,30 @@
       "metaSortKey": 15
     },
     {
+      "_id": "req_wh_pix19_ok",
+      "_type": "request",
+      "parentId": "fld_webhooks_pix",
+      "name": "POST /webhooks/celcoin/pix (recebimento) — 202 (Sprint 19)",
+      "method": "POST",
+      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-Webhook-Signature",
+          "value": "{{ celcoinPixSignature }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event_id\": \"evt-1\",\n  \"event_type\": \"pix.received\",\n  \"end_to_end_id\": \"E2E-1\",\n  \"amount\": 250.00\n}"
+      },
+      "description": "Endpoint dedicado da Sprint 19 (PixWebhookController). HMAC obrigatorio (secret app.webhooks.secrets.celcoin-pix); idempotencia por event_id do payload (sem Idempotency-Key). Cria PixWebhookEvent (so hash) + PixRecebimento inicial.",
+      "metaSortKey": 0
+    },
+    {
       "_id": "req_wh_pix_ok",
       "_type": "request",
       "parentId": "fld_webhooks_pix",

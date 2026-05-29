@@ -1670,14 +1670,18 @@ Esta fase sera considerada bem-sucedida quando:
 - organizar a operacao assistida da SEP antes da automacao ampla
 
 ### Epic 10 - Jornada da empresa credora
+**Status: backend concluido — Sprint 16 (foundation) e Sprint 17 (oportunidades e carteira) mergeadas em `develop` (PRs #67 e #69).** Doc operacional: [`repos/sep-api/CREDORES.md`](../repos/sep-api/CREDORES.md).
 - estruturar a jornada futura da empresa que aporta recursos na SEP
-- preparar onboarding, elegibilidade e governanca da empresa credora
-- modelar aportes, alocacoes e visao de carteira em fases futuras
+- ✅ Sprint 16: cadastro da credora a partir de onboarding PJ aprovado, perfil operacional, elegibilidade derivada do resultado KYB/PLD (sem reexecutar), endpoints REST `/api/v1/credores`, auditoria (`CREDORA_CADASTRADA`/`ELEGIVEL`/`INELEGIVEL`)
+- ✅ Sprint 17: oportunidades de investimento (snapshot de propostas elegiveis via ports), manifestacao/cancelamento de interesse e carteira de operacoes financiadas por associacao assistida (admin, contrato `ASSINADO`); endpoints `/api/v1/credores/oportunidades` e `/carteira`; auditoria (`CREDORA_INTERESSE_REGISTRADO`/`CANCELADO`, `CREDORA_OPERACAO_ASSOCIADA`). Sem aporte/Pix/escrow/matching automatico.
 - permitir acompanhamento das operacoes financiadas e seu status
+- movimentacao financeira real (aporte/Pix/escrow) e matching ficam fora do Epic 10 (dependem do Epic 15 e de decisao de produto)
 - manter a entrada desta jornada posterior ao nucleo de contratacao do emprestimo
 
 ### Epic 11 - Administracao e governanca
+**Status: Sprint 18 (RBAC cumulativo + parametros) mergeada em `develop` via PR #71 (merge `ab2c39a`).** Doc operacional: [`docs-sep/SEGURANCA.md`](./SEGURANCA.md) §multi-role.
 - expandir a administracao de usuarios para governanca operacional mais ampla
+- ✅ Sprint 18: roles cumulativas por usuario (resolve `FINANCEIRO + BACKOFFICE`) com JWT/authorities/guards multi-role e compatibilidade preservada; modulo `governanca` com parametros operacionais versionados/auditaveis; endpoints admin de roles e parametros com step-up; auditoria `USUARIO_ROLES_ALTERADAS`/`PARAMETRO_OPERACIONAL_ALTERADO`
 - preparar RBAC evoluido, perfis internos e parametrizacoes futuras
 - registrar auditoria administrativa e controles de acesso mais detalhados
 - permitir cadastros mestres e configuracoes operacionais do produto
@@ -1743,6 +1747,9 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - acompanhamento de carteira em fases futuras
 
 ### Epic 15 - Movimentacao Pix
+
+**Status: Sprint 19 (foundation) mergeada em `develop` via PR #73 (`12ca083`).** Modulo `pix` (dominio + idempotencia + webhook HMAC + auditoria), `PixProvider`/`EscrowProvider` por Provider Pattern (Fake default + Celcoin skeleton com WireMock). Sem desembolso/conciliacao real — Sprints 20/21. Doc operacional: [`repos/sep-api/PIX.md`](../repos/sep-api/PIX.md).
+
 - tratar Pix como fase posterior a fundacao atual da API e a estabilizacao das jornadas que impactam a contratacao
 - posicionar Pix depois de onboarding, analise de credito, formalizacao contratual e cobranca inicial
 - iniciar pelo recorte de `desembolso + recebimento`, evitando comecar por automacao ampla
@@ -1984,10 +1991,10 @@ Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte d
 
 | Sprint | Epic/frente | Tema | Spec | Tasks impl. |
 |--------|-------------|------|------|-------------|
-| 16 | Epic 10 | Jornada credora foundation | [`016`](../specs/fase-3/016-sprint-16-credora-foundation.md) | 6 |
-| 17 | Epic 10 | Oportunidades e carteira da credora | [`017`](../specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) | 6 |
-| 18 | Epic 11 | Administracao e governanca avancada | [`018`](../specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) | 6 |
-| 19 | Epic 15 | Pix foundation + EscrowProvider | [`019`](../specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) | 6 |
+| 16 | Epic 10 | Jornada credora foundation (**implementada**) | [`016`](../specs/fase-3/016-sprint-16-credora-foundation.md) | 6 |
+| 17 | Epic 10 | Oportunidades e carteira da credora (**implementada**) | [`017`](../specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) | 6 |
+| 18 | Epic 11 | Administracao e governanca avancada (**mergeada**, PR #71) | [`018`](../specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) | 6 |
+| 19 | Epic 15 | Pix foundation + EscrowProvider (**implementada**) | [`019`](../specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) | 6 |
 | 20 | Epic 15 | Pix desembolso assistido | [`020`](../specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) | 5 |
 | 21 | Epic 15 | Pix recebimento e conciliacao | [`021`](../specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 6 |
 

@@ -181,7 +181,7 @@
     <div class="meta-grid">
       <div class="metric"><span>Produto</span><strong>SEP</strong></div>
       <div class="metric"><span>Fase</span><strong>Fase 3 - Jornadas e capacidades pos-Fase-2</strong></div>
-      <div class="metric"><span>Status</span><strong>Specs planejados; steps just-in-time</strong></div>
+      <div class="metric"><span>Status</span><strong>Epics 10 e 11 concluidos no backend (Sprints 16-18 em develop); Sprint 19 (Pix foundation) mergeada em develop via PR #73 (12ca083); proxima Sprint 20</strong></div>
       <div class="metric"><span>Base</span><strong>Fase 2 concluida em main</strong></div>
     </div>
   </header>
@@ -217,9 +217,9 @@
           <tbody>
             <tr><td>1</td><td>Epic 13 - Frontend de Jornadas</td><td>Implementar jornadas web consumindo APIs da Fase 2.</td><td><span class="badge info">Candidata natural</span></td></tr>
             <tr><td>2</td><td>Epic 14 - Mobile SEP Fase 2+</td><td>Implementar jornadas mobile do tomador e empresa credora.</td><td>Exclui financeiro, backoffice, admin completo e auditoria.</td></tr>
-            <tr><td>3</td><td>Epic 10 - Jornada da empresa credora</td><td>Modelar e expor capacidades da empresa que aporta recursos.</td><td>Pode exigir backend novo.</td></tr>
-            <tr><td>4</td><td>Epic 11 - Administracao e governanca</td><td>Evoluir RBAC, parametros, cadastros mestres e auditoria administrativa.</td><td>Carrega pendencia de multi-role.</td></tr>
-            <tr><td>5</td><td>Epic 15 - Pix</td><td>Automatizar desembolso, recebimento e conciliacao via Pix/Celcoin.</td><td>Iniciar por recorte assistido.</td></tr>
+            <tr><td>3</td><td>Epic 10 - Jornada da empresa credora</td><td>Modelar e expor capacidades da empresa que aporta recursos.</td><td><span class="badge ok">Concluido no backend</span> (Sprints 16 e 17 em develop).</td></tr>
+            <tr><td>4</td><td>Epic 11 - Administracao e governanca</td><td>Evoluir RBAC, parametros, cadastros mestres e auditoria administrativa.</td><td><span class="badge ok">Concluido no backend</span> (Sprint 18 mergeada, PR #71)</td></tr>
+            <tr><td>5</td><td>Epic 15 - Pix</td><td>Automatizar desembolso, recebimento e conciliacao via Pix/Celcoin.</td><td><span class="badge ok">Foundation mergeada</span> (Sprint 19, PR #73 <code>12ca083</code>): modulo <code>pix</code> + providers + webhook + auditoria. Desembolso/conciliacao reais nas Sprints 20/21.</td></tr>
             <tr><td>Paralela</td><td>Epic 16 - Infraestrutura AWS</td><td>Planejar ambientes remotos, RDS, EC2, deploy e observabilidade.</td><td>Nao precisa bloquear jornadas locais.</td></tr>
           </tbody>
         </table>
@@ -235,8 +235,8 @@
           <tbody>
             <tr><td>Web das jornadas funcionais</td><td>Planejar F-Sprints da Epic 13 a partir dos contratos estabilizados.</td><td><span class="badge info">Candidato</span></td></tr>
             <tr><td>Mobile das jornadas funcionais</td><td>Planejar M-Sprints para tomador e credora, sem backoffice/admin mobile.</td><td><span class="badge info">Candidato</span></td></tr>
-            <tr><td>Jornada da empresa credora</td><td>Definir contratos de oportunidades, carteira, aportes e operacoes financiadas.</td><td><span class="badge info">Candidato</span></td></tr>
-            <tr><td>Governanca avancada</td><td>Definir RBAC evoluido, parametros e auditoria administrativa.</td><td><span class="badge info">Candidato</span></td></tr>
+            <tr><td>Jornada da empresa credora</td><td>Definir contratos de oportunidades, carteira, aportes e operacoes financiadas.</td><td><span class="badge ok">Concluido no backend</span> (Sprints 16 e 17); UI e movimentacao financeira fora do Epic 10.</td></tr>
+            <tr><td>Governanca avancada</td><td>Definir RBAC evoluido, parametros e auditoria administrativa.</td><td><span class="badge ok">Concluido no backend</span> (Sprint 18 mergeada, PR #71)</td></tr>
             <tr><td>Pix assistido</td><td>Detalhar providers, entidades, endpoints e webhooks antes da implementacao.</td><td><span class="badge info">Candidato</span></td></tr>
             <tr><td>Infraestrutura AWS</td><td>Planejar separadamente se houver necessidade de ambiente remoto.</td><td><span class="badge info">Candidato paralelo</span></td></tr>
           </tbody>
@@ -251,7 +251,7 @@
             <tr><td>Strategies reais de reprocesso de provider</td><td>Conectar strategies aos use cases reais dos modulos donos antes de expor acao de reprocesso no web.</td><td><span class="badge warn">Precheck F-Sprint 10</span></td></tr>
             <tr><td>Handler real por provider/event no reprocesso webhook</td><td>Substituir processamento generico por roteamento real dos eventos suportados antes de liberar reprocesso operacional.</td><td><span class="badge warn">Precheck F-Sprint 10</span></td></tr>
             <tr><td>Race residual no anti-abuso de reprocesso</td><td>Avaliar <code>pg_advisory_xact_lock</code> se houver concorrencia operacional real.</td><td><span class="badge info">Aceito/documentado</span></td></tr>
-            <tr><td>Multi-role FINANCEIRO + BACKOFFICE</td><td>Refatorar modelo de roles/permissoes antes de governanca avancada.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
+            <tr><td>Multi-role FINANCEIRO + BACKOFFICE</td><td>Refatorar modelo de roles/permissoes antes de governanca avancada.</td><td><span class="badge ok">Resolvido na Sprint 18</span></td></tr>
             <tr><td>V34 nao idempotente</td><td>Criar hotfix de migration defensiva apenas se houver necessidade operacional.</td><td><span class="badge info">Aceito/adiado</span></td></tr>
             <tr><td>OpenAPI/JavaDoc dos DTOs de role</td><td>Atualizar DTOs de role quando a governanca avancada entrar.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
             <tr><td>IT concorrente de recebimento</td><td>Criar teste explicito de concorrencia para <code>RegistrarRecebimentoUseCase</code>.</td><td><span class="badge warn">Aberto/adiado</span></td></tr>
@@ -310,6 +310,60 @@
             <tr><td>2026-05-27</td><td>Este relatorio passa a ser o painel exclusivo de acompanhamento da Fase 3.</td><td>Solicitacao do usuario.</td></tr>
             <tr><td>2026-05-27</td><td>Specs da Fase 3 criados por projeto: 6 backend, 8 web e 6 mobile, todos com ate 6 tasks de implementacao.</td><td><code>specs/fase-3/README.md</code>.</td></tr>
             <tr><td>2026-05-27</td><td>Revisao documental da Fase 3 incorporada: step-up estrito virou precheck da Sprint 20, reprocessos web dependem de handlers reais, jornada credora explicita contrato de autorizacao e Sprint 19 evolui <code>EscrowProvider</code> existente.</td><td>Revisao com subagent.</td></tr>
+            <tr><td>2026-05-28</td><td>Step just-in-time da Sprint 17 criado para oportunidades, interesse e carteira da empresa credora.</td><td><code>steps-fase-3/backend/017-sprint-17-steps.md</code>.</td></tr>
+            <tr><td>2026-05-28</td><td>Sprint 16 (Epic 10 foundation) concluida e mergeada em <code>develop</code> via PR #67 (squash <code>fec263e</code>); confirma a base da Sprint 17.</td><td><code>repos/sep-api/CREDORES.md</code>, PR #67.</td></tr>
+            <tr><td>2026-05-28</td><td>Sprint 17 (Epic 10 oportunidades e carteira) concluida e mergeada em <code>develop</code> via PR #69 (merge <code>415c82a</code>); fecha o Epic 10 no backend.</td><td><code>repos/sep-api/CREDORES.md</code>, PR #69.</td></tr>
+            <tr><td>2026-05-28</td><td>Carteira nasce por associacao operacional assistida e explicita (admin, contrato <code>ASSINADO</code>); interesse nao vira carteira automaticamente; sem matching/aporte/Pix.</td><td>Decisao com o usuario.</td></tr>
+            <tr><td>2026-05-28</td><td>Divida tecnica aceita: use cases de <code>credores</code> dependem de repositories diretamente (padrao S16 + cobranca); refator de ports de persistencia adiado p/ hardening.</td><td>Review manual Sprint 17.</td></tr>
+            <tr><td>2026-05-28</td><td>RBAC cumulativo: <code>roles</code> autoritativo + <code>usuario.role</code> principal denormalizada; claim JWT continua lista; consumo de parametros governados segue por properties (adocao incremental).</td><td>Sprint 18.</td></tr>
+            <tr><td>2026-05-28</td><td>use case -&gt; repository direto confirmado como padrao do projeto (nao divida) tambem no modulo <code>governanca</code>.</td><td>Review manual Sprint 18.</td></tr>
+            <tr><td>2026-05-29</td><td>Sprint 19 (Epic 15 - Pix foundation + EscrowProvider) mergeada em <code>develop</code> via PR #73 (<code>12ca083</code>): modulo <code>pix</code> (V45), webhook HMAC + idempotencia, auditoria (V46), providers Fake/Celcoin com WireMock.</td><td><code>repos/sep-api/PIX.md</code>, PR #73.</td></tr>
+            <tr><td>2026-05-29</td><td>Decisoes Sprint 19: <code>PixWebhookEvent</code> so hash do payload (minimizacao); idempotencia por <code>(provider,event_id)</code>; erros Celcoin traduzidos para excecoes de provider; OAuth fail-fast no boot; retry por tipo no YAML faz 4xx tambem reentrar (tradeoff de skeleton). Auditoria de transferencia/escrow de provider adiada p/ Sprints 20/21.</td><td>Review manual Sprint 19.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>Sprints concluidas na Fase 3</h2>
+      <h3>2026-05-28 - Sprint 16 (Backend, Epic 10 - Jornada Credora Foundation)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Campo</th><th>Detalhe</th></tr></thead>
+          <tbody>
+            <tr><td>Status anterior</td><td>Spec 016 planejada; modulo <code>credores</code> stub.</td></tr>
+            <tr><td>Acao realizada</td><td>Modulo <code>credores</code> (DDD + Hexagonal) em 3 ciclos: dominio+persistencia (<code>EmpresaCredora</code>, <code>PerfilCredora</code>, VOs, V38); use cases de cadastro/consulta + elegibilidade derivada do onboarding PJ sem reexecutar KYB/PLD (porta read-only aditiva <code>ConsultarEmpresaParaCredoraQuery</code>); REST <code>/api/v1/credores</code> + auditoria (<code>CredoresAuditListener</code>, tipos <code>CREDORA_*</code>, V39). Mergeada via PR #67 (squash <code>fec263e</code>).</td></tr>
+            <tr><td>Evidencia</td><td><code>repos/sep-api/CREDORES.md</code>; <code>EmpresaCredoraIT</code> 10 cenarios verdes; commits <code>81f31c2</code>/<code>95c48fa</code>/<code>d56822d</code>; PRD §Epic 10 e §30.</td></tr>
+            <tr><td>Pendencias</td><td>Auditoria de alteracao cadastral (sem use case de alteracao na foundation); aportes/oportunidades/carteira na Sprint 17.</td></tr>
+            <tr><td>Proximo passo</td><td>Sprint 17 (oportunidades e carteira da credora, spec 017) — base confirmada em <code>develop</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2026-05-28 - Sprint 17 (Backend, Epic 10 - Oportunidades e Carteira)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Campo</th><th>Detalhe</th></tr></thead>
+          <tbody>
+            <tr><td>Status anterior</td><td>Spec 017 planejada; carteira/oportunidades inexistentes.</td></tr>
+            <tr><td>Acao realizada</td><td>3 ciclos: dominio (<code>OportunidadeInvestimento</code>/<code>InteresseCredora</code>/<code>OperacaoFinanciada</code>, V40); ports de leitura consumer-driven + adapters para <code>credito</code>/<code>contratos</code>/<code>cobranca</code> (sem alterar esses modulos); use cases (sync admin, interesse, carteira, associacao assistida com contrato <code>ASSINADO</code>); REST <code>/oportunidades</code> e <code>/carteira</code> + auditoria (<code>CredoresAuditListener</code>, V41). Mergeada via PR #69 (merge <code>415c82a</code>).</td></tr>
+            <tr><td>Evidencia</td><td><code>repos/sep-api/CREDORES.md</code>; <code>CarteiraCredoraIT</code> + <code>CarteiraCredoraUseCaseTest</code> + <code>CarteiraCredoraDomainTest</code> (33 testes credores verdes); commits <code>2929fe8</code>/<code>5b8aab2</code>/<code>01b3837</code>/<code>681ba42</code>/<code>bfad652</code>; PRD §Epic 10 e §30.</td></tr>
+            <tr><td>Pendencias</td><td>Divida tecnica de ports de persistencia (hardening); followups N+1 carteira e sync sem paginacao; movimentacao financeira real fora do Epic 10.</td></tr>
+            <tr><td>Proximo passo</td><td>Sprint 18 (Epic 11 — Administracao e governanca avancada / RBAC + parametros, spec 018).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2026-05-28 - Sprint 18 (Backend, Epic 11 - RBAC cumulativo + parametros)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Campo</th><th>Detalhe</th></tr></thead>
+          <tbody>
+            <tr><td>Status anterior</td><td>Usuario single-role; pendencia <code>FINANCEIRO + BACKOFFICE</code>; sem catalogo de parametros governado.</td></tr>
+            <tr><td>Acao realizada</td><td>4 ciclos: (C1) <code>Usuario</code> multi-role (<code>Set&lt;Role&gt;</code> + <code>usuario_role</code>, V42, principal por precedencia); (C2) JWT/authorities/guards multi-role + 12 consumidores migrados para <code>temRole</code>; (C3) modulo <code>governanca</code> com <code>ParametroOperacional</code> versionado/auditavel (V43, seed 11 params, lock pessimista + UNIQUE versao); (C4) endpoints admin de roles e parametros com step-up + auditoria (<code>USUARIO_ROLES_ALTERADAS</code>, <code>PARAMETRO_OPERACIONAL_ALTERADO</code>, V44). Mergeada em <code>develop</code> via PR #71 (merge <code>ab2c39a</code>).</td></tr>
+            <tr><td>Evidencia</td><td><code>docs-sep/SEGURANCA.md</code> §17; suite 1493/0 (<code>MultiRoleAuthorizationIT</code>, <code>GovernancaRbacIT</code> etc.); commits <code>65c6726</code>..<code>da267a4</code>.</td></tr>
+            <tr><td>Pendencias</td><td>Consumo de properties -&gt; <code>ParametroOperacionalReader</code> (incremental); drop futuro de <code>usuario.role</code>; ports de persistencia cross-codebase (divida aceita).</td></tr>
+            <tr><td>Proximo passo</td><td>Sprint 19 (Epic 15 — Pix foundation + EscrowProvider, spec 019).</td></tr>
           </tbody>
         </table>
       </div>
@@ -318,10 +372,8 @@
     <section>
       <h2>Proximos passos</h2>
       <ol>
-        <li>Escolher qual sprint da Fase 3 sera executada primeiro.</li>
-        <li>Criar o step just-in-time da primeira sprint aprovada.</li>
-        <li>Reclassificar os itens adiados como entra na Fase 3, continua adiado, descartado ou dependencia externa.</li>
-        <li>Atualizar este relatorio quando a primeira sprint entrar em execucao.</li>
+        <li>Iniciar Sprint 19 (Epic 15 — Pix foundation + EscrowProvider, spec 019); precheck bloqueante da Sprint 20: step-up estrito sem bypass MFA.</li>
+        <li>Tratar dividas tecnicas e followups acumulados (ports de persistencia, consumo de parametros governados, N+1) em sprint de hardening.</li>
       </ol>
     </section>
   </main>

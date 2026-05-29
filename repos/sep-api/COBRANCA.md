@@ -14,6 +14,8 @@ Pos-formalizacao (contrato `ASSINADO`), o sistema gera agenda de pagamento, pers
 
 Pix, boleto e conciliacao automatica nao entram. Recebimento eh manual por API, usado pelo financeiro apos confirmacao off-band do pagamento. Comunicacoes de cobranca usam Provider Pattern com SMTP/Zenvia em ambientes reais e `LogNotificationProvider` em dev/test.
 
+> Pix (Epic 15): a Sprint 19 criou a fundacao do modulo `pix` (ver [`PIX.md`](PIX.md)) — webhook recebe e registra `PixRecebimento` inicial, mas **ainda nao concilia** parcela de cobranca automaticamente. A transicao do recebimento manual para a baixa automatica via Pix fica para as Sprints 20/21.
+
 ## Fluxo end-to-end implementado
 
 ```text

@@ -902,6 +902,18 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - mobile `sep-mobile`: M-Sprints 6-11 (tomador onboarding, credito, formalizacao, cobranca, credora e Pix visivel ao usuario)
   - cada sprint possui no maximo 6 tasks de implementacao; precheck, E2E/smoke e docs nao contam nessa regra
   - steps continuam just-in-time, criados somente quando a sprint for aprovada para execucao
+- **Fase 3 backend atualizada em 2026-05-28**:
+  - Sprint 16 (`feature/sprint-16-credora-foundation`) concluida e mergeada em `develop` via PR #67, consolidando o cadastro da empresa credora, perfil de investimento e docs operacionais em `repos/sep-api/CREDORES.md`
+  - Sprint 17 (`feature/sprint-17-credora-oportunidades-carteira`) concluida e mergeada em `develop` via PR #69, fechando Epic 10 backend com oportunidades, interesse e carteira da empresa credora
+  - decisoes da Sprint 17: `OportunidadeInvestimento` e sincronizada por use case/admin explicito; `OperacaoFinanciada` entra na carteira por associacao operacional/admin explicita apenas para contrato elegivel/assinado; matching/aporte automatico fica fora desta foundation
+  - steps just-in-time criados em `steps-fase-3/backend/017-sprint-17-steps.md` e `steps-fase-3/backend/018-sprint-18-steps.md`
+  - proxima execucao backend recomendada: Sprint 18 (Epic 11 — administracao, RBAC cumulativo e parametros operacionais) a partir de `develop` atualizado
+
+- **Sprint 19 backend mergeada em `develop` via PR #73 (`12ca083`, 2026-05-29)** (branch `feature/sprint-19-pix-foundation-escrow-provider`):
+  - abre Epic 15 (Pix). Cria a fundacao do modulo `pix` (dominio + idempotencia V45 + webhook HMAC + auditoria V46) e o `EscrowProvider`, ambos por Provider Pattern (Fake default + Celcoin skeleton com WireMock). Doc operacional em `repos/sep-api/PIX.md`.
+  - decisoes: `PixWebhookEvent` persiste so o hash do payload (minimizacao); idempotencia do webhook por `(provider, event_id)`; erros Celcoin traduzidos para excecoes de provider (sem vazar framework); OAuth fail-fast no boot quando `provider=celcoin`; retry roteado por tipo no YAML faz 4xx tambem reentrar (tradeoff de skeleton, igual `clicksign-assinatura`).
+  - foundation: sem desembolso real, conciliacao de parcela ou eventos de auditoria de transferencia/escrow de provider (`PIX_TRANSFERENCIA_SOLICITADA`, `ESCROW_*_PROVIDER_CRIADA`) — ficam para as Sprints 20/21.
+  - proxima execucao backend recomendada: Sprint 20 (Epic 15 — Pix desembolso assistido).
 
 ## Observacao importante para outro agente
 

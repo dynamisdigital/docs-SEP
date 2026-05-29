@@ -1157,6 +1157,51 @@
       "description": "Webhook Receiver Pattern (`POST /api/v1/webhooks/{provider}/{event}`) com HMAC-SHA256 + `Idempotency-Key` + Outbox stub. Preparação para Epic 15 (Pix) e Epic 5 (KYC callbacks Celcoin).\n\n**Headers obrigatórios:**\n- `Idempotency-Key`: UUID/string única por evento\n- `X-Webhook-Signature`: hex lowercase do HMAC-SHA256(secret, payload)\n\n**Como gerar a assinatura no Postman (Pre-request Script):**\n```js\nconst secret = pm.collectionVariables.get('webhookSecret');\nconst body = pm.request.body.raw;\nconst hmac = CryptoJS.HmacSHA256(body, secret).toString();\npm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});\n```",
       "item": [
         {
+          "name": "POST /webhooks/celcoin/pix (recebimento) — 202 (Sprint 19)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const secret = pm.collectionVariables.get('webhookSecretPix') || pm.collectionVariables.get('webhookSecret');",
+                  "const body = pm.request.body.raw;",
+                  "const hmac = CryptoJS.HmacSHA256(body, secret).toString();",
+                  "pm.request.headers.upsert({key: 'X-Webhook-Signature', value: hmac});",
+                  "console.log('signature:', hmac);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_id\": \"evt-{{$timestamp}}\",\n  \"event_type\": \"pix.received\",\n  \"end_to_end_id\": \"E2E-{{$timestamp}}\",\n  \"amount\": 250.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/webhooks/celcoin/pix",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "webhooks",
+                "celcoin",
+                "pix"
+              ]
+            },
+            "description": "Endpoint dedicado da Sprint 19 (PixWebhookController). HMAC obrigatorio (secret `app.webhooks.secrets.celcoin-pix`). Idempotencia por `event_id` do payload (sem Idempotency-Key no header). Cria `PixWebhookEvent` (so hash) + `PixRecebimento` inicial. Reenviar o mesmo `event_id` retorna 202 sem reprocessar; assinatura invalida -> 401."
+          }
+        },
+        {
           "name": "POST /webhooks/celcoin/pix-recebimento — 202",
           "event": [
             {

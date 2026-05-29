@@ -57,8 +57,9 @@ Leitura base para qualquer agente:
 
 | Modulo/tema | Documentacao principal | Specs/steps principais | ADRs comuns |
 |-------------|------------------------|------------------------|-------------|
-| `identity` / seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) | Sprint 5 em `specs/fase-2/` e `steps-fase-2/backend/` | 0001, 0007, 0009, 0010 |
-| `usuarios` | PRD + specs das Sprints 2, 5 e 8 | `specs/fase-1/002-*`, `specs/fase-2/005-*`, `008-*` | 0001, 0007 |
+| `identity` / seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) | Sprint 5 em `specs/fase-2/`; multi-role na Sprint 18 (`specs/fase-3/018-*`) | 0001, 0007, 0009, 0010 |
+| `usuarios` | PRD + specs das Sprints 2, 5, 8 e 18 (RBAC cumulativo) | `specs/fase-1/002-*`, `specs/fase-2/005-*`, `008-*`, `specs/fase-3/018-*` | 0001, 0007 |
+| `governanca` (RBAC + parametros) | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) §multi-role | [`018`](specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) (mergeada, PR #71) | 0001, 0007 |
 | `onboarding` KYC/KYB | [`repos/sep-api/ONBOARDING.md`](repos/sep-api/ONBOARDING.md) | Sprints 6 e 7 | 0004, 0007, 0008 |
 | PLD | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) | Sprint 7 | 0004, 0007, 0008 |
 | `credito` | [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) | Sprints 8 e 9 | 0007, 0012 |
@@ -67,9 +68,9 @@ Leitura base para qualquer agente:
 | `cobranca` | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) | [`012`](steps-fase-2/backend/012-sprint-12-steps.md) (implementada) + [`013`](steps-fase-2/backend/013-sprint-13-steps.md) | 0001, 0005, 0007, 0014 |
 | `backoffice` | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) | [`014`](steps-fase-2/backend/014-sprint-14-steps.md) | 0001, 0007 |
 | Hardening pos-Fase-2 | [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) + [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) | [`015`](steps-fase-2/backend/015-sprint-15-hardening-steps.md) | 0001, 0007, 0015 |
-| `credores` | PRD Epic 10 + [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) | [`016`](specs/fase-3/016-sprint-16-credora-foundation.md), [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) | 0001, 0007 |
-| `escrow` | [`repos/sep-api/COBRANCA.md` §escrow](repos/sep-api/COBRANCA.md) (use case publico Sprint 12) + specs Fase 3 | Sprint 12 (parte local), [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0005, 0007 |
-| `financeiro` / Pix | PRD Epic 15 + [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) | [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md), [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0005, 0007 |
+| `credores` | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + PRD Epic 10 | [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) (implementada), [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) (implementada) | 0001, 0004, 0007 |
+| `escrow` | [`repos/sep-api/PIX.md` §provider](repos/sep-api/PIX.md) (`EscrowProvider`, Sprint 19) + [`COBRANCA.md` §escrow](repos/sep-api/COBRANCA.md) (use case local Sprint 12) | Sprint 12 (parte local), [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0005, 0007 |
+| `pix` / `financeiro` | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) (Sprint 19 foundation) + PRD Epic 15 | [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0004, 0005, 0007, 0008 |
 | Web | [`repos/sep-app/README.md`](repos/sep-app/README.md) | `specs/fase-1/100-*` a `104-*`; `specs/fase-3/106-*` a `113-*`; `steps-fase-1/web/` | 0002, 0003, 0011 |
 | Mobile | [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) | `specs/fase-1/200-*` a `204-*`; `specs/fase-3/206-*` a `211-*`; `steps-fase-1/mobile/` | 0003, 0009, 0010, 0011, 0015 |
 
@@ -84,11 +85,13 @@ Leitura base para qualquer agente:
 | cobranca, parcelas, agenda, recebimento, idempotency-key, escrow movimentacao | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`012-sprint-12-steps.md`](steps-fase-2/backend/012-sprint-12-steps.md) |
 | inadimplencia, renegociacao, notificacao de cobranca, Zenvia, SMS | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`repos/sep-api/NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) + [`013-sprint-13-steps.md`](steps-fase-2/backend/013-sprint-13-steps.md) |
 | fila operacional, backoffice, reprocesso, dashboard interno | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) + [`014-sprint-14-steps.md`](steps-fase-2/backend/014-sprint-14-steps.md) |
-| empresa credora, oportunidades, carteira, aportes | [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) + [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) + [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) |
+| empresa credora, cadastro credora, elegibilidade credora | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) |
+| oportunidades, carteira, interesse, operacao financiada da credora | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) |
 | Pix, desembolso, recebimento Pix, conciliacao Pix | [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) + [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) + [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) |
 | KYC, KYB, documentos, Celcoin onboarding | [`repos/sep-api/ONBOARDING.md`](repos/sep-api/ONBOARDING.md) |
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |
 | MFA, TOTP, refresh, step-up, auditoria de seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) |
+| multi-role, roles cumulativas, FINANCEIRO+BACKOFFICE, parametros operacionais, governanca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) §multi-role + [`018`](specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) |
 | tela web, Angular, design Apple/Notion | [`docs-sep/WEB-SCREENS-PLAN.md`](docs-sep/WEB-SCREENS-PLAN.md) |
 | mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) |
 | pipeline, CI, deploy | [`docs-sep/ci-pipelines/README.md`](docs-sep/ci-pipelines/README.md) |

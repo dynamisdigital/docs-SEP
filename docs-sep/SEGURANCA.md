@@ -203,9 +203,17 @@ retencao minima 90 dias (LGPD Art. 16).
 | `MFA_ENABLED`, `MFA_DISABLED` | `ConfirmarTotpUseCase` / `DesabilitarTotpUseCase` | Toggle MFA |
 | `REFRESH_REUSE_DETECTED` | `RefreshTokenUseCase` | Reuse de refresh marcado USADO |
 | `STEP_UP_OK`, `STEP_UP_FAIL` | `CompletarStepUpUseCase` | Step-up TOTP |
+| `PIX_WEBHOOK_RECEBIDO`, `PIX_WEBHOOK_PROCESSADO`, `PIX_WEBHOOK_FALHOU` | `PixWebhookAuditListener` (Sprint 19) | Webhook Pix/Celcoin |
 
 Helper centralizado: `AuditLogSegurancaService` (3 overloads de
 `gravar(tipo, usuarioId, [ip], [userAgent], [detalhesJson])`).
+
+> Webhook Pix (`POST /api/v1/webhooks/celcoin/pix`, Sprint 19): autenticacao por
+> HMAC SHA-256 (`WebhookSignatureValidator`, secret `app.webhooks.secrets.celcoin-pix`),
+> assinatura invalida -> 401. Idempotencia por `event_id` do payload. A trilha de
+> auditoria tem `usuario_id` nulo (sem usuario autenticado) e detalhes JSON apenas
+> com `eventId`/`tipo`/`provider` — o payload bruto **nunca** e persistido (so o hash
+> SHA-256 em `pix_webhook_event`). Detalhes operacionais em [`repos/sep-api/PIX.md`](../repos/sep-api/PIX.md).
 
 ### Esquema (`audit_log_seguranca`)
 
@@ -545,3 +553,60 @@ Repo: `sep-api`. Estrategia: UPDATE condicional no banco.
 | Mesmo usuario apos PATCH senha + novo login + GET `/api/v1/usuarios` | 200 |
 | Refresh concorrente (mesmo cru): 2 chamadas simultaneas | 1 vence (200), 1 perde (401) + familia revogada |
 | Mobile alterar senha com MFA ativo | redireciona `/app/step-up?next=/app/perfil/alterar-senha`; pos-step-up, PATCH 204 |
+
+## 17. RBAC cumulativo e governanca de parametros (Sprint 18 — Epic 11)
+
+### Roles cumulativas
+
+Usuario passa a possuir um **conjunto** de roles (`Set<Role>`), resolvendo a pendencia
+`FINANCEIRO + BACKOFFICE`. Modelagem:
+
+- Fonte autoritativa: tabela `usuario_role` (`@ElementCollection`, V42 com backfill da role atual).
+- `usuario.role` e mantida como **role principal denormalizada**, sincronizada por precedencia
+  (`ADMIN > FINANCEIRO > BACKOFFICE > CLIENTE`, via `Role.principalDe`), preservando `getRole()`
+  e consumidores legados.
+- Compatibilidade JWT: a claim `roles` continua uma **lista de strings** `ROLE_*`, agora com TODAS
+  as roles. Tokens legados single-role continuam validos (parsing aceita 1+). `UsuarioAutenticado`
+  carrega o conjunto e expoe `temRole(Role)`; emite uma `GrantedAuthority` por role.
+- Guards: `@PreAuthorize("hasRole(...)"/"hasAnyRole(...)")` inalterados; checagens em codigo
+  migradas de `principal.role()` para `principal.temRole(...)`.
+
+Regras: cadastro publico continua criando apenas `CLIENTE`; criacao interna controlada por ADMIN;
+um admin **nao** pode alterar as proprias roles (403); a **ultima** role nao pode ser removida (400).
+
+Endpoints (todos `hasRole('ADMIN')`; mutacoes com `@RequireStepUp`):
+
+| Metodo | Path | Descricao |
+|--------|------|-----------|
+| GET | `/api/v1/usuarios/{id}/roles` | Consulta o conjunto + principal |
+| PUT | `/api/v1/usuarios/{id}/roles` | Substitui o conjunto (nao vazio) |
+| POST | `/api/v1/usuarios/{id}/roles/{role}` | Adiciona role |
+| DELETE | `/api/v1/usuarios/{id}/roles/{role}` | Remove role (nunca a ultima) |
+
+Endpoint legado `POST /api/v1/usuarios/{id}/role` mantido (substitui o conjunto pela role unica).
+
+Auditoria: `USUARIO_ROLES_ALTERADAS` (payload: alvo + roles anteriores/novas, sem dado sensivel).
+
+### Parametros operacionais governados (modulo `governanca`)
+
+Catalogo versionado e auditavel de limites operacionais criticos. `ParametroOperacional` guarda
+valor textual tipado (`INTEGER`/`DECIMAL`/`BOOLEAN`/`STRING`), chave unica e versao; cada alteracao
+incrementa a versao e grava `VersaoParametroOperacional` (valor anterior/novo, ator, justificativa).
+Concorrencia: lock pessimista na chave + `UNIQUE(parametro_id, versao)`.
+
+Seed inicial (V43, 11 parametros, defaults atuais de `application.yml`): `credito.valor.maximo.pf|pj`,
+`credito.prazo.maximo.pf|pj.meses`, `credito.score.pre-aprovacao`, `credito.open-finance.bonus.entradas.altas|minimas`,
+`credito.open-finance.penalidade.saldo.negativo`, `backoffice.proposta.pendente.horas`,
+`backoffice.contrato.aceito.horas`, `backoffice.webhook.pendente.horas`.
+
+Endpoints (`hasRole('ADMIN')`; `PATCH` com `@RequireStepUp`):
+
+| Metodo | Path | Descricao |
+|--------|------|-----------|
+| GET | `/api/v1/governanca/parametros` | Lista parametros |
+| GET | `/api/v1/governanca/parametros/{chave}` | Detalhe + historico |
+| PATCH | `/api/v1/governanca/parametros/{chave}` | Altera valor (validado pelo tipo) |
+
+Auditoria: `PARAMETRO_OPERACIONAL_ALTERADO` (V44). Consumo em regras de negocio: **adocao
+incremental** — `credito`/`backoffice` ainda leem properties; a porta `ParametroOperacionalReader`
+(com fallback ao default) habilita migracao gradual sem quebrar regras existentes.
