@@ -4,7 +4,8 @@ Este diretório reúne toda a documentação funcional, técnica e de produto do
 
 ## Estrutura dos Arquivos
 
-- **PRD.md**: Documento de requisitos do produto (Product Requirements Document), com visão geral, objetivos, escopo, épicos, critérios de sucesso e roadmap.
+- **PRD.md**: Índice do documento de requisitos do produto. O conteúdo detalhado fica dividido em `docs-sep/PRD-FASE-1.md`, `docs-sep/PRD-FASE-2.md` e `docs-sep/PRD-FASE-3.md`.
+- **CONTEXT.md**: Índice do contexto consolidado. O histórico detalhado fica dividido em `docs-sep/CONTEXT-PARTE-1.md` e `docs-sep/CONTEXT-PARTE-2.md`.
 - **AI-ROADMAP.md**: Mapa operacional para agentes de IA encontrarem rapidamente os documentos certos para implementações, reviews e dúvidas.
 - **documentacao-cliente.html**: Apresentação executiva para o cliente, com visão de negócio, jornadas, funcionalidades, cronograma e roadmap visual.
 - **documentacao-dev.html**: Guia técnico para desenvolvedores, detalhando stack, arquitetura, pacotes, endpoints, segurança, sprints, épicos e convenções.
@@ -16,7 +17,8 @@ Este diretório reúne toda a documentação funcional, técnica e de produto do
 
 ## Como usar
 
-- Consulte o **PRD.md** para entender o contexto, objetivos e planejamento macro do produto.
+- Consulte o **PRD.md** para navegar pelo PRD por fase.
+- Consulte o **CONTEXT.md** para navegar pelo contexto consolidado em duas partes.
 - Use o **AGENT.md** e o **AI-ROADMAP.md** para carregar o contexto minimo em novas sessoes com agentes.
 - Consulte o **AI-ROADMAP.md** para saber quais documentos ler por tipo de tarefa antes de implementar, revisar ou responder dúvidas.
 - Use a **documentacao-cliente.html** para apresentações e acompanhamento executivo.

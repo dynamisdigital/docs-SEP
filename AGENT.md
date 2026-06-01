@@ -6,8 +6,8 @@ Este arquivo e o guia operacional curto para qualquer agente de IA que trabalhe 
 
 Antes de implementar, revisar codigo ou responder duvidas, leia:
 
-1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - produto, epicos, roadmap e regras macro.
-2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - contexto e historico do projeto.
+1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - indice do PRD por fase. Conteudo detalhado em [`PRD-FASE-1.md`](docs-sep/PRD-FASE-1.md), [`PRD-FASE-2.md`](docs-sep/PRD-FASE-2.md) e [`PRD-FASE-3.md`](docs-sep/PRD-FASE-3.md).
+2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto consolidado. Conteudo detalhado em [`CONTEXT-PARTE-1.md`](docs-sep/CONTEXT-PARTE-1.md) e [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md).
 3. Este arquivo (`AGENT.md`) - regras operacionais para agentes.
 4. [`AI-ROADMAP.md`](AI-ROADMAP.md) - indice por tipo de tarefa.
 5. Spec relevante em `specs/`.
@@ -98,11 +98,12 @@ No repo `docs-SEP`:
 - O agente pode editar arquivos no working tree, mas nao cria branch, nao comita, nao faz push e nao faz reset/rebase/merge.
 - Sempre preservar mudancas existentes do usuario. Se houver arquivos modificados fora do escopo, ignorar.
 
-Arquivos de PR description:
+Arquivos de PR description (regra fixa — comportamento ativo do agente):
 
 - `repos/<repo>/SPRINT-*-PR.md` sao artefatos temporarios para apoiar a abertura/revisao do PR da sprint.
-- Eles podem ser criados no fechamento da sprint, quando o PR real precisar de uma descricao consolidada.
-- Ao iniciar uma nova sprint, apagar os `SPRINT-*-PR.md` da sprint anterior que ja foram usados no PR. O historico definitivo deve permanecer no PR do GitHub, no step da sprint, no doc operacional do modulo, no PRD/CONTEXT e no relatorio de acompanhamento.
+- **Fim de cada sprint**: o agente DEVE criar `repos/<repo>/SPRINT-<N>-PR.md` com a descricao consolidada do PR (Summary, test plan, mudancas por modulo, migrations, decisoes, dividas aceitas, followups, notas e lista de commits), sem aguardar pedido explicito. Formato espelha os PRs anteriores.
+- **Inicio de cada sprint**: o agente DEVE apagar o(s) `SPRINT-*-PR.md` da(s) sprint(s) anterior(es) ja usado(s) no PR, antes de iniciar a nova. O historico definitivo permanece no PR do GitHub, no step da sprint, no doc operacional do modulo, no PRD/CONTEXT e no relatorio de acompanhamento.
+- Operacao em `docs-SEP` e 100% manual no git: o agente cria/edita/apaga apenas no working tree; nunca commita, faz push ou abre PR desses arquivos.
 - Nao manter links permanentes para `SPRINT-*-PR.md` em docs operacionais, PRD, CONTEXT ou AI-ROADMAP.
 
 Melhoria de fim de fase:
@@ -205,7 +206,12 @@ Para sprints de hardening / bug-hunt:
 ## Referencias principais
 
 - [`docs-sep/PRD.md`](docs-sep/PRD.md)
+- [`docs-sep/PRD-FASE-1.md`](docs-sep/PRD-FASE-1.md)
+- [`docs-sep/PRD-FASE-2.md`](docs-sep/PRD-FASE-2.md)
+- [`docs-sep/PRD-FASE-3.md`](docs-sep/PRD-FASE-3.md)
 - [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md)
+- [`docs-sep/CONTEXT-PARTE-1.md`](docs-sep/CONTEXT-PARTE-1.md)
+- [`docs-sep/CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md)
 - [`AI-ROADMAP.md`](AI-ROADMAP.md)
 - [`adr/`](adr/)
 - [`specs/`](specs/)

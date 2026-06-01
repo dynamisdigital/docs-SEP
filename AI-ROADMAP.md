@@ -30,8 +30,8 @@ O `AI-ROADMAP.md` deve estar sempre atualizado.
 
 Leitura base para qualquer agente:
 
-1. [`docs-sep/PRD.md`](docs-sep/PRD.md)
-2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md)
+1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - indice do PRD; leia o arquivo de fase relevante (`PRD-FASE-1.md`, `PRD-FASE-2.md` ou `PRD-FASE-3.md`).
+2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto; leia `CONTEXT-PARTE-1.md` e/ou `CONTEXT-PARTE-2.md` conforme a tarefa.
 3. [`AGENT.md`](AGENT.md)
 4. Este arquivo (`AI-ROADMAP.md`)
 
@@ -45,7 +45,7 @@ Leitura base para qualquer agente:
 | Code review | Base -> spec da sprint -> step da task -> doc operacional do modulo -> diff/codigo -> testes existentes |
 | Criar nova sprint/steps | Base -> PRD secao da sprint -> spec correspondente -> steps anteriores similares -> ADRs relevantes |
 | Atualizacao documental | Base -> documento alvo -> documentos que apontam para ele -> este roadmap |
-| Duvida de produto/regra | `docs-sep/PRD.md` -> `docs-sep/CONTEXT.md` -> doc operacional do modulo -> spec da sprint |
+| Duvida de produto/regra | `docs-sep/PRD.md` + arquivo `PRD-FASE-*` relevante -> `docs-sep/CONTEXT.md` + parte relevante -> doc operacional do modulo -> spec da sprint |
 | Integracao externa | Base -> ADR 0004 -> ADR 0008 quando houver WireMock -> doc operacional do modulo -> specs/steps da integracao |
 | Seguranca/auth/step-up/auditoria | Base -> `docs-sep/SEGURANCA.md` -> specs/steps da Sprint 5 -> docs do modulo afetado |
 | Metricas de implementacao | Base -> [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) -> step da sprint -> relatorios/testes do repo |
@@ -70,7 +70,7 @@ Leitura base para qualquer agente:
 | Hardening pos-Fase-2 | [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) + [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) | [`015`](steps-fase-2/backend/015-sprint-15-hardening-steps.md) | 0001, 0007, 0015 |
 | `credores` | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + PRD Epic 10 | [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) (implementada), [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) (implementada) | 0001, 0004, 0007 |
 | `escrow` | [`repos/sep-api/PIX.md` §provider](repos/sep-api/PIX.md) (`EscrowProvider`, Sprint 19) + [`COBRANCA.md` §escrow](repos/sep-api/COBRANCA.md) (use case local Sprint 12) | Sprint 12 (parte local), [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0005, 0007 |
-| `pix` / `financeiro` | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) (Sprint 19 foundation) + PRD Epic 15 | [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0004, 0005, 0007, 0008 |
+| `pix` / `financeiro` | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) (Sprint 19 foundation + Sprint 20 desembolso) + PRD Epic 15 | [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`step 020`](steps-fase-3/backend/020-sprint-20-steps.md) (implementada), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0004, 0005, 0007, 0008 |
 | Web | [`repos/sep-app/README.md`](repos/sep-app/README.md) | `specs/fase-1/100-*` a `104-*`; `specs/fase-3/106-*` a `113-*`; `steps-fase-1/web/` | 0002, 0003, 0011 |
 | Mobile | [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) | `specs/fase-1/200-*` a `204-*`; `specs/fase-3/206-*` a `211-*`; `steps-fase-1/mobile/` | 0003, 0009, 0010, 0011, 0015 |
 

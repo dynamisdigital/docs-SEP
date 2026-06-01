@@ -186,6 +186,15 @@ Aplicada em:
 - `PATCH /api/v1/usuarios/{id}/senha`
 - `POST /api/v1/auth/totp/disable`
 
+### Step-up estrito (`@RequireStepUpEstrito`, Sprint 20)
+
+Variante **sem bypass de MFA** de `@RequireStepUp`, para operacoes financeiras de alto risco. O `StepUpEnforcementAspect` ganhou o ramo `aplicarEstrito`: carrega o usuario autenticado e **nega (403) se MFA nao estiver habilitado** antes de validar o token — fecha a janela de emitir step-up, desabilitar MFA dentro do TTL (5 min) e reusar o token. Na pratica, exige que o operador (`FINANCEIRO`/`ADMIN`) tenha MFA ativo.
+
+Aplicada em:
+- `POST /api/v1/pix/desembolsos` (desembolso Pix assistido — operacao financeira sensivel, CMN 4.656/2018).
+
+O `@RequireStepUp` legado mantem o bypass de migracao pre-MFA inalterado. Provada por `PixDesembolsoControllerTest` (`@WebMvcTest` com o aspect real: operador sem MFA -> 403).
+
 ## 7. Audit log de seguranca
 
 Tabela dedicada `audit_log_seguranca` (separada da auditoria JPA generica) com

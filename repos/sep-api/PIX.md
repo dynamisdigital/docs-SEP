@@ -99,7 +99,9 @@ ProcessarWebhookPixUseCase
   - roteia por tipo:
       RECEBIMENTO_PIX      -> cria PixRecebimento inicial (dedup por
                               end_to_end_id) + PROCESSADO
-      STATUS_TRANSFERENCIA -> apenas reconhece (PROCESSADO; sem desembolso)
+      STATUS_TRANSFERENCIA -> reconcilia o desembolso (Sprint 20): reconsulta
+                              o provider (trigger) e sincroniza idempotentemente;
+                              external id desconhecido -> IGNORADO
       DESCONHECIDO         -> IGNORADO com motivo
   - falha de processamento -> FALHOU (reprocesso futuro), sem 5xx
   - publica PixWebhookProcessadoEvent (exceto DESCONHECIDO) ou PixWebhookFalhouEvent
@@ -113,6 +115,51 @@ Garantias:
 - **Minimizacao**: payload bruto nunca persistido — so o hash. Sem `Idempotency-Key` exigido no header.
 - Recebimento nao concilia parcela de cobranca nem dispara desembolso nesta fase.
 
+## Desembolso assistido (Sprint 20 — Epic 15 parte 2)
+
+> Spec: [`specs/fase-3/020-sprint-20-pix-desembolso-assistido.md`](../../specs/fase-3/020-sprint-20-pix-desembolso-assistido.md). Steps: [`steps-fase-3/backend/020-sprint-20-steps.md`](../../steps-fase-3/backend/020-sprint-20-steps.md).
+
+Desembolso Pix **assistido pelo financeiro** apos contrato assinado. Nao ha desembolso automatico.
+
+### Endpoints REST (`/api/v1/pix/desembolsos`)
+
+| Metodo | Rota | Roles | Seguranca |
+| ------ | ---- | ----- | --------- |
+| `POST` | `/api/v1/pix/desembolsos` | `FINANCEIRO`, `ADMIN` | **step-up estrito** (`@RequireStepUpEstrito`, sem bypass de MFA) + `Idempotency-Key` |
+| `GET` | `/api/v1/pix/desembolsos/{id}` | `FINANCEIRO`, `ADMIN`, `BACKOFFICE` | autenticado — **leitura local** (nao chama provider) |
+| `POST` | `/api/v1/pix/desembolsos/{id}/status` | `FINANCEIRO`, `ADMIN`, `BACKOFFICE` | **step-up** (`@RequireStepUp`) — reconcilia consultando o provider |
+
+- `POST` retorna **201** quando cria; **200** no retorno idempotente (mesma key/contrato/valor/chave). Payload divergente -> **409**.
+- Request: `contratoId`, `valor`, `chavePixDestino`. Response: id/contrato/status/valor/**mascara** da chave + `novo`. A chave em claro **nunca** volta na resposta.
+
+### Elegibilidade (ports de leitura cruzada)
+
+O modulo `pix` valida elegibilidade sem acoplar-se a entidades de outros modulos — ports em `pix.application.port.out` + adapters em `pix.infrastructure.adapter.{contratos,cobranca,escrow}`:
+
+1. contrato existe e esta `ASSINADO`;
+2. existe agenda de cobranca ativa para o contrato;
+3. existe wallet/conta escrow operacional (`ATIVA`) para a proposta;
+4. valor informado igual ao valor financiado do contrato (proposta).
+
+Inelegibilidade -> 404 (contrato inexistente) ou 422 (nao assinado / sem agenda / escrow inoperante / valor divergente). Codigos `PIX-404-*`/`PIX-422-*`.
+
+### Idempotencia e duplicidade
+
+- `Idempotency-Key` obrigatoria. Reapresentacao consistente -> transferencia existente; divergente -> 409 (`PIX-409-IDEMPOTENCIA`).
+- **Um desembolso por contrato**: UNIQUE parcial `pix_transferencia (contrato_id) WHERE status ocupado` (CRIADA/SOLICITADA/PROCESSANDO/CONCLUIDA) — `FALHOU`/`CANCELADA` liberam retry. Duplicidade -> 409 (`PIX-409-DESEMBOLSO-DUPLICADO`); corrida concorrente -> 409 (`PIX-409-CONFLITO-CONCORRENTE`, sem reconsulta em tx rollback-only).
+
+### Fluxo de provider e status
+
+`SolicitarDesembolsoPixUseCase` orquestra em 2 fases via `DesembolsoTransacaoService` (`REQUIRES_NEW`): fase 1 **comita** `CRIADA` ANTES da chamada externa (**anti-orphan real** — flush nao basta, precisa commit); fase 2 chama `PixProvider.solicitarTransferencia` e aplica status via `SincronizadorStatusTransferencia` (PENDENTE->SOLICITADA, PROCESSANDO->PROCESSANDO, CONCLUIDA->CONCLUIDA, REJEITADA/falha tecnica->FALHOU). Se a fase 2 falhar, o registro local persiste rastreavel. `ConsultarStatusDesembolsoPixUseCase` (POST `/status`/reprocesso) reconsulta o provider e sincroniza idempotentemente (so avanca; terminal nao falha); leitura **resiliente** (provider indisponivel devolve status local com `providerIndisponivel=true`; `providerConsultado` distingue reconsulta real de no-op). O GET faz leitura local (`reconsultarProvider=false`).
+
+### Minimizacao de dados (CMN 4.656/2018 + LGPD)
+
+A chave Pix destino **nunca** eh persistida em claro: `pix_transferencia` guarda apenas `chave_destino_hash` (SHA-256, consistencia idempotente) e `chave_destino_mascara` (resposta/auditoria). A chave em claro so trafega no request e no comando ao provider. Migrations: `V47` (evolucao da transferencia + unique parcial por contrato), `V49` (unique parcial de `external_id`).
+
+### Backoffice
+
+Falha de desembolso (`PixTransferenciaFalhouEvent`) gera item `DESEMBOLSO_PIX_FALHOU` na fila operacional (`DesembolsoPixFalhouListener`, AFTER_COMMIT). Reprocesso (`PixTransferenciaRetentativaStrategy`, `TipoChamadaProvider.PIX_TRANSFERENCIA`) eh **seguro**: apenas reconsulta status (nunca reenvia — chave nao persistida); provider indisponivel -> FALHA (sem falso sucesso). `BACKOFFICE` nao inicia desembolso novo. Detalhe do item resolvido por `PixTransferenciaObjetoOriginalAdapter` (status + mascara). Migration `V48` estende os CHECKs de backoffice.
+
 ## Auditoria
 
 `PixWebhookAuditListener` (`@TransactionalEventListener` AFTER_COMMIT + `@Transactional` REQUIRES_NEW, padrao `CobrancaAuditListener`) grava em `audit_log_seguranca`:
@@ -125,7 +172,15 @@ Garantias:
 
 `usuario_id` fica nulo (autenticacao por HMAC). Detalhes JSON carregam apenas `eventId` + `tipo` + `provider` — sem payload, hash ou dado bancario. CHECK ampliado em `V46`.
 
-Eventos de provider de desembolso/escrow (`PIX_TRANSFERENCIA_SOLICITADA`, `ESCROW_*_PROVIDER_CRIADA`) ficam para as Sprints 20/21, quando houver use case que os dispare.
+Desembolso (Sprint 20) — `PixDesembolsoAuditListener` (AFTER_COMMIT + REQUIRES_NEW), CHECK ampliado em `V50`:
+
+| Evento | Quando |
+| ------ | ------ |
+| `PIX_TRANSFERENCIA_SOLICITADA` | provider aceitou a transferencia |
+| `PIX_TRANSFERENCIA_CONCLUIDA` | desembolso liquidado |
+| `PIX_TRANSFERENCIA_FALHOU` | rejeicao do provider ou falha tecnica |
+
+`usuario_id` aponta para o **tomador** (sujeito da operacao); o operador que disparou fica em `criado_por` da `pix_transferencia` (auditoria JPA). Detalhes JSON: apenas ids + valor + status/motivo — a **chave Pix nunca entra no audit log** (os eventos sequer a transportam).
 
 ## Testes
 
@@ -134,10 +189,14 @@ Eventos de provider de desembolso/escrow (`PIX_TRANSFERENCIA_SOLICITADA`, `ESCRO
 - Providers: `FakePixProviderTest`, `FakeEscrowProviderTest`, `CelcoinPixProviderIT`, `CelcoinEscrowProviderIT` (WireMock: OAuth Bearer, parsing, map de status, retry 5xx, traducao de erro, Idempotency-Key).
 - Webhook: `PixWebhookIT` (HMAC + alias, idempotencia, minimizacao, FALHOU, IGNORADO, correlationId, auditoria).
 
-## Pendencias para Sprints 20/21
+## Pendencias
 
-- Desembolso Pix real (use case que solicita ao `PixProvider`) + auditoria `PIX_TRANSFERENCIA_SOLICITADA`.
-- Use cases de provisionamento escrow via `EscrowProvider` + auditoria `ESCROW_*_PROVIDER_CRIADA` + coluna `Wallet.externalId`.
-- Conciliacao automatica de `PixRecebimento` com parcela de cobranca.
+Entregue na Sprint 20: desembolso assistido (REST + elegibilidade + idempotencia + step-up estrito + provider + status + webhook + backoffice + auditoria).
+
+Follow-ups / Sprint 21:
+
+- **Smoke E2E RestAssured full-chain** do desembolso (contrato ASSINADO + agenda + escrow + step-up token) — registrado como follow-up; logica coberta por testes de use case e HTTP/seguranca por `@WebMvcTest` (`PixDesembolsoControllerTest`, aspect real).
+- **Gap escrow `externalId`** para Celcoin real: `Wallet`/`ContaEscrow` locais (Sprint 12) tem `external_id` nulo; desembolso via Celcoin real depende dele. Use cases de provisionamento escrow via `EscrowProvider` + auditoria `ESCROW_*_PROVIDER_CRIADA`.
+- Conciliacao automatica de `PixRecebimento` com parcela de cobranca (Sprint 21).
 - Retry predicate Java (retry so em 5xx) para `celcoin-pix` / `celcoin-escrow`.
 - Contrato Celcoin real (endpoints/campos do skeleton sao suposicao validada por WireMock, nao pelo contrato fechado).
