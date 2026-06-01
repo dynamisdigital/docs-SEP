@@ -181,7 +181,7 @@
     <div class="meta-grid">
       <div class="metric"><span>Produto</span><strong>SEP</strong></div>
       <div class="metric"><span>Fase</span><strong>Fase 3 - Jornadas e capacidades pos-Fase-2</strong></div>
-      <div class="metric"><span>Status</span><strong>Epics 10 e 11 concluidos no backend (Sprints 16-18 em develop); Sprint 19 (Pix foundation) mergeada em develop via PR #73 (12ca083); proxima Sprint 20</strong></div>
+      <div class="metric"><span>Status</span><strong>Epics 10 e 11 concluidos no backend (Sprints 16-18 em develop); Sprint 19 (Pix foundation) mergeada via PR #73 (12ca083); Sprint 20 (Pix desembolso assistido) mergeada via PR #75 (d40768a); Sprint 21 (Pix recebimento/conciliacao) em andamento na branch feature/sprint-21-pix-recebimento-conciliacao (Tasks 21.1-21.2 commitadas, nao mergeadas)</strong></div>
       <div class="metric"><span>Base</span><strong>Fase 2 concluida em main</strong></div>
     </div>
   </header>
@@ -219,7 +219,7 @@
             <tr><td>2</td><td>Epic 14 - Mobile SEP Fase 2+</td><td>Implementar jornadas mobile do tomador e empresa credora.</td><td>Exclui financeiro, backoffice, admin completo e auditoria.</td></tr>
             <tr><td>3</td><td>Epic 10 - Jornada da empresa credora</td><td>Modelar e expor capacidades da empresa que aporta recursos.</td><td><span class="badge ok">Concluido no backend</span> (Sprints 16 e 17 em develop).</td></tr>
             <tr><td>4</td><td>Epic 11 - Administracao e governanca</td><td>Evoluir RBAC, parametros, cadastros mestres e auditoria administrativa.</td><td><span class="badge ok">Concluido no backend</span> (Sprint 18 mergeada, PR #71)</td></tr>
-            <tr><td>5</td><td>Epic 15 - Pix</td><td>Automatizar desembolso, recebimento e conciliacao via Pix/Celcoin.</td><td><span class="badge ok">Foundation mergeada</span> (Sprint 19, PR #73 <code>12ca083</code>): modulo <code>pix</code> + providers + webhook + auditoria. Desembolso/conciliacao reais nas Sprints 20/21.</td></tr>
+            <tr><td>5</td><td>Epic 15 - Pix</td><td>Automatizar desembolso, recebimento e conciliacao via Pix/Celcoin.</td><td><span class="badge ok">Foundation mergeada</span> (Sprint 19, PR #73 <code>12ca083</code>): modulo <code>pix</code> + providers + webhook + auditoria. <span class="badge ok">Desembolso assistido mergeado</span> (Sprint 20, PR #75 <code>d40768a</code>: REST + step-up estrito + elegibilidade + idempotencia + provider/status + webhook + backoffice + auditoria, V47-V50). <span class="badge warn">Sprint 21 em andamento</span> (recebimento/conciliacao): modelo de referencia Pix (Task 21.1, V51) + geracao de referencia para parcela elegivel (Task 21.2) commitados na branch.</td></tr>
             <tr><td>Paralela</td><td>Epic 16 - Infraestrutura AWS</td><td>Planejar ambientes remotos, RDS, EC2, deploy e observabilidade.</td><td>Nao precisa bloquear jornadas locais.</td></tr>
           </tbody>
         </table>
@@ -319,6 +319,10 @@
             <tr><td>2026-05-28</td><td>use case -&gt; repository direto confirmado como padrao do projeto (nao divida) tambem no modulo <code>governanca</code>.</td><td>Review manual Sprint 18.</td></tr>
             <tr><td>2026-05-29</td><td>Sprint 19 (Epic 15 - Pix foundation + EscrowProvider) mergeada em <code>develop</code> via PR #73 (<code>12ca083</code>): modulo <code>pix</code> (V45), webhook HMAC + idempotencia, auditoria (V46), providers Fake/Celcoin com WireMock.</td><td><code>repos/sep-api/PIX.md</code>, PR #73.</td></tr>
             <tr><td>2026-05-29</td><td>Decisoes Sprint 19: <code>PixWebhookEvent</code> so hash do payload (minimizacao); idempotencia por <code>(provider,event_id)</code>; erros Celcoin traduzidos para excecoes de provider; OAuth fail-fast no boot; retry por tipo no YAML faz 4xx tambem reentrar (tradeoff de skeleton). Auditoria de transferencia/escrow de provider adiada p/ Sprints 20/21.</td><td>Review manual Sprint 19.</td></tr>
+            <tr><td>2026-06-01</td><td>Sprint 20 (Epic 15 - Pix desembolso assistido) mergeada em <code>develop</code> via PR #75 (<code>d40768a</code>): REST <code>/api/v1/pix/desembolsos</code> + step-up estrito (<code>@RequireStepUpEstrito</code>, sem bypass MFA) + elegibilidade por ports + idempotencia + provider/status + webhook de reconciliacao + backoffice (item + reprocesso seguro) + auditoria <code>PIX_TRANSFERENCIA_*</code> (V47-V50). Chave Pix nunca persistida em claro.</td><td><code>repos/sep-api/PIX.md</code>, PR #75.</td></tr>
+            <tr><td>2026-06-01</td><td>Decisoes/code review Sprint 20: anti-orphan real via <code>DesembolsoTransacaoService</code> (REQUIRES_NEW comita CRIADA antes do provider); reprocesso so reporta sucesso quando o provider foi consultado; POST <code>/status</code> exige step-up; reprocesso Pix nunca reenvia (chave nao persistida). Gate "step-up estrito sem bypass MFA" resolvido.</td><td>Review subagente + 2 reviews manuais.</td></tr>
+            <tr><td>2026-06-01</td><td>Sprint 21 (Epic 15 - Pix recebimento/conciliacao) iniciada na branch <code>feature/sprint-21-pix-recebimento-conciliacao</code>. Task 21.1: <code>PixReferenciaRecebimento</code> (txid deterministico do SEP -&gt; parcela; V51; status ATIVA/PAGA/EXPIRADA/CANCELADA/DIVERGENTE com transicoes guardadas; guarda so ids, sem entidades de <code>cobranca</code>) + evolucao de <code>PixRecebimento</code> (conciliar/registrarDivergencia/marcarFalhou).</td><td>commit <code>7ef9e4d</code>.</td></tr>
+            <tr><td>2026-06-01</td><td>Sprint 21 Task 21.2: <code>GerarReferenciaRecebimentoPixUseCase</code> — txid do SEP enviado ao <code>PixProvider.criarCobrancaRecebimento</code> (Fake sucesso/falha + Celcoin skeleton <code>POST /pix/charges</code> via WireMock); parcela lida por <code>CobrancaRecebimentoPixQueryPort</code> (valor em aberto calculado por <code>cobranca</code>, <code>pix</code> nao recalcula mora); idempotencia por parcela (1 ATIVA); anti-orphan (flush antes do provider -&gt; corrida vira 409; falha do provider faz rollback); <code>ApiExceptionHandler</code> traduz <code>PixProviderException</code> (5xx-&gt;503/4xx-&gt;422/else-&gt;502). Suite 1669/0. Code review: 1 hardening (<code>@Transactional(readOnly)</code> no adapter), demais FP/by-design.</td><td>commits <code>f159510</code>/<code>02d20b0</code>.</td></tr>
           </tbody>
         </table>
       </div>
@@ -372,7 +376,7 @@
     <section>
       <h2>Proximos passos</h2>
       <ol>
-        <li>Iniciar Sprint 19 (Epic 15 — Pix foundation + EscrowProvider, spec 019); precheck bloqueante da Sprint 20: step-up estrito sem bypass MFA.</li>
+        <li>Concluir Sprint 21 (Epic 15 — Pix recebimento/conciliacao, spec/steps 021): Task 21.3 (webhook <code>RECEBIMENTO_PIX</code> com correlacao por txid + idempotencia), 21.4 (baixa de parcela + escrow via ports), 21.5 (backoffice de divergencias/reprocesso) e 21.6 (REST/OpenAPI + smoke E2E Fake + docs/collections). Tasks 21.1-21.2 ja commitadas na branch.</li>
         <li>Tratar dividas tecnicas e followups acumulados (ports de persistencia, consumo de parametros governados, N+1) em sprint de hardening.</li>
       </ol>
     </section>

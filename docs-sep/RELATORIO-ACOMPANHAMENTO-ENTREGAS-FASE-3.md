@@ -12,7 +12,7 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 |-------|-------------|
 | Produto | SEP |
 | Fase | Fase 3 - Jornadas e capacidades pos-Fase-2 |
-| Status | Epics 10 e 11 no backend concluidos em `develop` (Sprints 16-18); Sprint 19 (Epic 15 — Pix foundation) mergeada em `develop` via PR #73 (`12ca083`); proxima Sprint 20 (Pix desembolso assistido) |
+| Status | Epics 10 e 11 no backend concluidos em `develop` (Sprints 16-18); Sprint 19 (Epic 15 — Pix foundation) mergeada em `develop` via PR #73 (`12ca083`); Sprint 20 (Pix desembolso assistido) mergeada em `develop` via PR #75 (`d40768a`); **Sprint 21 (Pix recebimento/conciliacao) em andamento** na branch `feature/sprint-21-pix-recebimento-conciliacao` (Tasks 21.1-21.2 commitadas, nao mergeadas) |
 | Data de abertura | 2026-05-27 |
 | Base de entrada | Fase 2 concluida em `main` nos repos `sep-api`, `sep-app` e `sep-mobile` |
 | Fonte de fechamento anterior | [`RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](./RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) |
@@ -36,7 +36,7 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 | 2 | Epic 14 - Mobile SEP Fase 2+ | Implementar jornadas mobile do tomador e empresa credora | Mobile exclui financeiro interno, backoffice, administracao completa e auditoria |
 | 3 | Epic 10 - Jornada da empresa credora | Modelar e expor capacidades especificas da empresa que aporta recursos | **Concluido no backend**: Sprint 16 (foundation) + Sprint 17 (oportunidades/carteira) em `develop` |
 | 4 | Epic 11 - Administracao e governanca | Evoluir RBAC, parametros, cadastros mestres e auditoria administrativa | **Concluido no backend** (Sprint 18 mergeada, PR #71): RBAC cumulativo + parametros governados |
-| 5 | Epic 15 - Pix | Automatizar desembolso, recebimento e conciliacao via Pix/Celcoin, consumindo `escrow` | **Foundation mergeada** (Sprint 19, PR #73 `12ca083`): modulo `pix` + `PixProvider`/`EscrowProvider` + webhook HMAC + auditoria. Desembolso/conciliacao reais nas Sprints 20/21 |
+| 5 | Epic 15 - Pix | Automatizar desembolso, recebimento e conciliacao via Pix/Celcoin, consumindo `escrow` | **Foundation mergeada** (Sprint 19, PR #73 `12ca083`); **desembolso assistido mergeado** (Sprint 20, PR #75 `d40768a`: REST + step-up estrito + elegibilidade + idempotencia + provider/status + webhook + backoffice + auditoria, V47-V50). **Sprint 21 (recebimento/conciliacao) em andamento**: modelo de referencia Pix (Task 21.1, V51) + geracao de referencia para parcela elegivel (Task 21.2) commitados na branch |
 | Paralela | Epic 16 - Infraestrutura AWS | Planejar ambientes remotos, RDS, EC2, deploy e observabilidade | Trilha tecnica habilitadora; nao precisa bloquear jornadas locais |
 
 ## Itens adiados das Fases 1 e 2
@@ -64,7 +64,7 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 | OpenAPI/JavaDoc dos DTOs de role | Sprint 14 | Atualizar DTOs de role quando a governanca avancada entrar | Aberto/adiado |
 | IT concorrente de recebimento | Sprint 15 | Criar teste explicito de concorrencia para `RegistrarRecebimentoUseCase` | Aberto/adiado |
 | Retry/DLQ tecnico em listeners | Sprint 15 | Escalar falhas para backoffice ou fila tecnica em sprint de observabilidade | Aberto/adiado |
-| Step-up estrito sem bypass MFA | Sprint 15 | Decidir ADR ou annotation `@RequireStepUpEstrita` antes do desembolso Pix assistido | Entra como precheck bloqueante da Sprint 20 |
+| Step-up estrito sem bypass MFA | Sprint 15 | Decidir ADR ou annotation `@RequireStepUpEstrita` antes do desembolso Pix assistido | **Resolvido na Sprint 20**: criada `@RequireStepUpEstrito` (sem bypass; exige MFA ativo + token) e aplicada no `POST /api/v1/pix/desembolsos` |
 | PDFBox `Standard14Fonts` deprecated | Sprint 15 | Migrar antes de upgrade PDFBox 3.1+ | Aberto/adiado |
 | Truncamento auditavel de payload de assinatura | Sprint 15 | Refatorar `EventoAssinatura.truncar()` ou ampliar coluna com migration | Aberto/adiado |
 | Retry de listeners Open Finance | Sprint 15 | Escalar falha pos-Resilience4j para fila/backoffice | Aberto/adiado |
@@ -111,6 +111,11 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 | 2026-05-28 | use case -> repository direto confirmado como padrao do projeto (nao divida) tambem no modulo `governanca` | Review manual Sprint 18 |
 | 2026-05-29 | Sprint 19 (Epic 15 — Pix foundation + EscrowProvider) mergeada em `develop` via PR #73 (`12ca083`): modulo `pix` (V45), webhook HMAC + idempotencia, auditoria (V46), providers Fake/Celcoin com WireMock | `repos/sep-api/PIX.md`, PR #73 |
 | 2026-05-29 | Decisoes Sprint 19: `PixWebhookEvent` so hash do payload (minimizacao); idempotencia por `(provider,event_id)`; erros Celcoin traduzidos para excecoes de provider; OAuth fail-fast no boot; retry por tipo no YAML faz 4xx tambem reentrar (tradeoff de skeleton). Eventos de auditoria de transferencia/escrow de provider adiados p/ Sprints 20/21 | Review manual Sprint 19 |
+| 2026-06-01 | Sprint 20 (Epic 15 — Pix desembolso assistido) mergeada em `develop` via PR #75 (`d40768a`): REST `/api/v1/pix/desembolsos` + step-up estrito (`@RequireStepUpEstrito`, sem bypass MFA) + elegibilidade por ports + idempotencia + provider/status + webhook de reconciliacao + backoffice (item + reprocesso seguro) + auditoria `PIX_TRANSFERENCIA_*` (V47-V50). Chave Pix nunca persistida em claro | `repos/sep-api/PIX.md`, PR #75 |
+| 2026-06-01 | Decisoes/code review Sprint 20: anti-orphan real via `DesembolsoTransacaoService` (REQUIRES_NEW comita CRIADA antes do provider); reprocesso so reporta sucesso quando o provider foi de fato consultado; POST `/status` exige step-up (chama provider); reprocesso Pix nunca reenvia (chave nao persistida). Gate "step-up estrito sem bypass MFA" (precheck Sprint 20) resolvido | Review subagente + 2 reviews manuais |
+| 2026-06-01 | Follow-ups Sprint 20: smoke E2E RestAssured full-chain (contrato ASSINADO + agenda + escrow + step-up token); gap escrow `external_id` para Celcoin real; collections Postman/Insomnia de desembolso; conciliacao automatica de recebimento (Sprint 21) | `repos/sep-api/PIX.md` §Pendencias |
+| 2026-06-01 | Sprint 21 (Epic 15 — Pix recebimento/conciliacao) iniciada na branch `feature/sprint-21-pix-recebimento-conciliacao`. Task 21.1: `PixReferenciaRecebimento` (txid deterministico do SEP -> parcela; V51; status ATIVA/PAGA/EXPIRADA/CANCELADA/DIVERGENTE com transicoes guardadas; guarda so ids, sem entidades de `cobranca`) + evolucao de `PixRecebimento` (conciliar/registrarDivergencia/marcarFalhou) | commit `7ef9e4d` |
+| 2026-06-01 | Sprint 21 Task 21.2: `GerarReferenciaRecebimentoPixUseCase` — txid controlado pelo SEP enviado ao `PixProvider.criarCobrancaRecebimento` (Fake sucesso/falha + Celcoin skeleton `POST /pix/charges` via WireMock); parcela lida por `CobrancaRecebimentoPixQueryPort` (valor em aberto calculado por `cobranca`, `pix` nao recalcula mora); idempotencia por parcela (1 ATIVA); anti-orphan (flush antes do provider -> corrida vira 409 sem cobranca orfa; falha do provider faz rollback); `ApiExceptionHandler` traduz `PixProviderException` (5xx->503/4xx->422/else->502). Suite 1669/0. Code review (`cavecrew-reviewer`): 1 hardening aplicado (`@Transactional(readOnly)` no adapter), demais findings FP/by-design | commits `f159510`/`02d20b0` |
 
 ## Sprints concluidas na Fase 3
 
@@ -140,7 +145,7 @@ Este relatorio nao substitui o PRD, specs, steps, ADRs ou docs operacionais. Ele
 
 ## Proximos passos
 
-1. Iniciar Sprint 19 (Epic 15 — Pix foundation + EscrowProvider, spec 019). Precheck bloqueante da Sprint 20: step-up estrito sem bypass MFA.
+1. Concluir Sprint 21 (Epic 15 — Pix recebimento/conciliacao, spec/steps 021): Task 21.3 (webhook `RECEBIMENTO_PIX` com correlacao por txid + idempotencia), 21.4 (baixa de parcela + escrow via ports), 21.5 (backoffice de divergencias/reprocesso) e 21.6 (REST/OpenAPI + smoke E2E Fake + docs/collections). Tasks 21.1-21.2 ja commitadas na branch.
 2. Tratar dividas tecnicas e followups acumulados (ports de persistencia, consumo de parametros governados, N+1) em sprint de hardening.
 
 ## Template para atualizacao
