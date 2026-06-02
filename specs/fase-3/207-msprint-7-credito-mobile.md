@@ -42,7 +42,7 @@ Permitir ao tomador solicitar credito e acompanhar status de analise/Open Financ
 
 - Precheck contratos credito/Open Finance.
 - Smoke PWA proposta -> status.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

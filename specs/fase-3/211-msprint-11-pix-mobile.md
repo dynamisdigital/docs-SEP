@@ -41,7 +41,7 @@ Exibir ao tomador e a credora informacoes Pix relevantes, sem transformar o app 
 
 - Precheck backend Pix.
 - Smoke PWA status Pix.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

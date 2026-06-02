@@ -41,7 +41,7 @@ Implementar a experiencia web de formalizacao contratual: contrato, aceite, assi
 
 - Precheck de step-up web.
 - Smoke E2E contrato aprovado -> aceite -> assinatura fake/status.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

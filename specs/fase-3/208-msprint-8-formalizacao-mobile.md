@@ -41,7 +41,7 @@ Permitir ao tomador visualizar contrato, aceitar formalizacao com step-up e acom
 
 - Precheck step-up mobile.
 - Smoke PWA contrato -> aceite.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

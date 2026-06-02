@@ -41,7 +41,7 @@ Expor no web as operacoes Pix assistidas: desembolso, recebimentos, status e con
 
 - Precheck backend Sprints 19-21.
 - Smoke E2E Pix com Fake provider.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

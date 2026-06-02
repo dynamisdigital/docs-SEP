@@ -42,7 +42,7 @@ Dar ao tomador visibilidade mobile das parcelas, vencimentos, historico e renego
 
 - Precheck contratos cobranca.
 - Smoke PWA parcelas -> renegociacao.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

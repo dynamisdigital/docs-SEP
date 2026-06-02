@@ -42,7 +42,7 @@ Implementar a experiencia web da empresa credora: perfil, elegibilidade, oportun
 
 - Precheck dos contratos backend 16-17 e do contrato de autorizacao/ownership da credora.
 - Smoke E2E credora -> oportunidade -> interesse -> carteira.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

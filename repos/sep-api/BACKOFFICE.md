@@ -76,13 +76,15 @@ AUDIT REFORCADO
 
 ## Value objects (sealed/enum)
 
-- `TipoItemFila`: `ONBOARDING_PENDENTE`, `ONBOARDING_ERRO`, `PROPOSTA_PENDENTE`, `CONTRATO_NAO_ASSINADO`, `COBRANCA_INADIMPLENTE`, `WEBHOOK_FALHOU`, `DESEMBOLSO_PIX_FALHOU` (Sprint 20), `OUTRO`.
+- `TipoItemFila`: `ONBOARDING_PENDENTE`, `ONBOARDING_ERRO`, `PROPOSTA_PENDENTE`, `CONTRATO_NAO_ASSINADO`, `COBRANCA_INADIMPLENTE`, `WEBHOOK_FALHOU`, `DESEMBOLSO_PIX_FALHOU` (Sprint 20), `RECEBIMENTO_PIX_DIVERGENTE` (Sprint 21), `OUTRO`.
 - `PrioridadeItem`: `BAIXA`, `MEDIA`, `ALTA`, `CRITICA`. Cada constante carrega `ordinalPeso` int pra ordenacao numerica (evita sort lexicografico VARCHAR errado).
 - `StatusItemFila`: `ABERTO`, `EM_TRATAMENTO`, `RESOLVIDO`, `IGNORADO`. Helpers `permiteAssumir()`, `permiteResolverOuIgnorar()`, `isFinal()`.
-- `TipoEntidadeReferenciada`: `ONBOARDING`, `PROPOSTA`, `CONTRATO`, `PARCELA_COBRANCA`, `WEBHOOK_EVENT_LOG`, `PIX_TRANSFERENCIA` (Sprint 20), `OUTRO`.
+- `TipoEntidadeReferenciada`: `ONBOARDING`, `PROPOSTA`, `CONTRATO`, `PARCELA_COBRANCA`, `WEBHOOK_EVENT_LOG`, `PIX_TRANSFERENCIA` (Sprint 20), `PIX_RECEBIMENTO` (Sprint 21), `OUTRO`.
 - `TipoChamadaProvider`: `KYC`, `KYB`, `PLD`, `OPEN_FINANCE`, `ASSINATURA_DIGITAL`, `PIX_TRANSFERENCIA` (Sprint 20).
 
 > **Sprint 20 (desembolso Pix)**: falha de desembolso gera item `DESEMBOLSO_PIX_FALHOU` via `DesembolsoPixFalhouListener` (AFTER_COMMIT). Reprocesso `PIX_TRANSFERENCIA` (`PixTransferenciaRetentativaStrategy`) eh handler **real e seguro**: so reconsulta o status via `ConsultarStatusDesembolsoPixUseCase` (nunca reenvia — chave Pix nao persistida); provider indisponivel -> `falha` (sem falso sucesso). Detalhe do item via `PixTransferenciaObjetoOriginalAdapter` (status + mascara, nunca chave). `BACKOFFICE` nao inicia desembolso novo. CHECKs ampliados em `V48`.
+
+> **Sprint 21 (recebimento Pix)**: divergencia de recebimento (referencia desconhecida/nao-ATIVA, `endToEndId` ausente, valor parcial/maior, falha de baixa) gera item `RECEBIMENTO_PIX_DIVERGENTE`/`PIX_RECEBIMENTO` via `RecebimentoPixDivergenteListener` (AFTER_COMMIT, idempotente). **Sem reprocesso de provider** (`reprocesso.tipo_chamada` inalterado): o Pix ja foi recebido — o tratamento eh operacao assistida (assumir/comentar/resolver/ignorar). Detalhe do item via `PixRecebimentoObjetoOriginalAdapter` (status/valor/parcela, nunca payload/chave). CHECKs ampliados em `V52`.
 - `StatusReprocesso`: `PENDENTE`, `SUCESSO`, `FALHA`.
 
 ## Estados da fila

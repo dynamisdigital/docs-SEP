@@ -42,7 +42,7 @@ Dar visibilidade web ao tomador e ao financeiro sobre parcelas, agenda, recebime
 
 - Precheck dos endpoints de cobranca.
 - Smoke E2E parcelas -> recebimento/renegociacao.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

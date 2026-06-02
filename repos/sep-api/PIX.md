@@ -97,8 +97,9 @@ ProcessarWebhookPixUseCase
   - persiste PixWebhookEvent RECEBIDO (saveAndFlush; corrida de event_id
     cai no unique e e tratada como duplicado) + publica PixWebhookRecebidoEvent
   - roteia por tipo:
-      RECEBIMENTO_PIX      -> cria PixRecebimento inicial (dedup por
-                              end_to_end_id) + PROCESSADO
+      RECEBIMENTO_PIX      -> cria PixRecebimento (dedup por end_to_end_id),
+                              correlaciona por txid e concilia a parcela
+                              (Sprint 21) + PROCESSADO
       STATUS_TRANSFERENCIA -> reconcilia o desembolso (Sprint 20): reconsulta
                               o provider (trigger) e sincroniza idempotentemente;
                               external id desconhecido -> IGNORADO
@@ -113,7 +114,7 @@ Garantias:
 - **HMAC obrigatorio** (secret `app.webhooks.secrets.celcoin-pix`); assinatura invalida -> 401.
 - **Idempotencia** por `event_id` do payload (nao por header). Duplicado -> 202 sem novo registro/processamento.
 - **Minimizacao**: payload bruto nunca persistido — so o hash. Sem `Idempotency-Key` exigido no header.
-- Recebimento nao concilia parcela de cobranca nem dispara desembolso nesta fase.
+- A partir da Sprint 21, `RECEBIMENTO_PIX` correlaciona e concilia a parcela (ver secao abaixo). `STATUS_TRANSFERENCIA` segue o desembolso (Sprint 20).
 
 ## Desembolso assistido (Sprint 20 — Epic 15 parte 2)
 
@@ -160,6 +161,36 @@ A chave Pix destino **nunca** eh persistida em claro: `pix_transferencia` guarda
 
 Falha de desembolso (`PixTransferenciaFalhouEvent`) gera item `DESEMBOLSO_PIX_FALHOU` na fila operacional (`DesembolsoPixFalhouListener`, AFTER_COMMIT). Reprocesso (`PixTransferenciaRetentativaStrategy`, `TipoChamadaProvider.PIX_TRANSFERENCIA`) eh **seguro**: apenas reconsulta status (nunca reenvia — chave nao persistida); provider indisponivel -> FALHA (sem falso sucesso). `BACKOFFICE` nao inicia desembolso novo. Detalhe do item resolvido por `PixTransferenciaObjetoOriginalAdapter` (status + mascara). Migration `V48` estende os CHECKs de backoffice.
 
+## Recebimento e conciliacao (Sprint 21 — Epic 15 parte 3)
+
+> Spec: [`specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md`](../../specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md). Steps: [`steps-fase-3/backend/021-sprint-21-steps.md`](../../steps-fase-3/backend/021-sprint-21-steps.md).
+
+Recebimento Pix de parcelas com conciliacao automatica, mantendo a operacao assistida para divergencias. O dinheiro entra via webhook; a baixa passa pelo caminho oficial de `cobranca`.
+
+### Referencia Pix deterministica (`txid`)
+
+`PixReferenciaRecebimento` (V51) liga um `txid` controlado pelo SEP a uma parcela — sem ele nao ha baixa automatica. `GerarReferenciaRecebimentoPixUseCase` le a parcela elegivel via `CobrancaRecebimentoPixQueryPort` (o `pix` nunca toca entidades de cobranca), persiste a referencia `ATIVA` (anti-orphan: flush antes do provider; corrida cai na UNIQUE parcial `1 ATIVA por parcela` -> 409) e pede o copia-cola ao `PixProvider.criarCobrancaRecebimento`. Idempotente por parcela: referencia `ATIVA` existente e reaproveitada (`novo=false`). So persiste ids/txid/valor/copia-cola — sem dado pessoal/bancario.
+
+### Endpoints REST (`/api/v1/pix/recebimentos`)
+
+| Metodo | Rota | Roles | Observacao |
+| ------ | ---- | ----- | ---------- |
+| `POST` | `/referencias` | `FINANCEIRO`, `ADMIN` | gera/reaproveita referencia; 201 (novo) / 200 (idempotente). **Sem step-up** (cobranca para pagamento proprio) |
+| `GET` | `/referencias/{id}` | `FINANCEIRO`, `ADMIN`, `BACKOFFICE` | leitura local |
+| `GET` | `/{id}` | `FINANCEIRO`, `ADMIN`, `BACKOFFICE` | recebimento (operacao assistida) |
+
+Self-service do tomador (CLIENTE owner) fica para o front das jornadas (follow-up); nesta sprint a geracao eh operada por `FINANCEIRO`/`ADMIN`.
+
+### Conciliacao do webhook
+
+`ProcessarWebhookPixUseCase` para `RECEBIMENTO_PIX`: cria `PixRecebimento` (insert isolado em `PixRecebimentoTransacaoService`, `REQUIRES_NEW` — corrida na UNIQUE de `end_to_end_id` vira idempotente sem deixar a tx do webhook rollback-only), correlaciona pela referencia (`txid` -> fallback `providerReferenciaId`). Sem referencia -> `NAO_IDENTIFICADO`; com referencia -> `EM_PROCESSAMENTO` + dispara `ConciliarRecebimentoPixUseCase` (`REQUIRES_NEW`). Falha de baixa marca o recebimento `FALHOU` em tx separada e o webhook conclui `PROCESSADO` (sem 5xx).
+
+`ConciliarRecebimentoPixUseCase` baixa a parcela via `CobrancaRecebimentoPixPort` -> adapter -> `RegistrarRecebimentoUseCase` de cobranca (dono do lock, valor devido, status, `Recebimento` e movimentacao escrow). `meioPagamento=PIX`, `registradoPor=tomadorId`. **Idempotencia em camadas**: webhook por `(provider,event_id)`; recebimento por `end_to_end_id`; baixa/escrow por `Idempotency-Key = pix:<endToEndId>` (escrow registrado uma unica vez). Valor exato com parcela quitada -> referencia `PAGA`; parcial/maior -> baixa aplicada + referencia `DIVERGENTE`. `endToEndId` ausente ou referencia nao-ATIVA -> nao baixa (divergencia).
+
+### Backoffice de divergencias
+
+Toda divergencia (referencia desconhecida, nao-ATIVA, `endToEndId` ausente, valor parcial/maior, falha de baixa) publica `PixRecebimentoDivergenteEvent`; `RecebimentoPixDivergenteListener` (AFTER_COMMIT) cria item idempotente `RECEBIMENTO_PIX_DIVERGENTE`/`PIX_RECEBIMENTO` (`V52` estende os CHECKs). Detalhe por `PixRecebimentoObjetoOriginalAdapter` (status/valor/parcela — nunca payload/chave). **Sem reprocesso de provider**: o Pix ja foi recebido; o tratamento eh operacao assistida (assumir/comentar/resolver/ignorar). Nenhum caso divergente fica apenas em log.
+
 ## Auditoria
 
 `PixWebhookAuditListener` (`@TransactionalEventListener` AFTER_COMMIT + `@Transactional` REQUIRES_NEW, padrao `CobrancaAuditListener`) grava em `audit_log_seguranca`:
@@ -188,12 +219,15 @@ Desembolso (Sprint 20) — `PixDesembolsoAuditListener` (AFTER_COMMIT + REQUIRES
 - Persistencia/idempotencia: `PixRepositoryTest` (unique, unique parcial, composto).
 - Providers: `FakePixProviderTest`, `FakeEscrowProviderTest`, `CelcoinPixProviderIT`, `CelcoinEscrowProviderIT` (WireMock: OAuth Bearer, parsing, map de status, retry 5xx, traducao de erro, Idempotency-Key).
 - Webhook: `PixWebhookIT` (HMAC + alias, idempotencia, minimizacao, FALHOU, IGNORADO, correlationId, auditoria).
+- Recebimento (Sprint 21): `ProcessarWebhookPixRecebimentoTest` (correlacao txid/fallback, NAO_IDENTIFICADO, corrida idempotente, dispara conciliacao), `ConciliarRecebimentoPixUseCaseTest` (exato->PAGA, parcial/maior->DIVERGENTE, nao-ATIVA/sem-e2e nao baixa, replay, marcarFalha), `RecebimentoPixDivergenteListenerTest`, `PixRecebimentoObjetoOriginalAdapterTest`, `PixRecebimentoControllerTest` (`@WebMvcTest`, roles/403/404), `PixRecebimentoConciliacaoIT` (smoke E2E full-chain: referencia->webhook->CONCILIADO->parcela PAGA->Recebimento PIX + escrow->replay nao duplica).
 
 ## Pendencias
 
-Entregue na Sprint 20: desembolso assistido (REST + elegibilidade + idempotencia + step-up estrito + provider + status + webhook + backoffice + auditoria).
+Entregue na Sprint 20: desembolso assistido. Entregue na Sprint 21: recebimento Pix de parcela (referencia `txid` + REST + webhook correlacionado + baixa via port de cobranca + escrow idempotente + backoffice de divergencias).
 
-Follow-ups / Sprint 21:
+Follow-ups:
+- **Self-service do tomador** (CLIENTE owner gera referencia da propria parcela) — fica para o front das jornadas (web/mobile).
+- **Reprocesso local** de recebimento `FALHOU` (re-rodar conciliacao sem provider) — nao implementado; tratamento atual eh operacao assistida.
 
 - **Smoke E2E RestAssured full-chain** do desembolso (contrato ASSINADO + agenda + escrow + step-up token) — registrado como follow-up; logica coberta por testes de use case e HTTP/seguranca por `@WebMvcTest` (`PixDesembolsoControllerTest`, aspect real).
 - **Gap escrow `externalId`** para Celcoin real: `Wallet`/`ContaEscrow` locais (Sprint 12) tem `external_id` nulo; desembolso via Celcoin real depende dele. Use cases de provisionamento escrow via `EscrowProvider` + auditoria `ESCROW_*_PROVIDER_CRIADA`.

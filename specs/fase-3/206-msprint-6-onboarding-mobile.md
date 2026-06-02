@@ -42,7 +42,7 @@ Implementar o onboarding mobile do tomador em PWA/Ionic, consumindo APIs existen
 
 - Precheck de contratos onboarding.
 - Smoke PWA onboarding feliz.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

@@ -42,7 +42,7 @@ Implementar a operacao assistida web: fila operacional, comentarios, resolucao, 
 
 - Precheck de role/step-up e contratos backend de reprocesso real.
 - Smoke E2E fila -> comentario -> resolver/reprocessar.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

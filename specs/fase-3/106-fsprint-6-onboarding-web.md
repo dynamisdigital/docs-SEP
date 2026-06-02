@@ -42,7 +42,7 @@ Implementar as telas autenticadas de onboarding PF/PJ consumindo as APIs de KYC/
 
 - Precheck de contratos Swagger.
 - Smoke E2E onboarding feliz com backend real ou MSW.
-- Docs de uso web e atualização do relatório Fase 3.
+- Docs de uso web, PRD/CONTEXT e roadmap quando houver mudanca de status.
 
 ## Definition of Done
 

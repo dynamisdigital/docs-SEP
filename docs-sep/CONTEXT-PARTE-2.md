@@ -564,6 +564,23 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - descricao consolidada do PR em `repos/sep-api/SPRINT-20-PR.md`; `SPRINT-19-PR.md` removido (PR #73 ja usado).
   - proxima execucao backend recomendada: Sprint 21 (Epic 15 — Pix recebimento e conciliacao).
 
+- **Sprint 21 (Pix recebimento e conciliacao) mergeada em `origin/develop` via PR #77 (`dbc7761`, 2026-06-02)** — fecha o Epic 15 backend. `./gradlew test` verde + spotless limpo. 12 commits (`7ef9e4d`..`57ce6bc`).
+  - **Referencia deterministica**: `PixReferenciaRecebimento` (V51) liga `txid` controlado pelo SEP a uma parcela; `GerarReferenciaRecebimentoPixUseCase` le a parcela via `CobrancaRecebimentoPixQueryPort` (sem tocar entidades de cobranca), persiste `ATIVA` (anti-orphan + UNIQUE parcial `1 ATIVA/parcela`), pede copia-cola ao `PixProvider`. Idempotente por parcela.
+  - **Webhook correlacionado**: `RECEBIMENTO_PIX` ganha `txid`/`providerReferenciaId` no normalizado; `ProcessarWebhookPixUseCase` cria `PixRecebimento` (insert isolado em `PixRecebimentoTransacaoService` `REQUIRES_NEW` — corrida na unique de `end_to_end_id` vira idempotente sem deixar a tx do webhook rollback-only), correlaciona (txid -> fallback providerRef): achou -> `EM_PROCESSAMENTO`; nao achou -> `NAO_IDENTIFICADO`.
+  - **Baixa via port**: `CobrancaRecebimentoPixPort` -> adapter -> `RegistrarRecebimentoUseCase` (dono do lock/valor/status/Recebimento/escrow). `ConciliarRecebimentoPixUseCase` (`REQUIRES_NEW`) torna baixa+escrow+conciliacao atomicos; `Idempotency-Key=pix:<endToEndId>` garante baixa e escrow unicos; `meioPagamento=PIX`, `registradoPor=tomadorId`. Exato+quitada -> referencia PAGA; parcial/maior -> DIVERGENTE; `endToEndId` ausente ou referencia nao-ATIVA -> nao baixa; falha de baixa -> recebimento FALHOU em tx separada e webhook conclui PROCESSADO (sem 5xx).
+  - **Backoffice de divergencias**: `PixRecebimentoDivergenteEvent` -> `RecebimentoPixDivergenteListener` (AFTER_COMMIT) cria item idempotente `RECEBIMENTO_PIX_DIVERGENTE`/`PIX_RECEBIMENTO` (V52); `PixRecebimentoObjetoOriginalAdapter` resolve o detalhe. **Sem reprocesso de provider** (Pix ja recebido) — operacao assistida. Nenhum caso divergente fica so em log.
+  - **REST**: `/api/v1/pix/recebimentos` (`POST /referencias` FINANCEIRO/ADMIN sem step-up; `GET /referencias/{id}` e `GET /{id}` FINANCEIRO/ADMIN/BACKOFFICE). Smoke E2E `PixRecebimentoConciliacaoIT` full-chain (referencia -> webhook -> CONCILIADO -> parcela PAGA -> Recebimento PIX + escrow -> replay nao duplica).
+  - **Decisoes/dividas**: DDD preservado (pix sem entidades de cobranca; `StatusParcela` so no adapter); minimizacao (payload/chave fora); self-service do tomador (CLIENTE owner) e reprocesso local de FALHOU ficam follow-up; ajuste de campos Celcoin real pos-sandbox. Descricao consolidada em `repos/sep-api/SPRINT-21-PR.md`.
+  - relatorios de acompanhamento de entregas foram removidos do `docs-SEP` em 2026-06-02 (nao recriar).
+  - proxima execucao recomendada: retomar as trilhas web/mobile, iniciando pela F-Sprint 6 (onboarding web PF/PJ) sobre os contratos backend das Sprints 6-7.
+
+- **F-Sprint 6 (Onboarding web PF/PJ) preparada em 2026-06-02**:
+  - spec de origem: `specs/fase-3/106-fsprint-6-onboarding-web.md`; steps just-in-time criados em `steps-fase-3/web/106-fsprint-6-steps.md`.
+  - objetivo: primeira sprint funcional do Epic 13 no `sep-app`, consumindo APIs reais de onboarding PF (`/api/v1/onboarding/pessoa`) e PJ (`/api/v1/onboarding/empresa`) sem duplicar regras KYC/KYB/PLD no frontend.
+  - base esperada do web: F-Sprints 0-5 concluidas, shell autenticado Notion, guards/interceptors, tratamento 401/403/409, MFA/step-up e cadastro publico canalizado.
+  - contratos backend relevantes: `ONBOARDING.md`, `PLD.md`, `OpenAPI`, controllers `OnboardingPessoaController` e `OnboardingEmpresaController`.
+  - decisao de escopo: implementar status, upload, disparo de verificacao e visualizacao segura de PF/PJ; simular contratos no MSW; nao implementar decisao de aprovacao/reprovacao, OCR nativo, edicao pos-aprovacao ou mobile.
+
 ## Observacao importante para outro agente
 
 Se outro agente assumir este trabalho, ele deve:

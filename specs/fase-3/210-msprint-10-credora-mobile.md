@@ -42,7 +42,7 @@ Implementar a experiencia mobile simplificada da empresa credora: status, oportu
 
 - Precheck backend credora e contrato de autorizacao/ownership da credora.
 - Smoke PWA credora -> oportunidade -> carteira.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

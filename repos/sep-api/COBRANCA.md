@@ -130,6 +130,8 @@ Endpoint `POST /api/v1/cobranca/parcelas/{id}/recebimentos`:
 - Overpayment: parcela vira `PAGA`; excedente fica no `observacao`; tratamento financeiro detalhado fica pra Sprint futura.
 - Nova key em parcela `PAGA` -> 409 (`ParcelaEstadoInvalidoException` COB-409-001).
 
+> **Baixa automatica via Pix (Sprint 21)**: o modulo `pix` baixa a parcela pelo mesmo `RegistrarRecebimentoUseCase`, via `CobrancaRecebimentoPixPort` -> `CobrancaRecebimentoPixAdapter` (o `pix` nunca toca entidades/repositorios de `cobranca`). `meioPagamento=PIX`, `registradoPor=tomadorId`, `Idempotency-Key=pix:<endToEndId>` — herdando a idempotencia em 3 camadas + a movimentacao escrow unica. Pagamento parcial/maior segue a mesma regra de status; a divergencia eh sinalizada e tratada no lado `pix`/backoffice (ver [`PIX.md`](PIX.md) §Recebimento), sem regra nova em `cobranca`.
+
 ## Inadimplencia e workflow de cobranca
 
 Sprint 13 consome `ParcelaAtrasouEvent` publicado pelo job da Sprint 12 e aplica um workflow configuravel por `app.cobranca.workflow.dias-atraso`. Cada etapa pode emitir notificacoes por canal/template e sinalizar flags operacionais.

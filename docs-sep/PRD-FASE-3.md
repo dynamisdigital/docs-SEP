@@ -129,7 +129,7 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 
 ### Epic 15 - Movimentacao Pix
 
-**Status: Sprint 19 (foundation) mergeada em `develop` via PR #73 (`12ca083`); Sprint 20 (desembolso assistido) mergeada em `develop` via PR #75 (squash `d40768a`, 2026-06-01).** Modulo `pix` (dominio + idempotencia + webhook HMAC + auditoria), `PixProvider`/`EscrowProvider` por Provider Pattern (Fake default + Celcoin skeleton com WireMock). Sprint 20 entregou desembolso Pix assistido pelo financeiro: REST `/api/v1/pix/desembolsos` com step-up estrito (sem bypass de MFA), elegibilidade por ports (contrato ASSINADO + agenda + escrow), idempotencia, integracao `PixProvider` + status, webhook de reconciliacao, item de backoffice + reprocesso seguro e auditoria `PIX_TRANSFERENCIA_*` (V47-V50). Conciliacao automatica de recebimento fica para a Sprint 21. Doc operacional: [`repos/sep-api/PIX.md`](../repos/sep-api/PIX.md).
+**Status: Epic 15 backend concluido. Sprint 19 (foundation) mergeada via PR #73 (`12ca083`); Sprint 20 (desembolso assistido) via PR #75 (`d40768a`, 2026-06-01); Sprint 21 (recebimento e conciliacao) via PR #77 (`dbc7761`, 2026-06-02).** Modulo `pix` (dominio + idempotencia + webhook HMAC + auditoria), `PixProvider`/`EscrowProvider` por Provider Pattern (Fake default + Celcoin skeleton com WireMock). Sprint 20 entregou desembolso Pix assistido pelo financeiro: REST `/api/v1/pix/desembolsos` com step-up estrito (sem bypass de MFA), elegibilidade por ports (contrato ASSINADO + agenda + escrow), idempotencia, integracao `PixProvider` + status, webhook de reconciliacao, item de backoffice + reprocesso seguro e auditoria `PIX_TRANSFERENCIA_*` (V47-V50). Sprint 21 (recebimento e conciliacao) fecha o Epic 15 backend: referencia Pix por `txid` (`PixReferenciaRecebimento`, V51), REST `/api/v1/pix/recebimentos`, webhook `RECEBIMENTO_PIX` correlacionado + baixa de parcela via port de `cobranca` (escrow idempotente por `pix:<endToEndId>`), divergencias em item de backoffice `RECEBIMENTO_PIX_DIVERGENTE` (V52) e smoke E2E full-chain. Doc operacional: [`repos/sep-api/PIX.md`](../repos/sep-api/PIX.md).
 
 - tratar Pix como fase posterior a fundacao atual da API e a estabilizacao das jornadas que impactam a contratacao
 - posicionar Pix depois de onboarding, analise de credito, formalizacao contratual e cobranca inicial
@@ -342,13 +342,13 @@ Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte d
 | 18 | Epic 11 | Administracao e governanca avancada (**mergeada**, PR #71) | [`018`](../specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) | 6 |
 | 19 | Epic 15 | Pix foundation + EscrowProvider (**implementada**) | [`019`](../specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) | 6 |
 | 20 | Epic 15 | Pix desembolso assistido (**implementada**) | [`020`](../specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) | 5 |
-| 21 | Epic 15 | Pix recebimento e conciliacao | [`021`](../specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 6 |
+| 21 | Epic 15 | Pix recebimento e conciliacao (**implementada**) | [`021`](../specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 6 |
 
 ### Web (`sep-app`)
 
 | Sprint | Epic/frente | Tema | Spec | Tasks impl. |
 |--------|-------------|------|------|-------------|
-| F-6 | Epic 13 | Jornada onboarding PF/PJ | [`106`](../specs/fase-3/106-fsprint-6-onboarding-web.md) | 6 |
+| F-6 | Epic 13 | Jornada onboarding PF/PJ (**preparada para execucao**) | [`106`](../specs/fase-3/106-fsprint-6-onboarding-web.md) + [`steps`](../steps-fase-3/web/106-fsprint-6-steps.md) | 6 |
 | F-7 | Epic 13 | Propostas, credito e Open Finance | [`107`](../specs/fase-3/107-fsprint-7-credito-open-finance-web.md) | 6 |
 | F-8 | Epic 13 | Formalizacao, assinatura e CCB | [`108`](../specs/fase-3/108-fsprint-8-formalizacao-web.md) | 5 |
 | F-9 | Epic 13 | Cobranca, parcelas e inadimplencia | [`109`](../specs/fase-3/109-fsprint-9-cobranca-web.md) | 6 |

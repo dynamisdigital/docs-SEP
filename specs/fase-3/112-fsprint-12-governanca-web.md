@@ -41,7 +41,7 @@ Implementar telas administrativas para roles cumulativas, parametros operacionai
 
 - Precheck backend Sprint 18.
 - Smoke E2E alterar role/parametro.
-- Docs e relatório Fase 3.
+- Docs, PRD/CONTEXT e roadmap quando aplicavel.
 
 ## Definition of Done
 

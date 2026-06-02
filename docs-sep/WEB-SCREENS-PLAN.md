@@ -14,12 +14,21 @@ Este documento nao substitui o PRD. Ele detalha a camada de experiencia web e de
 - O web deve consumir a mesma API publica usada pelo mobile, sem backend separado nesta fase.
 - O web nao deve conter regra de negocio de dominio; decisoes, status e permissoes devem vir da API.
 - As telas devem ser planejadas por modulo funcional, alinhadas ao monolito modular DDD do backend.
-- A trilha de execucao do frontend e governada por 5 specs (uma por F-Sprint), em paralelo as Sprints 0-4 do backend:
+- A fundacao do frontend foi governada por 5 specs (uma por F-Sprint), em paralelo as Sprints 0-4 do backend:
   - [`specs/fase-1/100-fsprint-0-setup-angular.md`](../specs/fase-1/100-fsprint-0-setup-angular.md) (F-Sprint 0)
   - [`specs/fase-1/101-fsprint-1-design-tokens-showcase.md`](../specs/fase-1/101-fsprint-1-design-tokens-showcase.md) (F-Sprint 1)
   - [`specs/fase-1/102-fsprint-2-telas-apple-publicas.md`](../specs/fase-1/102-fsprint-2-telas-apple-publicas.md) (F-Sprint 2)
   - [`specs/fase-1/103-fsprint-3-shell-notion-auth.md`](../specs/fase-1/103-fsprint-3-shell-notion-auth.md) (F-Sprint 3)
   - [`specs/fase-1/104-fsprint-4-telas-autenticadas.md`](../specs/fase-1/104-fsprint-4-telas-autenticadas.md) (F-Sprint 4)
+- Apos F-Sprint 5 de seguranca web, a trilha funcional do Epic 13 passa a usar os specs da Fase 3:
+  - [`specs/fase-3/106-fsprint-6-onboarding-web.md`](../specs/fase-3/106-fsprint-6-onboarding-web.md) (F-Sprint 6)
+  - [`specs/fase-3/107-fsprint-7-credito-open-finance-web.md`](../specs/fase-3/107-fsprint-7-credito-open-finance-web.md) (F-Sprint 7)
+  - [`specs/fase-3/108-fsprint-8-formalizacao-web.md`](../specs/fase-3/108-fsprint-8-formalizacao-web.md) (F-Sprint 8)
+  - [`specs/fase-3/109-fsprint-9-cobranca-web.md`](../specs/fase-3/109-fsprint-9-cobranca-web.md) (F-Sprint 9)
+  - [`specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md`](../specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md) (F-Sprint 10)
+  - [`specs/fase-3/111-fsprint-11-credora-web.md`](../specs/fase-3/111-fsprint-11-credora-web.md) (F-Sprint 11)
+  - [`specs/fase-3/112-fsprint-12-governanca-web.md`](../specs/fase-3/112-fsprint-12-governanca-web.md) (F-Sprint 12)
+  - [`specs/fase-3/113-fsprint-13-pix-web.md`](../specs/fase-3/113-fsprint-13-pix-web.md) (F-Sprint 13)
 - A base visual do app web vem de dois design systems oficiais, sem template administrativo pronto e sem framework CSS de terceiros:
   - [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas (sem autenticacao): landing, login e cadastro
   - [`DESIGN-notion.md`](./DESIGN-notion.md) para todas as superficies autenticadas (dashboard, perfil, alteracao de senha, administracao de usuarios e demais jornadas)
