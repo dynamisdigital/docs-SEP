@@ -48,10 +48,10 @@ Leitura base para qualquer agente:
 | Duvida de produto/regra | `docs-sep/PRD.md` + arquivo `PRD-FASE-*` relevante -> `docs-sep/CONTEXT.md` + parte relevante -> doc operacional do modulo -> spec da sprint |
 | Integracao externa | Base -> ADR 0004 -> ADR 0008 quando houver WireMock -> doc operacional do modulo -> specs/steps da integracao |
 | Seguranca/auth/step-up/auditoria | Base -> `docs-sep/SEGURANCA.md` -> specs/steps da Sprint 5 -> docs do modulo afetado |
-| Metricas de implementacao | Base -> [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) -> step da sprint -> relatorios/testes do repo |
-| Acompanhamento de entregas | Base -> [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) -> [`Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) -> [`Fase 3 HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.html) -> [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) -> step da sprint |
+| Metricas de implementacao | Base -> [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) -> step da sprint -> testes do repo |
+| Status de sprint | Base -> PRD/CONTEXT da fase -> spec/step da sprint -> doc operacional do modulo -> PR description temporaria quando aplicavel |
 | Fechamento de sprint | Step da sprint -> doc operacional do modulo -> PR description temporaria, se o PR real precisar -> PRD -> collections -> este roadmap |
-| Melhoria de fim de fase / bug hunt | Base -> PRD/CONTEXT da fase -> relatorio de acompanhamento -> steps/specs da fase -> docs operacionais -> [`TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`](docs-sep/TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md) |
+| Melhoria de fim de fase / bug hunt | Base -> PRD/CONTEXT da fase -> steps/specs da fase -> docs operacionais -> metricas/testes -> [`TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`](docs-sep/TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md) |
 
 ## Mapa por modulo
 
@@ -67,7 +67,7 @@ Leitura base para qualquer agente:
 | `contratos` | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) + [`CCB.md`](repos/sep-api/CCB.md) | [`010`](steps-fase-2/backend/010-sprint-10-steps.md), [`011`](steps-fase-2/backend/011-sprint-11-steps.md) | 0004, 0006, 0007, 0013 |
 | `cobranca` | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) | [`012`](steps-fase-2/backend/012-sprint-12-steps.md) (implementada) + [`013`](steps-fase-2/backend/013-sprint-13-steps.md) | 0001, 0005, 0007, 0014 |
 | `backoffice` | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) | [`014`](steps-fase-2/backend/014-sprint-14-steps.md) | 0001, 0007 |
-| Hardening pos-Fase-2 | [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) + [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) | [`015`](steps-fase-2/backend/015-sprint-15-hardening-steps.md) | 0001, 0007, 0015 |
+| Hardening pos-Fase-2 | [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) + PRD/CONTEXT Fase 2 | [`015`](steps-fase-2/backend/015-sprint-15-hardening-steps.md) | 0001, 0007, 0015 |
 | `credores` | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + PRD Epic 10 | [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) (implementada), [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) (implementada) | 0001, 0004, 0007 |
 | `escrow` | [`repos/sep-api/PIX.md` §provider](repos/sep-api/PIX.md) (`EscrowProvider`, Sprint 19) + [`COBRANCA.md` §escrow](repos/sep-api/COBRANCA.md) (use case local Sprint 12) | Sprint 12 (parte local), [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0005, 0007 |
 | `pix` / `financeiro` | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) (Sprint 19 foundation + Sprint 20 desembolso) + PRD Epic 15 | [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`step 020`](steps-fase-3/backend/020-sprint-20-steps.md) (implementada), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 0004, 0005, 0007, 0008 |
@@ -87,7 +87,7 @@ Leitura base para qualquer agente:
 | fila operacional, backoffice, reprocesso, dashboard interno | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) + [`014-sprint-14-steps.md`](steps-fase-2/backend/014-sprint-14-steps.md) |
 | empresa credora, cadastro credora, elegibilidade credora | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) |
 | oportunidades, carteira, interesse, operacao financiada da credora | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) |
-| Pix, desembolso, recebimento Pix, conciliacao Pix | [`RELATORIO Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) + [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) + [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) |
+| Pix, desembolso, recebimento Pix, conciliacao Pix | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) + [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) + [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) |
 | KYC, KYB, documentos, Celcoin onboarding | [`repos/sep-api/ONBOARDING.md`](repos/sep-api/ONBOARDING.md) |
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |
 | MFA, TOTP, refresh, step-up, auditoria de seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) |
@@ -96,7 +96,7 @@ Leitura base para qualquer agente:
 | mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) |
 | pipeline, CI, deploy | [`docs-sep/ci-pipelines/README.md`](docs-sep/ci-pipelines/README.md) |
 | metricas, produtividade, progresso, DORA, SPACE, dashboard da sprint | [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |
-| relatorio de entregas, acompanhamento, status report, indicadores para stakeholders | [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) + [`Fase 3`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md) + [`Fase 3 HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.html) + [`HTML`](docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.html) |
+| acompanhamento, status de sprint, indicadores para stakeholders | PRD/CONTEXT da fase + step da sprint + doc operacional do modulo + [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |
 
 ## Checklists rapidos
 
@@ -135,7 +135,7 @@ Leitura base para qualquer agente:
 
 ### Antes de iniciar nova fase
 
-- Verificar se a fase anterior foi marcada como concluida no PRD/CONTEXT e no relatorio de acompanhamento.
+- Verificar se a fase anterior foi marcada como concluida no PRD/CONTEXT e nos docs operacionais afetados.
 - Se o usuario solicitar melhoria de fim de fase, trabalhar em modo plano e criar um arquivo `docs-sep/PLANO-MELHORIA-FIM-FASE-<N>.md` baseado no template.
 - Classificar achados em bugs P0/P1, melhorias pequenas, dividas aceitas e backlog adiado.
 - Aguardar aprovacao explicita antes de implementar qualquer task do plano.

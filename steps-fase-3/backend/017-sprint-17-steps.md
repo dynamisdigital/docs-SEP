@@ -414,8 +414,6 @@ cd <sep-api-root>
 - `docs-SEP/repos/sep-api/CREDORES.md`
 - `docs-SEP/docs-sep/PRD.md`
 - `docs-SEP/docs-sep/CONTEXT.md`
-- `docs-SEP/docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md`
-- `docs-SEP/docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.html`
 - `docs-SEP/AI-ROADMAP.md`
 - Collections Postman/Insomnia quando houver endpoints novos ou alterados.
 
@@ -427,7 +425,7 @@ cd <sep-api-root>
 
 ### Definicao de pronto da Task 17.7
 - [ ] Docs operacionais atualizadas.
-- [ ] PRD/CONTEXT/relatorio Fase 3 atualizados com status real.
+- [ ] PRD/CONTEXT atualizados com status real.
 - [ ] AI-ROADMAP revisado.
 - [ ] Collections atualizadas quando aplicavel.
 - [ ] Checkpoint final pronto para commit/PR.
@@ -445,4 +443,3 @@ cd <sep-api-root>
 - [ ] Auditoria registra interesse, cancelamento e associacao quando houver.
 - [ ] Testes proporcionais verdes.
 - [ ] Documentacao e collections atualizadas.
-

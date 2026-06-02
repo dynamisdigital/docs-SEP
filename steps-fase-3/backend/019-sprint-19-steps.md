@@ -485,8 +485,6 @@ cd <sep-api-root>
 - `docs-SEP/docs-sep/SEGURANCA.md` (webhook/HMAC/auditoria quando aplicavel).
 - `docs-SEP/docs-sep/PRD.md`
 - `docs-SEP/docs-sep/CONTEXT.md`
-- `docs-SEP/docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md`
-- `docs-SEP/docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.html`
 - `docs-SEP/AI-ROADMAP.md`
 - Collections Postman/Insomnia de webhook Pix/provider smoke.
 - `docs-SEP/repos/sep-api/SPRINT-19-PR.md` ao final da sprint.
@@ -496,13 +494,13 @@ cd <sep-api-root>
 - Documentar endpoints de webhook, HMAC e idempotencia.
 - Documentar quais capacidades Pix ainda sao foundation e quais ficam para Sprints 20/21.
 - Registrar migrations e eventos de auditoria.
-- Atualizar relatorio Fase 3 com status real da Sprint 19 apenas apos fechamento/merge confirmado.
+- Atualizar PRD/CONTEXT com status real da Sprint 19 apenas apos fechamento/merge confirmado.
 - Remover `SPRINT-18-PR.md` temporario se ele ja tiver sido usado e o usuario aprovar a limpeza.
 
 ### Definicao de pronto da Task 19.7
 - [ ] `PIX.md` criado.
 - [ ] Docs de seguranca/COBRANCA atualizadas quando comportamento mudar.
-- [ ] PRD/CONTEXT/relatorio Fase 3 atualizados com status real.
+- [ ] PRD/CONTEXT atualizados com status real.
 - [ ] AI-ROADMAP revisado.
 - [ ] Collections atualizadas quando aplicavel.
 - [ ] PR description temporaria criada para Sprint 19.
@@ -523,4 +521,3 @@ cd <sep-api-root>
 - [ ] OpenAPI/collections/docs refletem contratos novos.
 - [ ] Testes proporcionais verdes.
 - [ ] Migrations aplicam em banco limpo e banco existente.
-

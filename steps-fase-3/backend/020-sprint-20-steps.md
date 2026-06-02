@@ -484,8 +484,6 @@ cd <sep-api-root>
 - `docs-SEP/docs-sep/SEGURANCA.md` se houver novo endpoint/step-up documentavel.
 - `docs-SEP/docs-sep/PRD-FASE-3.md`
 - `docs-SEP/docs-sep/CONTEXT-PARTE-2.md`
-- `docs-SEP/docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md`
-- `docs-SEP/docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.html`
 - `docs-SEP/AI-ROADMAP.md`
 - Collections Postman/Insomnia para desembolso Pix.
 - `docs-SEP/repos/sep-api/SPRINT-20-PR.md` ao final da sprint.
@@ -496,13 +494,13 @@ cd <sep-api-root>
 - Documentar quais dados Pix sao persistidos e quais sao apenas trafegados ao provider.
 - Documentar status/transicoes e relacionamento com webhook `STATUS_TRANSFERENCIA`.
 - Documentar backoffice/reprocesso apenas se handler real foi implementado.
-- Atualizar relatorio Fase 3 com status real da Sprint 20 apenas apos fechamento/merge confirmado.
+- Atualizar PRD/CONTEXT com status real da Sprint 20 apenas apos fechamento/merge confirmado.
 - Remover `SPRINT-19-PR.md` temporario se ele ja tiver sido usado e o usuario aprovar a limpeza.
 
 ### Definicao de pronto da Task 20.6
 - [ ] `PIX.md` atualizado com desembolso assistido.
 - [ ] Docs afetadas atualizadas quando comportamento mudar.
-- [ ] PRD/CONTEXT/relatorio Fase 3 atualizados com status real.
+- [ ] PRD/CONTEXT atualizados com status real.
 - [ ] AI-ROADMAP revisado.
 - [ ] Collections atualizadas quando aplicavel.
 - [ ] PR description temporaria criada para Sprint 20.
@@ -523,4 +521,3 @@ cd <sep-api-root>
 - [ ] OpenAPI, collections e docs refletem os contratos novos.
 - [ ] Testes proporcionais verdes; bloqueios ambientais registrados.
 - [ ] Migrations aplicam em banco limpo e banco existente.
-

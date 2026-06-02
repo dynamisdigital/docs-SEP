@@ -59,7 +59,7 @@ No estado atual:
   - Sprints 10, 11 → Epic 7 (Formalizacao geracao, Assinatura Digital + CCB)
   - Sprints 12, 13 → Epic 8 (Cobranca parcelas, Inadimplencia)
   - Sprint 14 → Epic 9 (Backoffice operacional — fechamento Fase 2)
-- execucao backend da Fase 2 concluida em 2026-05-26 com a Sprint 14 (`backoffice`) mergeada em `develop` via PR #63 (`30def6a`); PRD §22/§29, `BACKOFFICE.md`, collections, relatorio de acompanhamento e AI-ROADMAP passaram a ser as fontes de fechamento da fase.
+- execucao backend da Fase 2 concluida em 2026-05-26 com a Sprint 14 (`backoffice`) mergeada em `develop` via PR #63 (`30def6a`); PRD §22/§29, `BACKOFFICE.md`, collections e AI-ROADMAP passaram a ser as fontes de fechamento da fase.
 - ADRs candidatos da Fase 2 (criados just-in-time durante cada sprint, nao agora):
   - ADR 0011: Motor de regras de credito interno (Sprint 8)
   - ADR 0012: Provedor de assinatura digital (Sprint 11) — gate da Sprint 11

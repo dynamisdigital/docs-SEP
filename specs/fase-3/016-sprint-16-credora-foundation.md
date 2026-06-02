@@ -7,7 +7,7 @@
 - **Status**: planejada
 - **Fase do produto**: Fase 3 - Epic 10 (Jornada da empresa credora)
 - **Trilha**: Backend (`sep-api`)
-- **Origem**: PRD Epic 10; RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3
+- **Origem**: PRD Epic 10; CONTEXT-PARTE-2
 - **Depende de**: Sprint 15 concluida em `main`
 - **Responsavel principal**: Dev Senior
 

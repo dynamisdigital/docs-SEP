@@ -459,8 +459,6 @@ cd <sep-api-root>
 - `docs-SEP/repos/sep-api/README.md` ou doc operacional de governanca, se criado.
 - `docs-SEP/docs-sep/PRD.md`
 - `docs-SEP/docs-sep/CONTEXT.md`
-- `docs-SEP/docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md`
-- `docs-SEP/docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.html`
 - `docs-SEP/AI-ROADMAP.md`
 - Collections Postman/Insomnia quando houver endpoints novos ou alterados.
 
@@ -468,12 +466,12 @@ cd <sep-api-root>
 - Documentar modelo multi-role e compatibilidade de claims.
 - Documentar endpoints de roles e parametros.
 - Registrar parametros operacionais iniciais e regras de alteracao.
-- Atualizar relatorio Fase 3 com status real da Sprint 18 apenas apos fechamento/merge confirmado.
+- Atualizar PRD/CONTEXT com status real da Sprint 18 apenas apos fechamento/merge confirmado.
 - Atualizar roadmap para apontar este step e docs operacionais.
 
 ### Definicao de pronto da Task 18.7
 - [ ] Docs de seguranca/governanca atualizadas.
-- [ ] PRD/CONTEXT/relatorio Fase 3 atualizados com status real.
+- [ ] PRD/CONTEXT atualizados com status real.
 - [ ] AI-ROADMAP revisado.
 - [ ] Collections atualizadas quando aplicavel.
 - [ ] Checkpoint final pronto para commit/PR.
@@ -492,4 +490,3 @@ cd <sep-api-root>
 - [ ] OpenAPI e docs refletem contratos novos.
 - [ ] Testes proporcionais verdes.
 - [ ] Migrations aplicam em banco limpo e banco existente.
-

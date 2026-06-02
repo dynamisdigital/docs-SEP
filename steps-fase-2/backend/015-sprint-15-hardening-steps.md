@@ -3,7 +3,7 @@
 **Spec de origem**: sem spec formal. Sprint operacional pos-Fase-2.
 
 Fontes de escopo:
-- [`docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`](../../docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS.md) (itens Aberto/Adiado).
+- PRD/CONTEXT Fase 2 (itens abertos, adiados e fechamento da fase).
 - [`docs-sep/SEGURANCA.md`](../../docs-sep/SEGURANCA.md) §14 (8 itens abertos).
 - [`docs-sep/METRICAS-IMPLEMENTACAO.md`](../../docs-sep/METRICAS-IMPLEMENTACAO.md) (JaCoCo aspiracional).
 - [`repos/sep-api/COBRANCA.md`](../../repos/sep-api/COBRANCA.md) §Limitacoes (11 itens).
@@ -25,7 +25,7 @@ Fontes de escopo:
 - `feature/sprint-15-hardening-bughunt`
 
 **Pre-requisitos globais**:
-- Sprint 14 mergeada em `develop` (RELATORIO 2026-05-27).
+- Sprint 14 mergeada em `develop` (fechamento documentado em PRD/CONTEXT).
 - `sep-api` em `develop` atualizado a partir de `origin/develop`.
 - Suite global verde no topo de `develop` antes da branch (baseline pos-14).
 - Working tree limpo nos 3 repos.
@@ -52,7 +52,7 @@ Fontes de escopo:
 - Fazer exatamente 1 code review automatizado da Task via subagente `cavecrew-reviewer`.
 - Hotfix de findings do review: implementar, novo checkpoint pre-commit, aprovacao, commit. Sem novo review automatizado salvo pedido explicito.
 - Pausar para review manual do usuario antes de iniciar a proxima Task.
-- Atualizar `RELATORIO-ACOMPANHAMENTO-ENTREGAS.md` (e variante HTML) em cada PAUSA pos-review.
+- Atualizar PRD/CONTEXT, docs operacionais e metricas quando a task alterar status, comportamento ou divida conhecida.
 
 **Skills obrigatorias na implementacao**:
 - `coding-guidelines`: pensar antes de codar, simplicidade primeiro, mudanca cirurgica, execucao orientada a meta.
@@ -89,7 +89,7 @@ Fontes de escopo:
 15.10 (coverage uplift por modulo)
   |
   v
-15.11 (SPRINT-15-PR.md + RELATORIO + METRICAS + AGENT.md)
+15.11 (SPRINT-15-PR.md + PRD/CONTEXT + METRICAS + AGENT.md)
 ```
 
 - 15.0/15.1/15.2 sao gates obrigatorios. Sem baseline + findings triagiados, fixes ficam cegos.
@@ -147,7 +147,7 @@ cd <sep-api-root>
 
 **Verificacao**:
 - Suite passa antes de qualquer alteracao.
-- Contagem de testes registrada no proprio step file e em `RELATORIO`. Esperado pos-Sprint 14: contagem >= 1300 testes (extrapolacao do baseline pos-13 de 1246).
+- Contagem de testes registrada no proprio step file e em `METRICAS-IMPLEMENTACAO.md`. Esperado pos-Sprint 14: contagem >= 1300 testes (extrapolacao do baseline pos-13 de 1246).
 - Falha = abortar e levantar com o usuario.
 
 ### Step 015.0.4 - Gerar JaCoCo baseline
@@ -326,7 +326,7 @@ Findings re-categorizados apos auditoria detalhada do codigo. Varios "P1" do bug
 - **15.6 (security §14)**: 15F-010 WireMock E2E + 3 itens conhecidos §14.
 - **15.7 (audit/PII)**: 15F-008, 017, 024, 027 (4 findings).
 - **15.8 (cleanup tech debt)**: 15F-006 + 5 marcadores conhecidos.
-- **followup RELATORIO** (P1 rebaixados pos-validacao + P2):
+- **followup PRD/CONTEXT/docs operacionais** (P1 rebaixados pos-validacao + P2):
   - 15F-001: pos-validacao — UNIQUE em recebimento.idempotency_key + lock pessimista parcela ja serializam. IT concorrente fica em followup.
   - 15F-011, 012: pos-validacao — codigo atual ja eh defensivo (Fix C2/M2 review Sprint 11).
   - 15F-020, 023: provider ja faz retry Resilience4j. Visibilidade operacional via Backoffice fica em sprint futura.
@@ -344,7 +344,7 @@ Findings re-categorizados apos auditoria detalhada do codigo. Varios "P1" do bug
 
 ## Task 15.2 - Triagem e backlog dinamico
 
-**Objetivo**: classificar cada finding em corrigir-na-sprint, follow-up-RELATORIO ou descartado-com-justificativa. Estabelece o plano real das Tasks 15.3-15.8.
+**Objetivo**: classificar cada finding em corrigir-na-sprint, follow-up documentado em fonte permanente ou descartado-com-justificativa. Estabelece o plano real das Tasks 15.3-15.8.
 
 **Pre-requisito**: Task 15.1 concluida.
 
@@ -355,7 +355,7 @@ Findings re-categorizados apos auditoria detalhada do codigo. Varios "P1" do bug
 **Regras**:
 - 100% dos P0 obrigatoriamente alocados em 15.3-15.8. Nao admite follow-up.
 - P1: alocar conforme capacidade da sprint. Estimar esforco unitario antes de aceitar.
-- P2: candidato natural a follow-up RELATORIO.
+- P2: candidato natural a follow-up em PRD/CONTEXT ou doc operacional.
 
 ### Step 015.2.2 - Atribuir destino
 
@@ -366,7 +366,7 @@ Para cada finding, preencher coluna "Destino" na tabela 15.1.5:
 - `15.6` = security hardening.
 - `15.7` = audit/PII.
 - `15.8` = cleanup tech debt.
-- `followup` = RELATORIO Aberto/Adiado.
+- `followup` = PRD/CONTEXT ou doc operacional com status Aberto/Adiado.
 - `descartado` = justificativa textual obrigatoria.
 
 ### Step 015.2.3 - Atualizar Definicao de Pronto das Tasks 15.3-15.8
@@ -420,7 +420,7 @@ grep -R "REQUIRES_NEW\|PESSIMISTIC_WRITE\|@Lock\|saveAndFlush" -n src/main/java
 ### Step 015.3.4 - Teste concorrente em pontos criticos
 
 - IT com 2 threads em `RegistrarRecebimentoUseCase` (cenario: 2 chamadas simultaneas com mesma `Idempotency-Key`).
-- IT em `ReprocessarWebhookUseCase` para race anti-abuso 3/24h (RELATORIO Aberto: "race anti-abuso best-effort").
+- IT em `ReprocessarWebhookUseCase` para race anti-abuso 3/24h (item Aberto: "race anti-abuso best-effort").
 - Asserts: 1 sucesso, 1 rejeicao com 409 ou no-op idempotente conforme contrato.
 
 ### Step 015.3.5 - Rodar suite
@@ -739,7 +739,7 @@ Esperado: zero nos 5 pontos listados. Outros pontos novos sao avaliados caso a c
 
 ## Task 15.9 - OpenAPI e role docs sync
 
-**Objetivo**: fechar item RELATORIO "OpenAPI role docs outdated". Cross-check de cada endpoint vs role real do `@PreAuthorize`.
+**Objetivo**: fechar item "OpenAPI role docs outdated". Cross-check de cada endpoint vs role real do `@PreAuthorize`.
 
 **Pre-requisito**: Tasks 15.3-15.8 concluidas.
 
@@ -814,7 +814,7 @@ Para cada modulo abaixo do gate:
 ### Step 015.10.5 - Tratar gaps irrecuperaveis na sprint
 
 Se um modulo ficar > 15pp do gate:
-- Documentar em RELATORIO Aberto/Adiado com plano.
+- Documentar em PRD/CONTEXT ou doc operacional com plano.
 - Elevar gate gradualmente em vez de forcar (atualizar `build.gradle` se preciso, com motivo no commit).
 
 ### Step 015.10.6 - Atualizar METRICAS-IMPLEMENTACAO.md
@@ -824,7 +824,7 @@ Se um modulo ficar > 15pp do gate:
 
 ### Definicao de pronto da Task 15.10
 
-- [ ] Todos os modulos >= 70% OU excecao documentada em RELATORIO.
+- [ ] Todos os modulos >= 70% OU excecao documentada em `METRICAS-IMPLEMENTACAO.md`.
 - [ ] `jacocoTestCoverageVerification` verde.
 - [ ] METRICAS-IMPLEMENTACAO.md atualizado com tabela final.
 - [ ] Sem teste duplicado ou flaky introduzido.
@@ -876,18 +876,17 @@ Bug-hunt cirurgico, fechamento de debitos conhecidos, baseline JaCoCo, sem nova 
 - <V36 ou nenhuma>
 
 ## Risco residual
-- Itens P1/P2 em follow-up listados em RELATORIO.
+- Itens P1/P2 em follow-up listados em PRD/CONTEXT ou no doc operacional afetado.
 
 ## Verificacao
 - `./gradlew check` verde.
 - Suite global verde.
 ```
 
-### Step 015.11.2 - Atualizar `RELATORIO-ACOMPANHAMENTO-ENTREGAS.md`
+### Step 015.11.2 - Atualizar PRD/CONTEXT e docs operacionais
 
 - Fechar itens resolvidos (cobranca N+1, audit blacklist, race anti-abuso, OpenAPI roles, etc).
 - Mover P2 e P1 nao resolvidos para Aberto/Adiado com IDs (15F-XXX).
-- Atualizar variante HTML.
 
 ### Step 015.11.3 - Atualizar `METRICAS-IMPLEMENTACAO.md`
 
@@ -916,7 +915,7 @@ Verificacao:
 ### Definicao de pronto da Task 15.11
 
 - [ ] `SPRINT-15-PR.md` criado e preenchido.
-- [ ] RELATORIO + HTML atualizados.
+- [ ] PRD/CONTEXT e docs operacionais atualizados.
 - [ ] METRICAS-IMPLEMENTACAO.md atualizado.
 - [ ] AGENT.md com notas operacionais.
 - [ ] Working tree `docs-SEP` reportado ao usuario, sem commit/push do agente.
@@ -934,8 +933,8 @@ Verificacao:
 - [ ] CPF representante PLD mascarado em PII e audit.
 - [ ] Paginacao `/recebimentos` documentada com backward compat.
 - [ ] OpenAPI sincronizado com roles reais.
-- [ ] Todos modulos >= 70% JaCoCo OU excecao registrada em RELATORIO.
-- [ ] RELATORIO + METRICAS + SPRINT-15-PR.md atualizados.
+- [ ] Todos modulos >= 70% JaCoCo OU excecao registrada em `METRICAS-IMPLEMENTACAO.md`.
+- [ ] PRD/CONTEXT + METRICAS + SPRINT-15-PR.md atualizados.
 - [ ] Suite global verde com contagem registrada.
 - [ ] Branch `feature/sprint-15-hardening-bughunt` pronta para PR para `develop`.
 

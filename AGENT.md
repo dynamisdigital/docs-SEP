@@ -102,7 +102,7 @@ Arquivos de PR description (regra fixa — comportamento ativo do agente):
 
 - `repos/<repo>/SPRINT-*-PR.md` sao artefatos temporarios para apoiar a abertura/revisao do PR da sprint.
 - **Fim de cada sprint**: o agente DEVE criar `repos/<repo>/SPRINT-<N>-PR.md` com a descricao consolidada do PR (Summary, test plan, mudancas por modulo, migrations, decisoes, dividas aceitas, followups, notas e lista de commits), sem aguardar pedido explicito. Formato espelha os PRs anteriores.
-- **Inicio de cada sprint**: o agente DEVE apagar o(s) `SPRINT-*-PR.md` da(s) sprint(s) anterior(es) ja usado(s) no PR, antes de iniciar a nova. O historico definitivo permanece no PR do GitHub, no step da sprint, no doc operacional do modulo, no PRD/CONTEXT e no relatorio de acompanhamento.
+- **Inicio de cada sprint**: o agente DEVE apagar o(s) `SPRINT-*-PR.md` da(s) sprint(s) anterior(es) ja usado(s) no PR, antes de iniciar a nova. O historico definitivo permanece no PR do GitHub, no step da sprint, no doc operacional do modulo e no PRD/CONTEXT.
 - Operacao em `docs-SEP` e 100% manual no git: o agente cria/edita/apaga apenas no working tree; nunca commita, faz push ou abre PR desses arquivos.
 - Nao manter links permanentes para `SPRINT-*-PR.md` em docs operacionais, PRD, CONTEXT ou AI-ROADMAP.
 
@@ -110,7 +110,7 @@ Melhoria de fim de fase:
 
 - Ao encerrar uma fase, antes de iniciar a fase seguinte, executar uma rotina de melhoria de codigo e busca de bugs quando o usuario solicitar.
 - Esta rotina deve comecar obrigatoriamente em modo plano. O agente nao implementa correcoes nessa etapa inicial.
-- O agente deve revisar PRD, CONTEXT, relatorio de acompanhamento, specs/steps da fase encerrada, docs operacionais, status dos repos, diffs entre branches relevantes e resultados de testes/CI disponiveis.
+- O agente deve revisar PRD, CONTEXT, specs/steps da fase encerrada, docs operacionais, metricas de implementacao, status dos repos, diffs entre branches relevantes e resultados de testes/CI disponiveis.
 - O resultado deve ser um arquivo Markdown de plano com tasks, usando como base `docs-sep/TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`. O arquivo concreto deve usar nome claro, por exemplo `docs-sep/PLANO-MELHORIA-FIM-FASE-2.md`.
 - O plano deve separar bugs P0/P1, melhorias de baixo risco, dividas tecnicas aceitas, itens adiados e validacoes necessarias.
 - Implementacao de qualquer task desse plano so pode ocorrer apos aprovacao explicita do usuario.

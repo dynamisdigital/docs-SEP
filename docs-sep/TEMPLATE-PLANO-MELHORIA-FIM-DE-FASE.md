@@ -26,9 +26,9 @@ usuario aprovar explicitamente.
 
 - PRD da fase e secoes de status.
 - CONTEXT.md.
-- RELATORIO-ACOMPANHAMENTO-ENTREGAS.md.
 - Steps e specs da fase encerrada.
 - Docs operacionais em `repos/<repo>/`.
+- Metricas de implementacao quando aplicavel.
 - Diffs entre branches relevantes (`develop`, `main`, feature branches ainda abertas).
 - Testes, CI e logs disponiveis localmente ou no GitHub quando o usuario solicitar consulta externa.
 

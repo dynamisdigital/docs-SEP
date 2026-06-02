@@ -21,7 +21,7 @@
 - Sprint 20 conhecida: `ProcessarWebhookPixUseCase` ja roteia `RECEBIMENTO_PIX` e `STATUS_TRANSFERENCIA`; desembolso Pix e backoffice Pix ja existem.
 - Sprint 12/13 conhecida: `AgendaPagamento`, `ParcelaCobranca`, `RegistrarRecebimentoUseCase`, `RegistrarMovimentacaoEscrowPort`, inadimplencia e backoffice de cobranca.
 - ADRs 0004 (Provider Pattern), 0005 (Escrow), 0007 (DDD + Hexagonal) e 0008 (WireMock) vigentes.
-- Docs de referencia: `repos/sep-api/PIX.md`, `COBRANCA.md`, `BACKOFFICE.md`, `docs-sep/SEGURANCA.md` e `docs-sep/RELATORIO-ACOMPANHAMENTO-ENTREGAS-FASE-3.md`.
+- Docs de referencia: `repos/sep-api/PIX.md`, `COBRANCA.md`, `BACKOFFICE.md`, `docs-sep/SEGURANCA.md`, PRD-FASE-3 e CONTEXT-PARTE-2.
 
 **Nota sobre numeracao de migrations**:
 - Confirmar sempre o proximo numero livre em `src/main/resources/db/migration`.
@@ -569,7 +569,7 @@ cd <sep-api-root>
   - regra de parcial/maior.
 - `docs-SEP/repos/sep-api/BACKOFFICE.md`:
   - novo tipo de item e reprocesso/no-op.
-- `docs-SEP/docs-sep/PRD-FASE-3.md`, `CONTEXT-PARTE-2.md`, relatorio Fase 3 e `AI-ROADMAP.md`.
+- `docs-SEP/docs-sep/PRD-FASE-3.md`, `CONTEXT-PARTE-2.md` e `AI-ROADMAP.md`.
 - Collections:
   - `docs-SEP/docs-sep/sep-api.postman_collection.json`;
   - `docs-SEP/docs-sep/sep-api.insomnia_collection.json`.

@@ -42,7 +42,7 @@ Permitir ao tomador criar e acompanhar propostas, iniciar consentimento Open Fin
 
 - Precheck dos endpoints de credito/Open Finance.
 - Smoke E2E proposta -> consentimento -> status.
-- Atualizacao de docs/relatorio Fase 3.
+- Atualizacao de PRD/CONTEXT/docs operacionais quando aplicavel.
 
 ## Definition of Done
 
