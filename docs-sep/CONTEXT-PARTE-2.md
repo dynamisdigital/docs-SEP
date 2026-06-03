@@ -520,7 +520,7 @@ No estado atual:
 
 ## Proximo passo mais natural
 
-Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend Sprints 5-14** (2026-05-11 a 2026-05-26), Sprint 15 hardening pos-Fase-2 (2026-05-27) + **M-Sprints 1-5 mobile** + **F-Sprints 1-5 web** + **Follow-ups 5F-FIX-01..06** concluidas, com fluxo GitHub `feature → develop → main` estavel, conteudo promovido para `main` nos tres repos de codigo e documentacao consolidada (`docs-sep/SEGURANCA.md` §16; `ONBOARDING.md`; `CREDITO.md`; `OPEN-FINANCE.md`; `CONTRATOS.md`; `CCB.md`; `COBRANCA.md`; `NOTIFICACOES.md`; `BACKOFFICE.md`), os proximos passos provaveis sao:
+Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend Sprints 5-14** (2026-05-11 a 2026-05-26), Sprint 15 hardening pos-Fase-2 (2026-05-27) + **M-Sprints 1-5 mobile** + **F-Sprints 1-6 web** (F-6 onboarding mergeada 2026-06-03, PR #33) + **Follow-ups 5F-FIX-01..06** concluidas, com fluxo GitHub `feature → develop → main` estavel, conteudo promovido para `main` nos tres repos de codigo e documentacao consolidada (`docs-sep/SEGURANCA.md` §16; `ONBOARDING.md`; `CREDITO.md`; `OPEN-FINANCE.md`; `CONTRATOS.md`; `CCB.md`; `COBRANCA.md`; `NOTIFICACOES.md`; `BACKOFFICE.md`), os proximos passos provaveis sao:
 - **Configurar branch protection no GitHub**: nos 3 repos (`sep-api`, `sep-app`, `sep-mobile`) — proteger `develop` contra delecao (`allow_deletions=false`), exigir PR + status checks; em `main` desabilitar squash merge e habilitar merge commit (preserva historico das features); definir `develop` como default branch (PRs apontam pra develop por padrao). Comandos `gh api` listados em conversa do agente; usuario executa apos `gh auth login`
 - **Epic 13 (Frontend de Jornadas)** e **Epic 14 Fase Mobile 2+** passam a ser candidatas naturais apos a estabilizacao dos contratos backend da Fase 2. Planejar specs/steps web/mobile just-in-time antes de implementar.
 - **Epic 15/Pix e integracoes reais de provider** podem ser detalhadas agora que os modulos de contratacao, cobranca e backoffice ja existem.
@@ -572,14 +572,15 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - **REST**: `/api/v1/pix/recebimentos` (`POST /referencias` FINANCEIRO/ADMIN sem step-up; `GET /referencias/{id}` e `GET /{id}` FINANCEIRO/ADMIN/BACKOFFICE). Smoke E2E `PixRecebimentoConciliacaoIT` full-chain (referencia -> webhook -> CONCILIADO -> parcela PAGA -> Recebimento PIX + escrow -> replay nao duplica).
   - **Decisoes/dividas**: DDD preservado (pix sem entidades de cobranca; `StatusParcela` so no adapter); minimizacao (payload/chave fora); self-service do tomador (CLIENTE owner) e reprocesso local de FALHOU ficam follow-up; ajuste de campos Celcoin real pos-sandbox. Descricao consolidada em `repos/sep-api/SPRINT-21-PR.md`.
   - relatorios de acompanhamento de entregas foram removidos do `docs-SEP` em 2026-06-02 (nao recriar).
-  - proxima execucao recomendada: retomar as trilhas web/mobile, iniciando pela F-Sprint 6 (onboarding web PF/PJ) sobre os contratos backend das Sprints 6-7.
+  - proxima execucao recomendada: continuar a trilha web com a F-Sprint 7 (propostas, credito e Open Finance, spec `107`) ou abrir a trilha mobile com a M-Sprint 6 (onboarding mobile, spec `206`), ambas sobre contratos backend ja estabilizados.
 
-- **F-Sprint 6 (Onboarding web PF/PJ) preparada em 2026-06-02**:
-  - spec de origem: `specs/fase-3/106-fsprint-6-onboarding-web.md`; steps just-in-time criados em `steps-fase-3/web/106-fsprint-6-steps.md`.
-  - objetivo: primeira sprint funcional do Epic 13 no `sep-app`, consumindo APIs reais de onboarding PF (`/api/v1/onboarding/pessoa`) e PJ (`/api/v1/onboarding/empresa`) sem duplicar regras KYC/KYB/PLD no frontend.
-  - base esperada do web: F-Sprints 0-5 concluidas, shell autenticado Notion, guards/interceptors, tratamento 401/403/409, MFA/step-up e cadastro publico canalizado.
-  - contratos backend relevantes: `ONBOARDING.md`, `PLD.md`, `OpenAPI`, controllers `OnboardingPessoaController` e `OnboardingEmpresaController`.
-  - decisao de escopo: implementar status, upload, disparo de verificacao e visualizacao segura de PF/PJ; simular contratos no MSW; nao implementar decisao de aprovacao/reprovacao, OCR nativo, edicao pos-aprovacao ou mobile.
+- **F-Sprint 6 (Onboarding web PF/PJ) concluida e mergeada em `develop` em 2026-06-03 (PR #33, merge `ed14629`)**:
+  - spec de origem: `specs/fase-3/106-fsprint-6-onboarding-web.md`; steps em `steps-fase-3/web/106-fsprint-6-steps.md`.
+  - primeira sprint funcional do Epic 13 no `sep-app`, consumindo APIs reais de onboarding PF (`/api/v1/onboarding/pessoa`) e PJ (`/api/v1/onboarding/empresa`) sem duplicar regras KYC/KYB/PLD no frontend.
+  - entregue (F-6.1 a F-6.6): tipos de borda + `OnboardingService` (multipart `tipo`+`arquivo`); rotas/menu/home; jornada PF (inicio, documentos, verificacao, status); jornada PJ/KYB (dados da empresa, representantes mascarados, resumo PLD status/data, status); componentes compartilhados `OnboardingStatusComponent` (badge semantico) e `OnboardingDocumentUploadComponent` (presentacional, limite 10MB) + helper `mensagemOnboardingErro`; MSW PF/PJ (sucesso, 409 CPF/CNPJ ativo, 400 documento invalido, 403 ownership).
+  - verificacao: 106 testes Vitest, build + build `dev-offline` verdes, smoke Playwright MSW `e2e/onboarding.spec.ts` (PF sucesso + 409, PJ representante mascarado + assert negativo de CPF completo para LGPD). Smoke com backend real ficou pendente por ambiente.
+  - decisoes: frontend so apresenta status do backend; representante exibido apenas com `cpfMascarado`; upload nao persiste arquivo em storage local; campos PJ opcionais omitidos quando vazios; `401/403/423` tratados pelo `errorInterceptor` global, paginas tratam `400/404/409/5xx`.
+  - doc operacional: `repos/sep-app/README.md` (secao Onboarding) atualizado.
 
 ## Observacao importante para outro agente
 
