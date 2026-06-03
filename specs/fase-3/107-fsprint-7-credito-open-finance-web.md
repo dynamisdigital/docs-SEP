@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 107
 - **Titulo**: F-Sprint 7 - Propostas, credito e Open Finance no web
-- **Status**: planejada
+- **Status**: implementada na branch `feature/fsprint-7-credito-open-finance-web` em 2026-06-03; push/PR manuais pendentes
 - **Fase do produto**: Fase 3 - Epic 13
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epic 13; APIs credito Sprints 8-9

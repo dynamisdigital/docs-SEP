@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`specs/fase-3/107-fsprint-7-credito-open-finance-web.md`](../../specs/fase-3/107-fsprint-7-credito-open-finance-web.md)
 
-**Status**: planejada.
+**Status**: implementada na branch `feature/fsprint-7-credito-open-finance-web` em 2026-06-03; push/PR manuais pendentes.
 
 **Objetivo geral**: implementar no `sep-app` a jornada autenticada de propostas de credito e Open Finance para o tomador, consumindo os contratos reais de `sep-api` (`credito` Sprints 8-9), com UI Notion, sem duplicar motor de credito, parecer manual, regras de score ou decisoes de negocio no frontend.
 
@@ -668,38 +668,38 @@ npm run build
 - Nao manter arquivo temporario `SPRINT-*-PR.md` como referencia permanente.
 
 ### Definicao de pronto da Task F-7.6
-- [ ] Open Finance inicia consentimento.
-- [ ] `urlAutorizacao` e tratada como handoff externo.
-- [ ] Retorno visual consulta status pela API SEP.
-- [ ] Agregados exibidos sem PII bancario.
-- [ ] MSW cobre `PENDENTE`, `AUTORIZADO`, `409`, `403` e `404`.
-- [ ] Lint/scss/test/build verdes ou falhas registradas.
-- [ ] Docs revisadas quando a sprint for concluida.
+- [x] Open Finance inicia consentimento.
+- [x] `urlAutorizacao` e tratada como handoff externo.
+- [x] Retorno visual consulta status pela API SEP.
+- [x] Agregados exibidos sem PII bancario.
+- [x] MSW cobre `PENDENTE`, `AUTORIZADO`, `409`, `403` e `404`.
+- [x] Lint/scss/test/build verdes ou falhas registradas.
+- [x] Docs revisadas quando a sprint for concluida.
 
 ---
 
 ## Definition of Done da F-Sprint 7
 
-- [ ] Jornada de credito navegavel no web autenticado.
-- [ ] Tomador lista, cria e consulta suas propostas.
-- [ ] Detalhe exibe status, score e parecer sem regra de decisao local.
-- [ ] Open Finance inicia consentimento e consulta status/agregados via API SEP.
-- [ ] Nenhum dado bancario bruto ou PII de Open Finance e exibido/persistido no frontend.
-- [ ] MSW cobre fluxos felizes e erros principais.
-- [ ] Testes unitarios/componentes proporcionais verdes.
-- [ ] `npm run lint`, `npm run lint:scss`, `npm run test -- --run` e `npm run build` executados no fechamento.
-- [ ] PRD/CONTEXT/AI-ROADMAP/docs operacionais revisados no fechamento da sprint.
-- [ ] PR description temporaria criada em `docs-SEP/repos/sep-app/SPRINT-F-7-PR.md` somente no fim da sprint se o PR real precisar.
+- [x] Jornada de credito navegavel no web autenticado.
+- [x] Tomador lista, cria e consulta suas propostas.
+- [x] Detalhe exibe status, score e parecer sem regra de decisao local.
+- [x] Open Finance inicia consentimento e consulta status/agregados via API SEP.
+- [x] Nenhum dado bancario bruto ou PII de Open Finance e exibido/persistido no frontend.
+- [x] MSW cobre fluxos felizes e erros principais.
+- [x] Testes unitarios/componentes proporcionais verdes.
+- [x] `npm run lint`, `npm run lint:scss`, `npm run test -- --run` e `npm run build` executados no fechamento.
+- [x] PRD/CONTEXT/AI-ROADMAP/docs operacionais revisados no fechamento da sprint.
+- [x] PR description temporaria criada em `docs-SEP/repos/sep-app/SPRINT-F-7-PR.md` somente no fim da sprint se o PR real precisar.
 
 ## Checklist de code review da F-Sprint 7
 
-- [ ] `CreditoService` nao calcula regra, score, elegibilidade ou decisao.
-- [ ] Componentes nao inferem aprovacao/rejeicao alem do status retornado.
-- [ ] Open Finance usa apenas API SEP e nao provider direto.
-- [ ] `redirectUri` nao aceita scheme inseguro.
-- [ ] Dados Open Finance sao apenas agregados sanitizados.
-- [ ] `CLIENTE` nao consegue enviar `tomadorId` para listar terceiros.
-- [ ] Erros `403/404/409/422` tem estados de UI claros.
-- [ ] Tests cobrem sucesso, ownership e pre-condicoes.
-- [ ] Layout Notion responsivo sem cards aninhados e sem textos estourando.
-- [ ] Docs/roadmap atualizados quando comportamento ou caminhos documentais mudarem.
+- [x] `CreditoService` nao calcula regra, score, elegibilidade ou decisao.
+- [x] Componentes nao inferem aprovacao/rejeicao alem do status retornado.
+- [x] Open Finance usa apenas API SEP e nao provider direto.
+- [x] `redirectUri` nao aceita scheme inseguro.
+- [x] Dados Open Finance sao apenas agregados sanitizados.
+- [x] `CLIENTE` nao consegue enviar `tomadorId` para listar terceiros.
+- [x] Erros `403/404/409/422` tem estados de UI claros.
+- [x] Tests cobrem sucesso, ownership e pre-condicoes.
+- [x] Layout Notion responsivo sem cards aninhados e sem textos estourando.
+- [x] Docs/roadmap atualizados quando comportamento ou caminhos documentais mudarem.
