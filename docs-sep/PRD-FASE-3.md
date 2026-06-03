@@ -349,7 +349,7 @@ Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte d
 | Sprint | Epic/frente | Tema | Spec | Tasks impl. |
 |--------|-------------|------|------|-------------|
 | F-6 | Epic 13 | Jornada onboarding PF/PJ (**mergeada**, PR #33) | [`106`](../specs/fase-3/106-fsprint-6-onboarding-web.md) + [`steps`](../steps-fase-3/web/106-fsprint-6-steps.md) | 6 |
-| F-7 | Epic 13 | Propostas, credito e Open Finance | [`107`](../specs/fase-3/107-fsprint-7-credito-open-finance-web.md) | 6 |
+| F-7 | Epic 13 | Propostas, credito e Open Finance (**implementada**) | [`107`](../specs/fase-3/107-fsprint-7-credito-open-finance-web.md) + [`steps`](../steps-fase-3/web/107-fsprint-7-steps.md) | 6 |
 | F-8 | Epic 13 | Formalizacao, assinatura e CCB | [`108`](../specs/fase-3/108-fsprint-8-formalizacao-web.md) | 5 |
 | F-9 | Epic 13 | Cobranca, parcelas e inadimplencia | [`109`](../specs/fase-3/109-fsprint-9-cobranca-web.md) | 6 |
 | F-10 | Epic 13 | Backoffice e financeiro operacional | [`110`](../specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md) | 6 |

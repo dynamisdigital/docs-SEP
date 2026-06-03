@@ -80,8 +80,8 @@ Leitura base para qualquer agente:
 |-----------------|------------|
 | contrato, aceite, formalizacao | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) |
 | CCB, assinatura digital, Clicksign, PDF assinado | [`repos/sep-api/CCB.md`](repos/sep-api/CCB.md) + [`CONTRATOS.md` §Sprint 11](repos/sep-api/CONTRATOS.md) |
-| proposta, parecer, score, motor de credito | [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) |
-| Open Finance, consentimento, movimentacao | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) |
+| proposta, parecer, score, motor de credito | [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) + [`107`](specs/fase-3/107-fsprint-7-credito-open-finance-web.md) + [`step 107`](steps-fase-3/web/107-fsprint-7-steps.md) |
+| Open Finance, consentimento, movimentacao | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) + [`107`](specs/fase-3/107-fsprint-7-credito-open-finance-web.md) + [`step 107`](steps-fase-3/web/107-fsprint-7-steps.md) |
 | cobranca, parcelas, agenda, recebimento, idempotency-key, escrow movimentacao | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`012-sprint-12-steps.md`](steps-fase-2/backend/012-sprint-12-steps.md) |
 | inadimplencia, renegociacao, notificacao de cobranca, Zenvia, SMS | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`repos/sep-api/NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) + [`013-sprint-13-steps.md`](steps-fase-2/backend/013-sprint-13-steps.md) |
 | fila operacional, backoffice, reprocesso, dashboard interno | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) + [`014-sprint-14-steps.md`](steps-fase-2/backend/014-sprint-14-steps.md) |

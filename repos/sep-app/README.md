@@ -59,3 +59,56 @@ Tipos de borda em `src/app/core/api/api.models.ts`; transporte em
   e PJ (representante mascarado). Habilita MSW por sessao via
   `localStorage.NG_APP_USE_MSW`; rodar com `npx playwright test onboarding`.
 - MSW handlers de onboarding em `src/mocks/handlers.ts`.
+
+## Jornada de Credito e Open Finance (F-Sprint 7)
+
+Jornada autenticada de propostas de credito e Open Finance do tomador dentro de
+`/app/credito`, consumindo os contratos reais de `sep-api` (modulo `credito`,
+Sprints 8-9). O frontend cria, lista e acompanha propostas e conduz o consentimento
+Open Finance; motor de credito, score, regras, parecer e decisao de consentimento
+pertencem ao backend.
+
+### Rotas
+
+| Rota | Tela |
+|------|------|
+| `/app/credito` | Home com atalhos (minhas propostas, nova proposta) |
+| `/app/credito/propostas` | Lista de propostas do tomador |
+| `/app/credito/propostas/nova` | Formulario de solicitacao de credito |
+| `/app/credito/propostas/:id` | Detalhe: proposta, score e ultimo parecer |
+| `/app/credito/propostas/:id/open-finance` | Consentimento Open Finance + status/agregados |
+| `/app/credito/propostas/:id/open-finance/retorno` | Retorno do provider (consulta status) |
+
+### Contratos consumidos
+
+Credito (`/api/v1/credito/propostas`): `POST`, `GET` (lista paginada `PageResponse<T>`),
+`GET /{id}`, `GET /{id}/regras` (FINANCEIRO/ADMIN).
+
+Open Finance (`/api/v1/credito/propostas/{id}/open-finance`): `POST /consentimento`,
+`GET` (status do consentimento + ultima movimentacao consolidada).
+
+Tipos de borda em `src/app/core/api/api.models.ts`; transporte em
+`src/app/core/credito/credito.service.ts`.
+
+### Decisoes
+
+- Componentes reutilizaveis em `features/authenticated/credito/shared/`:
+  `PropostaStatusComponent` (badge com label operacional), `ScorePanelComponent` e
+  `ParecerPanelComponent`, mais helpers `credito-format` (moeda/data/id curto) e
+  `credito-error`. Sao presentacionais.
+- O frontend nunca calcula score, elegibilidade, parcela, juros, IOF, CET ou decisao.
+- `CLIENTE` nunca envia `tomadorId`; ownership e resolvido no backend.
+- Open Finance: `redirectUri` sempre gerado pela aplicacao (rota `/retorno`, http(s));
+  `urlAutorizacao` tratada como handoff externo (`window.open` com `noopener`); a rota de
+  retorno consulta o `GET` da API, sem confiar em query params do provider.
+- LGPD: exibe apenas agregados sanitizados; nunca payload bruto, conta, agencia, titular
+  ou CPF/CNPJ de terceiro; nada persistido em storage local.
+- `401/403/423` tratados globalmente pelo `errorInterceptor`; paginas tratam
+  `400/404/409/422`.
+
+### Testes
+
+- Vitest: `CreditoService`, paginas de lista/detalhe/criacao/Open Finance e componentes
+  compartilhados (`npm run test`).
+- MSW handlers de credito/Open Finance em `src/mocks/handlers.ts`.
+- Smoke Playwright dedicado e smoke com backend real ficaram como follow-up.
