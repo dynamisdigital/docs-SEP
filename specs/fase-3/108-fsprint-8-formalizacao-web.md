@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 108
 - **Titulo**: F-Sprint 8 - Formalizacao, assinatura e CCB no web
-- **Status**: planejada
+- **Status**: mergeada em `origin/develop` (PR #39) e `origin/main` (PR #40), 2026-06-03
 - **Fase do produto**: Fase 3 - Epic 13
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epic 13; APIs contratos Sprints 10-11

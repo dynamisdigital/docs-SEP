@@ -78,8 +78,8 @@ Leitura base para qualquer agente:
 
 | Termo na tarefa | Comece por |
 |-----------------|------------|
-| contrato, aceite, formalizacao | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) |
-| CCB, assinatura digital, Clicksign, PDF assinado | [`repos/sep-api/CCB.md`](repos/sep-api/CCB.md) + [`CONTRATOS.md` §Sprint 11](repos/sep-api/CONTRATOS.md) |
+| contrato, aceite, formalizacao | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) + [`108`](specs/fase-3/108-fsprint-8-formalizacao-web.md) + [`step 108`](steps-fase-3/web/108-fsprint-8-steps.md) |
+| CCB, assinatura digital, Clicksign, PDF assinado | [`repos/sep-api/CCB.md`](repos/sep-api/CCB.md) + [`CONTRATOS.md` §Sprint 11](repos/sep-api/CONTRATOS.md) + [`108`](specs/fase-3/108-fsprint-8-formalizacao-web.md) + [`step 108`](steps-fase-3/web/108-fsprint-8-steps.md) |
 | proposta, parecer, score, motor de credito | [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) + [`107`](specs/fase-3/107-fsprint-7-credito-open-finance-web.md) + [`step 107`](steps-fase-3/web/107-fsprint-7-steps.md) |
 | Open Finance, consentimento, movimentacao | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) + [`107`](specs/fase-3/107-fsprint-7-credito-open-finance-web.md) + [`step 107`](steps-fase-3/web/107-fsprint-7-steps.md) |
 | cobranca, parcelas, agenda, recebimento, idempotency-key, escrow movimentacao | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`012-sprint-12-steps.md`](steps-fase-2/backend/012-sprint-12-steps.md) |
