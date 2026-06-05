@@ -112,3 +112,50 @@ Tipos de borda em `src/app/core/api/api.models.ts`; transporte em
   compartilhados (`npm run test`).
 - MSW handlers de credito/Open Finance em `src/mocks/handlers.ts`.
 - Smoke Playwright dedicado e smoke com backend real ficaram como follow-up.
+
+## Jornada de Cobranca (F-Sprint 9)
+
+Jornada autenticada de cobranca em `/app/cobranca`, consumindo o modulo `cobranca` de
+`sep-api` (Sprints backend 12-13). O frontend so apresenta: saldo, mora, multa, status e
+transicoes pertencem ao backend.
+
+### Rotas
+
+- `/app/cobranca` — shell por perfil: financeiro/admin veem agenda financeira e
+  inadimplencia; tomador (CLIENTE) acessa as parcelas a partir de um contrato assinado;
+  demais perfis (ex.: BACKOFFICE) ficam sem jornada (o backend nao os autoriza).
+- `/app/cobranca/contratos/:contratoId/agenda` e `/app/cobranca/parcelas/:id` — tomador.
+- `/app/cobranca/financeiro/agenda`, `/app/cobranca/financeiro/parcelas/:id` e
+  `/app/cobranca/financeiro/inadimplencia` — `roleGuard` FINANCEIRO/ADMIN.
+
+### Contratos consumidos
+
+Cobranca (`/api/v1/cobranca`): `GET /contratos/{id}/agenda`, `GET /parcelas/{id}`
+(`ValorAtualizadoParcelaResponse`), `POST /parcelas/{id}/recebimentos` (+ `Idempotency-Key`,
+200), `GET /recebimentos`, `GET /inadimplencia`, `POST /parcelas/{id}/contato` (201),
+`POST /parcelas/{id}/renegociacao` (step-up). `PATCH /renegociacoes/{id}/aceite|recusa`
+existem no backend, mas a jornada do tomador ficou de fora (ver Gaps).
+
+### Decisoes
+
+- Nenhum calculo financeiro no frontend; agenda mostra composicao estatica e o valor
+  atualizado vem so do detalhe da parcela.
+- `Idempotency-Key` gerada por tentativa de recebimento, descartada ao editar o payload ou
+  apos sucesso, nunca persistida; submit desabilitado durante o envio.
+- Step-up das operacoes de renegociacao via `stepUpInterceptor` (allowlist estendida para
+  `POST /renegociacao` e `PATCH /renegociacoes/{id}/aceite`; recusa sem step-up).
+- `UsuarioRole` passou a incluir `FINANCEIRO`/`BACKOFFICE` (role principal do backend).
+
+### Gaps
+
+- Aceite/recusa de renegociacao pelo tomador: depende de `GET /cobranca/renegociacoes/{id}`
+  e de descoberta do `renegociacaoId` (ausentes no backend) para nao decidir "no escuro".
+- Sem lista global de agendas (lookup por id); `GET /recebimentos` sem paginacao.
+
+### Testes
+
+- Vitest: `CobrancaService`, paginas (agenda/detalhe do tomador, agenda financeira,
+  parcela financeira, inadimplencia), badge/composicao e `stepUpInterceptor` (`npm run test`).
+- MSW handlers de cobranca em `src/mocks/handlers.ts`.
+- Smoke Playwright `e2e/cobranca.spec.ts` (offline). Renegociacao com step-up e smoke real
+  recomendados manualmente (step-up exige MFA, fora do dev-offline).

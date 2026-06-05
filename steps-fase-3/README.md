@@ -19,3 +19,4 @@ Steps just-in-time das sprints da Fase 3.
 | F-6 | [`web/106-fsprint-6-steps.md`](./web/106-fsprint-6-steps.md) | Jornada onboarding PF/PJ |
 | F-7 | [`web/107-fsprint-7-steps.md`](./web/107-fsprint-7-steps.md) | Propostas, credito e Open Finance |
 | F-8 | [`web/108-fsprint-8-steps.md`](./web/108-fsprint-8-steps.md) | Formalizacao, assinatura e CCB |
+| F-9 | [`web/109-fsprint-9-steps.md`](./web/109-fsprint-9-steps.md) | Parcelas, cobranca e inadimplencia |

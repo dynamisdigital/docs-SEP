@@ -351,7 +351,7 @@ Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte d
 | F-6 | Epic 13 | Jornada onboarding PF/PJ (**mergeada**, PR #33) | [`106`](../specs/fase-3/106-fsprint-6-onboarding-web.md) + [`steps`](../steps-fase-3/web/106-fsprint-6-steps.md) | 6 |
 | F-7 | Epic 13 | Propostas, credito e Open Finance (**implementada**) | [`107`](../specs/fase-3/107-fsprint-7-credito-open-finance-web.md) + [`steps`](../steps-fase-3/web/107-fsprint-7-steps.md) | 6 |
 | F-8 | Epic 13 | Formalizacao, assinatura e CCB (**mergeada**, PR #39/#40) | [`108`](../specs/fase-3/108-fsprint-8-formalizacao-web.md) + [steps](../steps-fase-3/web/108-fsprint-8-steps.md) | 5 |
-| F-9 | Epic 13 | Cobranca, parcelas e inadimplencia | [`109`](../specs/fase-3/109-fsprint-9-cobranca-web.md) | 6 |
+| F-9 | Epic 13 | Cobranca, parcelas e inadimplencia (**mergeada**, PR #42/#43; renegociacao do tomador adiada por gap backend) | [`109`](../specs/fase-3/109-fsprint-9-cobranca-web.md) + [steps](../steps-fase-3/web/109-fsprint-9-steps.md) | 6 |
 | F-10 | Epic 13 | Backoffice e financeiro operacional | [`110`](../specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md) | 6 |
 | F-11 | Epic 10/13 | Jornada empresa credora | [`111`](../specs/fase-3/111-fsprint-11-credora-web.md) | 6 |
 | F-12 | Epic 11/13 | Administracao e governanca avancada | [`112`](../specs/fase-3/112-fsprint-12-governanca-web.md) | 5 |
