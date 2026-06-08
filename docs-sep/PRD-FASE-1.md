@@ -49,7 +49,9 @@ Capacidades financeiras expandidas, como Pix, devem entrar apenas depois da esta
 
 Para o frontend e o mobile, ja existem dois design systems definidos como base oficial, localizados em:
 - [`DESIGN-apple.md`](./DESIGN-apple.md) - usado nas superficies publicas (sem autenticacao) do frontend: landing, login e cadastro
-- [`DESIGN-notion.md`](./DESIGN-notion.md) - usado em todas as superficies autenticadas (dashboard do frontend) e em todo o mobile
+- [`DESIGN-notion.md`](./DESIGN-notion.md) - usado historicamente em todas as superficies autenticadas do frontend web e tambem como base historica do mobile nas M-Sprints 0-5
+
+Atualizacao de Fase 3: o design system vigente para novas telas web/mobile passa a ser [`New Design System Sep.md`](<./New Design System Sep.md>) a partir do Epic 17 (`F-14` + `M-12`).
 
 Esses dois design systems substituem qualquer referencia anterior a templates administrativos prontos. A decisao foi tomada porque um template pronto deixaria o projeto pouco flexivel a mudancas; os design systems definem tokens, tipografia, componentes e regras de uso, mantendo liberdade de implementacao e coerencia visual entre as superficies.
 
@@ -88,7 +90,7 @@ A integracao com o ecossistema **Celcoin** (BaaS) e a estrategia escolhida para 
 - implementar auditoria automatica de criacao e alteracao
 - criar tratamento consistente de erros
 - garantir testes para autenticacao e autorizacao
-- adotar dois design systems oficiais como base visual: Apple para superficies publicas (landing, login, cadastro) e Notion para superficies autenticadas (dashboard frontend e todo o mobile)
+- adotar design systems oficiais como base visual: Apple para superficies publicas web e Notion para superficies autenticadas web ate o Epic 17; apos o Epic 17, New Design System SEP para novas telas web/mobile
 - usar SCSS puro como camada de estilizacao do frontend e do mobile, sem frameworks CSS prontos
 - definir padroes tecnicos obrigatorios para persistencia, seguranca, documentacao e observabilidade
 
@@ -364,9 +366,10 @@ ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../ad
 - Signals
 - SCSS puro como camada de estilizacao, sem frameworks CSS prontos (Bootstrap, Tailwind, Material e similares estao explicitamente fora)
 - design systems oficiais do produto:
-  - [`DESIGN-apple.md`](./DESIGN-apple.md) - aplica-se as superficies publicas: landing, login e cadastro
-  - [`DESIGN-notion.md`](./DESIGN-notion.md) - aplica-se ao dashboard e a todas as telas autenticadas
-- a fronteira entre os dois design systems e o estado de autenticacao: tudo que e acessivel sem JWT segue Apple; tudo a partir de `/auth/me` em diante segue Notion
+  - [`DESIGN-apple.md`](./DESIGN-apple.md) - base historica das superficies publicas web: landing, login e cadastro
+  - [`DESIGN-notion.md`](./DESIGN-notion.md) - base historica do dashboard e das telas autenticadas web
+  - [`New Design System Sep.md`](<./New Design System Sep.md>) - design vigente para novas telas web/mobile apos o Epic 17
+- a fronteira historica Apple/Notion no web era o estado de autenticacao: tudo que e acessivel sem JWT seguia Apple; tudo a partir de `/auth/me` seguia Notion. Apos o Epic 17, novas superficies web usam o New Design System SEP
 - tokens, tipografia, escala de espacamento, raios e componentes devem ser implementados em SCSS a partir das definicoes desses arquivos, sem depender de bibliotecas de UI prontas
 - plano oficial de telas web:
   - [`WEB-SCREENS-PLAN.md`](./WEB-SCREENS-PLAN.md)
@@ -375,8 +378,8 @@ ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../ad
 ### Diretriz de adocao dos design systems
 - o frontend nao deve adotar templates administrativos prontos; toda a base visual vem dos design systems oficiais
 - superficies publicas (landing, login, cadastro) devem seguir [`DESIGN-apple.md`](./DESIGN-apple.md) literalmente: tokens de cor, tipografia, raios, espacamento, regras de uso e do/dont
-- superficies autenticadas (dashboard e demais telas com JWT) devem seguir [`DESIGN-notion.md`](./DESIGN-notion.md) literalmente, com a mesma fidelidade
-- a transicao visual entre os dois design systems acontece exatamente no login: ate o login, Apple; apos o login, Notion
+- superficies autenticadas historicas (dashboard e demais telas com JWT) seguiram [`DESIGN-notion.md`](./DESIGN-notion.md); apos o Epic 17, novas superficies autenticadas seguem [`New Design System Sep.md`](<./New Design System Sep.md>)
+- a transicao visual historica entre Apple e Notion acontecia exatamente no login; apos o Epic 17, o web passa a ter design system unificado
 - componentes devem ser implementados como componentes Angular standalone proprios, em SCSS, com tokens extraidos dos design systems
 - nao devem ser introduzidos frameworks CSS de terceiros (Bootstrap, Tailwind, Material, etc.) como camada de estilizacao
 - bibliotecas externas que nao envolvem chrome visual (datepickers, mascaras, formularios reativos, utilidades) podem ser usadas, desde que estilizadas em SCSS para respeitar os tokens
@@ -387,8 +390,9 @@ ADR de referencia: [`adr/0005-segregacao-patrimonial-via-conta-escrow.md`](../ad
 - stack recomendada: `Ionic v8 + Angular + Capacitor`
 - a versao Angular do mobile acompanha a do frontend web (`20.x` baseline; opcionalmente `21` se a checagem de compatibilidade Ionic + plugins Capacitor passar na fase de implementacao)
 - o mobile deve reutilizar contratos, DTOs, autenticacao JWT, guards e padroes de integracao HTTP definidos para o frontend web
-- todo o mobile (visitante e autenticado) segue o design system [`DESIGN-notion.md`](./DESIGN-notion.md), adaptado as restricoes de viewport e ergonomia mobile (toque, tabs inferiores, navegacao em pilha)
-- a estilizacao deve ser feita em SCSS puro, sem frameworks CSS adicionais; quando componentes Ionic forem usados, devem ser customizados via CSS variables/SCSS para respeitar os tokens do Notion design system
+- a base historica do mobile (M-Sprints 0-5) seguiu [`DESIGN-notion.md`](./DESIGN-notion.md), adaptado as restricoes de viewport e ergonomia mobile
+- apos o Epic 17 / M-Sprint 12, novas telas mobile devem seguir [`New Design System Sep.md`](<./New Design System Sep.md>), traduzido para Ionic/Angular/SCSS
+- a estilizacao deve ser feita em SCSS puro, sem frameworks CSS adicionais; quando componentes Ionic forem usados, devem ser customizados via CSS variables/SCSS para respeitar os tokens do design system mobile vigente
 - Flutter e React Native nao sao recomendados nesta fase por adicionarem nova stack, curva de aprendizado e duplicacao tecnica para uma equipe ja orientada a Angular
 - plano oficial de telas mobile:
   - [`MOBILE-SCREENS-PLAN.md`](./MOBILE-SCREENS-PLAN.md)
@@ -636,7 +640,7 @@ Mesmo nesta fase inicial, a API deve nascer preparada para operacao futura com:
 
 ### Frontend e mobile
 - SCSS puro como camada de estilizacao do frontend e do mobile
-- design systems oficiais: [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas; [`DESIGN-notion.md`](./DESIGN-notion.md) para superficies autenticadas e para todo o mobile
+- design systems oficiais: [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas web historicas; [`DESIGN-notion.md`](./DESIGN-notion.md) para superficies autenticadas web historicas; [`New Design System Sep.md`](<./New Design System Sep.md>) para novas telas web/mobile apos o Epic 17
 - sem framework CSS de terceiros (Bootstrap, Tailwind, Material e similares estao explicitamente fora) nem template administrativo pronto
 - stack frontend: `Angular 20.x` + SCSS puro + Standalone Components + Signals
 - stack mobile baseline: `Angular 20.x + Ionic 8.4+ + Capacitor 6`, com avaliacao opcional de upgrade para `Angular 21` na fase de implementacao mobile, condicionada a haver release oficial do Ionic e dos plugins Capacitor com suporte explicito
@@ -1252,4 +1256,3 @@ Esta fase sera considerada bem-sucedida quando:
 - claims `sub`, `email` e `roles` estarem presentes no JWT emitido
 - auditoria usar o identificador do usuario autenticado
 - auditoria usar fallback tecnico quando nao houver autenticacao
-

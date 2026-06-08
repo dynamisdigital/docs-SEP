@@ -40,8 +40,8 @@ Leitura base para qualquer agente:
 | Tarefa | Leia nesta ordem |
 |--------|------------------|
 | Implementacao backend | Base -> spec da sprint em `specs/` -> step em `steps-fase-*` -> docs do modulo em `repos/sep-api/` -> ADRs relevantes |
-| Implementacao web | Base -> spec/step web -> `docs-sep/WEB-SCREENS-PLAN.md` -> `docs-sep/DESIGN-apple.md` ou `docs-sep/DESIGN-notion.md` -> `repos/sep-app/` |
-| Implementacao mobile | Base -> spec/step mobile -> `docs-sep/MOBILE-SCREENS-PLAN.md` -> `docs-sep/DESIGN-notion.md` -> `repos/sep-mobile/` |
+| Implementacao web | Base -> spec/step web -> `docs-sep/WEB-SCREENS-PLAN.md` -> `docs-sep/New Design System Sep.md` (design vigente apos F-14) -> `repos/sep-app/` |
+| Implementacao mobile | Base -> spec/step mobile -> `docs-sep/MOBILE-SCREENS-PLAN.md` -> `docs-sep/New Design System Sep.md` (design vigente apos M-12) -> `repos/sep-mobile/` |
 | Code review | Base -> spec da sprint -> step da task -> doc operacional do modulo -> diff/codigo -> testes existentes |
 | Criar nova sprint/steps | Base -> PRD secao da sprint -> spec correspondente -> steps anteriores similares -> ADRs relevantes |
 | Atualizacao documental | Base -> documento alvo -> documentos que apontam para ele -> este roadmap |
@@ -71,8 +71,8 @@ Leitura base para qualquer agente:
 | `credores` | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + PRD Epic 10 | [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) (implementada), [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) (implementada) | 0001, 0004, 0007 |
 | `escrow` | [`repos/sep-api/PIX.md` §provider](repos/sep-api/PIX.md) (`EscrowProvider`, Sprint 19) + [`COBRANCA.md` §escrow](repos/sep-api/COBRANCA.md) (use case local Sprint 12) | Sprint 12 (parte local), [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) (implementada) | 0005, 0007 |
 | `pix` / `financeiro` | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) (Sprint 19 foundation + Sprint 20 desembolso + Sprint 21 recebimento) + PRD Epic 15 | [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) (implementada), [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`step 020`](steps-fase-3/backend/020-sprint-20-steps.md) (implementada), [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) + [`step 021`](steps-fase-3/backend/021-sprint-21-steps.md) (implementada) | 0004, 0005, 0007, 0008 |
-| Web | [`repos/sep-app/README.md`](repos/sep-app/README.md) | `specs/fase-1/100-*` a `104-*`; `specs/fase-3/106-*` a `113-*`; `steps-fase-1/web/`; `steps-fase-3/web/` | 0002, 0003, 0011 |
-| Mobile | [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) | `specs/fase-1/200-*` a `204-*`; `specs/fase-3/206-*` a `211-*`; `steps-fase-1/mobile/` | 0003, 0009, 0010, 0011, 0015 |
+| Web | [`repos/sep-app/README.md`](repos/sep-app/README.md) + [`repos/sep-app/DESIGN-SYSTEM.md`](repos/sep-app/DESIGN-SYSTEM.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) | `specs/fase-1/100-*` a `104-*`; `specs/fase-3/106-*` a `114-*`; `steps-fase-1/web/`; `steps-fase-3/web/` | 0002, 0003, 0011 |
+| Mobile | [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) + [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) | `specs/fase-1/200-*` a `204-*`; `specs/fase-3/206-*` a `212-*`; `steps-fase-1/mobile/`; `steps-fase-3/mobile/212-*` | 0003, 0009, 0010, 0011, 0015 |
 
 ## Se a tarefa menciona...
 
@@ -92,8 +92,10 @@ Leitura base para qualquer agente:
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |
 | MFA, TOTP, refresh, step-up, auditoria de seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) |
 | multi-role, roles cumulativas, FINANCEIRO+BACKOFFICE, parametros operacionais, governanca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) §multi-role + [`018`](specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) |
-| tela web, Angular, design Apple/Notion | [`docs-sep/WEB-SCREENS-PLAN.md`](docs-sep/WEB-SCREENS-PLAN.md) |
-| mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) |
+| tela web, Angular, design Apple/Notion | [`docs-sep/WEB-SCREENS-PLAN.md`](docs-sep/WEB-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) quando envolver UI/design atual |
+| New Design System Web, F-Sprint 14, redesign web | [`114`](specs/fase-3/114-fsprint-14-new-design-system-web.md) + [`step 114`](steps-fase-3/web/114-fsprint-14-steps.md) + [`repos/sep-app/DESIGN-SYSTEM.md`](repos/sep-app/DESIGN-SYSTEM.md) |
+| mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) quando envolver UI/design |
+| New Design System Mobile, M-Sprint 12, redesign mobile | [`212`](specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`step 212`](steps-fase-3/mobile/212-msprint-12-steps.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) |
 | pipeline, CI, deploy | [`docs-sep/ci-pipelines/README.md`](docs-sep/ci-pipelines/README.md) |
 | metricas, produtividade, progresso, DORA, SPACE, dashboard da sprint | [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |
 | acompanhamento, status de sprint, indicadores para stakeholders | PRD/CONTEXT da fase + step da sprint + doc operacional do modulo + [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |

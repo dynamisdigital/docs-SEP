@@ -2,7 +2,9 @@
 
 **Spec de origem**: [`specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md`](../../specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md)
 
-**Status**: planejada.
+**Status**: implementada (2026-06-08). Descricao consolidada do PR em `repos/sep-app/SPRINT-F-10-PR.md`.
+
+**Nota de implementacao (staging do shell, F-10.2)**: para preservar o protocolo de breakpoints por Task e manter o build verde, o shell (`/app/backoffice`) habilitou cada card so na Task que entregou a tela correspondente (Dashboard em F-10.3, Fila em F-10.4, Reprocessos em F-10.6). Ate la o card ficou desabilitado em vez de apontar para rota inexistente. Ao fim da sprint os tres cards estao navegaveis, atendendo ao step 110.2.3. O teste do shell acompanha esse estado por Task.
 
 **Objetivo geral**: implementar no `sep-app` a operacao assistida web para `BACKOFFICE`, `FINANCEIRO` e `ADMIN`, consumindo os endpoints reais do modulo `backoffice` do `sep-api` (Sprint 14 e extensoes Pix das Sprints 20-21), com fila operacional, comentarios internos, resolucao/ignore com step-up, reprocessos permitidos e dashboard consolidado, sem duplicar regras de transicao, ownership, auditoria, anti-abuso ou logica de provider no frontend.
 

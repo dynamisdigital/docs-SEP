@@ -29,11 +29,13 @@ Este documento nao substitui o PRD. Ele detalha a camada de experiencia web e de
   - [`specs/fase-3/111-fsprint-11-credora-web.md`](../specs/fase-3/111-fsprint-11-credora-web.md) (F-Sprint 11)
   - [`specs/fase-3/112-fsprint-12-governanca-web.md`](../specs/fase-3/112-fsprint-12-governanca-web.md) (F-Sprint 12)
   - [`specs/fase-3/113-fsprint-13-pix-web.md`](../specs/fase-3/113-fsprint-13-pix-web.md) (F-Sprint 13)
-- A base visual do app web vem de dois design systems oficiais, sem template administrativo pronto e sem framework CSS de terceiros:
+  - [`specs/fase-3/114-fsprint-14-new-design-system-web.md`](../specs/fase-3/114-fsprint-14-new-design-system-web.md) (F-Sprint 14)
+- A base visual historica do app web veio de dois design systems oficiais:
   - [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas (sem autenticacao): landing, login e cadastro
-  - [`DESIGN-notion.md`](./DESIGN-notion.md) para todas as superficies autenticadas (dashboard, perfil, alteracao de senha, administracao de usuarios e demais jornadas)
-- A fronteira entre Apple e Notion e o estado de autenticacao: ate o login, Apple; a partir de `/auth/me`, Notion.
-- A estilizacao deve ser feita em SCSS puro com tokens extraidos diretamente dos design systems (cores, tipografia, espacamento, raios, sombras); Bootstrap, Tailwind, Material e similares estao explicitamente fora.
+  - [`DESIGN-notion.md`](./DESIGN-notion.md) para superficies autenticadas (dashboard, perfil, alteracao de senha, administracao de usuarios e demais jornadas)
+- Apos o Epic 17 / F-Sprint 14, o design system vigente para novas telas web passa a ser [`New Design System Sep.md`](<./New Design System Sep.md>), traduzido para Angular/SCSS.
+- A fronteira Apple/Notion era historicamente o estado de autenticacao; apos a F-Sprint 14, o web passa a ter design unificado.
+- A estilizacao deve ser feita em SCSS puro com tokens extraidos diretamente do design system vigente (cores, tipografia, espacamento, raios, sombras); Bootstrap, Tailwind, Material e similares estao explicitamente fora sem ADR.
 - Componentes devem ser implementados como Angular standalone components proprios.
 - As telas devem prever estados de carregamento, erro, vazio, sucesso e acesso negado.
 
@@ -296,7 +298,7 @@ Dependencia:
 - Sprint 3 concluida
 
 Observacoes:
-- Deve seguir o design system [`DESIGN-notion.md`](./DESIGN-notion.md) por se tratar de superficie autenticada: shell, navegacao, header, menu lateral e componentes compartilhados implementados em Angular standalone + SCSS puro, com tokens extraidos do Notion.
+- Deve seguir o design system vigente: historicamente [`DESIGN-notion.md`](./DESIGN-notion.md) por se tratar de superficie autenticada; apos o Epic 17 / F-Sprint 14, [`New Design System Sep.md`](<./New Design System Sep.md>) traduzido para Angular standalone + SCSS puro.
 
 ### 5.5 Dashboard Administrativa Inicial (Casca)
 
@@ -744,9 +746,10 @@ Observacoes:
 16. Formalizacao
 17. Cobranca
 18. Backoffice operacional
-19. Empresa credora
-20. Financeiro expandido
-21. Pix futuro
+19. New Design System SEP no web (F-Sprint 14, antes de novas telas funcionais)
+20. Empresa credora
+21. Financeiro expandido
+22. Pix futuro
 
 ## 9. Matriz Tela x Endpoint
 

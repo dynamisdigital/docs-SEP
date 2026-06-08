@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 3
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; backend Sprints 16-17
-- **Depende de**: backend Sprints 16-17; contrato de autorizacao/ownership da credora entregue na Sprint 16 ou RBAC cumulativo da Sprint 18 quando necessario
+- **Depende de**: [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) + backend Sprints 16-17; contrato de autorizacao/ownership da credora entregue na Sprint 16 ou RBAC cumulativo da Sprint 18 quando necessario
 - **Responsavel principal**: Dev Mobile
 
 ## Objetivo
@@ -48,4 +48,4 @@ Implementar a experiencia mobile simplificada da empresa credora: status, oportu
 
 - Credora ve apenas seus dados.
 - Tomador nao acessa rota credora sem permissao.
-- Experiencia segue Notion mobile.
+- Experiencia segue New Design System SEP mobile.

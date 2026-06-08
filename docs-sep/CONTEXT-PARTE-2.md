@@ -12,6 +12,7 @@ No estado atual:
 - a implementacao completa ainda nao comecou
 - o uso de template administrativo pronto foi descartado em favor de dois design systems oficiais: Apple para superficies publicas (landing, login, cadastro) e Notion para superficies autenticadas (dashboard frontend e todo o mobile), com SCSS puro como camada de estilizacao
 - ficou registrado que a versao do Angular do frontend e do mobile esta definida em `20.x` como baseline, com opcao de upgrade para `21` condicionada a checagem de compatibilidade Ionic + plugins Capacitor na fase de implementacao mobile; a clausula anterior de downgrade foi removida junto com a saida do template, e a stack mobile baseline ficou consolidada como `Angular 20.x + Ionic 8.4+ + Capacitor 6`
+- em 2026-06-08 foi planejado o Epic 17 para migrar `sep-app` e `sep-mobile` para o novo [`New Design System Sep.md`](<./New Design System Sep.md>) apos a F-Sprint 10: F-Sprint 14 cobre web (`sep-app`, Angular/SCSS) e M-Sprint 12 cobre mobile (`sep-mobile`, Ionic/Angular/SCSS), sem troca de stack salvo ADR explicita em contrario
 - a revisao tecnica do backend ja consolidou Flyway, BCrypt, Springdoc, Actuator, CORS e UUID como padroes da implementacao
 - a revisao tecnica tambem consolidou o padrao inicial de JWT, auditoria e convencoes de persistencia
 - a fase futura de `Movimentacao Pix` foi aprovada conceitualmente e incorporada ao PRD como epic posterior

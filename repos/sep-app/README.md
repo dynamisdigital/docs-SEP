@@ -159,3 +159,65 @@ existem no backend, mas a jornada do tomador ficou de fora (ver Gaps).
 - MSW handlers de cobranca em `src/mocks/handlers.ts`.
 - Smoke Playwright `e2e/cobranca.spec.ts` (offline). Renegociacao com step-up e smoke real
   recomendados manualmente (step-up exige MFA, fora do dev-offline).
+
+## Backoffice e financeiro operacional (F-Sprint 10)
+
+Operacao assistida em `/app/backoffice` para `BACKOFFICE`, `FINANCEIRO` e `ADMIN`, consumindo
+o modulo `backoffice` de `sep-api` (Sprint 14 + extensoes Pix das Sprints 20-21). O frontend
+apenas apresenta e dispara acoes; transicoes de status, ownership, auditoria, anti-abuso e o
+gate de step-up pertencem ao backend. `CLIENTE` nao ve o menu nem acessa as rotas (guard de
+visibilidade; a autorizacao real e do backend).
+
+### Rotas
+
+| Rota | Tela |
+|------|------|
+| `/app/backoffice` | Shell com as secoes (dashboard, fila, reprocessos) |
+| `/app/backoffice/dashboard` | Visao consolidada operacional/financeira |
+| `/app/backoffice/fila` | Fila com filtros, paginacao e ordenacao do backend |
+| `/app/backoffice/fila/:id` | Detalhe do item: dados, comentarios, objeto original e acoes |
+| `/app/backoffice/reprocessos` | Painel de reprocesso de webhook e provider |
+
+O route group e protegido por `roleGuard` (`BACKOFFICE`/`FINANCEIRO`/`ADMIN`) e o item
+`Backoffice` no sidenav segue as mesmas roles.
+
+### Contratos consumidos
+
+Backoffice (`/api/v1/backoffice`): `GET /dashboard` (`Cache-Control: no-store`),
+`GET /fila` (`Page<ItemFilaResponse>` com filtros `tipo`/`prioridade`/`status`/
+`data_abertura_de`/`data_abertura_ate`/`atribuido_a`/`page`/`size`/`sort`),
+`GET /fila/{id}`, `POST /fila/{id}/assumir`, `POST /fila/{id}/comentarios`,
+`PATCH /fila/{id}/resolver` (step-up), `PATCH /fila/{id}/ignorar` (step-up),
+`POST /reprocessos/webhook/{webhookEventId}` (step-up), `POST /reprocessos/provider/{tipoChamada}/{entidadeId}` (step-up).
+
+Tipos de borda em `src/app/core/api/api.models.ts`; transporte em
+`src/app/core/backoffice/backoffice.service.ts`.
+
+### Decisoes
+
+- Componentes compartilhados em `features/authenticated/backoffice/shared/`:
+  `BackofficeChipComponent` (chip de prioridade/status), `ReprocessoResultadoComponent`
+  (resultado do reprocesso) e `backoffice-format` (moeda/data/duracao + labels). Sao
+  presentacionais.
+- A tela nunca recalcula contadores, medias, somatorios, SLA, prioridade ou permissao de
+  transicao; apresenta os agregados do backend (dashboard com `no-store`, sem persistir).
+- `resolver`, `ignorar` e os reprocessos exigem step-up: o token e anexado pelo
+  `stepUpInterceptor` (allowlist estendida) — o service nao envia token. Sem token, o `403`
+  redireciona para `/app/step-up?next=<rota>`; `409` recarrega o estado real.
+- Reprocesso respeita o backend: `PIX_TRANSFERENCIA` tem reconsulta real; `KYC`/`KYB`/`PLD`/
+  `OPEN_FINANCE`/`ASSINATURA_DIGITAL` podem ser stubs — a UI exibe o `resultado` como veio e
+  nao promete retentativa. `RECEBIMENTO_PIX_DIVERGENTE` nao tem reprocesso de provider (so
+  tratamento manual). Anti-abuso `429` mostra mensagem especifica, sem retry automatico.
+- LGPD: filtros, fila e detalhe nao expoem payload bruto de webhook/provider, CPF/CNPJ
+  completo, chave Pix, dados bancarios ou tokens; comentario/justificativa ficam so na memoria
+  do form (nada em storage).
+- `tempoMedioResolucao30d` chega como numero de segundos (Duration); a apresentacao formata.
+
+### Testes
+
+- Vitest: `BackofficeService`, paginas (dashboard, fila, detalhe, reprocessos), shell,
+  chip/resultado, `stepUpInterceptor` e sidenav (`npm run test`).
+- MSW handlers de backoffice em `src/mocks/handlers.ts` (fila, dashboard, reprocessos, step-up
+  e anti-abuso `429`).
+- Smoke Playwright `e2e/backoffice.spec.ts` (offline): dashboard, fila, detalhe, assumir e
+  comentar. `resolver`/`ignorar` e reprocessos exigem step-up (MFA) e ficam para o smoke real.

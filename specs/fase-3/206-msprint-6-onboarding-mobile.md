@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 2+
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; APIs onboarding Sprints 6-7
-- **Depende de**: M-Sprint 5 + backend Fase 2 em `main`
+- **Depende de**: M-Sprint 12 + M-Sprint 5 + backend Fase 2 em `main`
 - **Responsavel principal**: Dev Mobile
 
 ## Objetivo
@@ -22,7 +22,7 @@ Implementar o onboarding mobile do tomador em PWA/Ionic, consumindo APIs existen
 - Formulario PF/PJ reduzido para mobile.
 - Upload de documentos.
 - Status de verificacao e pendencias.
-- UX touch com Notion mobile.
+- UX touch com New Design System SEP mobile.
 
 ### Fora de escopo
 - Backoffice/admin mobile.

@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 2+
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; APIs cobranca Sprints 12-13
-- **Depende de**: [`208-msprint-8-formalizacao-mobile.md`](./208-msprint-8-formalizacao-mobile.md)
+- **Depende de**: [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) + [`208-msprint-8-formalizacao-mobile.md`](./208-msprint-8-formalizacao-mobile.md)
 - **Responsavel principal**: Dev Mobile
 
 ## Objetivo

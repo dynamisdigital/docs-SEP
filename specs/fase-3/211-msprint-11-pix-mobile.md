@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 14 + Epic 15
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epics 14 e 15
-- **Depende de**: backend Sprints 19-21
+- **Depende de**: [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) + backend Sprints 19-21
 - **Responsavel principal**: Dev Mobile
 
 ## Objetivo

@@ -15,6 +15,8 @@ A trilha de execucao do mobile e governada por 5 specs (uma por M-Sprint), em pa
 
 As Fases Mobile 2-4 (jornadas funcionais) deste plano vao alem das M-Sprints 0-4 e sao detalhadas em fases posteriores quando as APIs das Epics 5-11 estiverem publicadas.
 
+Atualizacao de planejamento: apos a F-Sprint 10, web e mobile ganham o Epic 17 para substituir Apple/Notion pelo [`New Design System Sep.md`](<./New Design System Sep.md>). O recorte mobile e a M-Sprint 12, pareada com a F-Sprint 14 do `sep-app`, e deve estabilizar a base visual antes de novas telas funcionais mobile.
+
 ## 2. Diretrizes Gerais
 
 - Stack recomendada: `Ionic v8 + Angular + Capacitor`.
@@ -27,9 +29,9 @@ As Fases Mobile 2-4 (jornadas funcionais) deste plano vao alem das M-Sprints 0-4
 - O mobile nao deve conter regra de negocio de dominio.
 - Decisoes de credito, status, permissoes, bloqueios e elegibilidade devem vir da API.
 - O mobile deve reutilizar contratos, DTOs, autenticacao JWT, guards e padroes HTTP definidos com o frontend web.
-- Todo o mobile (visitante e autenticado) deve seguir o design system [`DESIGN-notion.md`](./DESIGN-notion.md), adaptado as restricoes de viewport, ergonomia de toque, tabs inferiores e navegacao em pilha.
-- A estilizacao deve ser feita em SCSS puro com tokens extraidos do Notion design system (cores, tipografia, espacamento, raios, sombras); Bootstrap, Tailwind, Material e similares estao explicitamente fora.
-- Componentes Ionic, quando usados, devem ser customizados via CSS variables/SCSS para respeitar os tokens do Notion.
+- A base historica das M-Sprints 0-5 seguiu [`DESIGN-notion.md`](./DESIGN-notion.md). A direcao vigente para novas telas mobile passa a ser [`New Design System Sep.md`](<./New Design System Sep.md>) apos a M-Sprint 12.
+- A estilizacao deve continuar em SCSS/CSS variables sobre Ionic. O documento novo usa Tailwind/shadcn como origem, mas no `sep-mobile` os tokens devem ser traduzidos para Ionic/Angular/SCSS, sem adicionar Tailwind, shadcn, Radix ou React sem ADR aprovada.
+- Componentes Ionic, quando usados, devem ser customizados via CSS variables/SCSS para respeitar os tokens do New Design System SEP.
 
 ## 3. Escopo Mobile
 
@@ -751,14 +753,15 @@ Rotas secundarias:
 10. Criar meu perfil
 11. Criar alterar senha
 12. Criar placeholders navegaveis para jornadas futuras
-13. Implementar onboarding do tomador quando API existir
-14. Implementar solicitacao e acompanhamento de emprestimo
-15. Implementar formalizacao
-16. Implementar parcelas
-17. Implementar onboarding da empresa credora
-18. Implementar oportunidades e operacoes financiadas
-19. Implementar carteira simplificada
-20. Implementar pagamento/Pix visivel ao usuario somente em fase futura
+13. New Design System SEP no mobile (M-Sprint 12, antes das telas funcionais)
+14. Implementar onboarding do tomador quando API existir
+15. Implementar solicitacao e acompanhamento de emprestimo
+16. Implementar formalizacao
+17. Implementar parcelas
+18. Implementar onboarding da empresa credora
+19. Implementar oportunidades e operacoes financiadas
+20. Implementar carteira simplificada
+21. Implementar pagamento/Pix visivel ao usuario somente em fase futura
 
 ## 11. Matriz Tela x Endpoint
 

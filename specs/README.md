@@ -59,9 +59,11 @@ Apenas backend. Web e Mobile da Fase 2 entram em planejamento separado depois qu
 
 Ver tambem: [PRD §22 (Backlog Tecnico)](../docs-sep/PRD.md), [PRD §29 (Mapeamento Fase 2)](../docs-sep/PRD.md).
 
-## Fase 3 — Jornadas e capacidades pos-Fase-2 (20 specs)
+## Fase 3 — Jornadas e capacidades pos-Fase-2 (22 specs)
 
 Specs separados por projeto, com ate 6 tasks de implementacao por sprint. Precheck, E2E/smoke e docs nao contam no limite.
+
+As tabelas da Fase 3 abaixo seguem a ordem recomendada de execucao, nao a ordenacao numerica estrita. Isso antecipa o Epic 17 (`F-14` e `M-12`) para reduzir retrabalho visual.
 
 Ver indice completo em [`fase-3/README.md`](./fase-3/README.md).
 
@@ -75,7 +77,7 @@ Ver indice completo em [`fase-3/README.md`](./fase-3/README.md).
 | 20 | [`fase-3/020-sprint-20-pix-desembolso-assistido.md`](./fase-3/020-sprint-20-pix-desembolso-assistido.md) | Pix desembolso assistido |
 | 21 | [`fase-3/021-sprint-21-pix-recebimento-conciliacao.md`](./fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | Pix recebimento e conciliacao |
 
-### Web (8 specs)
+### Web (9 specs)
 | Sprint | Arquivo | Tema |
 |--------|---------|------|
 | F-6 | [`fase-3/106-fsprint-6-onboarding-web.md`](./fase-3/106-fsprint-6-onboarding-web.md) | Jornada onboarding PF/PJ |
@@ -83,13 +85,15 @@ Ver indice completo em [`fase-3/README.md`](./fase-3/README.md).
 | F-8 | [`fase-3/108-fsprint-8-formalizacao-web.md`](./fase-3/108-fsprint-8-formalizacao-web.md) | Formalizacao, assinatura e CCB |
 | F-9 | [`fase-3/109-fsprint-9-cobranca-web.md`](./fase-3/109-fsprint-9-cobranca-web.md) | Cobranca, parcelas e inadimplencia |
 | F-10 | [`fase-3/110-fsprint-10-backoffice-financeiro-web.md`](./fase-3/110-fsprint-10-backoffice-financeiro-web.md) | Backoffice e financeiro operacional |
+| F-14 | [`fase-3/114-fsprint-14-new-design-system-web.md`](./fase-3/114-fsprint-14-new-design-system-web.md) | New Design System Web |
 | F-11 | [`fase-3/111-fsprint-11-credora-web.md`](./fase-3/111-fsprint-11-credora-web.md) | Jornada empresa credora |
 | F-12 | [`fase-3/112-fsprint-12-governanca-web.md`](./fase-3/112-fsprint-12-governanca-web.md) | Administracao e governanca avancada |
 | F-13 | [`fase-3/113-fsprint-13-pix-web.md`](./fase-3/113-fsprint-13-pix-web.md) | Pix operacional no web |
 
-### Mobile (6 specs)
+### Mobile (7 specs)
 | Sprint | Arquivo | Tema |
 |--------|---------|------|
+| M-12 | [`fase-3/212-msprint-12-new-design-system-mobile.md`](./fase-3/212-msprint-12-new-design-system-mobile.md) | New Design System Mobile |
 | M-6 | [`fase-3/206-msprint-6-onboarding-mobile.md`](./fase-3/206-msprint-6-onboarding-mobile.md) | Tomador: onboarding mobile |
 | M-7 | [`fase-3/207-msprint-7-credito-mobile.md`](./fase-3/207-msprint-7-credito-mobile.md) | Tomador: proposta, credito e Open Finance |
 | M-8 | [`fase-3/208-msprint-8-formalizacao-mobile.md`](./fase-3/208-msprint-8-formalizacao-mobile.md) | Tomador: formalizacao e contrato |

@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 13 + Epic 11
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epics 11 e 13
-- **Depende de**: backend Sprint 18
+- **Depende de**: F-Sprint 14; backend Sprint 18
 - **Responsavel principal**: Devs Plenos Frontend
 
 ## Objetivo
@@ -48,3 +48,4 @@ Implementar telas administrativas para roles cumulativas, parametros operacionai
 - Alteracoes sensiveis usam step-up.
 - UI nao permite operacao sem role adequada.
 - Historico fica legivel para auditoria.
+- UI segue o design system vigente do web (New Design System SEP apos F-Sprint 14).

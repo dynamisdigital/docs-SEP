@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 13 + Epic 10
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epics 10 e 13
-- **Depende de**: backend Sprints 16-17; contrato de autorizacao/ownership da credora entregue na Sprint 16 ou RBAC cumulativo da Sprint 18 quando necessario
+- **Depende de**: F-Sprint 14; backend Sprints 16-17; contrato de autorizacao/ownership da credora entregue na Sprint 16 ou RBAC cumulativo da Sprint 18 quando necessario
 - **Responsavel principal**: Devs Plenos Frontend
 
 ## Objetivo
@@ -47,5 +47,5 @@ Implementar a experiencia web da empresa credora: perfil, elegibilidade, oportun
 ## Definition of Done
 
 - Credora acessa apenas sua jornada.
-- UI segue Notion autenticado.
+- UI segue New Design System SEP.
 - Estados sem backend correspondente nao sao simulados como regra de negocio.

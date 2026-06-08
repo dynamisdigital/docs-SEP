@@ -82,7 +82,7 @@ Este arquivo preserva o roadmap consolidado e detalha as frentes de expansao da 
 - escopo: tudo que depende apenas das APIs entregues nas Sprints 1-4 (auth, usuarios e admin de usuarios)
 
 ### Epic 13 - Frontend de Jornadas
-- implementar telas funcionais das jornadas, todas no design system Notion, consumindo APIs das Epics 5-11
+- implementar telas funcionais das jornadas, historicamente no design system Notion ate F-Sprint 10 e, apos o Epic 17, no New Design System SEP, consumindo APIs das Epics 5-11
 - jornada do tomador: onboarding, solicitar emprestimo, acompanhar proposta, status da analise, formalizacao, parcelas e historico
 - jornada da empresa credora: dashboard, perfil, KYB, oportunidades, operacoes financiadas, carteira e detalhe da operacao
 - jornada do financeiro interno: dashboard financeiro, fila operacional, conciliacao, pendencias e visao de recebimentos/desembolsos
@@ -93,8 +93,8 @@ Este arquivo preserva o roadmap consolidado e detalha as frentes de expansao da 
 ### Epic 14 - Mobile SEP
 - iniciar junto com a fundacao do frontend, como trilha paralela dependente dos mesmos contratos da API
 - stack mobile: `Angular 20.x + Ionic 8.4+ + Capacitor 6` como baseline; opcionalmente `Angular 21 + Ionic correspondente` se a checagem de compatibilidade na fase de implementacao mobile passar
-- adotar o design system [`DESIGN-notion.md`](./DESIGN-notion.md) em todo o mobile (visitante e autenticado), adaptado para toque, tabs inferiores e navegacao em pilha
-- estilizar em SCSS puro, customizando componentes Ionic via CSS variables/SCSS para respeitar os tokens do Notion; sem frameworks CSS adicionais
+- a base historica das M-Sprints 0-5 adotou [`DESIGN-notion.md`](./DESIGN-notion.md) em todo o mobile; a partir do Epic 17, o design system vigente do app mobile passa a ser [`New Design System Sep.md`](<./New Design System Sep.md>), adaptado para Ionic/Angular/SCSS
+- estilizar em SCSS puro, customizando componentes Ionic via CSS variables/SCSS; sem frameworks CSS adicionais. Ate a M-Sprint 5 a referencia era Notion mobile; apos a M-Sprint 12, novos estilos devem seguir o New Design System SEP
 - validar primeiro em PWA/browser e evoluir para Android/iOS via Capacitor em fase posterior
 - incluir apenas as jornadas mobile do tomador de emprestimo e da empresa credora
 - excluir a visao do financeiro interno, backoffice operacional, administracao, governanca, cadastros mestres e telas de auditoria
@@ -192,6 +192,15 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - planejar producao com EC2 e RDS proprios
 - considerar `sa-east-1` como regiao recomendada
 
+### Epic 17 - New Design System SEP
+**Status: planejado para execucao apos a F-Sprint 10.** Specs: web [`114-fsprint-14-new-design-system-web.md`](../specs/fase-3/114-fsprint-14-new-design-system-web.md) e mobile [`212-msprint-12-new-design-system-mobile.md`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md). Steps: web [`114-fsprint-14-steps.md`](../steps-fase-3/web/114-fsprint-14-steps.md) e mobile [`212-msprint-12-steps.md`](../steps-fase-3/mobile/212-msprint-12-steps.md). Fonte visual: [`New Design System Sep.md`](<./New Design System Sep.md>).
+- substituir a base visual Apple/Notion do `sep-app` e a base Notion mobile do `sep-mobile` pelo novo design system descrito em [`New Design System Sep.md`](<./New Design System Sep.md>)
+- preservar as stacks atuais: `Angular + SCSS` no `sep-app` e `Angular + Ionic + Capacitor + SCSS` no `sep-mobile`, traduzindo tokens Tailwind/shadcn do documento de origem para CSS variables, SCSS e Ionic variables quando aplicavel
+- manter a identidade SEP; referencias `SimpliClin` do documento de origem sao inspiracao visual, nao marca final do app
+- migrar tokens, dark mode, shell, navegacao, cards, botoes, inputs, badges, dialogs, toasts, loaders, skeletons e showcases web/mobile
+- nao alterar contratos REST, regras de negocio, autenticacao, roles, escopo de cada jornada ou exclusoes de financeiro/backoffice/admin no mobile
+- exigir ADR e aprovacao explicita se houver proposta de trocar qualquer stack para Tailwind, shadcn, Radix ou React
+
 ### Ordem de prioridade funcional consolidada
 1. Fundacao da API
 2. Gestao de usuarios
@@ -209,6 +218,7 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 14. Mobile SEP
 15. Movimentacao Pix
 16. Infraestrutura AWS futura
+17. New Design System SEP (priorizado para execucao logo apos a F-Sprint 10 antes de novas telas web/mobile)
 
 ### Fronteiras entre epicos
 - `Onboarding KYC/KYB`
@@ -253,6 +263,11 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
   - camada de experiencia mobile para tomador e empresa credora
   - nao substitui o frontend web/backoffice nem deve incluir financeiro interno ou administracao completa nesta fase
   - deve compartilhar contratos e padroes de autenticacao com o frontend web
+- `New Design System SEP`
+  - camada visual habilitadora do `sep-app` e do `sep-mobile`
+  - substitui Apple/Notion como direcao vigente para novas telas web e substitui Notion mobile como direcao vigente para novas telas mobile
+  - nao substitui os Epics 13/14 nem cria jornada funcional propria
+  - traduz o design de origem para Angular/SCSS e Ionic/Angular/SCSS sem mudar as stacks por padrao
 - `Movimentacao Pix`
   - responsavel pelo meio de movimentacao e liquidacao financeira via Pix
   - nao substitui cobranca, analise de credito ou formalizacao
@@ -264,6 +279,7 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - funcionalidades que impactam diretamente a jornada de contratacao do emprestimo devem ser implementadas antes das capacidades financeiras expandidas
 - funcionalidades operacionais posteriores, como Pix e automacoes avancadas, so entram apos estabilizacao do fluxo de contratacao
 - Mobile SEP deve iniciar junto com a fundacao do frontend, mas sua implementacao funcional depende de contratos estaveis da API e deve priorizar tomador e empresa credora
+- o Epic 17 deve rodar apos a F-Sprint 10 para estabilizar a base visual do `sep-app` e do `sep-mobile` antes de novas telas funcionais
 - infraestrutura AWS nao e funcionalidade de negocio; pode ser planejada como trilha tecnica apos o gate minimo da Sprint 3, preferencialmente apos Sprint 4, mesmo que a lista funcional ainda avance para KYC/KYB, credito e formalizacao
 - as quatro jornadas do PO devem estar explicitamente refletidas em epics do roadmap, mesmo quando forem implementadas em fases diferentes
 
@@ -300,7 +316,8 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - o banco continuara unico ate decisao futura explicita
 - DDD sera usado primeiro como organizacao modular e linguagem de dominio, nao como pretexto para distribuir o sistema cedo demais
 - este PRD e um documento vivo: as specs das Sprints 1 a 4 ja existem em `../specs/` e devem evoluir junto com o produto
-- o frontend consumira esta API a partir de uma base Angular standalone + SCSS, implementada diretamente sobre os dois design systems oficiais (Apple para superficies publicas e Notion para superficies autenticadas), sem reaproveitar templates administrativos prontos nem frameworks CSS de terceiros
+- o frontend web consumira esta API a partir de uma base Angular standalone + SCSS, implementada diretamente sobre os design systems oficiais do web (Apple para superficies publicas e Notion para superficies autenticadas), sem reaproveitar templates administrativos prontos nem frameworks CSS de terceiros
+- o web e o mobile passam a ter design system unificado a partir do Epic 17: [`New Design System Sep.md`](<./New Design System Sep.md>), traduzido para Angular/SCSS no `sep-app` e Ionic/Angular/SCSS no `sep-mobile`
 - a versao do Angular esta travada em `20.x` como baseline para o frontend e o mobile; o upgrade para `21` so pode ser avaliado na fase de implementacao mobile e depende de release oficial do Ionic e dos plugins Capacitor com suporte explicito
 - nao ha previsao de downgrade do Angular abaixo de `20`; a clausula anterior de downgrade (motivada pelo template administrativo descartado) foi removida
 
@@ -333,6 +350,8 @@ As tres secoes tem sobreposicao intencional (estado, stack, arquitetura, marco r
 
 Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte da Fase 2 concluida em `main` e separa sprints por projeto (`sep-api`, `sep-app`, `sep-mobile`). Cada sprint foi planejada com no maximo 6 tasks de implementacao; precheck, E2E/smoke e documentacao nao entram nessa contagem.
 
+As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao dos specs foi preservada (`F-14` e `M-12`), mas a execucao foi antecipada para evitar retrabalho visual.
+
 ### Backend (`sep-api`)
 
 | Sprint | Epic/frente | Tema | Spec | Tasks impl. |
@@ -353,6 +372,7 @@ Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte d
 | F-8 | Epic 13 | Formalizacao, assinatura e CCB (**mergeada**, PR #39/#40) | [`108`](../specs/fase-3/108-fsprint-8-formalizacao-web.md) + [steps](../steps-fase-3/web/108-fsprint-8-steps.md) | 5 |
 | F-9 | Epic 13 | Cobranca, parcelas e inadimplencia (**mergeada**, PR #42/#43; renegociacao do tomador adiada por gap backend) | [`109`](../specs/fase-3/109-fsprint-9-cobranca-web.md) + [steps](../steps-fase-3/web/109-fsprint-9-steps.md) | 6 |
 | F-10 | Epic 13 | Backoffice e financeiro operacional | [`110`](../specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md) | 6 |
+| F-14 | Epic 17 | New Design System Web (**executar antes de F-11 para evitar retrabalho visual**) | [`114`](../specs/fase-3/114-fsprint-14-new-design-system-web.md) + [`steps`](../steps-fase-3/web/114-fsprint-14-steps.md) | 6 |
 | F-11 | Epic 10/13 | Jornada empresa credora | [`111`](../specs/fase-3/111-fsprint-11-credora-web.md) | 6 |
 | F-12 | Epic 11/13 | Administracao e governanca avancada | [`112`](../specs/fase-3/112-fsprint-12-governanca-web.md) | 5 |
 | F-13 | Epic 13/15 | Pix operacional no web | [`113`](../specs/fase-3/113-fsprint-13-pix-web.md) | 5 |
@@ -361,6 +381,7 @@ Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte d
 
 | Sprint | Epic/frente | Tema | Spec | Tasks impl. |
 |--------|-------------|------|------|-------------|
+| M-12 | Epic 17 | New Design System Mobile (**executar antes de M-6 para evitar retrabalho visual**) | [`212`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`steps`](../steps-fase-3/mobile/212-msprint-12-steps.md) | 6 |
 | M-6 | Epic 14 | Tomador: onboarding mobile | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) | 6 |
 | M-7 | Epic 14 | Tomador: proposta, credito e Open Finance | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) | 6 |
 | M-8 | Epic 14 | Tomador: formalizacao e contrato | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) | 5 |
@@ -372,6 +393,8 @@ Tabela executiva consolidando o planejamento inicial da Fase 3. A Fase 3 parte d
 - **Separacao por projeto**: backend, web e mobile possuem specs proprios e podem evoluir com dependencias explicitas.
 - **Granularidade menor**: quando um tema exigiria mais de 6 tasks de implementacao, ele foi dividido em sprints separadas.
 - **Steps just-in-time**: esta secao cria o mapa de specs; os steps continuam sendo criados apenas antes da execucao de cada sprint.
+- **Ordem vs numeracao**: F-14 e M-12 preservam a numeracao ja criada, mas a ordem recomendada de execucao e logo apos F-10; F-14 roda antes de F-11 e M-12 roda antes de M-6 para evitar retrabalho visual.
 - **Mobile restrito**: mobile cobre tomador e empresa credora; financeiro interno, backoffice operacional, administracao completa e auditoria continuam fora do app.
+- **Design system web/mobile**: a F-Sprint 14 + M-Sprint 12/Epic 17 substituem Apple/Notion como design vigente por [`New Design System Sep.md`](<./New Design System Sep.md>), mantendo Angular/SCSS no web e Ionic/Angular/SCSS no mobile salvo ADR explicita.
 - **Infraestrutura AWS**: permanece trilha paralela candidata, nao mapeada como sprint funcional nesta tabela.
 - **Gates de seguranca e operacao**: desembolso Pix assistido depende da decisao de step-up estrito sem bypass MFA; reprocessos web dependem de handlers reais backend por provider/event; jornadas credora web/mobile dependem de contrato explicito de autorizacao/ownership.

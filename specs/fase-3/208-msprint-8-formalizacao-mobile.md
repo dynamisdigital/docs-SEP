@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 2+
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; APIs contratos Sprints 10-11
-- **Depende de**: [`207-msprint-7-credito-mobile.md`](./207-msprint-7-credito-mobile.md)
+- **Depende de**: [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) + [`207-msprint-7-credito-mobile.md`](./207-msprint-7-credito-mobile.md)
 - **Responsavel principal**: Dev Mobile
 
 ## Objetivo

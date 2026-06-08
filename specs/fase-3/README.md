@@ -2,6 +2,8 @@
 
 Fase 3 cobre as jornadas e capacidades posteriores ao fechamento da Fase 2 em `main`.
 
+As tabelas usam a ordem recomendada de execucao. A numeracao dos specs continua preservada; por isso `F-14` aparece antes de `F-11` e `M-12` aparece antes de `M-6`.
+
 ## Regras de planejamento
 
 - Specs separados por projeto: backend (`0XX`), web (`1XX`) e mobile (`2XX`).
@@ -31,6 +33,7 @@ Fase 3 cobre as jornadas e capacidades posteriores ao fechamento da Fase 2 em `m
 | F-8 | [`108-fsprint-8-formalizacao-web.md`](./108-fsprint-8-formalizacao-web.md) | Formalizacao, assinatura e CCB | 5 |
 | F-9 | [`109-fsprint-9-cobranca-web.md`](./109-fsprint-9-cobranca-web.md) | Cobranca, parcelas e inadimplencia | 6 |
 | F-10 | [`110-fsprint-10-backoffice-financeiro-web.md`](./110-fsprint-10-backoffice-financeiro-web.md) | Backoffice e financeiro operacional | 6 |
+| F-14 | [`114-fsprint-14-new-design-system-web.md`](./114-fsprint-14-new-design-system-web.md) | New Design System Web | 6 |
 | F-11 | [`111-fsprint-11-credora-web.md`](./111-fsprint-11-credora-web.md) | Jornada empresa credora | 6 |
 | F-12 | [`112-fsprint-12-governanca-web.md`](./112-fsprint-12-governanca-web.md) | Administracao e governanca avancada | 5 |
 | F-13 | [`113-fsprint-13-pix-web.md`](./113-fsprint-13-pix-web.md) | Pix operacional no web | 5 |
@@ -39,6 +42,7 @@ Fase 3 cobre as jornadas e capacidades posteriores ao fechamento da Fase 2 em `m
 
 | Sprint | Arquivo | Tema | Impl tasks |
 |--------|---------|------|------------|
+| M-12 | [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) | New Design System Mobile | 6 |
 | M-6 | [`206-msprint-6-onboarding-mobile.md`](./206-msprint-6-onboarding-mobile.md) | Tomador: onboarding mobile | 6 |
 | M-7 | [`207-msprint-7-credito-mobile.md`](./207-msprint-7-credito-mobile.md) | Tomador: proposta, credito e Open Finance | 6 |
 | M-8 | [`208-msprint-8-formalizacao-mobile.md`](./208-msprint-8-formalizacao-mobile.md) | Tomador: formalizacao e contrato | 5 |
@@ -49,10 +53,13 @@ Fase 3 cobre as jornadas e capacidades posteriores ao fechamento da Fase 2 em `m
 ## Dependencias gerais
 
 - Web F-6 a F-10 dependem das APIs backend da Fase 2; reprocessos da F-10 exigem handler real backend por provider/event.
-- Web F-11 depende das Sprints backend 16-17 e do contrato de autorizacao/ownership da credora, entregue na Sprint 16 ou complementado pela Sprint 18.
-- Web F-12 depende da Sprint backend 18.
-- Web F-13 depende das Sprints backend 19-21.
-- Mobile M-6 a M-9 dependem das APIs backend da Fase 2.
+- Web F-14 depende da F-Sprint 10 concluida e da base tecnica web F-Sprints 0-5; deve ser executada antes de F-11 para evitar retrabalho visual.
+- Web F-11 depende das Sprints backend 16-17, do contrato de autorizacao/ownership da credora e da F-Sprint 14.
+- Web F-12 depende da Sprint backend 18 e da F-Sprint 14.
+- Web F-13 depende das Sprints backend 19-21 e da F-Sprint 14.
+- Mobile M-12 depende da F-Sprint 10 concluida, da base tecnica mobile M-Sprints 0-5 e do alinhamento com F-14; deve ser executada antes de M-6 para evitar retrabalho visual.
+- Mobile M-6 a M-9 dependem das APIs backend da Fase 2 e da M-Sprint 12.
 - Mobile M-10 depende das Sprints backend 16-17 e do contrato de autorizacao/ownership da credora, entregue na Sprint 16 ou complementado pela Sprint 18.
 - Mobile M-11 depende das Sprints backend 19-21.
+- Mobile M-10 e M-11 tambem dependem da M-Sprint 12.
 - Backend Sprint 20 depende da decisao de step-up estrito sem bypass MFA antes de qualquer desembolso assistido.

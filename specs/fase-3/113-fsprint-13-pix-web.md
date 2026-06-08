@@ -8,7 +8,7 @@
 - **Fase do produto**: Fase 3 - Epic 13 + Epic 15
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epic 15
-- **Depende de**: backend Sprints 19-21
+- **Depende de**: F-Sprint 14; backend Sprints 19-21
 - **Responsavel principal**: Devs Plenos Frontend
 
 ## Objetivo
@@ -48,3 +48,4 @@ Expor no web as operacoes Pix assistidas: desembolso, recebimentos, status e con
 - Financeiro opera Pix assistido pelo web.
 - Divergencias ficam visiveis e rastreaveis.
 - UI nao mascara falhas como sucesso.
+- UI segue o design system vigente do web (New Design System SEP apos F-Sprint 14).

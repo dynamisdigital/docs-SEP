@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 110
 - **Titulo**: F-Sprint 10 - Backoffice e financeiro operacional no web
-- **Status**: planejada
+- **Status**: implementada (2026-06-08)
 - **Fase do produto**: Fase 3 - Epic 13
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epic 13; APIs backoffice Sprint 14

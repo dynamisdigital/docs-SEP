@@ -8,13 +8,13 @@ O conteudo foi dividido por fase para reduzir o tamanho dos arquivos e facilitar
 
 1. [`PRD-FASE-1.md`](./PRD-FASE-1.md) - fundacao tecnica da API, contratos iniciais, arquitetura base, sprints 0-4, criterios de sucesso e testes obrigatorios da primeira entrega.
 2. [`PRD-FASE-2.md`](./PRD-FASE-2.md) - jornada de contratacao backend, sprints 5-14, epics 5-9 e mapeamento da Fase 2.
-3. [`PRD-FASE-3.md`](./PRD-FASE-3.md) - expansao do produto, epics 10-16, Fase 3 backend/web/mobile, regras de execucao, premissas e orientacao para agentes.
+3. [`PRD-FASE-3.md`](./PRD-FASE-3.md) - expansao do produto, epics 10-17, Fase 3 backend/web/mobile, regras de execucao, premissas e orientacao para agentes.
 
 ## Como navegar
 
 - Para requisitos iniciais de usuarios, autenticacao, auditoria, JWT, DTOs, endpoints e arquitetura base, leia [`PRD-FASE-1.md`](./PRD-FASE-1.md).
 - Para onboarding, credito, formalizacao, cobranca e backoffice operacional, leia [`PRD-FASE-2.md`](./PRD-FASE-2.md).
-- Para credoras, governanca, Pix, web/mobile de jornadas e infraestrutura AWS futura, leia [`PRD-FASE-3.md`](./PRD-FASE-3.md).
+- Para credoras, governanca, Pix, web/mobile de jornadas, novo design system web/mobile e infraestrutura AWS futura, leia [`PRD-FASE-3.md`](./PRD-FASE-3.md).
 
 ## Observacao
 
