@@ -137,10 +137,10 @@ test -f "steps-fase-3/web/114-fsprint-14-steps.md"
 - Spec e steps da F-Sprint 14 localizados.
 
 ### Definicao de pronto da Task F-14.0
-- [ ] Branch correta.
-- [ ] Baseline registrada.
-- [ ] Fonte de design confirmada.
-- [ ] Escopo sem troca de stack confirmado.
+- [x] Branch correta.
+- [x] Baseline registrada.
+- [x] Fonte de design confirmada.
+- [x] Escopo sem troca de stack confirmado.
 
 ### Commit Task F-14.0
 Nao gera commit; apenas validacao.
@@ -206,10 +206,10 @@ grep -R "apple\\|Apple\\|notion\\|Notion\\|--apple\\|--notion\\|theme-transition
 - Plano permite rollback por commit.
 
 ### Definicao de pronto da Task F-14.1
-- [ ] Superficies impactadas mapeadas.
-- [ ] Decisao de nomes dos novos tokens definida.
-- [ ] Riscos registrados no checkpoint.
-- [ ] Nenhuma alteracao funcional feita.
+- [x] Superficies impactadas mapeadas.
+- [x] Decisao de nomes dos novos tokens definida.
+- [x] Riscos registrados no checkpoint.
+- [x] Nenhuma alteracao funcional feita.
 
 ### Commit sugerido
 ```text
@@ -285,10 +285,10 @@ chore(web): mapear migracao para new design system
 - `npm run lint:scss` passa.
 
 ### Definicao de pronto da Task F-14.2
-- [ ] Tokens light/dark implementados.
-- [ ] Globals migrados.
-- [ ] Legado Apple/Notion isolado.
-- [ ] `npm run lint:scss` passa.
+- [x] Tokens light/dark implementados.
+- [x] Globals migrados.
+- [x] Legado Apple/Notion isolado.
+- [x] `npm run lint:scss` passa.
 
 ### Commit sugerido
 ```text
@@ -359,9 +359,9 @@ feat(web): adicionar tokens do new design system
 - Loading/skeleton nao causa layout shift relevante.
 
 ### Definicao de pronto da Task F-14.3
-- [ ] Componentes base migrados.
-- [ ] Estados globais migrados.
-- [ ] `npm run lint`, `npm run lint:scss` e `npm run test -- --run` passam.
+- [x] Componentes base migrados.
+- [x] Estados globais migrados.
+- [x] `npm run lint`, `npm run lint:scss` e `npm run test -- --run` passam.
 
 ### Commit sugerido
 ```text
@@ -440,11 +440,11 @@ feat(web): migrar componentes base para new design system
 - Botoes compactos continuam legiveis.
 
 ### Definicao de pronto da Task F-14.4
-- [ ] Shell migrado.
-- [ ] Telas publicas migradas.
-- [ ] Telas autenticadas existentes migradas.
-- [ ] Nenhuma mudanca funcional indevida.
-- [ ] `npm run test -- --run` passa.
+- [x] Shell migrado.
+- [x] Telas publicas migradas.
+- [x] Telas autenticadas existentes migradas.
+- [x] Nenhuma mudanca funcional indevida.
+- [x] `npm run test -- --run` passa.
 
 ### Commit sugerido
 ```text
@@ -518,10 +518,10 @@ feat(web): aplicar new design system nas telas existentes
 - Sem dependencia de dados reais.
 
 ### Definicao de pronto da Task F-14.5
-- [ ] Dashboards/listas densas migrados.
-- [ ] Padrao de graficos decidido.
-- [ ] Showcase atualizado.
-- [ ] Sem biblioteca visual nova sem ADR.
+- [x] Dashboards/listas densas migrados.
+- [x] Padrao de graficos decidido.
+- [x] Showcase atualizado.
+- [x] Sem biblioteca visual nova sem ADR.
 
 ### Commit sugerido
 ```text
@@ -614,10 +614,10 @@ git log --oneline -5
 - Nao iniciar F-Sprint seguinte sem ordem explicita.
 
 ### Definicao de pronto da Task F-14.6
-- [ ] Testes e build executados.
-- [ ] Docs atualizados.
-- [ ] Resumo de fechamento preparado.
-- [ ] Usuario liberou proxima sprint explicitamente.
+- [x] Testes e build executados.
+- [x] Docs atualizados.
+- [x] Resumo de fechamento preparado.
+- [x] Usuario liberou proxima sprint explicitamente.
 
 ### Commit sugerido
 ```text
@@ -628,17 +628,17 @@ docs(web): registrar new design system web
 
 ## Checklist final da F-Sprint 14
 
-- [ ] New Design System SEP e fonte visual vigente do `sep-app`.
-- [ ] Tokens HSL light/dark implementados.
-- [ ] Componentes base migrados.
-- [ ] Shell e telas existentes migrados.
-- [ ] Showcase atualizado.
-- [ ] Sem strings/branding `SimpliClin` como produto final.
-- [ ] Sem Tailwind/shadcn/React adicionados sem ADR.
-- [ ] Sem regra de negocio nova no frontend.
-- [ ] `npm run lint -- --quiet` verde.
-- [ ] `npm run lint:scss` verde.
-- [ ] `npm run test -- --run` verde.
-- [ ] `npm run build` verde.
-- [ ] Smoke Playwright validado.
-- [ ] Docs e indices atualizados.
+- [x] New Design System SEP e fonte visual vigente do `sep-app`.
+- [x] Tokens HSL light/dark implementados.
+- [x] Componentes base migrados.
+- [x] Shell e telas existentes migrados.
+- [x] Showcase atualizado.
+- [x] Sem strings/branding `SimpliClin` como produto final.
+- [x] Sem Tailwind/shadcn/React adicionados sem ADR.
+- [x] Sem regra de negocio nova no frontend.
+- [x] `npm run lint -- --quiet` verde.
+- [x] `npm run lint:scss` verde.
+- [x] `npm run test -- --run` verde.
+- [x] `npm run build` verde.
+- [x] Smoke Playwright validado (9 cenarios verdes; `golden-path`/`admin-flow`/`cobranca` falham por dependerem do cadastro em `/register`, quebra preexistente desde a Sprint 5 — nao e regressao da F-14, follow-up para atualizar os specs).
+- [x] Docs e indices atualizados.

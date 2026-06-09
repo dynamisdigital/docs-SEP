@@ -221,3 +221,48 @@ Tipos de borda em `src/app/core/api/api.models.ts`; transporte em
   e anti-abuso `429`).
 - Smoke Playwright `e2e/backoffice.spec.ts` (offline): dashboard, fila, detalhe, assumir e
   comentar. `resolver`/`ignorar` e reprocessos exigem step-up (MFA) e ficam para o smoke real.
+
+## New Design System Web (F-Sprint 14)
+
+Migracao visual do `sep-app` dos design systems Apple/Notion para o
+[`New Design System Sep.md`](<../../docs-sep/New Design System Sep.md>), mantendo a stack
+Angular + SCSS. Mudanca puramente visual: sem alteracao de contrato REST, regra de negocio,
+role, guard ou escopo funcional. Detalhes em
+[`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md).
+
+### O que mudou
+
+- **Camada de estilo nova** em `src/styles/`: `_sep-ds-tokens.scss` (tokens HSL light/dark,
+  raio `0.75rem`, sombras, gradientes, espacamento neutro `--sep-space-*`),
+  `_sep-ds-typography.scss` (mixins `sep-type-*`, fonte de sistema) e
+  `_sep-ds-components.scss` (mixins de botoes, cards, inputs, badges, navegacao, tabelas,
+  overlays, loaders/skeletons).
+- **Tema claro/escuro** novo: `ThemeService` (`src/app/core/theme/`) aplica a classe `.dark`
+  no documento, persiste em `localStorage` (`SEP_THEME`) e respeita `prefers-color-scheme`;
+  alternador no header.
+- **Todas as telas existentes** (publicas e autenticadas ate F-10, shell, navegacao,
+  dashboards e vitrine `/design-system`) migradas para os novos tokens/mixins.
+- **Legado removido**: os partials `_apple-*`/`_notion-*` foram excluidos de `src/styles/`.
+  Apple/Notion permanecem apenas como historico documental.
+
+### Decisoes
+
+- Cores consumidas via `hsl(var(--token))`; cores semanticas mapeadas (azul->primary,
+  verde->success, laranja->warning, vermelho/critico->destructive).
+- `sep-card` (estilo shadcn) nao embute padding; telas que usavam o antigo `notion-card`
+  recebem `padding: var(--sep-space-24)` explicito.
+- Botoes secundarios neutros usam `sep-button-outline` (o token `--secondary` e verde, de
+  suporte). A vitrine usa base + modifier para nao duplicar a base no CSS final.
+- Landing publica: tiles escuros estilo Apple convertidos para superficies claras do novo DS
+  (gradient-hero, card, muted, accent). Marca segue sendo SEP (sem `SimpliClin`).
+
+### Testes
+
+- Vitest: 285 testes verdes, incluindo `ThemeService` (`npm run test`).
+- `npm run lint`, `npm run lint:scss` e `npm run build` verdes (sem aviso de budget — a
+  vitrine voltou a caber no orcamento de estilo).
+- Smoke Playwright: cenarios publicos/autenticados passam. Falha **preexistente** (anterior
+  a F-14): os specs `golden-path`, `admin-flow` e `cobranca` dependem do formulario de
+  cadastro em `/register`, que desde a Sprint 5 redireciona para a tela de canalizacao por
+  perfil (`RedirectToAppComponent`); o `RegisterComponent` nao esta mais roteado. Recomendado
+  atualizar esses specs em follow-up.

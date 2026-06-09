@@ -33,8 +33,8 @@ Este documento nao substitui o PRD. Ele detalha a camada de experiencia web e de
 - A base visual historica do app web veio de dois design systems oficiais:
   - [`DESIGN-apple.md`](./DESIGN-apple.md) para superficies publicas (sem autenticacao): landing, login e cadastro
   - [`DESIGN-notion.md`](./DESIGN-notion.md) para superficies autenticadas (dashboard, perfil, alteracao de senha, administracao de usuarios e demais jornadas)
-- Apos o Epic 17 / F-Sprint 14, o design system vigente para novas telas web passa a ser [`New Design System Sep.md`](<./New Design System Sep.md>), traduzido para Angular/SCSS.
-- A fronteira Apple/Notion era historicamente o estado de autenticacao; apos a F-Sprint 14, o web passa a ter design unificado.
+- Com o Epic 17 / F-Sprint 14 (concluida), o design system vigente do web e [`New Design System Sep.md`](<./New Design System Sep.md>), traduzido para Angular/SCSS; os partials Apple/Notion foram removidos do `sep-app` e seguem apenas como historico documental.
+- A fronteira Apple/Notion era historicamente o estado de autenticacao; com a F-Sprint 14 o web passou a ter design unificado (claro/escuro).
 - A estilizacao deve ser feita em SCSS puro com tokens extraidos diretamente do design system vigente (cores, tipografia, espacamento, raios, sombras); Bootstrap, Tailwind, Material e similares estao explicitamente fora sem ADR.
 - Componentes devem ser implementados como Angular standalone components proprios.
 - As telas devem prever estados de carregamento, erro, vazio, sucesso e acesso negado.

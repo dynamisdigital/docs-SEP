@@ -371,8 +371,8 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | F-7 | Epic 13 | Propostas, credito e Open Finance (**implementada**) | [`107`](../specs/fase-3/107-fsprint-7-credito-open-finance-web.md) + [`steps`](../steps-fase-3/web/107-fsprint-7-steps.md) | 6 |
 | F-8 | Epic 13 | Formalizacao, assinatura e CCB (**mergeada**, PR #39/#40) | [`108`](../specs/fase-3/108-fsprint-8-formalizacao-web.md) + [steps](../steps-fase-3/web/108-fsprint-8-steps.md) | 5 |
 | F-9 | Epic 13 | Cobranca, parcelas e inadimplencia (**mergeada**, PR #42/#43; renegociacao do tomador adiada por gap backend) | [`109`](../specs/fase-3/109-fsprint-9-cobranca-web.md) + [steps](../steps-fase-3/web/109-fsprint-9-steps.md) | 6 |
-| F-10 | Epic 13 | Backoffice e financeiro operacional | [`110`](../specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md) | 6 |
-| F-14 | Epic 17 | New Design System Web (**executar antes de F-11 para evitar retrabalho visual**) | [`114`](../specs/fase-3/114-fsprint-14-new-design-system-web.md) + [`steps`](../steps-fase-3/web/114-fsprint-14-steps.md) | 6 |
+| F-10 | Epic 13 | Backoffice e financeiro operacional (**mergeada**, PR #46 -> develop; promocao para main pendente) | [`110`](../specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md) + [steps](../steps-fase-3/web/110-fsprint-10-steps.md) | 6 |
+| F-14 | Epic 17 | New Design System Web (**mergeada**, PR #48 -> develop; promocao para main pendente) | [`114`](../specs/fase-3/114-fsprint-14-new-design-system-web.md) + [`steps`](../steps-fase-3/web/114-fsprint-14-steps.md) | 6 |
 | F-11 | Epic 10/13 | Jornada empresa credora | [`111`](../specs/fase-3/111-fsprint-11-credora-web.md) | 6 |
 | F-12 | Epic 11/13 | Administracao e governanca avancada | [`112`](../specs/fase-3/112-fsprint-12-governanca-web.md) | 5 |
 | F-13 | Epic 13/15 | Pix operacional no web | [`113`](../specs/fase-3/113-fsprint-13-pix-web.md) | 5 |
