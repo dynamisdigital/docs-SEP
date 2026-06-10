@@ -21,6 +21,8 @@ Steps just-in-time das sprints da Fase 3.
 | F-8 | [`web/108-fsprint-8-steps.md`](./web/108-fsprint-8-steps.md) | Formalizacao, assinatura e CCB |
 | F-9 | [`web/109-fsprint-9-steps.md`](./web/109-fsprint-9-steps.md) | Parcelas, cobranca e inadimplencia |
 | F-10 | [`web/110-fsprint-10-steps.md`](./web/110-fsprint-10-steps.md) | Backoffice e financeiro operacional |
+| F-11 | [`web/111-fsprint-11-steps.md`](./web/111-fsprint-11-steps.md) | Jornada credora web |
+| F-12 | [`web/112-fsprint-12-steps.md`](./web/112-fsprint-12-steps.md) | Administracao e governanca web (roles + parametros) |
 | F-14 | [`web/114-fsprint-14-steps.md`](./web/114-fsprint-14-steps.md) | New Design System Web |
 
 ## Mobile (`sep-mobile`)
