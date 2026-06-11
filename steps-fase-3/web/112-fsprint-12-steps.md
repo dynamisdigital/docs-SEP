@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`specs/fase-3/112-fsprint-12-governanca-web.md`](../../specs/fase-3/112-fsprint-12-governanca-web.md)
 
-**Status**: planejada.
+**Status**: concluida e mergeada (PR #51 -> `develop`, PR #52 -> `main`, 2026-06-10).
 
 > **Revisao pos-F-12.1 (gaps resolvidos antes de F-12.2)** — confronto do steps com o codigo real (`sep-app` + contratos `sep-api`):
 > 1. **Ancoragem de rotas**: a area `Administracao` ja existe (`/app/admin`, `roleGuard ['ADMIN']`, com `users` + `users/:id`) e o sidenav ja tem o item `Administracao -> /app/admin/users`. Decisao: governanca **aninha em `/app/admin/*`**, sem criar grupo `/app/governanca` paralelo nem novo item de sidenav `Governanca`.
