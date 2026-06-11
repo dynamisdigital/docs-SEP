@@ -575,6 +575,14 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - relatorios de acompanhamento de entregas foram removidos do `docs-SEP` em 2026-06-02 (nao recriar).
   - proxima execucao recomendada historica: continuar a trilha web com a F-Sprint 9 (cobranca, parcelas e inadimplencia, spec `109`) ou abrir a trilha mobile. **Atualizacao de ordem mobile**: antes da M-Sprint 6 (`206`, onboarding mobile), executar e validar a M-Sprint 12 (`212`, aplicacao do design system mobile) para evitar retrabalho visual nas jornadas funcionais.
 
+- **F-Sprint 15 (Aplicacao do New Design System Web) mergeada em `origin/develop` via PR #55 (`8efb32e`), 2026-06-11 (promocao para `main` pendente; `main` esta em PR #54)**:
+  - spec `specs/fase-3/115-fsprint-15-aplicacao-design-system-web.md`; steps `steps-fase-3/web/115-fsprint-15-steps.md`. Epic 17.
+  - aplicou os primitivos do design system (que a F-14 deixou sem uso pleno) em login/registro (painel de marca + CTA gradiente), dashboard (header sticky + "Acesso Rapido" em tiles coloridos + jornadas com chips), shell (sidenav agrupada + header sticky translucido) e landing publica `/` (hero 2-col com painel de marca + cards de feature com icon-chip).
+  - adicionou `lucide-angular` (set curado registrado no bootstrap) e os mixins `sep-icon-chip`/`sep-quick-tile`/`sep-button-gradient`/`sep-auth-brand-panel` + tokens `--gradient-foreground`/`--header-height`/`--sep-radius-xl`. **Nao recriou tokens** (reuso da base F-14).
+  - mudanca puramente visual: sem alterar contrato REST, regra de negocio, role, guard ou rota. Limpeza: removidos Karma/Jasmine nao usados (repo roda Vitest) + os 3 SVGs legados da landing; declarados `@eslint/js`/`@types/node`; `@lucide/angular` (experimento revertido) confirmado ausente.
+  - decisao registrada: `lucide-angular@0.544.0` (deprecado mas compativel com Angular 20 zone-based); migracao para `@lucide/angular` (reescrita zoneless) fica como divida.
+  - verificacao: `npm run lint`/`lint:scss`/`test` (Vitest 397/397)/`build` verdes. Smoke Playwright nao executado por bloqueio ambiental (`.angular/cache`/`test-results`/`playwright-report` root-owned; EACCES no `ng serve`) — reexecutar apos `chown`.
+
 - **F-Sprint 13 (Pix operacional no web) mergeada em `origin/develop` via PR #53 (`8ab6a80`), 2026-06-11 (promocao para `main` pendente)**:
   - spec de origem: `specs/fase-3/113-fsprint-13-pix-web.md`; steps em `steps-fase-3/web/113-fsprint-13-steps.md`. Epic 15 + superficies operacionais do Epic 13. Consome o modulo `pix` do `sep-api` (Sprints backend 19-21: desembolso, recebimento/conciliacao, divergencias).
   - **area interna nova** `/app/pix` (`roleGuard ['FINANCEIRO','ADMIN','BACKOFFICE']`; `CLIENTE` bloqueado no guard e no sidenav). Landing `pix-shell` com cards data-driven (padrao da landing Administracao); item `Pix` no sidenav para roles internas.

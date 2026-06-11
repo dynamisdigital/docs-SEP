@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 115
 - **Titulo**: F-Sprint 15 - Aplicacao visual do New Design System SEP (login, registro, dashboard, shell)
-- **Status**: planejada
+- **Status**: concluida (mergeada em `develop` via PR #55; promocao para `main` pendente)
 - **Fase do produto**: Fase 3 - Epic 17
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epic 17; [`New Design System Sep.md`](<../../docs-sep/New Design System Sep.md>); bundle de handoff `SimpliClin Design System` (claude.ai/design); feedback do usuario sobre o resultado visual da F-Sprint 14
@@ -40,6 +40,7 @@ A numeracao `F-15` e o proximo ID web livre apos a F-Sprint 14.
 - Polir shell autenticado: sidenav agrupada com item ativo destacado e header sticky com toggle de tema.
 - Atualizar showcase/design-system, testes (Vitest/Playwright) e documentacao operacional do `sep-app`.
 - Auditar e remover dependencias npm nao usadas apos as atualizacoes de pacote da sprint.
+- Redesenhar a landing publica (`/`): hero 2-col com painel de marca, CTA gradiente e grid de cards de feature com icon-chip; remover ilustracoes SVG legadas.
 
 ### Fora de escopo
 
@@ -57,6 +58,7 @@ A numeracao `F-15` e o proximo ID web livre apos a F-Sprint 14.
 2. Dashboard: header sticky, "Acesso Rapido" como tiles coloridos, jornadas com chips, sem dados fabricados.
 3. Shell: sidenav agrupada e header sticky translucido com toggle de tema.
 4. Showcase, testes, varredura de dependencias nao usadas e documentacao operacional.
+5. Landing publica (`/`): hero 2-col com painel de marca + grid de cards de feature com icon-chip; remover SVGs legados.
 
 ## Gates que nao contam como task
 

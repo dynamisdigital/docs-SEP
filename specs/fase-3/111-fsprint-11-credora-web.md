@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 111
 - **Titulo**: F-Sprint 11 - Jornada da empresa credora no web
-- **Status**: planejada
+- **Status**: planejada — PROXIMA WEB A IMPLEMENTAR (gap confirmado em 2026-06-11: backend credora pronto nas Sprints 16/17, mas a jornada web nunca foi implementada; nao ha PR nem feature no `sep-app`)
 - **Fase do produto**: Fase 3 - Epic 13 + Epic 10
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epics 10 e 13

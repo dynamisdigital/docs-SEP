@@ -230,6 +230,13 @@ Angular + SCSS. Mudanca puramente visual: sem alteracao de contrato REST, regra 
 role, guard ou escopo funcional. Detalhes em
 [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md).
 
+A **F-Sprint 15** aplicou esse design system com profundidade em login/registro (painel de
+marca), dashboard (header sticky + "Acesso Rapido" + jornadas), shell (sidenav agrupada +
+header sticky) e na landing publica (`/`: hero 2-col + cards de feature), adicionando os
+primitivos `sep-icon-chip`/`sep-quick-tile`/`sep-button-gradient`/
+`sep-auth-brand-panel`, os tokens `--sep-radius-xl`/`--gradient-foreground`/`--header-height` e a
+biblioteca de icones `lucide-angular`. Spec/steps `115-fsprint-15-*`. Sem recriar tokens.
+
 ### O que mudou
 
 - **Camada de estilo nova** em `src/styles/`: `_sep-ds-tokens.scss` (tokens HSL light/dark,

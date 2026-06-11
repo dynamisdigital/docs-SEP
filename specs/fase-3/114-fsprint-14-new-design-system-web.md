@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 114
 - **Titulo**: F-Sprint 14 - Migracao do web para o New Design System SEP
-- **Status**: planejada
+- **Status**: mergeada (PR #48 -> develop, 2026-06-09; promovida a main via PR #52)
 - **Fase do produto**: Fase 3 - Epic 17
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epic 17; [`New Design System Sep.md`](<../../docs-sep/New Design System Sep.md>)

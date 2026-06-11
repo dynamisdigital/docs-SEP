@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 112
 - **Titulo**: F-Sprint 12 - Administracao e governanca avancada no web
-- **Status**: planejada
+- **Status**: mergeada (PR #51 -> develop, 2026-06-10; promovida a main via PR #52)
 - **Fase do produto**: Fase 3 - Epic 13 + Epic 11
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epics 11 e 13

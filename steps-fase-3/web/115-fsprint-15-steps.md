@@ -369,21 +369,58 @@ docs(web): registrar aplicacao do design system na f-sprint 15
 
 ---
 
+## Task F-15.5 - Landing publica (`/`)
+
+**Objetivo**: aplicar o design system na landing publica (tela index), que ficou fora do escopo inicial e destoava das telas novas.
+
+**Pre-requisito**: Task F-15.0 concluida (primitivos disponiveis).
+
+**Esforco**: 0,5 dia.
+
+### Step 115.5.1 - Reescrever a landing
+
+**Arquivos**:
+- `<sep-app-root>/src/app/features/public/landing/landing.component.{ts,html,scss,spec.ts}`
+- Remover `<sep-app-root>/src/assets/landing/sep-{escrow,credito,capital}.svg` (orfaos), com grep-guard.
+
+**Implementacao**:
+- Nav sticky translucido; CTA gradiente.
+- Hero 2-col: texto + CTAs (`sep-button-gradient`/outline) + selos `circle-check` Lucide a esquerda; painel de marca (`sep-auth-brand-panel`) a direita.
+- Secao "Como funciona": grid de `sep-card` com `sep-icon-chip($tone)` (shield/credit-card/wallet) + titulo + descricao (conteudo real escrow/tomador/credora).
+- Provider Lucide no `render()` do spec; preservar h1, links Entrar/Criar conta, heading "Seguranca por desenho", texto "escrow".
+
+**Verificacao**:
+- `npm run lint`, `npm run lint:scss`, `npm run test` (landing 3/3 + suite), `npm run build` (sem budget warning).
+- `grep -rn 'assets/landing' src` vazio.
+
+### Definicao de pronto da Task F-15.5
+- [ ] Landing com hero 2-col + painel de marca + grid de cards com icon-chip.
+- [ ] SVGs legados removidos sem refs quebradas.
+- [ ] Testes/build verdes; rota `/` e contrato preservados.
+
+### Commit sugerido
+```text
+feat(web): redesenhar landing publica com hero 2-col e cards de feature
+```
+
+---
+
 ## Checklist final da F-Sprint 15
 
-- [ ] Login/registro com painel de marca SEP, sem logo de terceiro.
-- [ ] Dashboard com "Acesso Rapido" colorido, jornadas com chips e header sticky.
-- [ ] Shell (sidenav + header) coerente com o dashboard.
-- [ ] Botoes de destaque com cor/gradiente; chips de icone coloridos aplicados.
-- [ ] `lucide-angular` adicionado; sem Tailwind/shadcn/React.
-- [ ] Dependencias nao usadas auditadas (`depcheck`); `@lucide/angular` confirmado removido.
-- [ ] Sem token/paleta recriado (reuso da base F-14).
-- [ ] Sem metrica/numero fabricado no dashboard.
-- [ ] Sem mudanca funcional, de contrato ou de autorizacao.
-- [ ] Light/dark validados nas telas alteradas.
-- [ ] `npm run lint` verde.
-- [ ] `npm run lint:scss` verde.
-- [ ] `npm run test` verde.
-- [ ] `npm run build` verde.
-- [ ] Smoke Playwright validado (falhas preexistentes documentadas).
-- [ ] Docs e indices atualizados.
+- [x] Login/registro com painel de marca SEP, sem logo de terceiro.
+- [x] Dashboard com "Acesso Rapido" colorido, jornadas com chips e header sticky.
+- [x] Shell (sidenav + header) coerente com o dashboard.
+- [x] Landing publica (`/`) redesenhada (hero 2-col + painel de marca + cards com icon-chip); SVGs legados removidos.
+- [x] Botoes de destaque com cor/gradiente; chips de icone coloridos aplicados.
+- [x] `lucide-angular` adicionado; sem Tailwind/shadcn/React.
+- [x] Dependencias nao usadas auditadas (`depcheck`); `@lucide/angular` confirmado removido; Karma/Jasmine removidos.
+- [x] Sem token/paleta recriado (reuso da base F-14).
+- [x] Sem metrica/numero fabricado no dashboard.
+- [x] Sem mudanca funcional, de contrato ou de autorizacao.
+- [x] Light/dark validados nas telas alteradas (review manual do usuario).
+- [x] `npm run lint` verde.
+- [x] `npm run lint:scss` verde.
+- [x] `npm run test` verde (Vitest 397/397).
+- [x] `npm run build` verde (sem budget warning).
+- [ ] Smoke Playwright NAO executado: `ng serve` (webServer) bloqueado por `.angular/cache` root-owned (EACCES) no ambiente; reexecutar apos `chown`. Selectors do e2e preservados; suite Vitest cobre o render.
+- [x] Docs e indices atualizados.
