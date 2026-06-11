@@ -319,3 +319,67 @@ steps: [`112-fsprint-12-steps.md`](../../steps-fase-3/web/112-fsprint-12-steps.m
 - `npm run lint`, `npm run lint:scss` e `npm run build` verdes.
 - Smoke Playwright offline `e2e/governanca.spec.ts` (landing, parametros + historico, secao de
   roles). As mutacoes exigem step-up (MFA) e ficam para smoke real com backend em `:8080`.
+
+## Jornada Pix operacional (F-Sprint 13)
+
+Operacao Pix assistida (Epic 15 + superficies operacionais do Epic 13) consumindo o modulo `pix`
+do `sep-api` (Sprints backend 19-21): desembolso assistido, status de transferencia, referencias e
+recebimentos de parcela, e divergencias. Area interna, visivel para `FINANCEIRO`, `ADMIN` e
+`BACKOFFICE` (grupo `/app/pix` com `roleGuard`; `CLIENTE` bloqueado). O frontend apresenta estado,
+dispara comandos autorizados e conduz step-up; elegibilidade, idempotencia, conciliacao, escrow e
+provider ficam no backend. Spec: [`113`](../../specs/fase-3/113-fsprint-13-pix-web.md);
+steps: [`113-fsprint-13-steps.md`](../../steps-fase-3/web/113-fsprint-13-steps.md).
+
+### Rotas
+
+- `/app/pix` -> landing com cards (`Desembolsos`, `Recebimentos`, `Divergencias`).
+- `/app/pix/desembolsos` -> form de novo desembolso (`FINANCEIRO`/`ADMIN`) + consulta por id.
+- `/app/pix/desembolsos/:id` -> status local + reconsulta no provider (step-up).
+- `/app/pix/recebimentos` -> gerar referencia de parcela (`FINANCEIRO`/`ADMIN`) + consultas por id.
+- `/app/pix/recebimentos/referencias/:id` -> referencia (txid, copia-cola, vinculo de parcela).
+- `/app/pix/recebimentos/:id` -> recebimento conciliado/divergente, com vinculos quando houver.
+- `/app/pix/divergencias` -> painel que reusa a fila do backoffice filtrada pelos tipos Pix.
+
+### Contratos consumidos
+
+- Desembolso: `POST /pix/desembolsos` (`FINANCEIRO`/`ADMIN`, step-up estrito + `Idempotency-Key`,
+  `201`/`200`), `GET /pix/desembolsos/{id}` (leitura local) e `POST /pix/desembolsos/{id}/status`
+  (reconsulta no provider, step-up). Roles de leitura/reconsulta: `FINANCEIRO`/`ADMIN`/`BACKOFFICE`.
+- Recebimento: `POST /pix/recebimentos/referencias` (`FINANCEIRO`/`ADMIN`, **sem step-up**,
+  `201`/`200`), `GET /pix/recebimentos/referencias/{id}` e `GET /pix/recebimentos/{id}`
+  (`FINANCEIRO`/`ADMIN`/`BACKOFFICE`).
+- Divergencias: reusa `GET /backoffice/fila?tipo=...` (`RECEBIMENTO_PIX_DIVERGENTE`,
+  `DESEMBOLSO_PIX_FALHOU`); o tratamento (assumir/comentar/resolver/ignorar) permanece no backoffice.
+- Step-up: o `stepUpInterceptor` anexa `X-Step-Up-Token` em `POST /pix/desembolsos` e
+  `POST /pix/desembolsos/{id}/status`; leituras e geracao de referencia nunca consomem token.
+
+### Decisoes
+
+- `Idempotency-Key` do desembolso e gerada por tentativa (`crypto.randomUUID`), descartada ao mudar
+  o payload ou apos a resposta final; nunca persistida em storage.
+- Chave Pix do destinatario trafega apenas no request de desembolso; o backend so devolve a mascara.
+  A UI nunca loga, persiste nem reexibe a chave em claro.
+- Backend nao expoe listagem global de desembolsos -> navegacao por id / apos criar (sem lista local).
+- `FALHOU`/`CANCELADA` (transferencia) e `NAO_IDENTIFICADO`/divergente (recebimento) aparecem como
+  estado claro; provider indisponivel na reconsulta vira alerta rastreavel, nunca sucesso falso.
+- Divergencias reusam o backoffice: a area Pix nao duplica a fila nem oferece "reenviar Pix" ou
+  "reprocessar provider" para recebimento; desembolso falho so oferece reconsulta de status.
+
+### Gaps
+
+- **Sem endpoint dedicado de divergencias Pix**: o painel reusa a fila do backoffice filtrada por
+  tipo (`listarFila`). Follow-up: endpoint/contadores dedicados se o volume justificar.
+- **Parcela para `BACKOFFICE`**: a rota de parcela na cobranca (`/app/cobranca/financeiro/parcelas/:id`)
+  e `FINANCEIRO`/`ADMIN`; nos detalhes de referencia/recebimento o id da parcela aparece como texto
+  para `BACKOFFICE` (sem link), que trata divergencias pelo proprio fluxo.
+
+### Testes
+
+- Vitest: suite verde (`npm run test`), incluindo `PixService` (URLs/headers/idempotencia/step-up),
+  area/shell + sidenav (roles), desembolso (idempotencia, step-up, `403`/`409`/`422`, provider
+  indisponivel), recebimentos (referencia nova/reaproveitada, conciliado, `NAO_IDENTIFICADO`),
+  divergencias (reuso do backoffice, sem acao perigosa) e o `stepUpInterceptor` (rotas Pix).
+- `npm run lint`, `npm run lint:scss` e `npm run build` verdes.
+- Smoke Playwright offline `e2e/pix.spec.ts` (area, desembolso por role + status, referencia com
+  copia-cola, recebimento conciliado, divergencias -> backoffice). A solicitacao de desembolso exige
+  step-up (MFA) e fica para o smoke real com backend em `:8080`.

@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 113
 - **Titulo**: F-Sprint 13 - Pix operacional no web
-- **Status**: planejada
+- **Status**: mergeada (PR #53 -> develop, 2026-06-11)
 - **Fase do produto**: Fase 3 - Epic 13 + Epic 15
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD Epic 15

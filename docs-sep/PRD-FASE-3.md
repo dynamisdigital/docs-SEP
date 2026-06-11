@@ -375,7 +375,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | F-14 | Epic 17 | New Design System Web (**mergeada**, PR #48 -> develop; promovida para main via PR #52) | [`114`](../specs/fase-3/114-fsprint-14-new-design-system-web.md) + [`steps`](../steps-fase-3/web/114-fsprint-14-steps.md) | 6 |
 | F-11 | Epic 10/13 | Jornada empresa credora | [`111`](../specs/fase-3/111-fsprint-11-credora-web.md) | 6 |
 | F-12 | Epic 11/13 | Administracao e governanca avancada (**mergeada**, PR #51 -> develop, PR #52 -> main) | [`112`](../specs/fase-3/112-fsprint-12-governanca-web.md) + [`steps`](../steps-fase-3/web/112-fsprint-12-steps.md) | 5 |
-| F-13 | Epic 13/15 | Pix operacional no web | [`113`](../specs/fase-3/113-fsprint-13-pix-web.md) | 5 |
+| F-13 | Epic 13/15 | Pix operacional no web (**mergeada**, PR #53 -> develop; promocao para main pendente) | [`113`](../specs/fase-3/113-fsprint-13-pix-web.md) + [`steps`](../steps-fase-3/web/113-fsprint-13-steps.md) | 5 |
 
 ### Mobile (`sep-mobile`)
 
