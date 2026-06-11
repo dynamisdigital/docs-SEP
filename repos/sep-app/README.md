@@ -266,3 +266,56 @@ role, guard ou escopo funcional. Detalhes em
   cadastro em `/register`, que desde a Sprint 5 redireciona para a tela de canalizacao por
   perfil (`RedirectToAppComponent`); o `RegisterComponent` nao esta mais roteado. Recomendado
   atualizar esses specs em follow-up.
+
+## Administracao e governanca (F-Sprint 12)
+
+Telas administrativas de governanca (Epic 11 + Epic 13) consumindo o modulo `governanca` do
+`sep-api` (Sprint 18 - RBAC cumulativo e parametros operacionais). Toda a area e **ADMIN-only**:
+os endpoints de governanca usam `hasRole('ADMIN')` (inclusive leitura), e a area web aninha na
+`Administracao` ja existente (`/app/admin`, `roleGuard ['ADMIN']`). Precedencia de role,
+validacao de tipo, versionamento e auditoria permanecem no backend; o frontend so apresenta e
+dispara acoes. Spec: [`112`](../../specs/fase-3/112-fsprint-12-governanca-web.md);
+steps: [`112-fsprint-12-steps.md`](../../steps-fase-3/web/112-fsprint-12-steps.md).
+
+### Rotas
+
+- `/app/admin` -> landing `Administracao` com cards (`Usuarios`, `Parametros operacionais`).
+- `/app/admin/users`, `/app/admin/users/:id` -> lista e detalhe de usuario; o detalhe ganhou a
+  **secao de roles cumulativas** (consulta + edicao do conjunto).
+- `/app/admin/parametros` -> lista de parametros operacionais.
+- `/app/admin/parametros/:chave` -> detalhe + historico de versoes + alteracao de valor.
+
+### Contratos consumidos
+
+- `GET/PUT /usuarios/{id}/roles`, `POST/DELETE /usuarios/{id}/roles/{role}` (roles cumulativas).
+- `GET /governanca/parametros`, `GET /governanca/parametros/{chave}`,
+  `PATCH /governanca/parametros/{chave}` (`novoValor` + `justificativa`).
+- Mutacoes exigem step-up: o `stepUpInterceptor` anexa `X-Step-Up-Token` nas mutacoes de roles
+  (PUT/POST/DELETE) e no `PATCH` de parametro; os GET de leitura nunca consomem token.
+
+### Decisoes
+
+- Governanca aninhada em `/app/admin` (sem grupo `/app/governanca` paralelo). Roles cumulativas
+  reusam o detalhe de usuario; nao ha pagina de roles separada nem campo de `id`/busca.
+- Edicao de roles via `PUT` (conjunto inteiro). Auto-protecao: edicao desabilitada quando o alvo
+  e o proprio admin (backend retorna `403`); `403` de mutacao redireciona para `/app/step-up`.
+- Valor de parametro trafega como `string`; input unico de texto com dica do tipo. A validacao
+  por tipo/faixa fica no backend (`400`/`422` tratados); a UI nao recalcula.
+- Justificativa de alteracao fica apenas em estado de formulario (nunca em `localStorage`).
+
+### Gaps
+
+- **Auditoria de roles na web**: a Sprint 18 nao expoe endpoint de leitura da trilha de
+  alteracao de roles. A UI explicita que a alteracao e auditada no backend, mas a trilha
+  detalhada nao e exibida nesta versao (sem simular trilha). Follow-up: novo endpoint backend.
+  O historico de **parametros** (`GET /governanca/parametros/{chave}`) e a trilha auditavel
+  disponivel.
+
+### Testes
+
+- Vitest: suite verde (`npm run test`), incluindo `GovernancaService`, gestao de roles no
+  detalhe de usuario, lista/detalhe/alteracao de parametros e o `stepUpInterceptor` (URLs
+  sensiveis de roles e parametro; GETs nao consomem token).
+- `npm run lint`, `npm run lint:scss` e `npm run build` verdes.
+- Smoke Playwright offline `e2e/governanca.spec.ts` (landing, parametros + historico, secao de
+  roles). As mutacoes exigem step-up (MFA) e ficam para smoke real com backend em `:8080`.

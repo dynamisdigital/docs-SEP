@@ -654,6 +654,12 @@ Dependencias:
 
 Observacoes:
 - A fase inicial tera apenas administracao basica de usuarios.
+- **F-Sprint 12 implementada**: area `Administracao` (`/app/admin`, ADMIN-only) com gestao de
+  roles cumulativas no detalhe de usuario e parametros operacionais (lista, detalhe + historico
+  de versoes, alteracao com step-up), consumindo o modulo `governanca` do backend (Sprint 18).
+  Auditoria de roles na web fica como gap (sem endpoint de leitura). Ver
+  [`repos/sep-app/README.md`](../repos/sep-app/README.md) e
+  [`112`](../specs/fase-3/112-fsprint-12-governanca-web.md).
 
 ### 6.9 Pix Futuro
 

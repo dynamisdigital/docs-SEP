@@ -92,6 +92,7 @@ Leitura base para qualquer agente:
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |
 | MFA, TOTP, refresh, step-up, auditoria de seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) |
 | multi-role, roles cumulativas, FINANCEIRO+BACKOFFICE, parametros operacionais, governanca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) §multi-role + [`018`](specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) |
+| governanca web, roles na UI, parametros operacionais web, /app/admin | [`112`](specs/fase-3/112-fsprint-12-governanca-web.md) + [`step 112`](steps-fase-3/web/112-fsprint-12-steps.md) + [`repos/sep-app/README.md`](repos/sep-app/README.md) §Administracao e governanca |
 | tela web, Angular, design Apple/Notion | [`docs-sep/WEB-SCREENS-PLAN.md`](docs-sep/WEB-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) quando envolver UI/design atual |
 | New Design System Web, F-Sprint 14, redesign web | [`114`](specs/fase-3/114-fsprint-14-new-design-system-web.md) (mergeada, PR #48 -> develop) + [`step 114`](steps-fase-3/web/114-fsprint-14-steps.md) + [`repos/sep-app/DESIGN-SYSTEM.md`](repos/sep-app/DESIGN-SYSTEM.md) |
 | mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) quando envolver UI/design |
