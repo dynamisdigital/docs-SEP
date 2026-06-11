@@ -15,7 +15,7 @@ A trilha de execucao do mobile e governada por 5 specs (uma por M-Sprint), em pa
 
 As Fases Mobile 2-4 (jornadas funcionais) deste plano vao alem das M-Sprints 0-4 e sao detalhadas em fases posteriores quando as APIs das Epics 5-11 estiverem publicadas.
 
-Atualizacao de planejamento: apos a F-Sprint 10, web e mobile ganham o Epic 17 para substituir Apple/Notion pelo [`New Design System Sep.md`](<./New Design System Sep.md>). O recorte mobile e a M-Sprint 12, pareada com a F-Sprint 14 do `sep-app`, e deve estabilizar a base visual antes de novas telas funcionais mobile.
+Atualizacao de planejamento: apos a F-Sprint 10, web e mobile ganham o Epic 17 para substituir Apple/Notion pelo [`New Design System Sep.md`](<./New Design System Sep.md>). O recorte mobile e a M-Sprint 12 revisada, alinhada a aplicacao visual da F-Sprint 15 do `sep-app`, e deve estabilizar splash, login, homes, shell e tabs antes de novas telas funcionais mobile.
 
 ## 2. Diretrizes Gerais
 
@@ -753,8 +753,8 @@ Rotas secundarias:
 10. Criar meu perfil
 11. Criar alterar senha
 12. Criar placeholders navegaveis para jornadas futuras
-13. New Design System SEP no mobile (M-Sprint 12, antes das telas funcionais)
-14. Implementar onboarding do tomador quando API existir
+13. Aplicar o New Design System SEP no mobile (M-Sprint 12 revisada, baseada na F-Sprint 15, obrigatoria antes da M-Sprint 6 / spec 206)
+14. Implementar onboarding do tomador (M-Sprint 6 / spec 206) somente apos a M-Sprint 12 estar concluida e validada
 15. Implementar solicitacao e acompanhamento de emprestimo
 16. Implementar formalizacao
 17. Implementar parcelas

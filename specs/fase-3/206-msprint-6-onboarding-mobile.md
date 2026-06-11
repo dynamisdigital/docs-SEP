@@ -8,12 +8,14 @@
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 2+
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; APIs onboarding Sprints 6-7
-- **Depende de**: M-Sprint 12 + M-Sprint 5 + backend Fase 2 em `main`
+- **Depende de**: [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) concluida + M-Sprint 5 + backend Fase 2 em `main`
 - **Responsavel principal**: Dev Mobile
 
 ## Objetivo
 
 Implementar o onboarding mobile do tomador em PWA/Ionic, consumindo APIs existentes e mantendo a regra de negocio no backend.
+
+> **Ordem obrigatoria**: esta M-Sprint 6 (`206`) so deve iniciar depois da M-Sprint 12 (`212`) estar implementada e validada. A 212 estabiliza o design system mobile, splash/login/homes/shell/tabs e evita retrabalho visual nas jornadas funcionais.
 
 ## Escopo
 

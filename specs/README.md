@@ -93,7 +93,7 @@ Ver indice completo em [`fase-3/README.md`](./fase-3/README.md).
 ### Mobile (7 specs)
 | Sprint | Arquivo | Tema |
 |--------|---------|------|
-| M-12 | [`fase-3/212-msprint-12-new-design-system-mobile.md`](./fase-3/212-msprint-12-new-design-system-mobile.md) | New Design System Mobile |
+| M-12 | [`fase-3/212-msprint-12-new-design-system-mobile.md`](./fase-3/212-msprint-12-new-design-system-mobile.md) | Aplicacao do design system mobile (antes de M-6/206) |
 | M-6 | [`fase-3/206-msprint-6-onboarding-mobile.md`](./fase-3/206-msprint-6-onboarding-mobile.md) | Tomador: onboarding mobile |
 | M-7 | [`fase-3/207-msprint-7-credito-mobile.md`](./fase-3/207-msprint-7-credito-mobile.md) | Tomador: proposta, credito e Open Finance |
 | M-8 | [`fase-3/208-msprint-8-formalizacao-mobile.md`](./fase-3/208-msprint-8-formalizacao-mobile.md) | Tomador: formalizacao e contrato |

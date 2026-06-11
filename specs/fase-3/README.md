@@ -42,7 +42,7 @@ As tabelas usam a ordem recomendada de execucao. A numeracao dos specs continua 
 
 | Sprint | Arquivo | Tema | Impl tasks |
 |--------|---------|------|------------|
-| M-12 | [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) | New Design System Mobile | 6 |
+| M-12 | [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) | Aplicacao do design system mobile (**obrigatoria antes de M-6/206**) | 5 |
 | M-6 | [`206-msprint-6-onboarding-mobile.md`](./206-msprint-6-onboarding-mobile.md) | Tomador: onboarding mobile | 6 |
 | M-7 | [`207-msprint-7-credito-mobile.md`](./207-msprint-7-credito-mobile.md) | Tomador: proposta, credito e Open Finance | 6 |
 | M-8 | [`208-msprint-8-formalizacao-mobile.md`](./208-msprint-8-formalizacao-mobile.md) | Tomador: formalizacao e contrato | 5 |
@@ -57,8 +57,8 @@ As tabelas usam a ordem recomendada de execucao. A numeracao dos specs continua 
 - Web F-11 depende das Sprints backend 16-17, do contrato de autorizacao/ownership da credora e da F-Sprint 14.
 - Web F-12 depende da Sprint backend 18 e da F-Sprint 14.
 - Web F-13 depende das Sprints backend 19-21 e da F-Sprint 14.
-- Mobile M-12 depende da F-Sprint 10 concluida, da base tecnica mobile M-Sprints 0-5 e do alinhamento com F-14; deve ser executada antes de M-6 para evitar retrabalho visual.
-- Mobile M-6 a M-9 dependem das APIs backend da Fase 2 e da M-Sprint 12.
+- Mobile M-12 depende da base tecnica mobile M-Sprints 0-5 e do alinhamento com a aplicacao visual da F-Sprint 15; deve ser executada antes de M-6/206 para evitar retrabalho visual.
+- Mobile M-6/206 a M-9 dependem das APIs backend da Fase 2 e da M-Sprint 12 concluida.
 - Mobile M-10 depende das Sprints backend 16-17 e do contrato de autorizacao/ownership da credora, entregue na Sprint 16 ou complementado pela Sprint 18.
 - Mobile M-11 depende das Sprints backend 19-21.
 - Mobile M-10 e M-11 tambem dependem da M-Sprint 12.

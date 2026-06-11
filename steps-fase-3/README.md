@@ -29,4 +29,4 @@ Steps just-in-time das sprints da Fase 3.
 
 | Sprint | Arquivo | Tema |
 |--------|---------|------|
-| M-12 | [`mobile/212-msprint-12-steps.md`](./mobile/212-msprint-12-steps.md) | New Design System Mobile |
+| M-12 | [`mobile/212-msprint-12-steps.md`](./mobile/212-msprint-12-steps.md) | Aplicacao do design system mobile (antes de M-6/206) |

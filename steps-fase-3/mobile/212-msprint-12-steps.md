@@ -1,52 +1,54 @@
-# Steps - M-Sprint 12 - New Design System Mobile
+# Steps - M-Sprint 12 - Aplicacao do New Design System Mobile
 
 **Spec de origem**: [`specs/fase-3/212-msprint-12-new-design-system-mobile.md`](../../specs/fase-3/212-msprint-12-new-design-system-mobile.md)
 
-**Objetivo geral**: migrar o `sep-mobile` do design Notion mobile para o New Design System SEP descrito em [`docs-sep/New Design System Sep.md`](<../../docs-sep/New Design System Sep.md>), mantendo a stack Ionic/Angular/Capacitor, preservando contratos de API e sem introduzir regra de negocio no app.
+**Sprint de referencia**: [`steps-fase-3/web/115-fsprint-15-steps.md`](../web/115-fsprint-15-steps.md). A F-Sprint 15 aplica visualmente o New Design System SEP no `sep-app`; esta M-Sprint 12 traduz a mesma melhoria para `sep-mobile` com Ionic/Angular/SCSS.
 
-**Sprint pareada**: [`steps-fase-3/web/114-fsprint-14-steps.md`](../web/114-fsprint-14-steps.md). A F-Sprint 14 cobre `sep-app`; esta M-Sprint 12 cobre `sep-mobile`.
+**Objetivo geral**: aplicar a riqueza visual do New Design System SEP nas superficies existentes do `sep-mobile` (splash/welcome, login/TOTP, registro, homes, shell/header/tabs e showcase), mantendo Ionic/Angular/Capacitor/SCSS, preservando contratos de API e sem introduzir regra de negocio no app.
 
-**Nota de ordem**: apesar do ID `M-12`, esta sprint deve ser executada antes da M-Sprint 6. O objetivo e estabilizar o design system antes de onboarding, credito, formalizacao, cobranca, credora e Pix mobile.
-
-**Esforco total estimado**: 4-6 dias.
+**Esforco total estimado**: 3-4 dias.
 
 **Repo de destino**: `sep-mobile`.
 
 **Localizacao do projeto mobile**: `<sep-mobile-root>/`.
 
+**Nota de ordem**:
+- Apesar do ID `M-12`, executar antes das M-Sprints funcionais 6-11.
+- A M-Sprint 6 (`206`, onboarding mobile) fica bloqueada ate a conclusao/validacao desta M-Sprint 12.
+- A sprint substitui o plano antigo de "migracao generica" por uma aplicacao visual baseada na F-Sprint 15.
+- Nao depende de telas futuras; atua sobre superficies ja existentes do mobile.
+
 **Decisao de arquitetura da sprint**:
-- O design de origem foi extraido de React + Tailwind + shadcn/ui.
-- O `sep-mobile` continua em Angular + Ionic + SCSS.
-- Esta sprint traduz tokens, padroes visuais e componentes para SCSS/Ionic.
-- Nao instalar Tailwind, shadcn/ui, Radix, React, `next-themes` ou `framer-motion` sem ADR aprovada e ordem explicita do usuario.
+- O `sep-mobile` continua em Ionic + Angular + Capacitor + SCSS.
+- A sprint nao recria stack nem copia implementacao web literalmente.
+- O mobile ja usa Ionicons (`ionicons`). Preferir `ion-icon`/Ionicons em vez de instalar `lucide-angular`.
+- Tailwind, shadcn/ui, Radix, React, `next-themes`, `framer-motion` ou biblioteca nova de icones exigem ADR/aprovacao explicita.
+- Esta sprint adiciona/aplica primitivos visuais mobile: `sep-mobile-icon-chip`, `sep-mobile-quick-tile`, `sep-mobile-button-gradient`, `sep-mobile-auth-brand-panel`, header translucido e tabs mais expressivas.
 
 **Lembrete de marca**:
-- `SimpliClin` no documento de origem e referencia do produto de onde o design foi extraido.
-- O app continua sendo SEP; nao trocar nome, marca, copy institucional ou assets finais para SimpliClin.
-- Se for necessario um icone novo, criar/adaptar um `SepMobileIcon` inspirado no padrao de linhas/nos, sem reutilizar marca de terceiro como identidade final.
+- `SimpliClin`/`TeaAgenda` no design de origem sao referencia visual de outro produto.
+- O app continua SEP; marca = texto `SEP`, gradiente/paleta propria e linguagem visual do design system.
+- Nao importar logo/assets de terceiro como identidade final.
 
 **Ordem de execucao recomendada**:
 
 ```text
-M-12.0 (prechecks)
+(prechecks: branch + baseline)
    |
    v
-M-12.1 (auditoria visual e plano de migracao)
+M-12.0 (fundacao: auditoria + tokens/mixins mobile + Ionicons)
    |
    v
-M-12.2 (tokens HSL + Ionic variables)
+M-12.1 (publico: splash/welcome + login/TOTP + registro)
    |
    v
-M-12.3 (componentes base)
+M-12.2 (homes: autenticada + tomador + credora)
    |
    v
-M-12.4 (shell e telas existentes)
+M-12.3 (shell: header + tabs + estados)
    |
    v
-M-12.5 (showcase + testes visuais)
-   |
-   v
-M-12.6 (docs e fechamento)
+M-12.4 (showcase + testes + docs)
 ```
 
 **Como usar este arquivo**:
@@ -57,41 +59,52 @@ M-12.6 (docs e fechamento)
 5. Em `docs-SEP`, nao fazer commit automatico; o git da documentacao e manual.
 
 **Pre-requisitos globais**:
-- F-Sprint 10 concluida ou em fechamento, pois o Epic 17 foi planejado para rodar apos ela.
-- Alinhamento com a F-Sprint 14 para manter tokens e nomenclatura consistentes entre web e mobile.
-- `sep-mobile` com M-Sprints 0-5 entregues.
-- Nenhuma M-Sprint funcional da Fase 3 (M-6 a M-11) iniciada sem decisao explicita de aceitar retrabalho visual.
+- `sep-mobile/develop` atualizado.
+- Branch sugerida: `feature/msprint-12-aplicacao-design-system-mobile`.
+- M-Sprints 0-5 entregues como base tecnica mobile.
+- Baseline verde (`lint`, `lint:scss`, `test`, `build`) registrada antes de alterar; falhas preexistentes anotadas.
 - Node/npm do repo mobile funcionando.
-- Acesso ao documento [`docs-sep/New Design System Sep.md`](<../../docs-sep/New Design System Sep.md>).
-- Conhecimento dos arquivos atuais de design mobile Notion (`src/styles/*`, `src/theme/variables.scss`, `src/global.scss`).
+- `New Design System Sep.md`, spec/steps 115 e spec/steps 212 lidos.
+- Conhecimento dos arquivos atuais:
+  - `src/styles/_notion-mobile-*`;
+  - `src/theme/variables.scss`;
+  - `src/global.scss`;
+  - `src/app/features/public/**`;
+  - `src/app/features/authenticated/**`;
+  - `src/app/features/tomador/**`;
+  - `src/app/features/credora/**`;
+  - `src/app/layout/**`;
+  - `src/app/features/design-system/**`.
 
 **Fora de escopo durante estes steps**:
 - Telas funcionais novas de onboarding, credito, formalizacao, cobranca, credora ou Pix.
 - Backend, contratos REST, MSW de regra de negocio e autorizacao.
 - Backoffice/financeiro/admin no mobile.
 - Build nativo Android/iOS.
-- Troca de stack para Tailwind/shadcn.
+- Troca de stack para Tailwind/shadcn/React.
+- Metricas/numeros fabricados em homes.
 
 ---
 
-## Task M-12.0 - Prechecks da M-Sprint 12
+## Task M-12.0 - Fundacao visual mobile
 
-**Objetivo**: confirmar estado do repo, baseline e fontes documentais antes de mexer em design.
+**Objetivo**: confirmar baseline, auditar a base visual existente e preparar os primitivos visuais mobile equivalentes aos da F-Sprint 15.
 
-**Esforco**: 30-45 min.
+**Esforco**: 0,5-1 dia.
 
 ### Step 212.0.1 - Conferir branch e status Git
 
 **Comandos**:
 ```bash
 cd <sep-mobile-root>
+git fetch --all --prune
 git status --short --branch
-git rev-parse --abbrev-ref HEAD
-git log --oneline -10
+git rev-list --left-right --count HEAD...origin/develop
+git log --oneline -10 origin/develop
 ```
 
 **Verificacao**:
-- Branch criada a partir de `develop` atualizado.
+- Branch local alinhada a `origin/develop`.
 - Working tree limpo ou alteracoes locais identificadas como do usuario.
 - Nenhuma alteracao de sprint anterior sem owner claro.
 
@@ -102,14 +115,14 @@ git log --oneline -10
 cd <sep-mobile-root>
 git switch develop
 git pull --ff-only
-git switch -c feature/msprint-12-new-design-system-mobile
+git switch -c feature/msprint-12-aplicacao-design-system-mobile
 ```
 
 **Verificacao**:
-- Branch `feature/msprint-12-new-design-system-mobile` ativa.
+- Branch criada a partir de `develop` atualizado.
 - Se `git pull --ff-only` falhar, parar e avisar o usuario.
 
-### Step 212.0.3 - Confirmar baseline do projeto
+### Step 212.0.3 - Registrar baseline
 
 **Comandos**:
 ```bash
@@ -124,482 +137,316 @@ npm run build
 
 **Verificacao**:
 - Baseline verde antes das alteracoes.
-- Qualquer falha preexistente deve ser registrada antes de mudar SCSS/componentes.
+- Falhas preexistentes registradas antes de mudar SCSS/componentes.
 
-### Step 212.0.4 - Confirmar fontes de design
-
-**Comandos**:
-```bash
-cd <docs-sep-root>
-test -f "docs-sep/New Design System Sep.md"
-test -f "specs/fase-3/212-msprint-12-new-design-system-mobile.md"
-test -f "steps-fase-3/mobile/212-msprint-12-steps.md"
-```
-
-**Verificacao**:
-- Documento novo de design localizado.
-- Spec e steps da M-Sprint 12 localizados.
-
-### Definicao de pronto da Task M-12.0
-- [ ] Branch correta.
-- [ ] Baseline registrada.
-- [ ] Fonte de design confirmada.
-- [ ] Escopo sem troca de stack confirmado.
-
-### Commit Task M-12.0
-Nao gera commit; apenas validacao.
-
----
-
-## Task M-12.1 - Auditoria visual e plano de migracao
-
-**Objetivo**: mapear todos os pontos onde o Notion mobile aparece no `sep-mobile` e definir a estrategia de substituicao sem quebrar as telas existentes.
-
-**Pre-requisito**: Task M-12.0 concluida.
-
-**Esforco**: 0,5 dia.
-
-### Step 212.1.1 - Inventariar arquivos de estilo atuais
+### Step 212.0.4 - Auditar base visual atual
 
 **Comandos**:
 ```bash
 cd <sep-mobile-root>
-find src -maxdepth 5 -type f | sort
-grep -R "notion\\|Notion\\|--notion\\|ion-color\\|theme-transition\\|dark" -n src
+find src/app/features src/app/layout src/styles src/theme -maxdepth 5 -type f | sort
+grep -R "notion\\|Notion\\|--notion\\|ion-color\\|theme-transition\\|dark\\|ion-icon" -n src/app src/styles src/theme src/global.scss
 ```
 
 **Verificacao**:
-- Lista de arquivos de tokens, mixins, variaveis Ionic, globals e componentes afetados.
-- Separar o que e token global do que e estilo local de tela.
+- Pontos Notion mobile identificados.
+- Superficies reais listadas: splash/welcome, login/TOTP, registro, home autenticada, home tomador, home credora, perfil, biometria, step-up, header, shell, tabs e showcase.
+- Confirmar que Ionicons ja atende os icones necessarios antes de propor nova dependencia.
 
-### Step 212.1.2 - Mapear telas e componentes existentes
-
-**Comandos**:
-```bash
-cd <sep-mobile-root>
-find src/app/features -maxdepth 6 -type f | sort
-find src/app/layout -maxdepth 6 -type f | sort
-find src/app/shared -maxdepth 6 -type f | sort
-```
-
-**Verificacao**:
-- Telas publicas existentes identificadas.
-- Shell autenticado/tabs/stack identificados.
-- Showcase atual identificado, se existir.
-
-### Step 212.1.3 - Comparar design novo contra o Notion mobile atual
-
-**Implementacao**:
-- Criar nota curta no PR description temporario ou no checkpoint da task com:
-  - tokens a substituir;
-  - componentes a migrar;
-  - telas impactadas;
-  - riscos de regressao visual;
-  - decisoes que exigiriam ADR.
-- Nao criar arquivo documental temporario no repo se nao for necessario.
-
-**Pontos obrigatorios da comparacao**:
-- Paleta HSL nova (`--background`, `--primary`, `--secondary`, `--success`, `--warning`, `--destructive`, `--devolutiva`).
-- Dark mode novo.
-- Raios `0.75rem` e derivacoes.
-- Sombras `--shadow-sm/md/lg/card/elegant/glow`.
-- Header `h-14`, superficies `bg-card`, painel de pagina e cards.
-- Componentes base: botoes, badges, inputs, tabs, tabelas/listas, dialogs/dropdowns, skeleton/loading.
-
-### Step 212.1.4 - Definir nomes de arquivos e estrategia de compatibilidade
-
-**Direcao recomendada**:
-- Criar novos arquivos com prefixo `_sep-ds-*` ou `_new-design-system-*`.
-- Evitar manter novos tokens com prefixo `notion`.
-- Remover imports Notion somente depois de a nova camada compilar.
-- Se houver muitas classes antigas em templates, criar aliases temporarios apenas se reduzirem risco de migracao.
-
-**Verificacao**:
-- Plano nao exige alterar fluxo funcional.
-- Plano nao exige instalar Tailwind/shadcn.
-- Plano permite rollback por commit.
-
-### Definicao de pronto da Task M-12.1
-- [ ] Arquivos/telas impactados mapeados.
-- [ ] Decisao de nomes dos novos tokens definida.
-- [ ] Riscos registrados no checkpoint.
-- [ ] Nenhuma alteracao funcional feita.
-
-### Commit sugerido
-```text
-chore(mobile): mapear migracao para new design system
-```
-
----
-
-## Task M-12.2 - Tokens HSL, dark mode e Ionic variables
-
-**Objetivo**: criar a base visual global do New Design System SEP no mobile, mapeando os tokens do documento de origem para SCSS/CSS variables e para Ionic.
-
-**Pre-requisito**: Task M-12.1 concluida.
-
-**Esforco**: 1 dia.
-
-### Step 212.2.1 - Criar arquivo de tokens do New Design System SEP
+### Step 212.0.5 - Criar primitivos visuais mobile
 
 **Arquivos provaveis**:
-- `<sep-mobile-root>/src/styles/_sep-design-system-tokens.scss`
+- `<sep-mobile-root>/src/styles/_sep-mobile-ds-tokens.scss`
+- `<sep-mobile-root>/src/styles/_sep-mobile-ds-components.scss`
 - `<sep-mobile-root>/src/styles/index.scss`
-
-**Implementacao**:
-- Transcrever os tokens `:root` do documento de origem como CSS custom properties.
-- Transcrever o bloco `.dark`.
-- Preservar HSL no formato `--primary: 213 58% 43%`.
-- Expor helpers SCSS minimos apenas se o projeto ja usa mixins para tokens.
-- Adicionar tokens de sombra e transicao:
-  - `--shadow-sm`
-  - `--shadow-md`
-  - `--shadow-lg`
-  - `--shadow-card`
-  - `--shadow-elegant`
-  - `--shadow-glow`
-  - `--transition-smooth`
-
-**Verificacao**:
-- Nenhum token novo usa prefixo `notion`.
-- Light e dark mode existem no mesmo arquivo.
-- O arquivo compila com Stylelint.
-
-### Step 212.2.2 - Mapear tokens para Ionic
-
-**Arquivo provavel**:
 - `<sep-mobile-root>/src/theme/variables.scss`
 
 **Implementacao**:
-- Mapear `--ion-background-color` para `hsl(var(--background))`.
-- Mapear `--ion-text-color` para `hsl(var(--foreground))`.
-- Mapear cores Ionic principais para `primary`, `secondary`, `success`, `warning`, `destructive`.
-- Ajustar toolbar, tab bar, item, card e input para usar `background`, `card`, `border`, `muted` e `ring`.
-- Manter compatibilidade com componentes Ionic existentes.
+- Reusar tokens existentes quando ja houver traducao do New Design System SEP.
+- Adicionar somente tokens faltantes e justificados, por exemplo `--sep-radius-xl: 1rem`.
+- Mapear tokens principais para Ionic quando fizer sentido: `--ion-color-primary`, `--ion-background-color`, `--ion-text-color`, `--ion-card-background`, `--ion-toolbar-background`.
+- Criar mixins/classes base:
+  - `sep-mobile-icon-chip($tone)`;
+  - `sep-mobile-quick-tile`;
+  - `sep-mobile-button-gradient`;
+  - `sep-mobile-auth-brand-panel`;
+  - `sep-mobile-surface-card`;
+  - `sep-mobile-touch-state`.
+- Consumir gradiente/sombra/paleta do design system; nao duplicar paleta hardcoded em cada tela.
 
 **Verificacao**:
-- `ion-button color="primary"` usa azul novo.
-- `ion-button color="secondary"` usa verde novo.
-- Estados `success`, `warning` e `danger` continuam acessiveis.
-- Dark mode nao deixa toolbar/tab bar com fundo incorreto.
-
-### Step 212.2.3 - Atualizar estilos globais
-
-**Arquivo provavel**:
-- `<sep-mobile-root>/src/global.scss`
-
-**Implementacao**:
-- Atualizar `body` para `bg-background` equivalente via CSS variables.
-- Aplicar transicoes globais de tema para superficies, texto, borda, svg, inputs e botoes.
-- Definir fundo geral frio claro e superficie de pagina com `card`.
-- Manter imports padrao do Ionic.
-- Remover dependencia ativa de mixins Notion, se a nova camada ja cobrir equivalentes.
-
-**Verificacao**:
-- App abre sem flash visual quebrado.
-- Scroll, safe area e teclado virtual continuam respeitados.
-- Sem seletor global que quebre componentes Ionic internos.
-
-### Step 212.2.4 - Remover ou isolar tokens Notion antigos
-
-**Implementacao**:
-- Remover imports Notion que deixaram de ser usados.
-- Se algum arquivo antigo ainda for necessario para compatibilidade, marcar como legado em comentario curto e abrir pendencia para remocao.
-- Nao deixar `Notion` como fonte visual vigente em docs/comentarios novos.
-
-**Verificacao**:
-- `grep -R "notion\\|Notion\\|--notion" -n src` mostra apenas legado justificado ou nada.
 - `npm run lint:scss` passa.
+- Um uso simples dos mixins compila.
+- Nenhuma tela funcional muda comportamento.
+
+### Definicao de pronto da Task M-12.0
+- [ ] Branch correta criada.
+- [ ] Baseline registrado.
+- [ ] Base visual e superficies impactadas auditadas.
+- [ ] Decisao de icones registrada (preferir Ionicons).
+- [ ] Primitivos mobile criados/ajustados sem troca de stack.
+- [ ] `npm run lint:scss` e `npm run build` passam ou falha preexistente documentada.
+
+### Commit sugerido
+```text
+feat(mobile): adicionar primitivos visuais do design system
+```
+
+---
+
+## Task M-12.1 - Publico mobile: splash, welcome, login/TOTP e registro
+
+**Objetivo**: dar presenca de marca e cor combinada as superficies publicas, preservando logica de formularios e autenticacao.
+
+**Pre-requisito**: Task M-12.0 concluida.
+
+**Esforco**: 0,5-1 dia.
+
+### Step 212.1.1 - Redesenhar splash e welcome
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/features/public/splash/*`
+- `<sep-mobile-root>/src/app/features/public/welcome/*`
+
+**Implementacao**:
+- Aplicar painel/hero mobile com marca `SEP`, gradiente da paleta e CTA principal.
+- Usar `ion-icon` com chips coloridos para beneficios/atalhos reais.
+- Manter rotas, textos de acao e fluxo de navegacao existentes.
+- Garantir layout sem overflow em viewport estreita.
+
+**Verificacao**:
+- Specs existentes de splash/welcome passam.
+- Nenhum asset de terceiro introduzido.
+
+### Step 212.1.2 - Redesenhar login e TOTP
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/features/public/login/login.component.*`
+- `<sep-mobile-root>/src/app/features/public/login/verify-totp/*`
+
+**Implementacao**:
+- Usar `sep-mobile-auth-brand-panel` em formato mobile: faixa superior/painel compacto + form.
+- CTA de submit com `sep-mobile-button-gradient`.
+- Inputs Ionic/HTML mantem `formControlName`, validacoes, mensagens, loading e ARIA.
+- TOTP segue visual coerente com login, sem alterar o desafio MFA.
+
+**Verificacao**:
+- Login/TOTP chamam os mesmos services.
+- `401/403/423` continuam no tratamento atual.
+- Specs de login passam; ajustar somente seletores visuais se necessario.
+
+### Step 212.1.3 - Redesenhar registro
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/features/public/register/*`
+
+**Implementacao**:
+- Mesmo padrao visual do login.
+- Select/segmento de perfil consistente com Ionic e com foco visivel.
+- Preservar validacoes e body enviado ao backend.
+
+**Verificacao**:
+- Cadastro continua chamando o mesmo endpoint.
+- Mobile viewport sem overflow horizontal.
+
+### Definicao de pronto da Task M-12.1
+- [ ] Splash/welcome com marca SEP e CTA visualmente forte.
+- [ ] Login/TOTP com painel de marca e CTA gradiente.
+- [ ] Registro coerente com login.
+- [ ] Nenhuma mudanca de logica, contrato ou auth.
+- [ ] `npm run test`, `npm run lint:scss` passam.
+
+### Commit sugerido
+```text
+feat(mobile): redesenhar superficies publicas com design system
+```
+
+---
+
+## Task M-12.2 - Homes e jornadas existentes
+
+**Objetivo**: aplicar tiles, chips e cards nas homes existentes sem criar funcionalidades novas nem dados fabricados.
+
+**Pre-requisito**: Task M-12.1 concluida.
+
+**Esforco**: 0,5-1 dia.
+
+### Step 212.2.1 - Enriquecer home autenticada
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/features/authenticated/home/*`
+
+**Implementacao**:
+- Transformar atalhos reais em tiles (`sep-mobile-quick-tile`) com `ion-icon` e tom semantico.
+- Aplicar header/saudacao visualmente mais forte, sem metricas inventadas.
+- Manter role-gating e rotas existentes.
+
+**Verificacao**:
+- Nenhum numero, saldo ou contador sem fonte real.
+- Navegacao existente preservada.
+
+### Step 212.2.2 - Enriquecer home tomador
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/features/tomador/home/*`
+
+**Implementacao**:
+- Cards de jornada do tomador com chips de icone, estados textuais reais e CTAs existentes.
+- Se alguma jornada for placeholder, manter estado "em preparacao" sem simular dados.
+
+**Verificacao**:
+- Fluxo tomador nao ganha tela funcional nova.
+- Placeholders continuam claros.
+
+### Step 212.2.3 - Enriquecer home credora
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/features/credora/home/*`
+
+**Implementacao**:
+- Cards/tiles para jornada credora existente com linguagem visual equivalente ao tomador.
+- Nao prometer aporte, marketplace, Pix ou carteira se a tela atual nao tiver contrato implementado.
+
+**Verificacao**:
+- Conteudo segue o estado real do app.
+- Sem dados financeiros ficticios.
+
+### Step 212.2.4 - Ajustar perfil, biometria, troca de senha e step-up
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/features/authenticated/profile/**`
+- `<sep-mobile-root>/src/app/features/authenticated/step-up/*`
+
+**Implementacao**:
+- Aplicar cards, botoes, alerts e estados coerentes.
+- Nao alterar biometria, MFA, step-up token ou contratos.
+
+**Verificacao**:
+- Specs de perfil/troca de senha continuam verdes.
 
 ### Definicao de pronto da Task M-12.2
-- [ ] Tokens light/dark implementados.
-- [ ] Ionic variables mapeadas.
-- [ ] Globals migrados.
-- [ ] Notion antigo removido ou isolado como legado.
-- [ ] `npm run lint:scss` passa.
-
-### Commit sugerido
-```text
-feat(mobile): adicionar tokens do new design system
-```
-
----
-
-## Task M-12.3 - Componentes base e estados globais
-
-**Objetivo**: migrar os componentes primarios para o novo visual sem alterar comportamento.
-
-**Pre-requisito**: Task M-12.2 concluida.
-
-**Esforco**: 1-1,5 dia.
-
-### Step 212.3.1 - Migrar botoes e icon buttons
-
-**Arquivos provaveis**:
-- `<sep-mobile-root>/src/styles/_sep-design-system-components.scss`
-- templates/componentes que usam classes antigas.
-
-**Implementacao**:
-- Base:
-  - inline/flex center;
-  - gap entre icone e texto;
-  - raio `md`;
-  - foco visivel com `ring`;
-  - disabled com opacidade e sem pointer events.
-- Variantes:
-  - primary/default;
-  - secondary;
-  - outline;
-  - ghost;
-  - destructive;
-  - icon.
-- Tamanhos:
-  - default touch target >= 44px;
-  - small sem ficar abaixo de 40px em mobile;
-  - icon com dimensao estavel.
-
-**Verificacao**:
-- Botoes com icone nao mudam layout ao carregar.
-- Texto nao estoura em viewport mobile.
-- Foco por teclado continua visivel em PWA.
-
-### Step 212.3.2 - Migrar formularios, inputs e filtros segmentados
-
-**Implementacao**:
-- Inputs com borda `border/input`, `bg-background`, `placeholder muted`, foco em `ring`.
-- Labels com `text-sm font-medium text-muted-foreground` equivalente.
-- Mensagens de erro em destructive.
-- Filtros segmentados com fundo `muted/30`, borda e botoes compactos.
-- Preservar integracao com Angular Reactive Forms existente.
-
-**Verificacao**:
-- Campos seguem contraste minimo.
-- Erros de validacao continuam legiveis.
-- Teclado virtual nao cobre CTA principal sem possibilidade de scroll.
-
-### Step 212.3.3 - Migrar cards, badges, listas e empty states
-
-**Implementacao**:
-- Card base: `rounded-lg border bg-card text-card-foreground shadow-sm`.
-- Cards de metrica/atalho podem usar `shadow-md`, hover/tap sutil e icone em bloco colorido.
-- Badges com raio pill, borda opcional e variantes semanticamente corretas.
-- Listas densas com hover/tap `muted/30` ou `muted/50`.
-- Empty states sem texto educativo longo.
-
-**Verificacao**:
-- Nao criar cards dentro de cards.
-- Cards possuem altura/espacamento estavel.
-- Badges nao quebram texto de status.
-
-### Step 212.3.4 - Migrar dialogs, dropdowns, toasts, loaders e skeletons
-
-**Implementacao**:
-- Dialog/sheet mobile com overlay escuro, `bg-background`, borda, sombra e animacao curta.
-- Dropdown/popover com `bg-popover`, borda, sombra e itens com foco/hover.
-- Toasts usando semantic colors.
-- Loader com `animate-spin` equivalente em SCSS.
-- Skeleton com `animate-pulse` equivalente.
-
-**Verificacao**:
-- Dialog respeita safe areas.
-- Toast nao cobre botoes de navegacao essenciais.
-- Skeleton nao causa layout shift relevante.
-
-### Step 212.3.5 - Garantir dark mode nos componentes base
-
-**Implementacao**:
-- Validar `.dark` em body/root conforme padrao existente do app.
-- Corrigir componentes com cores hardcoded.
-- Preferir `hsl(var(--token))` a hex em CSS novo.
-
-**Verificacao**:
-- Light/dark trocam sem perder contraste.
-- SVGs e icones herdam cor correta.
-- Nenhuma cor antiga Notion domina a UI.
-
-### Definicao de pronto da Task M-12.3
-- [ ] Componentes base migrados.
-- [ ] Estados globais migrados.
-- [ ] Dark mode validado.
-- [ ] `npm run lint`, `npm run lint:scss` e `npm run test` passam.
-
-### Commit sugerido
-```text
-feat(mobile): migrar componentes base para new design system
-```
-
----
-
-## Task M-12.4 - Shell, navegacao e telas existentes
-
-**Objetivo**: aplicar o novo design nas superficies reais existentes do app mobile.
-
-**Pre-requisito**: Task M-12.3 concluida.
-
-**Esforco**: 1-1,5 dia.
-
-### Step 212.4.1 - Migrar shell mobile autenticado
-
-**Arquivos provaveis**:
-- `<sep-mobile-root>/src/app/layout/mobile-tabs/*`
-- `<sep-mobile-root>/src/app/layout/stack-shell/*`
-- `<sep-mobile-root>/src/app/app.component.*`
-
-**Implementacao**:
-- Header mobile inspirado no padrao:
-  - altura proxima de `h-14`;
-  - borda inferior;
-  - fundo `background`/`card`;
-  - marca SEP clara;
-  - subtitulo curto apenas se ja existir espaco.
-- Tabs inferiores:
-  - superficie `card`;
-  - borda superior `border`;
-  - item ativo com `primary`;
-  - labels curtos.
-- Stack navigation:
-  - back button iconico;
-  - titulo compacto;
-  - area de conteudo com padding mobile.
-
-**Verificacao**:
-- Navegacao por tabs continua funcionando.
-- Header nao ocupa excesso de viewport.
-- Areas clicaveis >= 44px.
-
-### Step 212.4.2 - Migrar telas publicas existentes
-
-**Arquivos provaveis**:
-- `<sep-mobile-root>/src/app/features/public/**`
-
-**Implementacao**:
-- Splash/boas-vindas/login/cadastro devem usar:
-  - fundo frio claro;
-  - cards brancos apenas quando forem superficies reais de formulario;
-  - botoes primary/outline;
-  - campos e erros migrados.
-- Nao transformar landing mobile em marketing page longa.
-- Nao usar copy `SimpliClin`.
-
-**Verificacao**:
-- Login/cadastro continuam chamando os mesmos services.
-- MSW/dev-offline continua funcionando.
-- Em 360px de largura, textos nao estouram.
-
-### Step 212.4.3 - Migrar telas autenticadas existentes
-
-**Arquivos provaveis**:
-- `<sep-mobile-root>/src/app/features/tomador/**`
-- `<sep-mobile-root>/src/app/features/credora/**`
-- `<sep-mobile-root>/src/app/features/authenticated/**`, se existir.
-
-**Implementacao**:
-- Home do tomador e da credora usam quick actions em grid mobile.
-- Cards de status/atalhos usam cores semanticas novas.
-- Perfil e alterar senha usam formularios novos.
-- Estados loading/error/empty usam componentes migrados.
-
-**Verificacao**:
-- Nenhuma permissao/role muda.
-- Nenhum endpoint novo e chamado.
-- UI continua focada em tomador/credora.
-
-### Step 212.4.4 - Remover classes locais antigas substituidas
-
-**Implementacao**:
-- Eliminar duplicacoes de SCSS local que agora estao em componentes/tokens globais.
-- Manter estilos locais apenas para layout especifico de tela.
-- Evitar refactor de TypeScript sem relacao visual.
-
-**Verificacao**:
-- Reducao ou neutralidade de duplicacao visual.
-- Componentes nao dependem de seletor global fragil.
-
-### Definicao de pronto da Task M-12.4
-- [ ] Shell migrado.
-- [ ] Telas publicas existentes migradas.
-- [ ] Telas autenticadas existentes migradas.
-- [ ] Nenhuma mudanca funcional indevida.
+- [ ] Home autenticada com tiles coloridos.
+- [ ] Home tomador e credora com cards/chips coerentes.
+- [ ] Perfil/biometria/step-up visualmente alinhados.
+- [ ] Sem dados fabricados.
 - [ ] `npm run test` passa.
 
 ### Commit sugerido
 ```text
-feat(mobile): aplicar new design system nas telas existentes
+feat(mobile): aplicar design system nas homes e jornadas
 ```
 
 ---
 
-## Task M-12.5 - Showcase, regressao visual e smoke PWA
+## Task M-12.3 - Shell mobile: header, tabs e estados
 
-**Objetivo**: validar o novo design de forma inspecionavel e automatizar o minimo contra regressao visual/funcional.
+**Objetivo**: alinhar o frame autenticado ao novo visual para dar consistencia as telas.
 
-**Pre-requisito**: Task M-12.4 concluida.
+**Pre-requisito**: Task M-12.2 concluida.
 
-**Esforco**: 1 dia.
+**Esforco**: 0,5 dia.
 
-### Step 212.5.1 - Atualizar showcase de design system
+### Step 212.3.1 - Polir header mobile
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/layout/header-mobile/*`
+
+**Implementacao**:
+- Header translucido/sticky com blur quando suportado.
+- Titulo, avatar/identidade, acoes e tema coerentes com o design.
+- Manter inputs/outputs e interacoes existentes.
+
+**Verificacao**:
+- Header nao sobrepoe conteudo em iOS safe area.
+- Specs DOM do header passam.
+
+### Step 212.3.2 - Polir shell e tabs
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/app/layout/shell/*`
+- `<sep-mobile-root>/src/app/layout/tabs/*`
+
+**Implementacao**:
+- Tabs com estado ativo mais evidente: icone colorido, wash de fundo, label legivel.
+- Usar variaveis Ionic e tokens SEP para background, border, focus e touch target.
+- Respeitar `safe-area-inset-bottom`.
+- Nao alterar rotas ou role-gating.
+
+**Verificacao**:
+- Navegacao por tabs preservada.
+- Sem overlap com conteudo em viewport pequena.
+
+### Step 212.3.3 - Ajustar estados globais
+
+**Arquivos provaveis**:
+- `<sep-mobile-root>/src/global.scss`
+- `<sep-mobile-root>/src/theme/variables.scss`
+- componentes de erro/publicos
+
+**Implementacao**:
+- Loading, empty, error, toast/dialog/alert e focus visible com tokens novos.
+- Dark mode sem contraste insuficiente.
+
+**Verificacao**:
+- `npm run lint:scss` passa.
+- Validar manualmente light/dark.
+
+### Definicao de pronto da Task M-12.3
+- [ ] Header mobile polido.
+- [ ] Tabs com estado ativo claro e safe area respeitada.
+- [ ] Estados globais coerentes.
+- [ ] Navegacao e guards preservados.
+- [ ] Specs de layout passam.
+
+### Commit sugerido
+```text
+feat(mobile): polir shell e navegacao mobile
+```
+
+---
+
+## Task M-12.4 - Showcase, testes e documentacao
+
+**Objetivo**: demonstrar os novos primitivos, validar regressao e atualizar docs operacionais.
+
+**Pre-requisito**: Task M-12.3 concluida.
+
+**Esforco**: 0,5 dia.
+
+### Step 212.4.1 - Atualizar showcase mobile
 
 **Arquivos provaveis**:
 - `<sep-mobile-root>/src/app/features/design-system/**`
 
 **Implementacao**:
-- Showcase deve cobrir:
-  - paleta light/dark;
-  - tipografia;
-  - botoes;
-  - inputs/formularios;
-  - badges/status;
-  - cards/listas;
-  - dialogs/toasts;
-  - loaders/skeletons;
-  - tabs/navegacao.
-- Se houver graficos no app mobile atual, documentar padrao inspirado em `recharts` sem adicionar biblioteca nova sem demanda real.
+- Demonstrar:
+  - `sep-mobile-icon-chip`;
+  - `sep-mobile-quick-tile`;
+  - `sep-mobile-button-gradient`;
+  - `sep-mobile-auth-brand-panel`;
+  - cards/tabs/header;
+  - estados light/dark.
+- Usar exemplos neutros, sem dado real de cliente.
 
 **Verificacao**:
-- Showcase renderiza em viewport Pixel 5/360px.
-- Sem dependencia de dados reais.
+- Showcase renderiza em viewport mobile.
+- Nao depende de backend.
 
-### Step 212.5.2 - Atualizar testes unitarios
+### Step 212.4.2 - Atualizar testes
 
 **Comandos**:
 ```bash
 cd <sep-mobile-root>
-npm run test -- --run
-```
-
-**Implementacao**:
-- Ajustar queries que dependiam de textos/classes removidas.
-- Cobrir:
-  - existencia do shell;
-  - render de login/home/perfil;
-  - showcase definido/renderizavel conforme padrao do repo;
-  - dark mode se ja houver mecanismo testavel.
-
-**Verificacao**:
-- Testes nao dependem de cor computada em happy-dom quando isso for instavel.
-- Evitar snapshots grandes e frageis.
-
-### Step 212.5.3 - Atualizar smoke PWA/Playwright
-
-**Comandos**:
-```bash
-cd <sep-mobile-root>
+npm run test
 npm run e2e
 ```
 
-**Cenarios minimos**:
-- App carrega em viewport mobile.
-- Login/boas-vindas visiveis.
-- Shell autenticado abre com MSW/dev-offline, se o repo ja tiver esse fluxo.
-- Showcase abre sem tela em branco.
+**Implementacao**:
+- Ajustar seletores que dependiam de markup removido.
+- Cobrir render de splash/welcome, login, registro, home, header/tabs e showcase.
+- Manter smoke PWA em viewport mobile; registrar falhas preexistentes.
 
-**Verificacao visual manual**:
-- Sem texto sobreposto.
-- Sem overflow horizontal.
-- Cards/botoes com tap target adequado.
-- Dark mode, se disponivel, sem contraste quebrado.
-
-### Step 212.5.4 - Rodar suite final da sprint
+### Step 212.4.3 - Rodar suite final
 
 **Comandos**:
 ```bash
@@ -611,101 +458,48 @@ npm run build
 ```
 
 **Verificacao**:
-- Suite verde.
-- Warnings preexistentes registrados.
-- Build PWA gera output esperado (`www/` ou equivalente do repo).
+- Suite verde ou falhas preexistentes registradas com evidencia.
 
-### Definicao de pronto da Task M-12.5
-- [ ] Showcase atualizado.
-- [ ] Testes ajustados.
-- [ ] Smoke PWA validado.
-- [ ] Suite final verde ou falha preexistente documentada.
+### Step 212.4.4 - Atualizar docs operacionais
 
-### Commit sugerido
-```text
-test(mobile): validar new design system no pwa
-```
-
----
-
-## Task M-12.6 - Docs, fechamento e checkpoint final
-
-**Objetivo**: atualizar documentacao operacional e fechar a sprint com estado rastreavel.
-
-**Pre-requisito**: Task M-12.5 concluida.
-
-**Esforco**: 0,5 dia.
-
-### Step 212.6.1 - Atualizar doc operacional do `sep-mobile`
-
-**Arquivo provavel**:
+**Arquivos**:
 - `<docs-sep-root>/repos/sep-mobile/README.md`
-
-**Implementacao**:
-- Registrar que o design system vigente do mobile passa a ser [`New Design System Sep.md`](<../../docs-sep/New Design System Sep.md>).
-- Registrar que Notion mobile virou legado historico.
-- Registrar onde ficam tokens, variaveis Ionic, componentes base e showcase no repo.
-- Registrar comandos de validacao visual.
-
-### Step 212.6.2 - Atualizar PRD/roadmap se necessario
-
-**Arquivos provaveis**:
-- `<docs-sep-root>/docs-sep/PRD-FASE-3.md`
-- `<docs-sep-root>/docs-sep/MOBILE-SCREENS-PLAN.md`
 - `<docs-sep-root>/AI-ROADMAP.md`
+- `<docs-sep-root>/docs-sep/MOBILE-SCREENS-PLAN.md`, se o plano textual ainda disser que M-12 e apenas migracao Notion generica
+- `<docs-sep-root>/repos/sep-mobile/SPRINT-M-12-PR.md` no fechamento da sprint
 
 **Implementacao**:
-- Marcar M-Sprint 12 conforme status real.
-- Atualizar qualquer mencao ativa que ainda diga que o mobile deve usar Notion como design vigente.
-- Nao reescrever historico de sprints concluidas; registre apenas a mudanca de direcao visual.
+- Registrar que a M-Sprint 12 revisada segue a F-Sprint 15.
+- Listar os primitivos mobile e onde ficam.
+- Atualizar status real da M-Sprint 12 quando concluida.
+- Criar PR description temporaria no fechamento, espelhando os PRs anteriores.
 
-### Step 212.6.3 - Capturar resumo de fechamento
-
-**Conteudo do resumo**:
-- Branch e commits.
-- Arquivos principais alterados.
-- Decisoes tomadas.
-- Checks executados e resultados.
-- Pendencias conhecidas.
-- Screenshots ou observacoes manuais de viewport, se aplicavel.
-
-### Step 212.6.4 - Checkpoint final da sprint
-
-**Comandos**:
-```bash
-cd <sep-mobile-root>
-git status --short
-git log --oneline -5
-```
-
-**Pausa obrigatoria**:
-- Aguardar revisao manual do usuario.
-- Nao iniciar M-Sprint seguinte sem ordem explicita.
-
-### Definicao de pronto da Task M-12.6
-- [ ] Docs atualizados.
-- [ ] Resumo de fechamento preparado.
-- [ ] Workspace limpo ou alteracoes pendentes explicadas.
-- [ ] Usuario liberou proxima sprint explicitamente.
+### Definicao de pronto da Task M-12.4
+- [ ] Showcase cobre novos primitivos mobile.
+- [ ] Testes, lint, SCSS lint e build executados.
+- [ ] Smoke PWA validado ou pendencia justificada.
+- [ ] Docs e indices atualizados.
+- [ ] Spec/indices deixam claro que M-12 deve ser feita antes da M-6/206.
+- [ ] `SPRINT-M-12-PR.md` criado no fechamento.
 
 ### Commit sugerido
 ```text
-docs(mobile): registrar new design system mobile
+docs(mobile): registrar aplicacao do design system na m-sprint 12
 ```
 
 ---
 
 ## Checklist final da M-Sprint 12
 
-- [ ] New Design System SEP e fonte visual vigente do `sep-mobile`.
-- [ ] Tokens HSL light/dark implementados.
-- [ ] Ionic variables mapeadas.
-- [ ] Componentes base migrados.
-- [ ] Shell e telas existentes migrados.
-- [ ] Showcase atualizado.
-- [ ] Sem strings/branding `SimpliClin` como produto final.
-- [ ] Sem Tailwind/shadcn/React adicionados sem ADR.
-- [ ] Sem regra de negocio nova no app.
+- [ ] Splash/welcome com marca SEP e CTA visualmente forte.
+- [ ] Login/TOTP/registro com painel de marca e formularios preservados.
+- [ ] Homes com tiles coloridos, chips de icone e cards de jornada.
+- [ ] Header/tabs/shell coerentes com o New Design System SEP.
+- [ ] Botoes de destaque com cor/gradiente.
+- [ ] Ionicons usados de forma curada; sem Tailwind/shadcn/React.
+- [ ] Sem metrica/numero fabricado.
+- [ ] Sem mudanca funcional, de contrato, auth, biometria ou step-up.
+- [ ] Light/dark validados nas telas alteradas.
 - [ ] `npm run lint` verde.
 - [ ] `npm run lint:scss` verde.
 - [ ] `npm run test` verde.
