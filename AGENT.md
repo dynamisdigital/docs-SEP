@@ -80,6 +80,10 @@ Nos repos de codigo (`sep-api`, `sep-app`, `sep-mobile`):
 
 - Criar branch de sprint a partir de `develop` atualizado com `git pull --ff-only`.
 - Usar uma branch por sprint: `feature/<sprint-ou-tema>`.
+- Antes de iniciar qualquer nova task/sprint, verificar a cadeia de integracao:
+  - confirmar que `main` esta mergeada em `develop` ou registrar pendencia explicita;
+  - confirmar que `develop` contem a task/sprint finalizada imediatamente anterior, ou registrar pendencia explicita;
+  - se a task anterior ainda nao foi integrada em `develop`, nao iniciar implementacao nova sem aprovacao explicita do usuario.
 - Push e PR sao manuais do desenvolvedor humano. Nao executar `git push` nem abrir PR sem pedido explicito.
 - Commits seguem Conventional Commits: `feat`, `fix`, `ci`, `chore`, `test`, `docs`, `refactor`.
 - Antes de qualquer staging/commit ao concluir uma Task, parar em checkpoint com:

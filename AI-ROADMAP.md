@@ -107,6 +107,7 @@ Leitura base para qualquer agente:
 
 ### Antes de implementar
 
+- Verificar cadeia Git antes de iniciar a nova task: `main` mergeada em `develop` e `develop` contendo a task/sprint finalizada anterior; se houver pendencia, registrar e aguardar aprovacao antes de implementar.
 - Confirmar spec e step da sprint/task.
 - Confirmar ADRs que governam a decisao tecnica.
 - Confirmar doc operacional do modulo, se existir.
@@ -132,6 +133,7 @@ Leitura base para qualquer agente:
 ### Antes de fechar sprint
 
 - Marcar DoD no step da sprint.
+- Confirmar que a task/sprint concluida foi integrada em `develop` antes de iniciar a proxima task; se ainda nao foi, registrar pendencia no checkpoint/PR.
 - Atualizar doc operacional do modulo em `repos/<repo>/`.
 - Criar PR description temporaria quando aplicavel; se materializada como `repos/<repo>/SPRINT-*-PR.md`, apagar esse arquivo ao iniciar a sprint seguinte.
 - Atualizar PRD quando a sprint for concluida.
