@@ -16,7 +16,7 @@
 
 A M-Sprint 12 antiga estava planejada como uma migracao generica do Notion mobile para o New Design System SEP, pareada com a F-Sprint 14. Esse plano ficou desatualizado depois da criacao da F-Sprint 15: no web, a melhoria real nao e recriar tokens, mas **aplicar melhor** os recursos visuais do design system em superficies chave.
 
-Esta M-Sprint 12 deve seguir a mesma direcao da F-Sprint 15, adaptada ao mobile: aplicar o New Design System SEP no `sep-mobile` com mais presenca visual, cor, hierarquia e polimento em splash/welcome, login, registro, home autenticada, home tomador/credora, header, tabs e showcase.
+Esta M-Sprint 12 deve seguir a mesma direcao da F-Sprint 15, adaptada ao mobile: aplicar o New Design System SEP no `sep-mobile` com mais presenca visual, cor, hierarquia e polimento em splash/welcome, login, registro, home autenticada, home tomador/credora, header, tabs e showcase. No mobile, `splash/welcome` cumprem o papel da landing publica redesenhada na F-Sprint 15; nao ha necessidade de criar uma rota landing separada se o fluxo publico atual continuar sendo `splash -> welcome -> login/register`.
 
 A sprint preserva a stack atual (`Ionic + Angular + Capacitor + SCSS`) e nao altera contratos REST, autenticacao, autorizacao, biometria, step-up, rotas de negocio ou regras de produto. O foco e visual e ergonomico.
 
@@ -55,6 +55,7 @@ Apesar do ID `M-12`, a ordem de execucao planejada continua antes das M-Sprints 
   - shell, header mobile e tabs.
 - Atualizar showcase mobile para demonstrar os novos primitivos.
 - Ajustar testes unitarios/DOM e smoke PWA em viewport mobile.
+- Auditar dependencias apos a sprint para remover pacotes comprovadamente orfaos, sem instalar bibliotecas novas por simetria com o web.
 - Atualizar documentacao operacional do `sep-mobile`, roadmap e PR description temporaria.
 
 ### Fora de escopo
@@ -73,7 +74,7 @@ Apesar do ID `M-12`, a ordem de execucao planejada continua antes das M-Sprints 
 1. Publico mobile: redesenhar splash/welcome, login, TOTP e registro com painel de marca, CTA gradiente e formularios preservados.
 2. Home autenticada e jornadas: aplicar tiles coloridos, chips de icone e cards de jornada nas homes existentes, sem dados fabricados.
 3. Shell mobile: polir header, tabs, estados ativos, superficies, feedback de toque e dark mode.
-4. Showcase, testes, smoke PWA e documentacao operacional.
+4. Showcase, testes, smoke PWA, auditoria de dependencias e documentacao operacional.
 
 ## Gates que nao contam como task
 
@@ -93,4 +94,5 @@ Apesar do ID `M-12`, a ordem de execucao planejada continua antes das M-Sprints 
 - Dashboard/homes nao exibem metrica ou numero fabricado.
 - Light/dark mode funcionam sem contraste insuficiente nas telas alteradas.
 - `npm run lint`, `npm run lint:scss`, `npm run test`, `npm run build` e smoke PWA passam ou tem falha preexistente documentada.
+- Dependencias orfas introduzidas ou reveladas pela sprint foram auditadas; remocoes so ocorrem com grep-guard e suite verde.
 - Documentacao e indices apontam para a M-Sprint 12 revisada e para a relacao com a F-Sprint 15.

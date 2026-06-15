@@ -4,7 +4,7 @@
 
 **Sprint de referencia**: [`steps-fase-3/web/115-fsprint-15-steps.md`](../web/115-fsprint-15-steps.md). A F-Sprint 15 aplica visualmente o New Design System SEP no `sep-app`; esta M-Sprint 12 traduz a mesma melhoria para `sep-mobile` com Ionic/Angular/SCSS.
 
-**Objetivo geral**: aplicar a riqueza visual do New Design System SEP nas superficies existentes do `sep-mobile` (splash/welcome, login/TOTP, registro, homes, shell/header/tabs e showcase), mantendo Ionic/Angular/Capacitor/SCSS, preservando contratos de API e sem introduzir regra de negocio no app.
+**Objetivo geral**: aplicar a riqueza visual do New Design System SEP nas superficies existentes do `sep-mobile` (splash/welcome, login/TOTP, registro, homes, shell/header/tabs e showcase), mantendo Ionic/Angular/Capacitor/SCSS, preservando contratos de API e sem introduzir regra de negocio no app. `Splash/welcome` sao o equivalente mobile da landing publica redesenhada na F-Sprint 15; nao criar rota landing separada sem necessidade real de produto.
 
 **Esforco total estimado**: 3-4 dias.
 
@@ -48,7 +48,7 @@ M-12.2 (homes: autenticada + tomador + credora)
 M-12.3 (shell: header + tabs + estados)
    |
    v
-M-12.4 (showcase + testes + docs)
+M-12.4 (showcase + testes + depcheck + docs)
 ```
 
 **Como usar este arquivo**:
@@ -83,6 +83,7 @@ M-12.4 (showcase + testes + docs)
 - Build nativo Android/iOS.
 - Troca de stack para Tailwind/shadcn/React.
 - Metricas/numeros fabricados em homes.
+- Landing publica separada: no mobile, `splash/welcome` cobrem esse papel salvo spec futura.
 
 ---
 
@@ -210,6 +211,7 @@ feat(mobile): adicionar primitivos visuais do design system
 
 **Implementacao**:
 - Aplicar painel/hero mobile com marca `SEP`, gradiente da paleta e CTA principal.
+- Tratar `welcome` como a landing publica mobile: hero compacto, CTAs para login/registro e beneficios reais do SEP, sem criar rota nova.
 - Usar `ion-icon` com chips coloridos para beneficios/atalhos reais.
 - Manter rotas, textos de acao e fluxo de navegacao existentes.
 - Garantir layout sem overflow em viewport estreita.
@@ -460,7 +462,27 @@ npm run build
 **Verificacao**:
 - Suite verde ou falhas preexistentes registradas com evidencia.
 
-### Step 212.4.4 - Atualizar docs operacionais
+### Step 212.4.4 - Auditar dependencias nao usadas
+
+**Objetivo**: verificar se a sprint deixou ou revelou dependencias orfas, especialmente pacotes de teste legados, sem remover runtime por suposicao.
+
+**Comandos**:
+```bash
+cd <sep-mobile-root>
+npx depcheck
+```
+
+**Implementacao**:
+- Validar cada item apontado pelo `depcheck` antes de remover: descartar falsos positivos (`@types/*`, plugins de build/test, libs usadas por configuracao ou CLI).
+- Se `karma`, `jasmine-*` ou outra dependencia legada aparecer como comprovadamente sem uso, confirmar com `grep`/`rg` antes de remover do `package.json`/lock.
+- Nao remover dependencia de runtime sem confirmar que nenhum `import`, provider, script ou configuracao usa o pacote.
+- Apos qualquer remocao, rodar `npm run lint`, `npm run lint:scss`, `npm run test` e `npm run build`.
+
+**Verificacao**:
+- Dependencias orfas removidas apenas com evidencia ou pendencias justificadas no checkpoint.
+- Suite final continua verde apos remocoes.
+
+### Step 212.4.5 - Atualizar docs operacionais
 
 **Arquivos**:
 - `<docs-sep-root>/repos/sep-mobile/README.md`
@@ -478,6 +500,7 @@ npm run build
 - [ ] Showcase cobre novos primitivos mobile.
 - [ ] Testes, lint, SCSS lint e build executados.
 - [ ] Smoke PWA validado ou pendencia justificada.
+- [ ] Dependencias orfas auditadas com `depcheck`; remocoes, se houver, validadas com grep-guard e suite verde.
 - [ ] Docs e indices atualizados.
 - [ ] Spec/indices deixam claro que M-12 deve ser feita antes da M-6/206.
 - [ ] `SPRINT-M-12-PR.md` criado no fechamento.
@@ -505,4 +528,5 @@ docs(mobile): registrar aplicacao do design system na m-sprint 12
 - [ ] `npm run test` verde.
 - [ ] `npm run build` verde.
 - [ ] Smoke PWA/mobile validado.
+- [ ] Dependencias orfas auditadas; nenhuma biblioteca nova adicionada por simetria com o web.
 - [ ] Docs e indices atualizados.

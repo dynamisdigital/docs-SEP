@@ -390,3 +390,82 @@ steps: [`113-fsprint-13-steps.md`](../../steps-fase-3/web/113-fsprint-13-steps.m
 - Smoke Playwright offline `e2e/pix.spec.ts` (area, desembolso por role + status, referencia com
   copia-cola, recebimento conciliado, divergencias -> backoffice). A solicitacao de desembolso exige
   step-up (MFA) e fica para o smoke real com backend em `:8080`.
+
+## Jornada da empresa credora (F-Sprint 11)
+
+Jornada web da empresa credora (Epic 10 + Epic 13) consumindo o modulo `credores` do `sep-api`
+(Sprints backend 16-17): cadastro a partir de onboarding PJ aprovado, perfil/elegibilidade derivada,
+oportunidades, manifestacao/cancelamento de interesse e carteira de operacoes financiadas. O
+frontend apenas apresenta os DTOs e reflete os retornos do backend; elegibilidade, ownership, regras
+de interesse, associacao de carteira e auditoria ficam no backend. Spec:
+[`111`](../../specs/fase-3/111-fsprint-11-credora-web.md);
+steps: [`111-fsprint-11-steps.md`](../../steps-fase-3/web/111-fsprint-11-steps.md).
+
+### Modelo de acesso
+
+- **Nao existe role `CREDORA`.** O acesso e governado por usuario autenticado (`authGuard` herdado do
+  shell) + **presenca de credora**. O item `Credora` no sidenav aparece para `CLIENTE` (persona da
+  credora); o gating real de conteudo e por presenca de credora no backend.
+- `credoraPresenceGuard` consulta `GET /credores/me`: `404` (sem credora) -> roteia ao cadastro;
+  `200` libera perfil/oportunidades/carteira; erro nao-404 libera para a propria pagina surfacar a
+  falha. Os endpoints da persona credora usam `isAuthenticated()`; **nenhuma operacao desta jornada
+  usa step-up**.
+
+### Rotas
+
+- `/app/credora` -> landing que resolve presenca de credora (cadastro vs. perfil/oportunidades/carteira).
+- `/app/credora/cadastro` -> cadastro a partir de onboarding PJ aprovado.
+- `/app/credora/perfil` -> perfil e elegibilidade derivada.
+- `/app/credora/oportunidades` -> lista de oportunidades disponiveis.
+- `/app/credora/oportunidades/:id` -> detalhe + manifestar/cancelar interesse.
+- `/app/credora/carteira` -> carteira de operacoes financiadas.
+- `/app/credora/carteira/:id` -> detalhe da operacao com resumo agregado de cobranca.
+
+### Contratos consumidos
+
+- Foundation: `POST /credores` (`201`; erros `404` onboarding ausente, `422 CRD-422-001` KYB
+  incompleto/nao-PJ, `403 CRD-403-001` ownership, `409 CRD-409-001` credora ja existente ->
+  perfil), `GET /credores/me` (`200`/`404`) e `GET /credores/me/elegibilidade` (`200`/`404`).
+- Oportunidades: `GET /credores/oportunidades` (so `DISPONIVEL`), `GET /credores/oportunidades/{id}`.
+- Interesse: `POST /credores/oportunidades/{id}/interesses` (`201`; `422` inelegivel, `409`
+  duplicado) e `DELETE /credores/oportunidades/{id}/interesses/me` (`204`; **nao idempotente**: `404`
+  sem interesse ativo, tratado na UI como "sem interesse ativo").
+- Carteira: `GET /credores/carteira` e `GET /credores/carteira/{id}` (`200`/`404` por ownership).
+
+### Decisoes
+
+- A tela nunca recalcula elegibilidade nem deriva estado de interesse. O perfil carrega `/me` +
+  `/me/elegibilidade`; a CTA de oportunidades so aparece quando `ATIVA` + `ELEGIVEL`, espelhando o
+  gate do backend (que ainda valida). O cadastro trata cada erro de dominio com mensagem clara e
+  conduz ao perfil no `409`.
+- **Backend nao expoe estado de interesse por item**: o estado de interesse e local e corrigido pelos
+  retornos do backend (`201`/`409` -> ativo; `204`/`404` -> inativo). O botao desabilita durante o
+  envio (anti duplo-clique). A UI deixa explicito que manifestar interesse **nao gera** aporte,
+  alocacao nem operacao de carteira.
+- A carteira mostra apenas o agregado de cobranca (parcelas pagas/total, em atraso, valor total,
+  total recebido, proximo vencimento); nunca busca parcelas individuais nem dado sensivel do tomador.
+  O CNPJ aparece como o backend devolve (mascarado). Campos nullable aparecem como tracinho.
+- Sem paginacao/cache local artificial: as listas de oportunidades e carteira sao consumidas como o
+  backend retorna.
+
+### Gaps
+
+- **Estado de interesse nao persiste entre cargas**: como o backend nao expoe interesse por item, ao
+  recarregar o detalhe da oportunidade o "interesse registrado" so reaparece quando o usuario tenta
+  manifestar de novo e recebe `409` (tratado graciosamente). Follow-up: expor estado de interesse por
+  oportunidade no backend.
+- **Operacao admin fora de escopo**: sincronizar oportunidades, associar carteira (`POST
+  /credores/carteira/operacoes`, com step-up) e consulta administrativa `GET /credores/{id}` nao
+  pertencem a esta jornada.
+
+### Testes
+
+- Vitest: suite verde (`npm run test`), incluindo `CredoraService` (URLs/metodos/sem step-up,
+  `404` de `/me` e `DELETE` nao idempotente), guard de presenca, shell, sidenav, cadastro
+  (`404`/`422`/`403`/`409` + payload), perfil/elegibilidade (estados exaustivos), oportunidades
+  (lista/detalhe), interesse (manifestar `201`/`409`/`422`, cancelar `204`/`404`) e carteira
+  (lista/detalhe agregado, campos nulos, `404` por ownership).
+- `npm run lint`, `npm run lint:scss` e `npm run build` verdes.
+- Smoke manual dev-offline com `credora@empresa.com` / `123456` (credora elegivel),
+  `credora-inelegivel@empresa.com` (inelegivel) e `credora-novo@empresa.com` (sem credora -> cadastro).
+  O smoke real com backend em `:8080` fica como follow-up.

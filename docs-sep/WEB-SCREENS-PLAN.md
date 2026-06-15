@@ -627,6 +627,12 @@ Dependencias:
 
 Observacoes:
 - A experiencia da empresa credora tambem existira no mobile, mas de forma simplificada.
+- **Implementado na F-Sprint 11** (web, branch local `feature/fsprint-11-credora-web`): cadastro a
+  partir de onboarding PJ aprovado, perfil/elegibilidade, oportunidades (lista + detalhe), interesse
+  (manifestar/cancelar) e carteira (lista + detalhe com resumo agregado de cobranca). Acesso por
+  autenticacao + presenca de credora, sem role `CREDORA`. Detalhe operacional em
+  [`repos/sep-app/README.md` §credora](../repos/sep-app/README.md). O onboarding KYB da credora e a
+  operacao admin (sincronizar oportunidades, associar carteira) ficam fora desta jornada.
 
 ### 6.8 Administracao e Governanca
 

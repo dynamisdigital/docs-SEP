@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`specs/fase-3/111-fsprint-11-credora-web.md`](../../specs/fase-3/111-fsprint-11-credora-web.md)
 
-**Status**: planejada.
+**Status**: implementada (branch local `feature/fsprint-11-credora-web`; push/PR manuais).
 
 **Objetivo geral**: implementar no `sep-app` a jornada web da empresa credora (Epic 10 + Epic 13), consumindo os endpoints reais do modulo `credores` do `sep-api` (Sprint 16 foundation + Sprint 17 oportunidades/carteira): cadastro da credora a partir de onboarding PJ aprovado, perfil e elegibilidade derivada do KYB/PLD, dashboard da credora, lista e detalhe de oportunidades, manifestacao/cancelamento de interesse e carteira de operacoes financiadas, sem duplicar elegibilidade, ownership, regras de interesse, associacao de carteira, auditoria ou logica de provider no frontend.
 
@@ -39,18 +39,17 @@ Oportunidades e carteira (Sprint 17):
 - `GET /api/v1/credores/oportunidades` -> lista de `OportunidadeResponse` (oportunidades `DISPONIVEL` da credora).
 - `GET /api/v1/credores/oportunidades/{id}` -> `OportunidadeResponse`.
 - `POST /api/v1/credores/oportunidades/{id}/interesses` body vazio -> `201 InteresseResponse`. Exige credora `ATIVA`+`ELEGIVEL` (`422`) e oportunidade `DISPONIVEL`; `409` para interesse ativo duplicado.
-- `DELETE /api/v1/credores/oportunidades/{id}/interesses/me` -> `204`. Cancelamento idempotente por ownership.
-- `GET /api/v1/credores/carteira` -> lista de `OperacaoFinanciadaResponse`.
-- `GET /api/v1/credores/carteira/{id}` -> `OperacaoFinanciadaDetalheResponse`, por ownership; `404` para operacao de outra credora.
+- `DELETE /api/v1/credores/oportunidades/{id}/interesses/me` -> `204` quando ha interesse ativo. **Nao e idempotente** (confirmado na F-11.0 contra `CancelarInteresseCredoraUseCase`): sem interesse `ATIVO` responde `404` (`InteresseNaoEncontrado`). A UI trata esse `404` como "sem interesse ativo" (estado desejado), nao como erro duro.
+- `GET /api/v1/credores/carteira` -> lista de `OperacaoCarteiraResponse` (mesmo DTO da lista e do detalhe, ja enriquecido com cobranca).
+- `GET /api/v1/credores/carteira/{id}` -> `OperacaoCarteiraResponse`, por ownership; `404` para operacao de outra credora.
 
 **DTOs esperados no frontend**:
 - `CadastrarCredoraRequest`: `onboardingId`, `tipoCredora` (`TipoCredora`), `capacidadeAporte` (opcional, `number`).
-- `EmpresaCredoraResponse`: `id`, `onboardingId`, `cnpj` (ja formatado `00.000.000/0000-00`), `razaoSocial`, `status` (`StatusCredora`), `elegibilidade` (`StatusElegibilidade`), `motivoInelegibilidade` (opcional), `tipoCredora` (`TipoCredora`), `capacidadeAporte` (opcional), `dataCadastro`.
+- `EmpresaCredoraResponse`: `id`, `usuarioId`, `onboardingId`, `cnpj` (ja formatado `00.000.000/0000-00`), `razaoSocial`, `status` (`StatusCredora`), `elegibilidade` (`StatusElegibilidade`), `motivoInelegibilidade` (nullable), `tipoCredora` (`TipoCredora`), `capacidadeAporte` (nullable, `number`), `dataCriacao`, `dataModificacao`. (F-11.0: backend retorna `usuarioId` e duas datas, nao um `dataCadastro`.)
 - `ElegibilidadeCredoraResponse`: `elegibilidade` (`StatusElegibilidade`), `motivoInelegibilidade` (opcional), `status` (`StatusCredora`).
-- `OportunidadeResponse`: `id`, `propostaId`, `contratoId` (opcional), `valor` (`number`), `prazoMeses` (`number`), `taxaJurosMensal` (`number`), `status` (`StatusOportunidade`). Se o backend expuser estado de interesse por item (ex: `possuiInteresseAtivo`), refletir o campo real; nao inferir interesse no frontend.
+- `OportunidadeResponse`: `id`, `propostaId`, `contratoId` (nullable), `valor` (`number`), `prazoMeses` (`number`), `taxaJurosMensal` (`number`), `status` (`StatusOportunidade`), `dataCriacao`. F-11.0: o backend **nao** expoe estado de interesse por item (sem `possuiInteresseAtivo`); o frontend nunca infere interesse a partir desta resposta.
 - `InteresseResponse`: `id`, `oportunidadeId`, `status` (`StatusInteresseCredora`), `dataCriacao`.
-- `OperacaoFinanciadaResponse`: `id`, `contratoId`, `status` (`StatusOperacaoFinanciada`), `valor` (`number`), `dataAssociacao`.
-- `OperacaoFinanciadaDetalheResponse`: campos de `OperacaoFinanciadaResponse` + `justificativa`, snapshot da oportunidade de origem, `contrato` (`ContratoCarteiraView`: `statusContratual` como `string`) e `cobranca` (`CarteiraCobrancaResumo`: agregado de parcelas e recebimentos, sem dado sensivel do tomador).
+- `OperacaoCarteiraResponse` (DTO unico de lista E detalhe — F-11.0: o backend nao tem DTO separado de detalhe): `id`, `contratoId`, `oportunidadeId` (nullable), `status` (`StatusOperacaoFinanciada`), `justificativa`, `valor` (nullable), `prazoMeses` (nullable), `taxaJurosMensal` (nullable), `contratoStatus` (`string`, nullable), `cobranca` (`CarteiraCobrancaResumo`: agregado de parcelas/recebimentos, sem dado sensivel do tomador; nullable), `dataCriacao`. Campos de snapshot/cobranca ficam nulos quando a operacao nao referencia oportunidade ou a leitura cross-module nao retorna dados.
 
 > Campos exatos e nullability devem ser confirmados contra os DTOs reais em `credores.web.dto` na Task F-11.0 antes de fixar os modelos TypeScript. Onde a doc operacional nao especifica um campo, conferir o controller/DTO do backend e nao inventar conveniencia visual.
 
@@ -284,7 +283,7 @@ npm run build
 
 **Verificacao**:
 - Specs validam URL, metodo HTTP e body esperado de cada operacao.
-- Specs validam que `DELETE .../interesses/me` retorna `204` e e idempotente.
+- Specs validam que `DELETE .../interesses/me` retorna `204` com interesse ativo e `404` sem interesse ativo (nao idempotente, espelha o backend).
 - Nenhum service calcula elegibilidade nem deriva estado de interesse local.
 
 ### Step 111.1.3 - Adicionar fixtures MSW de credora
@@ -300,7 +299,7 @@ npm run build
 - `POST /credores` cobrindo `201` feliz e os erros `404`, `422` (CRD-422-001), `403` (CRD-403-001) e `409` (CRD-409-001).
 - `GET /credores/oportunidades` com itens `DISPONIVEL`; `GET /credores/oportunidades/{id}` com detalhe.
 - `POST /credores/oportunidades/{id}/interesses` retornando `201`; `409` para interesse ativo duplicado; `422` quando a credora do mock for inelegivel.
-- `DELETE /credores/oportunidades/{id}/interesses/me` retornando `204` (idempotente, inclusive sem interesse ativo).
+- `DELETE /credores/oportunidades/{id}/interesses/me`: `204` quando ha interesse ativo; `404` sem interesse ativo (nao idempotente, espelha `CancelarInteresseCredoraUseCase`).
 - `GET /credores/carteira` com operacoes `ASSOCIADA`; `GET /credores/carteira/{id}` com detalhe enriquecido (contrato + resumo de cobranca) e `404` para operacao de outra credora.
 
 **Verificacao**:
@@ -571,11 +570,11 @@ npm run test -- --run credora-cadastro credora-perfil
 
 **Implementacao**:
 - Botao `Cancelar interesse` chama `DELETE /credores/oportunidades/{id}/interesses/me`.
-- Tratar `204` como sucesso, inclusive idempotente (sem interesse ativo).
+- Tratar `204` como sucesso. Sem interesse ativo o backend responde `404` (nao e idempotente): tratar esse `404` como "sem interesse ativo", atualizando o estado sem erro duro.
 - Apos sucesso, atualizar estado de interesse no detalhe.
 
 **Verificacao**:
-- Cancelamento idempotente nao quebra a UI.
+- Cancelamento sem interesse ativo (`404`) nao quebra a UI: reflete "sem interesse ativo".
 - Estado de interesse reflete o resultado real apos a operacao.
 
 ### Step 111.5.3 - Deixar claro que interesse nao gera carteira
@@ -593,7 +592,7 @@ npm run test -- --run credora-cadastro credora-perfil
 - Credora inelegivel recebe `422` tratado.
 - Interesse duplicado recebe `409` tratado.
 - Cancelar interesse retorna `204` e atualiza estado.
-- Cancelar sem interesse ativo (idempotente) nao quebra.
+- Cancelar sem interesse ativo retorna `404` e e tratado como "sem interesse ativo" (nao quebra).
 
 ### Step 111.5.5 - Checkpoint C5
 
@@ -738,18 +737,18 @@ npm run build
 ### Step 111.7.5 - Definition of Done da sprint
 
 **Checklist**:
-- [ ] `CredoraService` e modelos alinhados ao backend (Sprints 16-17).
-- [ ] Rotas protegidas por `authGuard` + resolucao de presenca de credora; sem role `CREDORA` inventada.
-- [ ] Cadastro a partir de onboarding PJ aprovado funcional, com erros de dominio tratados.
-- [ ] Perfil e elegibilidade apresentados sem recalculo no frontend.
-- [ ] Oportunidades com lista e detalhe.
-- [ ] Interesse: manifestar e cancelar (idempotente), respeitando elegibilidade/disponibilidade/unicidade do backend.
-- [ ] Carteira com lista e detalhe enriquecido, por ownership.
-- [ ] UI segue New Design System SEP.
-- [ ] Nenhum dado sensivel do tomador, bancario ou Pix exposto.
-- [ ] MSW e specs cobrem principais fluxos e erros.
-- [ ] Suite completa, lint, SCSS e build verdes.
-- [ ] Docs atualizados.
+- [x] `CredoraService` e modelos alinhados ao backend (Sprints 16-17).
+- [x] Rotas protegidas por `authGuard` + resolucao de presenca de credora; sem role `CREDORA` inventada.
+- [x] Cadastro a partir de onboarding PJ aprovado funcional, com erros de dominio tratados.
+- [x] Perfil e elegibilidade apresentados sem recalculo no frontend.
+- [x] Oportunidades com lista e detalhe.
+- [x] Interesse: manifestar e cancelar (cancelar nao idempotente: `404` sem interesse ativo, tratado na UI como "sem interesse ativo"), respeitando elegibilidade/disponibilidade/unicidade do backend.
+- [x] Carteira com lista e detalhe enriquecido, por ownership.
+- [x] UI segue New Design System SEP.
+- [x] Nenhum dado sensivel do tomador, bancario ou Pix exposto.
+- [x] MSW e specs cobrem principais fluxos e erros.
+- [x] Suite completa, lint, SCSS e build verdes.
+- [x] Docs atualizados.
 
 ### Step 111.7.6 - Checkpoint C7
 
