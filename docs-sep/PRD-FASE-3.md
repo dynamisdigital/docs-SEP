@@ -193,7 +193,7 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - considerar `sa-east-1` como regiao recomendada
 
 ### Epic 17 - New Design System SEP
-**Status: web CONCLUIDO — F-Sprint 14 (design system, PR #48) + F-Sprint 15 (aplicacao em login/registro/dashboard/shell/landing, PR #55), mergeadas em `develop`; mobile (M-Sprint 12) pendente.** Specs: web [`114-fsprint-14-new-design-system-web.md`](../specs/fase-3/114-fsprint-14-new-design-system-web.md) + [`115-fsprint-15-aplicacao-design-system-web.md`](../specs/fase-3/115-fsprint-15-aplicacao-design-system-web.md) e mobile [`212-msprint-12-new-design-system-mobile.md`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md). Steps: web [`114-fsprint-14-steps.md`](../steps-fase-3/web/114-fsprint-14-steps.md) + [`115-fsprint-15-steps.md`](../steps-fase-3/web/115-fsprint-15-steps.md) e mobile [`212-msprint-12-steps.md`](../steps-fase-3/mobile/212-msprint-12-steps.md). Fonte visual: [`New Design System Sep.md`](<./New Design System Sep.md>).
+**Status: web CONCLUIDO — F-Sprint 14 (design system, PR #48) + F-Sprint 15 (aplicacao em login/registro/dashboard/shell/landing, PR #55), mergeadas em `develop`; mobile (M-Sprint 12) CONCLUIDO, mergeado em `develop` e promovido a `main` em 2026-06-15.** Specs: web [`114-fsprint-14-new-design-system-web.md`](../specs/fase-3/114-fsprint-14-new-design-system-web.md) + [`115-fsprint-15-aplicacao-design-system-web.md`](../specs/fase-3/115-fsprint-15-aplicacao-design-system-web.md) e mobile [`212-msprint-12-new-design-system-mobile.md`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md). Steps: web [`114-fsprint-14-steps.md`](../steps-fase-3/web/114-fsprint-14-steps.md) + [`115-fsprint-15-steps.md`](../steps-fase-3/web/115-fsprint-15-steps.md) e mobile [`212-msprint-12-steps.md`](../steps-fase-3/mobile/212-msprint-12-steps.md). Fonte visual: [`New Design System Sep.md`](<./New Design System Sep.md>).
 - substituir a base visual Apple/Notion do `sep-app` e a base Notion mobile do `sep-mobile` pelo novo design system descrito em [`New Design System Sep.md`](<./New Design System Sep.md>)
 - preservar as stacks atuais: `Angular + SCSS` no `sep-app` e `Angular + Ionic + Capacitor + SCSS` no `sep-mobile`, traduzindo tokens Tailwind/shadcn do documento de origem para CSS variables, SCSS e Ionic variables quando aplicavel
 - manter a identidade SEP; referencias `SimpliClin` do documento de origem sao inspiracao visual, nao marca final do app
@@ -381,7 +381,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 
 | Sprint | Epic/frente | Tema | Spec | Tasks impl. |
 |--------|-------------|------|------|-------------|
-| M-12 | Epic 17 | Aplicacao do design system mobile (**executar antes de M-6/206 para evitar retrabalho visual**) | [`212`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`steps`](../steps-fase-3/mobile/212-msprint-12-steps.md) | 5 |
+| M-12 | Epic 17 | Aplicacao do design system mobile (**concluida em 2026-06-15; desbloqueia M-6/206**) | [`212`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`steps`](../steps-fase-3/mobile/212-msprint-12-steps.md) | 5 |
 | M-6 | Epic 14 | Tomador: onboarding mobile | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) | 6 |
 | M-7 | Epic 14 | Tomador: proposta, credito e Open Finance | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) | 6 |
 | M-8 | Epic 14 | Tomador: formalizacao e contrato | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) | 5 |
@@ -393,7 +393,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 - **Separacao por projeto**: backend, web e mobile possuem specs proprios e podem evoluir com dependencias explicitas.
 - **Granularidade menor**: quando um tema exigiria mais de 6 tasks de implementacao, ele foi dividido em sprints separadas.
 - **Steps just-in-time**: esta secao cria o mapa de specs; os steps continuam sendo criados apenas antes da execucao de cada sprint.
-- **Ordem vs numeracao**: F-14/F-15 e M-12 preservam a numeracao ja criada, mas a ordem recomendada de execucao coloca a base/aplicacao visual antes das jornadas funcionais; M-12 roda obrigatoriamente antes de M-6/206 para evitar retrabalho visual.
+- **Ordem vs numeracao**: F-14/F-15 e M-12 preservam a numeracao ja criada, mas a ordem recomendada de execucao coloca a base/aplicacao visual antes das jornadas funcionais; M-12 foi concluida antes de M-6/206, removendo o bloqueio visual para iniciar a jornada funcional mobile.
 - **Mobile restrito**: mobile cobre tomador e empresa credora; financeiro interno, backoffice operacional, administracao completa e auditoria continuam fora do app.
 - **Design system web/mobile**: a F-Sprint 14 + M-Sprint 12/Epic 17 substituem Apple/Notion como design vigente por [`New Design System Sep.md`](<./New Design System Sep.md>), mantendo Angular/SCSS no web e Ionic/Angular/SCSS no mobile salvo ADR explicita.
 - **Infraestrutura AWS**: permanece trilha paralela candidata, nao mapeada como sprint funcional nesta tabela.

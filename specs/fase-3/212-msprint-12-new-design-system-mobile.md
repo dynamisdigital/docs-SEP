@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 212
 - **Titulo**: M-Sprint 12 - Aplicacao visual do New Design System SEP no mobile
-- **Status**: planejada
+- **Status**: concluida (mergeada em `develop` e promovida a `main`, 2026-06-15)
 - **Fase do produto**: Fase 3 - Epic 17
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 17; [`New Design System Sep.md`](<../../docs-sep/New Design System Sep.md>); F-Sprint 15 [`115-fsprint-15-aplicacao-design-system-web.md`](./115-fsprint-15-aplicacao-design-system-web.md); feedback do usuario sobre a aplicacao visual do design system
@@ -20,7 +20,7 @@ Esta M-Sprint 12 deve seguir a mesma direcao da F-Sprint 15, adaptada ao mobile:
 
 A sprint preserva a stack atual (`Ionic + Angular + Capacitor + SCSS`) e nao altera contratos REST, autenticacao, autorizacao, biometria, step-up, rotas de negocio ou regras de produto. O foco e visual e ergonomico.
 
-Apesar do ID `M-12`, a ordem de execucao planejada continua antes das M-Sprints funcionais 6-11, para evitar retrabalho visual em onboarding, credito, formalizacao, cobranca, credora e Pix mobile. Em especial, a M-Sprint 6 (`206-msprint-6-onboarding-mobile.md`) nao deve iniciar antes da M-Sprint 12 estar concluida e validada.
+Apesar do ID `M-12`, a ordem de execucao foi antecipada antes das M-Sprints funcionais 6-11 para evitar retrabalho visual em onboarding, credito, formalizacao, cobranca, credora e Pix mobile. Com a M-Sprint 12 concluida e validada, a M-Sprint 6 (`206-msprint-6-onboarding-mobile.md`) fica desbloqueada do ponto de vista visual.
 
 ## Decisoes de design
 

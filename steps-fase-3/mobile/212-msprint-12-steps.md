@@ -13,8 +13,8 @@
 **Localizacao do projeto mobile**: `<sep-mobile-root>/`.
 
 **Nota de ordem**:
-- Apesar do ID `M-12`, executar antes das M-Sprints funcionais 6-11.
-- A M-Sprint 6 (`206`, onboarding mobile) fica bloqueada ate a conclusao/validacao desta M-Sprint 12.
+- Apesar do ID `M-12`, a sprint foi executada antes das M-Sprints funcionais 6-11.
+- A M-Sprint 6 (`206`, onboarding mobile) fica desbloqueada apos a conclusao/validacao desta M-Sprint 12.
 - A sprint substitui o plano antigo de "migracao generica" por uma aplicacao visual baseada na F-Sprint 15.
 - Nao depende de telas futuras; atua sobre superficies ja existentes do mobile.
 
@@ -181,12 +181,12 @@ grep -R "notion\\|Notion\\|--notion\\|ion-color\\|theme-transition\\|dark\\|ion-
 - Nenhuma tela funcional muda comportamento.
 
 ### Definicao de pronto da Task M-12.0
-- [ ] Branch correta criada.
-- [ ] Baseline registrado.
-- [ ] Base visual e superficies impactadas auditadas.
-- [ ] Decisao de icones registrada (preferir Ionicons).
-- [ ] Primitivos mobile criados/ajustados sem troca de stack.
-- [ ] `npm run lint:scss` e `npm run build` passam ou falha preexistente documentada.
+- [x] Branch correta criada.
+- [x] Baseline registrado.
+- [x] Base visual e superficies impactadas auditadas.
+- [x] Decisao de icones registrada (preferir Ionicons).
+- [x] Primitivos mobile criados/ajustados sem troca de stack.
+- [x] `npm run lint:scss` e `npm run build` passam ou falha preexistente documentada.
 
 ### Commit sugerido
 ```text
@@ -252,11 +252,11 @@ feat(mobile): adicionar primitivos visuais do design system
 - Mobile viewport sem overflow horizontal.
 
 ### Definicao de pronto da Task M-12.1
-- [ ] Splash/welcome com marca SEP e CTA visualmente forte.
-- [ ] Login/TOTP com painel de marca e CTA gradiente.
-- [ ] Registro coerente com login.
-- [ ] Nenhuma mudanca de logica, contrato ou auth.
-- [ ] `npm run test`, `npm run lint:scss` passam.
+- [x] Splash/welcome com marca SEP e CTA visualmente forte.
+- [x] Login/TOTP com painel de marca e CTA gradiente.
+- [x] Registro coerente com login.
+- [x] Nenhuma mudanca de logica, contrato ou auth.
+- [x] `npm run test`, `npm run lint:scss` passam.
 
 ### Commit sugerido
 ```text
@@ -327,11 +327,11 @@ feat(mobile): redesenhar superficies publicas com design system
 - Specs de perfil/troca de senha continuam verdes.
 
 ### Definicao de pronto da Task M-12.2
-- [ ] Home autenticada com tiles coloridos.
-- [ ] Home tomador e credora com cards/chips coerentes.
-- [ ] Perfil/biometria/step-up visualmente alinhados.
-- [ ] Sem dados fabricados.
-- [ ] `npm run test` passa.
+- [x] Home autenticada com tiles coloridos.
+- [x] Home tomador e credora com cards/chips coerentes.
+- [x] Perfil/biometria/step-up visualmente alinhados.
+- [x] Sem dados fabricados.
+- [x] `npm run test` passa.
 
 ### Commit sugerido
 ```text
@@ -394,11 +394,11 @@ feat(mobile): aplicar design system nas homes e jornadas
 - Validar manualmente light/dark.
 
 ### Definicao de pronto da Task M-12.3
-- [ ] Header mobile polido.
-- [ ] Tabs com estado ativo claro e safe area respeitada.
-- [ ] Estados globais coerentes.
-- [ ] Navegacao e guards preservados.
-- [ ] Specs de layout passam.
+- [x] Header mobile polido.
+- [x] Tabs com estado ativo claro e safe area respeitada.
+- [x] Estados globais coerentes.
+- [x] Navegacao e guards preservados.
+- [x] Specs de layout passam.
 
 ### Commit sugerido
 ```text
@@ -497,13 +497,13 @@ npx depcheck
 - Criar PR description temporaria no fechamento, espelhando os PRs anteriores.
 
 ### Definicao de pronto da Task M-12.4
-- [ ] Showcase cobre novos primitivos mobile.
-- [ ] Testes, lint, SCSS lint e build executados.
-- [ ] Smoke PWA validado ou pendencia justificada.
-- [ ] Dependencias orfas auditadas com `depcheck`; remocoes, se houver, validadas com grep-guard e suite verde.
-- [ ] Docs e indices atualizados.
-- [ ] Spec/indices deixam claro que M-12 deve ser feita antes da M-6/206.
-- [ ] `SPRINT-M-12-PR.md` criado no fechamento.
+- [x] Showcase cobre novos primitivos mobile.
+- [x] Testes, lint, SCSS lint e build executados.
+- [x] Smoke PWA validado ou pendencia justificada.
+- [x] Dependencias orfas auditadas com `depcheck`; remocoes, se houver, validadas com grep-guard e suite verde.
+- [x] Docs e indices atualizados.
+- [x] Spec/indices deixam claro que M-12 foi concluida antes da M-6/206.
+- [x] `SPRINT-M-12-PR.md` criado no fechamento.
 
 ### Commit sugerido
 ```text
@@ -514,19 +514,27 @@ docs(mobile): registrar aplicacao do design system na m-sprint 12
 
 ## Checklist final da M-Sprint 12
 
-- [ ] Splash/welcome com marca SEP e CTA visualmente forte.
-- [ ] Login/TOTP/registro com painel de marca e formularios preservados.
-- [ ] Homes com tiles coloridos, chips de icone e cards de jornada.
-- [ ] Header/tabs/shell coerentes com o New Design System SEP.
-- [ ] Botoes de destaque com cor/gradiente.
-- [ ] Ionicons usados de forma curada; sem Tailwind/shadcn/React.
-- [ ] Sem metrica/numero fabricado.
-- [ ] Sem mudanca funcional, de contrato, auth, biometria ou step-up.
-- [ ] Light/dark validados nas telas alteradas.
-- [ ] `npm run lint` verde.
-- [ ] `npm run lint:scss` verde.
-- [ ] `npm run test` verde.
-- [ ] `npm run build` verde.
-- [ ] Smoke PWA/mobile validado.
-- [ ] Dependencias orfas auditadas; nenhuma biblioteca nova adicionada por simetria com o web.
-- [ ] Docs e indices atualizados.
+- [x] Splash/welcome com marca SEP e CTA visualmente forte.
+- [x] Login/TOTP/registro com painel de marca e formularios preservados.
+- [x] Homes com tiles coloridos, chips de icone e cards de jornada.
+- [x] Header/tabs/shell coerentes com o New Design System SEP.
+- [x] Botoes de destaque com cor/gradiente.
+- [x] Ionicons usados de forma curada; sem Tailwind/shadcn/React.
+- [x] Sem metrica/numero fabricado.
+- [x] Sem mudanca funcional, de contrato, auth, biometria ou step-up.
+- [x] Light/dark validados nas telas alteradas.
+- [x] `npm run lint` verde.
+- [x] `npm run lint:scss` verde.
+- [x] `npm run test` verde.
+- [x] `npm run build` verde.
+- [x] Smoke PWA/mobile validado.
+- [x] Dependencias orfas auditadas; nenhuma biblioteca nova adicionada por simetria com o web.
+- [x] Docs e indices atualizados.
+
+## Fechamento
+
+- Status: concluida em 2026-06-15.
+- Validacoes: `npm run lint`, `npm run lint:scss`, `npm run test` (104 testes) e `npm run build` verdes.
+- E2E: `npm run e2e` com smoke PWA (3 cenarios) e `profile-actions` verdes; pendencia conhecida no `golden-path-mobile` por seletor `link /cadastr/i` frente ao CTA "Criar conta".
+- Cadeia Git: `sep-mobile` com `main` e `develop` alinhadas localmente antes da proxima task (`git rev-list --left-right --count main...develop` = `0 0`).
+- Proxima sprint mobile funcional (`206`, M-Sprint 6) desbloqueada do ponto de vista visual; executar o precheck Git global antes de iniciar.

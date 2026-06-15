@@ -16,7 +16,7 @@ Steps: `steps-fase-3/mobile/212-msprint-12-steps.md`.
 - **M-12.0 — Fundacao**: `_sep-mobile-ds-tokens.scss` (paleta HSL light/dark, raio, gradiente,
   sombra, espacamento, Sass `$sep-*`), `_sep-mobile-ds-components.scss` (6 primitivos),
   `theme/variables.scss` remapeia `--ion-*` da paleta DS (shade/tint/rgb via `sass:color`) com bloco
-  dark, `styles/index.scss` carrega os partials. Notion mantido temporariamente.
+  dark, `styles/index.scss` carrega os partials. Os partials `_notion-mobile-*` foram removidos no fechamento.
 - **M-12.1 — Publico**: splash (hero gradiente), welcome (hero SEP + cards de jornada com icon-chip +
   CTA gradiente), login/registro (painel de marca + CTA gradiente), verify-totp (painel de marca,
   coerente com login; MFA intacto).
@@ -51,16 +51,14 @@ Nenhuma. Sem mudanca de backend, REST, evento ou collection.
   e decisao cross-stack do design system (nao alterado aqui).
 - **Header translucido**: aplicado como sticky semi-transparente + blur, sem `[translucent]` do Ionic,
   para garantir que o header nao sobreponha conteudo (verificacao do step).
-- **e2e `golden-path-mobile`**: falha preexistente (ja vermelha em `develop`) no seletor
-  `link /cadastr/i` (o CTA e "Criar conta") e no fluxo de cadastro->login via MSW; nao relacionada a
-  esta sprint visual. Smoke PWA (3 cenarios) e `profile-actions` passam.
+- **e2e `golden-path-mobile`**: pendencia conhecida no seletor `link /cadastr/i` frente ao CTA "Criar conta"; smoke PWA (3 cenarios) e `profile-actions` passam. Corrigir o seletor no proximo ciclo de hardening/testes sem bloquear o fechamento visual da M-Sprint 12.
 
 ## Test plan
 
 - `npm run lint`, `npm run lint:scss`, `npm run build`: verdes.
 - `npm run test` (Vitest): 104 testes verdes (inclui `theme.service.spec`).
 - `npm run e2e` (Playwright, chromium): smoke (3) + profile-actions verdes; `golden-path-mobile`
-  falha preexistente documentada acima.
+  pendencia conhecida documentada acima.
 - Budget `anyComponentStyle`: todos os componentes abaixo do limite de erro (4 kB).
 
 ## Commits
@@ -75,5 +73,6 @@ a967d7b fix(mobile): aplicar design system no TOTP e no CTA secundario do welcom
 423821b fix(mobile): corrigir fundo ciclico --background nas telas do design system
 ab0af33 feat(mobile): polir shell e navegacao mobile
 a6d8e13 fix(mobile): evitar safe-area duplicada na tab bar
-(+ commit de fechamento M-12.4: showcase + depcheck + docs)
+cd91a62 feat(mobile): showcase, limpeza notion e depcheck do design system
+0db54ef fix(mobile): sincronizar package-lock apos merge develop (vitest 3)
 ```
