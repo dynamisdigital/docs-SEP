@@ -295,20 +295,21 @@
   <h2>1. Visão do Produto</h2>
   <div class="subtitle">Plataforma SEP com foco em capital de giro PJ, apoiada em infraestrutura Banking as a Service.</div>
 
-  <div class="stats" style="grid-template-columns: repeat(3, 1fr);">
-    <div class="stat"><div class="num-big">16</div><div class="label">Épicos no Roadmap</div></div>
+  <div class="stats">
+    <div class="stat"><div class="num-big">17</div><div class="label">Épicos no Roadmap</div></div>
     <div class="stat"><div class="num-big">4</div><div class="label">Jornadas de Negócio</div></div>
-    <div class="stat"><div class="num-big">5</div><div class="label">Sprints para cada Stack</div></div>
+    <div class="stat"><div class="num-big">48</div><div class="label">Sprints Entregues</div></div>
+    <div class="stat"><div class="num-big">21</div><div class="label">Sprints de Backend</div></div>
   </div>
 
-  <p>O produto SEP é uma plataforma que conecta empresas tomadoras de empréstimo a empresas credoras, com operação assistida por um time financeiro interno e governança do administrador do sistema. A fase atual entrega a <strong>fundação técnica da API</strong>, preparando o terreno para as próximas ondas funcionais: onboarding, análise de crédito, formalização contratual e cobrança.</p>
+  <p>O produto SEP é uma plataforma que conecta empresas tomadoras de empréstimo a empresas credoras, com operação assistida por um time financeiro interno e governança do administrador do sistema. As <strong>Fases 1 e 2 estão concluídas</strong> e a <strong>Fase 3 está em finalização</strong>: a jornada de crédito completa — onboarding KYC/KYB, análise de crédito, formalização contratual com CCB e cobrança — já está entregue no backend e na web, assim como a movimentação financeira via <strong>Pix</strong> (desembolso e recebimento com conta escrow).</p>
 
   <div class="alert">
-    <strong>Importante:</strong> esta fase não entrega o produto completo. Ela constrói a base segura, auditável e documentada sobre a qual as jornadas de negócio serão construídas em ondas.
+    <strong>O que ainda falta:</strong> as jornadas de negócio no <em>aplicativo mobile</em> (telas de tomador e credora, M-Sprints 6 a 11) e a <em>infraestrutura em nuvem</em> (ambientes de homologação e produção na AWS, Epic 16). O backend, a aplicação web e o Pix já estão construídos.
   </div>
 
   <div class="alert" style="background: #eff6ff; border-left-color: #3b82f6;">
-    <strong>Artefatos de apoio agora disponíveis:</strong> além do <em>PRD</em> e do <em>CONTEXT</em>, o planejamento da execução já conta com trilhas documentais específicas para web e mobile, incluindo <code>WEB-SCREENS-PLAN.md</code>, <code>MOBILE-SCREENS-PLAN.md</code> e o guia operacional <code>FRONTEND-TASKS.html</code> para a squad frontend web.
+    <strong>Artefatos de apoio disponíveis:</strong> além do <em>PRD</em> e do <em>CONTEXT</em>, a execução conta com trilhas documentais específicas para web e mobile — <code>WEB-SCREENS-PLAN.md</code>, <code>MOBILE-SCREENS-PLAN.md</code>, o guia <code>FRONTEND-TASKS.html</code> e o <code>New Design System Sep.md</code>, base do design system próprio já aplicado na web e no mobile.
   </div>
 </section>
 
@@ -420,7 +421,7 @@
 
 <section id="perfis">
   <h2>4. Usuários e Perfis</h2>
-  <div class="subtitle">Modelo inicial de permissões da Fase 1. Define o que cada perfil pode fazer na API e, por consequência, no Frontend Web e no Mobile. Será expandido com perfis operacionais (financeiro interno, backoffice, governança) nas épicas posteriores.</div>
+  <div class="subtitle">Modelo de permissões da plataforma. Os perfis básicos (Visitante, Cliente, Administrador) foram definidos na fundação; os perfis operacionais — Financeiro, Backoffice e Governança — e o de Empresa Credora foram entregues nas Epics 8-11, com suporte a <strong>papéis cumulativos</strong> (RBAC). Define o que cada perfil pode fazer na API e, por consequência, no Frontend Web e no Mobile.</div>
 
   <div class="grid grid-3" style="margin-top: 24px;">
     <div class="card" style="border-top: 4px solid #94a3b8;">
@@ -469,16 +470,60 @@
       </ul>
       <div class="tag next">RBAC inicial</div>
     </div>
+    <div class="card" style="border-top: 4px solid #10b981;">
+      <h4>🧑‍💼 Financeiro <code>(ROLE_FINANCEIRO)</code></h4>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Time interno que conduz a esteira de crédito, cobrança e conciliação.</p>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px; margin-bottom: 12px;">
+        <li>analisar propostas e registrar parecer/decisão</li>
+        <li>operar cobrança, parcelas e conciliação</li>
+        <li>executar ações que exigem step-up de segurança</li>
+      </ul>
+      <div class="tag done">Entregue (Epics 6-8)</div>
+    </div>
+    <div class="card" style="border-top: 4px solid #3b82f6;">
+      <h4>🗂️ Backoffice <code>(ROLE_BACKOFFICE)</code></h4>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Operação assistida: fila de operações, exceções e reprocessos.</p>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px; margin-bottom: 12px;">
+        <li>gerir a fila operacional e comentários</li>
+        <li>tratar pendências e divergências (inclusive Pix)</li>
+        <li>solicitar reprocessos</li>
+      </ul>
+      <div class="tag done">Entregue (Epic 9)</div>
+    </div>
+    <div class="card" style="border-top: 4px solid #8b5cf6;">
+      <h4>⚙️ Governança <code>(ROLE_GOVERNANCA)</code></h4>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Administração avançada: RBAC, parâmetros operacionais e cadastros mestres.</p>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px; margin-bottom: 12px;">
+        <li>gerir papéis e permissões (papéis cumulativos)</li>
+        <li>versionar parâmetros operacionais</li>
+        <li>auditar acessos administrativos</li>
+      </ul>
+      <div class="tag done">Entregue (Epic 11)</div>
+    </div>
+    <div class="card" style="border-top: 4px solid #f59e0b;">
+      <h4>💰 Empresa Credora <code>(ROLE_CREDORA)</code></h4>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 12px;">Empresa que aporta recursos: oportunidades, interesse e carteira.</p>
+      <p style="font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 6px;">Pode:</p>
+      <ul style="font-size: 13px; color: var(--muted); margin-left: 18px; margin-bottom: 12px;">
+        <li>passar por onboarding e elegibilidade</li>
+        <li>ver oportunidades e manifestar interesse</li>
+        <li>acompanhar a carteira e operações financiadas</li>
+      </ul>
+      <div class="tag done">Entregue (Epic 10)</div>
+    </div>
   </div>
 
   <div class="alert" style="margin-top: 28px;">
-    <strong>Evolução prevista:</strong> os perfis operacionais — <em>Financeiro Interno</em>, <em>Backoffice</em>, <em>Governança</em> — entram nas Epics 9, 10 e 11. O perfil de <em>Empresa Credora</em> pode reusar <code>ROLE_CLIENTE</code> ou ganhar role própria conforme a Epic 10 (Jornada da Empresa Credora) for detalhada. A política inicial de senha de <strong>6 caracteres</strong> será revisada antes de produção.
+    <strong>Status dos perfis:</strong> os perfis operacionais — <em>Financeiro</em>, <em>Backoffice</em>, <em>Governança</em> — e o de <em>Empresa Credora</em> já foram entregues (Epics 8-11), com suporte a <strong>papéis cumulativos</strong> (ex.: Financeiro + Backoffice). A política de senha herdada da fundação ainda deve ser endurecida antes da entrada em produção.
   </div>
 </section>
 
 <section id="epicos">
   <h2>5. Épicos do Roadmap</h2>
-  <div class="subtitle">Dezesseis épicos mapeados, com priorização funcional consolidada.</div>
+  <div class="subtitle">Dezessete épicos mapeados. Fases 1, 2 e 3 concluídas; Fase 4 em finalização (Pix entregue; mobile e infra restantes). O Epic 17 (novo design system) é transversal e já foi aplicado na web e no mobile.</div>
 
   <div class="diagram-wrapper">
     <svg viewBox="0 0 920 620" xmlns="http://www.w3.org/2000/svg">
@@ -498,7 +543,7 @@
       </defs>
 
       <!-- Fase 1: Fundação -->
-      <text x="20" y="30" font-size="15" font-weight="700" fill="#059669">FASE 1 · Fundação da API (em execução)</text>
+      <text x="20" y="30" font-size="15" font-weight="700" fill="#059669">FASE 1 · Fundação da API (concluída)</text>
       <g>
         <rect x="20" y="45" width="210" height="70" rx="8" fill="url(#epicFase1)"/>
         <text x="125" y="72" text-anchor="middle" fill="white" font-size="13" font-weight="700">E1 · Fundação da API</text>
@@ -521,7 +566,7 @@
       </g>
 
       <!-- Fase 2: Contratação -->
-      <text x="20" y="165" font-size="15" font-weight="700" fill="#d97706">FASE 2 · Jornada de Contratação do Empréstimo</text>
+      <text x="20" y="165" font-size="15" font-weight="700" fill="#d97706">FASE 2 · Jornada de Contratação do Empréstimo (concluída)</text>
       <g>
         <rect x="20" y="180" width="210" height="70" rx="8" fill="url(#epicFase2)"/>
         <text x="125" y="207" text-anchor="middle" fill="#7c2d12" font-size="13" font-weight="700">E5 · Onboarding KYC/KYB</text>
@@ -544,7 +589,7 @@
       </g>
 
       <!-- Fase 3: Operação e jornadas -->
-      <text x="20" y="300" font-size="15" font-weight="700" fill="#1d4ed8">FASE 3 · Operação e Jornadas Completas</text>
+      <text x="20" y="300" font-size="15" font-weight="700" fill="#1d4ed8">FASE 3 · Operação e Jornadas Completas (concluída)</text>
       <g>
         <rect x="20" y="315" width="210" height="70" rx="8" fill="url(#epicFase3)"/>
         <text x="125" y="342" text-anchor="middle" fill="white" font-size="13" font-weight="700">E9 · Backoffice</text>
@@ -567,7 +612,7 @@
       </g>
 
       <!-- Fase 4: Frontend de Jornadas, Mobile e Capacidades expandidas -->
-      <text x="20" y="435" font-size="15" font-weight="700" fill="#475569">FASE 4 · Frontend de Jornadas, Mobile e Capacidades Expandidas</text>
+      <text x="20" y="435" font-size="15" font-weight="700" fill="#475569">FASE 4 · Frontend de Jornadas, Mobile, Pix e Infra (em finalização)</text>
       <g>
         <rect x="20" y="450" width="210" height="70" rx="8" fill="url(#epicFase4)"/>
         <text x="125" y="477" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">E13 · Frontend de Jornadas</text>
@@ -576,7 +621,7 @@
       <g>
         <rect x="240" y="450" width="210" height="70" rx="8" fill="url(#epicFase4)"/>
         <text x="345" y="477" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="700">E14 · Mobile SEP</text>
-        <text x="345" y="497" text-anchor="middle" fill="#334155" font-size="11">Angular 20 + Ionic 8.4 + Capacitor 6</text>
+        <text x="345" y="497" text-anchor="middle" fill="#334155" font-size="11">Angular 20 + Ionic 8.4 + Capacitor 8.x</text>
       </g>
       <g>
         <rect x="460" y="450" width="210" height="70" rx="8" fill="url(#epicFase4)"/>
@@ -591,23 +636,23 @@
 
       <!-- Legenda -->
       <rect x="20" y="545" width="16" height="16" fill="url(#epicFase1)"/>
-      <text x="42" y="558" font-size="12" fill="#334155">Em execução</text>
-      <rect x="160" y="545" width="16" height="16" fill="url(#epicFase2)"/>
-      <text x="182" y="558" font-size="12" fill="#334155">Próxima onda</text>
-      <rect x="320" y="545" width="16" height="16" fill="url(#epicFase3)"/>
-      <text x="342" y="558" font-size="12" fill="#334155">Expansão</text>
-      <rect x="450" y="545" width="16" height="16" fill="url(#epicFase4)"/>
-      <text x="472" y="558" font-size="12" fill="#334155">Posterior</text>
+      <text x="42" y="558" font-size="12" fill="#334155">Fase 1 · concluída</text>
+      <rect x="180" y="545" width="16" height="16" fill="url(#epicFase2)"/>
+      <text x="202" y="558" font-size="12" fill="#334155">Fase 2 · concluída</text>
+      <rect x="345" y="545" width="16" height="16" fill="url(#epicFase3)"/>
+      <text x="367" y="558" font-size="12" fill="#334155">Fase 3 · concluída</text>
+      <rect x="510" y="545" width="16" height="16" fill="url(#epicFase4)"/>
+      <text x="532" y="558" font-size="12" fill="#334155">Fase 4 · em finalização</text>
 
-      <text x="20" y="595" font-size="13" fill="#64748b" font-style="italic">Análise de crédito foi priorizada explicitamente antes de Pix. Tudo que impacta contratação vem antes de capacidades financeiras expandidas.</text>
+      <text x="20" y="595" font-size="13" fill="#64748b" font-style="italic">Status: E1-E12 e E15 (Pix) concluídos; E13/E14 (web/mobile) em finalização; E16 (infra AWS) planejado; E17 (design system) já aplicado.</text>
     </svg>
-    <div class="caption">Roadmap de épicos em quatro fases, respeitando a ordem de prioridade funcional consolidada no PRD.</div>
+    <div class="caption">Roadmap de épicos em quatro fases. Fases 1-3 concluídas; Fase 4 em finalização (Pix entregue, restam mobile e infra). O Epic 17 (novo design system) é transversal e já aplicado.</div>
   </div>
 </section>
 
 <section id="historias">
   <h2>6. Épicos → Histórias</h2>
-  <div class="subtitle">Decomposição dos épicos ativos em histórias de usuário organizadas por valor de negócio.</div>
+  <div class="subtitle">Decomposição dos principais épicos em histórias de usuário, organizadas por valor de negócio, com o status atual de entrega.</div>
 
   <div class="grid grid-2">
     <div class="card">
@@ -622,7 +667,7 @@
         <li>Expor endpoint de healthcheck via Actuator</li>
         <li>Prever CORS para integração futura com Angular</li>
       </ul>
-      <span class="tag done">Fase atual</span>
+      <span class="tag done">Concluído</span>
     </div>
 
     <div class="card">
@@ -635,7 +680,7 @@
         <li>Minha senha fica armazenada de forma segura (hash BCrypt)</li>
         <li>Em nenhuma resposta da API a senha aparece</li>
       </ul>
-      <span class="tag done">Fase atual</span>
+      <span class="tag done">Concluído</span>
     </div>
 
     <div class="card">
@@ -651,7 +696,7 @@
         <li>Como usuário autenticado, posso alterar minha própria senha</li>
         <li>Autorização respeita perfil e ownership do recurso</li>
       </ul>
-      <span class="tag done">Fase atual</span>
+      <span class="tag done">Concluído</span>
     </div>
 
     <div class="card">
@@ -664,7 +709,7 @@
         <li>Os códigos de resposta seguem convenção REST</li>
         <li>Os cenários críticos de autenticação e autorização são cobertos por testes automatizados</li>
       </ul>
-      <span class="tag done">Fase atual</span>
+      <span class="tag done">Concluído</span>
     </div>
 
     <div class="card">
@@ -676,7 +721,7 @@
         <li>Trilha operacional de aprovação, rejeição e pendências</li>
         <li>Preparação para integrações futuras (OCR, biometria)</li>
       </ul>
-      <span class="tag next">Próxima onda</span>
+      <span class="tag done">Concluído</span>
     </div>
 
     <div class="card">
@@ -688,7 +733,7 @@
         <li>Análise assistida pelo time interno</li>
         <li>Histórico de alterações e fundamentos da decisão</li>
       </ul>
-      <span class="tag next">Próxima onda</span>
+      <span class="tag done">Concluído</span>
     </div>
 
     <div class="card">
@@ -700,7 +745,7 @@
         <li>Bloqueio de desembolso sem formalização concluída</li>
         <li>Preparação para assinatura eletrônica e CCB</li>
       </ul>
-      <span class="tag next">Próxima onda</span>
+      <span class="tag done">Concluído</span>
     </div>
 
     <div class="card">
@@ -712,7 +757,51 @@
         <li>Reprocessos operacionais e trilha de cobrança</li>
         <li>Suporte ao financeiro na conciliação</li>
       </ul>
-      <span class="tag next">Próxima onda</span>
+      <span class="tag done">Concluído</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">9</span>Backoffice Operacional</h4>
+      <p style="color: var(--muted); font-size: 14px;">Central da operação assistida.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Fila de operações, comentários e pendências</li>
+        <li>Tratamento de exceções e reprocessos</li>
+        <li>Dashboard interno e visão consolidada</li>
+      </ul>
+      <span class="tag done">Concluído</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">10</span>Jornada da Empresa Credora</h4>
+      <p style="color: var(--muted); font-size: 14px;">Quem aporta recursos na plataforma.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Cadastro, elegibilidade e perfil de investimento</li>
+        <li>Oportunidades e manifestação de interesse</li>
+        <li>Carteira e operações financiadas</li>
+      </ul>
+      <span class="tag done">Concluído</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">11</span>Governança e RBAC</h4>
+      <p style="color: var(--muted); font-size: 14px;">Administração avançada e parâmetros.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Papéis cumulativos (ex.: Financeiro + Backoffice)</li>
+        <li>Parâmetros operacionais versionados</li>
+        <li>Cadastros mestres e auditoria administrativa</li>
+      </ul>
+      <span class="tag done">Concluído</span>
+    </div>
+
+    <div class="card">
+      <h4><span class="num">15</span>Movimentação Pix</h4>
+      <p style="color: var(--muted); font-size: 14px;">Dinheiro em movimento com conta escrow.</p>
+      <ul class="clean" style="font-size: 14px;">
+        <li>Desembolso assistido com step-up de segurança</li>
+        <li>Recebimento e baixa de parcelas</li>
+        <li>Conciliação e tratamento de divergências</li>
+      </ul>
+      <span class="tag done">Concluído</span>
     </div>
   </div>
 </section>
@@ -730,40 +819,40 @@
       <g>
         <circle cx="120" cy="180" r="18" fill="#059669"/>
         <text x="120" y="186" text-anchor="middle" fill="white" font-size="12" font-weight="700">1</text>
-        <text x="120" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Agora</text>
+        <text x="120" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Concluído</text>
         <text x="120" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Fundação API</text>
         <text x="120" y="236" text-anchor="middle" font-size="11" fill="#64748b">E1 · E2 · E3 · E4</text>
       </g>
 
       <g>
-        <circle cx="300" cy="180" r="18" fill="#f59e0b"/>
+        <circle cx="300" cy="180" r="18" fill="#059669"/>
         <text x="300" y="186" text-anchor="middle" fill="white" font-size="12" font-weight="700">2</text>
-        <text x="300" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#d97706">Próxima</text>
+        <text x="300" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Concluído</text>
         <text x="300" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Contratação</text>
         <text x="300" y="236" text-anchor="middle" font-size="11" fill="#64748b">E5 · E6 · E7 · E8</text>
       </g>
 
       <g>
-        <circle cx="480" cy="180" r="18" fill="#3b82f6"/>
+        <circle cx="480" cy="180" r="18" fill="#059669"/>
         <text x="480" y="186" text-anchor="middle" fill="white" font-size="12" font-weight="700">3</text>
-        <text x="480" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">Expansão</text>
+        <text x="480" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">Concluído</text>
         <text x="480" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Jornadas completas</text>
         <text x="480" y="236" text-anchor="middle" font-size="11" fill="#64748b">E9 · E10 · E11 · E12</text>
       </g>
 
       <g>
-        <circle cx="680" cy="180" r="18" fill="#94a3b8"/>
+        <circle cx="680" cy="180" r="18" fill="#3b82f6"/>
         <text x="680" y="186" text-anchor="middle" fill="white" font-size="12" font-weight="700">4</text>
-        <text x="680" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#475569">Posterior</text>
-        <text x="680" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Frontend Jornadas + Mobile + Pix + Infra</text>
+        <text x="680" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#1d4ed8">Agora</text>
+        <text x="680" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Web e Pix concluídos · Mobile e Infra restantes</text>
         <text x="680" y="236" text-anchor="middle" font-size="11" fill="#64748b">E13 · E14 · E15 · E16</text>
       </g>
 
       <g>
         <circle cx="820" cy="180" r="14" fill="#8b5cf6"/>
         <text x="820" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#5b21b6">Futuro</text>
-        <text x="820" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Automação</text>
-        <text x="820" y="236" text-anchor="middle" font-size="11" fill="#64748b">Pix avançado</text>
+        <text x="820" y="220" text-anchor="middle" font-size="12" fill="#1e293b">Produção e escala</text>
+        <text x="820" y="236" text-anchor="middle" font-size="11" fill="#64748b">AWS + integrações reais</text>
       </g>
 
       <!-- Regra -->
@@ -777,7 +866,7 @@
   <h2>8. Sprints do Projeto</h2>
   <div class="subtitle">Organização das sprints da fundação técnica, separadas pelas três trilhas paralelas: <strong>Backend</strong>, <strong>Web</strong> e <strong>Mobile</strong>. Cada trilha tem seus próprios specs e steps, e roda em paralelo às demais sob ownership distinto.</div>
 
-  <h3>Trilha Backend (Sprints 0-4)</h3>
+  <h3>Trilha Backend — Fundação (Sprints 0-4) · concluída</h3>
   <div class="subtitle" style="margin-bottom: 24px;">Conduzida pelo Dev Senior. Stack: Java 21 + Spring Boot 3.5.x + PostgreSQL 16 + Spring Security + JWT. A Sprint 0 é a fase de <em>Hygiene &amp; Foundation</em>: estabelece tooling, branch protection, CI mínimo e ADRs iniciais antes de qualquer código de aplicação. Specs: <code>specs/fase-1/000</code> a <code>specs/fase-1/004</code>; steps em <code>steps-fase-1/backend/</code>.</div>
 
   <div class="diagram-wrapper">
@@ -877,7 +966,27 @@
     <strong>Governança de execução:</strong> o PRD mantém o planejamento de alto nível, mas a execução detalhada já foi desdobrada em trilhas documentais específicas. O backend segue os specs <code>000-sprint-0-hygiene-foundation.md</code>, <code>001-sprint-1-fundacao-tecnica.md</code>, <code>002-sprint-2-gestao-usuarios.md</code>, <code>003-sprint-3-seguranca-autenticacao.md</code> e <code>004-sprint-4-erros-docs-testes.md</code>. Em paralelo, a frente web segue os specs <code>100-fsprint-0-setup-angular.md</code> a <code>104-fsprint-4-telas-autenticadas.md</code>, apoiados por <code>WEB-SCREENS-PLAN.md</code> e <code>FRONTEND-TASKS.html</code>. A trilha mobile segue os specs <code>200-msprint-0-setup-ionic.md</code> a <code>204-msprint-4-telas-autenticadas-mobile.md</code>, apoiados por <code>MOBILE-SCREENS-PLAN.md</code>.
   </div>
 
-  <h3>Trilha Web (F-Sprints 0-4)</h3>
+  <h3 style="margin-top: 36px;">Trilha Backend — Sprints 5 a 21 (entregues)</h3>
+  <div class="subtitle" style="margin-bottom: 16px;">Após a fundação, o backend percorreu mais 17 sprints, concluindo as Fases 2 e 3. Todas integradas em <code>develop</code>.</div>
+  <table>
+    <thead>
+      <tr><th style="width:90px;">Sprint</th><th>Tema</th><th style="width:130px;">Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>5</strong></td><td>Endurecimento de segurança (MFA TOTP, refresh rotativo, step-up, rate limiting)</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>6-7</strong></td><td>Onboarding KYC (PF) e KYB (PJ) + PLD (COAF/OFAC/INTERPOL/MTE)</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>8-9</strong></td><td>Crédito: motor de regras, score interno e Open Finance</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>10-11</strong></td><td>Formalização: geração de contrato, aceite, assinatura digital e CCB</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>12-13</strong></td><td>Cobrança: parcelas (Price/SAC), inadimplência, renegociação e notificações</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>14</strong></td><td>Backoffice operacional: fila, comentários, reprocesso, dashboard interno</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>15</strong></td><td>Hardening pós-Fase-2: caça a bugs e elevação da cobertura de testes</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>16-17</strong></td><td>Empresa credora: cadastro, elegibilidade, oportunidades e carteira</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>18</strong></td><td>Governança e RBAC cumulativo + parâmetros operacionais</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>19-21</strong></td><td>Pix: fundação + escrow, desembolso assistido, recebimento e conciliação</td><td>✅ Concluída</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top: 36px;">Trilha Web — Fundação (F-Sprints 0-4) · concluída</h3>
   <div class="subtitle" style="margin-bottom: 24px;">Trilha paralela conduzida pelos dois Devs Plenos Frontend. Stack: Angular 20.x + SCSS puro + Standalone Components + Signals. A fronteira de design system é o estado de autenticação: <strong>Apple</strong> nas superfícies públicas (landing, login, cadastro) e <strong>Notion</strong> nas autenticadas (dashboard e demais telas). Specs: <code>specs/fase-1/100</code> a <code>specs/fase-1/104</code>; steps em <code>steps-fase-1/web/</code>.</div>
 
   <div class="diagram-wrapper">
@@ -972,11 +1081,27 @@
   </div>
 
   <div class="alert" style="margin-top: 28px; background: #fef2f2; border-left-color: #dc2626;">
-    <strong>Escopo da fundação web (Epic 12):</strong> tudo que depende apenas das APIs entregues nas Sprints 1-4 (auth, usuários e admin de usuários). Inclui telas públicas (Apple), shell autenticado (Notion), biblioteca interna de componentes Notion, guards de rota, integração HTTP e tratamento padronizado de erros. Telas funcionais das jornadas (tomador, credora, financeiro, backoffice) ficam na <em>Epic 13 — Frontend de Jornadas</em>, posterior, e dependem das APIs das Epics 5-11.
+    <strong>Escopo da fundação web (Epic 12):</strong> tudo que depende apenas das APIs entregues nas Sprints 1-4 (auth, usuários e admin de usuários). Inclui telas públicas, shell autenticado, biblioteca interna de componentes, guards de rota, integração HTTP e tratamento padronizado de erros. As telas funcionais das jornadas (tomador, credora, financeiro, backoffice) compõem a <em>Epic 13 — Frontend de Jornadas</em>, hoje entregue na web (F-Sprints 6-15), com o visual unificado pelo novo design system (Epic 17).
   </div>
 
-  <h3>Trilha Mobile (M-Sprints 0-4)</h3>
-  <div class="subtitle" style="margin-bottom: 24px;">Trilha paralela conduzida pelo Dev Mobile dedicado, em paralelo ao backend e à frente web. Stack: Angular 20.x + Ionic 8.4+ + Capacitor 6, com design system Notion adaptado para toque, tabs inferiores e navegação em pilha. Validação inicial em PWA; build Android/iOS via Capacitor entra em fase posterior.</div>
+  <h3 style="margin-top: 36px;">Trilha Web — F-Sprints 5 a 15 (entregues)</h3>
+  <div class="subtitle" style="margin-bottom: 16px;">A web evoluiu da fundação até todas as jornadas e recebeu o <strong>novo design system próprio da SEP</strong> (F-14/F-15).</div>
+  <table>
+    <thead>
+      <tr><th style="width:90px;">F-Sprint</th><th>Tema</th><th style="width:130px;">Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>5</strong></td><td>Hardening de segurança web</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>6-8</strong></td><td>Onboarding, crédito/Open Finance e formalização (web)</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>9-10</strong></td><td>Cobrança e backoffice (web)</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>11-12</strong></td><td>Empresa credora e governança (web)</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>13</strong></td><td>Pix web (desembolso, recebimento, divergências)</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>14-15</strong></td><td>Novo design system: tokens/temas e aplicação (login, dashboard, shell, jornadas)</td><td>✅ Concluída</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top: 36px;">Trilha Mobile — Fundação (M-Sprints 0-4) · concluída</h3>
+  <div class="subtitle" style="margin-bottom: 24px;">Trilha paralela conduzida pelo Dev Mobile dedicado, em paralelo ao backend e à frente web. Stack: Angular 20.x + Ionic 8.4+ + Capacitor 8.x, com design system Notion adaptado para toque, tabs inferiores e navegação em pilha. Validação inicial em PWA; build Android/iOS via Capacitor entra em fase posterior.</div>
 
   <div class="diagram-wrapper">
     <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
@@ -992,7 +1117,7 @@
       <text x="102" y="104" text-anchor="middle" fill="#fef3c7" font-size="11" font-weight="600">Setup Ionic + Tooling</text>
       <line x1="35" y1="118" x2="170" y2="118" stroke="white" stroke-opacity="0.3"/>
       <text x="35" y="142" fill="white" font-size="11">• Ionic 8.4 + Angular 20</text>
-      <text x="35" y="162" fill="white" font-size="11">• Capacitor 6 (PWA)</text>
+      <text x="35" y="162" fill="white" font-size="11">• Capacitor 8.x (PWA)</text>
       <text x="35" y="182" fill="white" font-size="11">• ESLint + Prettier</text>
       <text x="35" y="202" fill="white" font-size="11">• Stylelint + Husky</text>
       <text x="35" y="222" fill="white" font-size="11">• Vitest + Playwright</text>
@@ -1071,7 +1196,20 @@
     <strong>Escopo da fundação mobile (Epic 14, fase inicial):</strong> apenas tomador e empresa credora. Financeiro interno, backoffice, administração completa, governança, cadastros mestres e telas de auditoria <em>não</em> entram no recorte mobile. O app reusa contratos, DTOs, autenticação JWT, guards e padrões de integração HTTP definidos para o frontend web — sem reinventar contratos. Validação inicial em PWA/browser; build Android/iOS via Capacitor entra na Fase Mobile 2+ da Epic 14, posterior à conclusão das M-Sprints 0-4.
   </div>
 
-  <h3>Composição da Equipe</h3>
+  <h3 style="margin-top: 36px;">Trilha Mobile — M-Sprints 5 a 12</h3>
+  <div class="subtitle" style="margin-bottom: 16px;">Após a fundação, o mobile recebeu o hardening e o <strong>novo design system</strong> (M-12, com modo escuro). As jornadas de negócio (M-6 a M-11) estão em construção.</div>
+  <table>
+    <thead>
+      <tr><th style="width:90px;">M-Sprint</th><th>Tema</th><th style="width:160px;">Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>5</strong></td><td>Hardening mobile (verificação MFA, refresh token)</td><td>✅ Concluída</td></tr>
+      <tr><td><strong>6-11</strong></td><td>Jornadas externas (onboarding, crédito, formalização, cobrança, credora, Pix)</td><td>🟡 Em construção</td></tr>
+      <tr><td><strong>12</strong></td><td>Novo design system mobile (tokens, temas, modo escuro)</td><td>✅ Concluída</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top: 36px;">Composição da Equipe</h3>
   <div class="grid grid-4">
     <div class="card">
       <h4>Dev Senior</h4>
@@ -1138,7 +1276,7 @@
       <rect x="210" y="320" width="180" height="130" rx="12" fill="url(#lIonic)"/>
       <text x="300" y="352" text-anchor="middle" fill="white" font-size="16" font-weight="700">Mobile</text>
       <text x="300" y="376" text-anchor="middle" fill="white" font-size="12" opacity="0.95">Ionic 8.4 + Angular 20</text>
-      <text x="300" y="392" text-anchor="middle" fill="white" font-size="12" opacity="0.95">Capacitor 6 (PWA primeiro)</text>
+      <text x="300" y="392" text-anchor="middle" fill="white" font-size="12" opacity="0.95">Capacitor 8.x (PWA primeiro)</text>
       <text x="300" y="412" text-anchor="middle" fill="#fef3c7" font-size="11">DS Notion adaptado (touch,</text>
       <text x="300" y="426" text-anchor="middle" fill="#fef3c7" font-size="11">tabs inferiores, pilha)</text>
       <text x="300" y="446" text-anchor="middle" fill="white" font-size="10" opacity="0.85">Tomador + Empresa Credora</text>
@@ -1148,8 +1286,8 @@
       <text x="540" y="255" text-anchor="middle" fill="white" font-size="16" font-weight="700">API SEP</text>
       <text x="540" y="280" text-anchor="middle" fill="white" font-size="13" opacity="0.95">Spring Boot · Java 21</text>
       <text x="540" y="302" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Monolito modular DDD</text>
-      <text x="540" y="326" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Auth · Users · Auditoria</text>
-      <text x="540" y="342" text-anchor="middle" fill="white" font-size="11" opacity="0.85">JWT · Swagger · Actuator</text>
+      <text x="540" y="326" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Onboarding · Crédito · Contratos · Cobrança</text>
+      <text x="540" y="342" text-anchor="middle" fill="white" font-size="11" opacity="0.85">Backoffice · Credores · Governança · Pix · Escrow</text>
 
       <!-- Database -->
       <g>
@@ -1191,19 +1329,19 @@
       <rect x="430" y="475" width="220" height="70" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="6,4" stroke-width="2"/>
       <text x="540" y="502" text-anchor="middle" fill="#475569" font-size="14" font-weight="700">Celcoin BaaS</text>
       <text x="540" y="522" text-anchor="middle" fill="#64748b" font-size="12">Pix · Conta escrow · KYC/KYB</text>
-      <text x="540" y="538" text-anchor="middle" fill="#94a3b8" font-size="11" font-style="italic">Fase futura (Epics 5+, 15)</text>
+      <text x="540" y="538" text-anchor="middle" fill="#94a3b8" font-size="11" font-style="italic">Providers implementados; conexão real na infra</text>
 
       <line x1="540" y1="360" x2="540" y2="473" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
     </svg>
-    <div class="caption">Frontend Web (Angular) e Mobile (Ionic + Angular + Capacitor) consomem a mesma API SEP via REST, sem backends separados. A API grava em PostgreSQL. Mobile reusa contratos, DTOs, autenticação JWT e padrões de integração HTTP do frontend web. A integração com Celcoin BaaS entra em fase posterior.</div>
+    <div class="caption">Frontend Web (Angular) e Mobile (Ionic + Angular + Capacitor) consomem a mesma API SEP via REST, sem backends separados. A API grava em PostgreSQL. Mobile reusa contratos, DTOs, autenticação JWT e padrões de integração HTTP do frontend web. A integração com Celcoin BaaS é isolada por Provider Pattern (fakes/skeleton hoje; conexão real na fase de infraestrutura).</div>
   </div>
 
   <div class="alert">
     <strong>Arquitetura inicial:</strong> monolito modular. Microsserviços não fazem parte da fase inicial — essa decisão reduz risco e complexidade até a estabilização do fluxo de contratação.
   </div>
 
-  <h3 style="margin-top: 36px;">Endpoints entregues na Fase 1</h3>
-  <div class="subtitle" style="margin-bottom: 16px;">Seis endpoints REST cobrem todo o escopo das Sprints 1-4: cadastro de usuário, autenticação JWT, autorização por perfil/ownership e alteração da própria senha. Tudo documentado via <strong>Springdoc OpenAPI / Swagger UI</strong> a partir da Sprint 4.</div>
+  <h3 style="margin-top: 36px;">Endpoints centrais (fundação)</h3>
+  <div class="subtitle" style="margin-bottom: 16px;">A API expõe hoje <strong>mais de 30 endpoints</strong> via <strong>Springdoc OpenAPI / Swagger UI</strong>, cobrindo todos os módulos de negócio. A tabela abaixo destaca os endpoints centrais de usuários e autenticação (fundação); os demais módulos (onboarding, crédito, contratos, cobrança, backoffice, credores, governança, pix) seguem o mesmo padrão REST.</div>
 
   <table>
     <thead>
@@ -1304,12 +1442,12 @@
       <text x="440" y="155" text-anchor="middle" fill="white" font-size="14">🧩 Standalone Components</text>
       <text x="440" y="180" text-anchor="middle" fill="white" font-size="14">⚡ Signals</text>
       <text x="440" y="205" text-anchor="middle" fill="white" font-size="14">🎨 SCSS puro</text>
-      <text x="440" y="230" text-anchor="middle" fill="white" font-size="14">🖼️ DS Apple + Notion</text>
+      <text x="440" y="230" text-anchor="middle" fill="white" font-size="14">🖼️ Design System SEP</text>
       <text x="440" y="255" text-anchor="middle" fill="white" font-size="14">🧪 Vitest + Playwright</text>
-      <text x="440" y="295" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">Apple no público (landing,</text>
-      <text x="440" y="313" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">login, cadastro)</text>
-      <text x="440" y="345" text-anchor="middle" fill="#fef3c7" font-size="12">Notion no autenticado</text>
-      <text x="440" y="363" text-anchor="middle" fill="#fef3c7" font-size="12">(dashboard e demais telas)</text>
+      <text x="440" y="295" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">Design system próprio da SEP</text>
+      <text x="440" y="313" text-anchor="middle" fill="#fef3c7" font-size="12" font-style="italic">(tokens, temas, modo escuro)</text>
+      <text x="440" y="345" text-anchor="middle" fill="#fef3c7" font-size="12">Aplicado em login, dashboard,</text>
+      <text x="440" y="363" text-anchor="middle" fill="#fef3c7" font-size="12">shell e jornadas</text>
 
       <!-- Mobile -->
       <rect x="590" y="60" width="270" height="330" rx="12" fill="#b45309"/>
@@ -1317,7 +1455,7 @@
       <line x1="610" y1="102" x2="840" y2="102" stroke="#fbbf24"/>
       <text x="725" y="130" text-anchor="middle" fill="white" font-size="14">🅰️ Angular 20</text>
       <text x="725" y="155" text-anchor="middle" fill="white" font-size="14">📱 Ionic 8.4+</text>
-      <text x="725" y="180" text-anchor="middle" fill="white" font-size="14">⚓ Capacitor 6</text>
+      <text x="725" y="180" text-anchor="middle" fill="white" font-size="14">⚓ Capacitor 8.x</text>
       <text x="725" y="205" text-anchor="middle" fill="white" font-size="14">🎨 SCSS puro</text>
       <text x="725" y="230" text-anchor="middle" fill="white" font-size="14">🔐 Capacitor Preferences</text>
       <text x="725" y="255" text-anchor="middle" fill="white" font-size="14">🧪 Vitest + Playwright PWA</text>
@@ -1367,7 +1505,7 @@
 
       <!-- Agora -->
       <rect x="40" y="70" width="260" height="300" rx="12" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
-      <text x="170" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#047857">AGORA (Fase 1)</text>
+      <text x="170" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#047857">AGORA (Fase 3)</text>
 
       <rect x="70" y="125" width="200" height="90" rx="8" fill="url(#envDev)"/>
       <text x="170" y="155" text-anchor="middle" fill="white" font-size="14" font-weight="700">develop (local)</text>
@@ -1385,7 +1523,7 @@
 
       <!-- Futuro -->
       <rect x="380" y="70" width="480" height="300" rx="12" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
-      <text x="620" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#b45309">FUTURO (Infra posterior · E14)</text>
+      <text x="620" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="#b45309">FUTURO (Infra · Epic 16)</text>
 
       <!-- VPS compartilhada -->
       <rect x="400" y="125" width="220" height="100" rx="8" fill="#fef3c7" stroke="#f59e0b"/>
@@ -1484,8 +1622,8 @@
 </section>
 
 <section id="sucesso">
-  <h2>13. Critérios de Sucesso da Fase Atual</h2>
-  <div class="subtitle">O que precisa estar funcionando para considerarmos a fundação entregue.</div>
+  <h2>13. Critérios de Sucesso da Fundação (Fase 1)</h2>
+  <div class="subtitle">Critérios definidos para a fundação técnica — todos atingidos. As fases seguintes (2 e 3, já entregues) têm seus próprios critérios de aceite (DoD) por sprint.</div>
 
   <table>
     <thead>
@@ -1583,7 +1721,7 @@
 <footer>
   <div style="max-width: 1180px; margin: 0 auto;">
     <strong>Plataforma SEP</strong> · Documentação de Produto · Versão Product Owner<br>
-    Baseado no <em>PRD.md</em>, <em>CONTEXT.md</em> e nos artefatos derivados de execução · Atualizado em 03/05/2026
+    Baseado no <em>PRD.md</em>, <em>CONTEXT.md</em> e nos artefatos derivados de execução · Atualizado em 16/06/2026
   </div>
 </footer>
 

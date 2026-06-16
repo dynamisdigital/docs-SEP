@@ -256,7 +256,7 @@ F-0.1 (scaffold)
   - **MSW server NAO plugado em `test-setup.ts`** — happy-dom nao tem `BroadcastChannel`; deferido para F-Sprint 2/3 quando primeiro teste dependente da API entrar. Polyfills (Web Streams + `BroadcastChannel` stub) ja prontos em `src/test-polyfills.ts`
   - `src/main.ts` MSW gate via `localStorage.NG_APP_USE_MSW === 'true'` (nao `import.meta.env.NG_APP_USE_MSW`) — Angular CLI nao injeta env vars `NG_APP_*` em main.ts em build
   - `@testing-library/angular@18.1.1` (nao `^17`) — versao 17 puxa `@angular/animations@21` transitivamente, conflita com Angular 20; 18.1.1 suporta Angular 20+ nativamente
-  - `npm ci --legacy-peer-deps` necessario — `@angular/build` declara `vitest@^3.1.1` como peer optional, mas pinamos `vitest@^2` por compat com `@analogjs/vitest-angular@^1`
+  - `npm ci --legacy-peer-deps` necessario — `@angular/build` declara `vitest@^3.1.1` como peer optional, mas pinamos `vitest@^4.1.5`
   - `@angular/platform-browser-dynamic@^20` instalado explicitamente — Angular 20 nao traz por default; necessario para `BrowserDynamicTestingModule`
   - Workflow renomeado para `name: CI-APP` (template chega como `name: CI`) para diferenciar de `CI-API` e do futuro `CI-MOBILE` em required checks cross-repo
   - `package.json` e `package-lock.json` versionados ja com todas as devDependencies das 4 Tasks (commit unico em F-0.1) para evitar checkpoints intermediarios na historia

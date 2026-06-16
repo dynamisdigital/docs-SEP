@@ -452,7 +452,7 @@
   <a href="#jornadas">Quem Participa</a>
   <a href="#funcionalidades">Funcionalidades</a>
   <a href="#cronograma">Cronograma</a>
-  <a href="#fase-atual">Fase Atual</a>
+  <a href="#fase-atual">Onde Estamos</a>
   <a href="#proximos">Próximos Marcos</a>
   <a href="#faq">Perguntas Comuns</a>
 </nav>
@@ -465,7 +465,7 @@
 
   <div class="big-intro">
     <p>A <strong>SEP</strong> é uma plataforma digital que organiza, de ponta a ponta, o processo de empréstimo entre empresas. De um lado, <strong>empresas que precisam de capital de giro</strong> para crescer; do outro, <strong>empresas credoras que querem investir seus recursos</strong>. No meio, um time financeiro interno que conduz a operação com cuidado, e um administrador que garante que tudo funcione dentro das regras.</p>
-    <p>Tudo é construído com uma preocupação dupla: <strong>segurança</strong> para quem aporta o dinheiro e <strong>agilidade</strong> para quem precisa dele. O sistema registra cada passo, documenta cada decisão e deixa pronto o terreno para integrações financeiras modernas como Pix.</p>
+    <p>Tudo é construído com uma preocupação dupla: <strong>segurança</strong> para quem aporta o dinheiro e <strong>agilidade</strong> para quem precisa dele. Hoje a plataforma já cobre a jornada completa de crédito — do cadastro ao desembolso e à cobrança — e <strong>já incorpora movimentação financeira via Pix</strong>, com cada passo registrado e auditável.</p>
   </div>
 
   <div class="stats-row">
@@ -483,12 +483,16 @@
     </div>
   </div>
 
+  <div class="callout success">
+    <strong>Onde o projeto está hoje:</strong> as <em>Fases 1 e 2 estão concluídas</em> e a <em>Fase 3 está em finalização</em>. Toda a jornada de crédito — onboarding, análise, contrato, cobrança — e a movimentação via Pix já estão construídas no backend e disponíveis na aplicação web. Resta concluir as telas das jornadas no aplicativo mobile e a infraestrutura de ambientes em nuvem.
+  </div>
+
   <div class="callout info">
-    <strong>Como lemos este documento:</strong> as entregas estão organizadas em <em>fases</em>. Cada fase abre um conjunto de capacidades novas, começando pela fundação técnica e avançando até movimentações financeiras integradas. A ordem respeita uma prioridade clara: o que fecha a jornada do empréstimo vem antes do que amplia as capacidades financeiras.
+    <strong>Como lemos este documento:</strong> as entregas estão organizadas em <em>fases</em>. Cada fase abre um conjunto de capacidades novas, começando pela fundação técnica e avançando até movimentações financeiras integradas. A ordem respeitou uma prioridade clara: o que fecha a jornada do empréstimo veio antes do que amplia as capacidades financeiras.
   </div>
 
   <div class="callout success">
-    <strong>Aceleração com agentes de IA:</strong> o projeto é executado por 3 desenvolvedores apoiados por agentes de inteligência artificial, atuando cerca de 6 horas por dia cada. Somado à especificação detalhada que já existe (PRD + specs por sprint), isso permite uma cadência significativamente maior do que a de um projeto tradicional — os prazos apresentados aqui já consideram esse ganho.
+    <strong>Aceleração com agentes de IA:</strong> o projeto é executado por 3 desenvolvedores apoiados por agentes de inteligência artificial, atuando cerca de 6 horas por dia cada. Somado à especificação detalhada que já existe (PRD + specs por sprint), isso permitiu uma cadência significativamente maior do que a de um projeto tradicional — o ritmo de entrega observado até aqui reflete esse ganho.
   </div>
 </section>
 
@@ -528,23 +532,23 @@
 </section>
 
 <section id="funcionalidades">
-  <h2>3. O que a Plataforma Vai Entregar</h2>
-  <div class="subtitle">Capacidades agrupadas por valor de negócio, com indicação da fase em que cada bloco fica disponível.</div>
+  <h2>3. O que a Plataforma Entrega</h2>
+  <div class="subtitle">Capacidades agrupadas por valor de negócio, com indicação do que já está construído e do que ainda está em finalização.</div>
 
   <h3>🧩 Base do sistema</h3>
   <div class="feature-block">
-    <div class="feature-item now">
-      <h4>Cadastro e autenticação <span class="phase-tag now">Em execução</span></h4>
-      <p>Qualquer pessoa pode se cadastrar na plataforma. Depois disso, entra com e-mail e senha e recebe uma sessão segura para acessar seus dados.</p>
+    <div class="feature-item done">
+      <h4>Cadastro e autenticação <span class="phase-tag done">Concluído</span></h4>
+      <p>Qualquer pessoa pode se cadastrar na plataforma. Depois disso, entra com e-mail e senha e recebe uma sessão segura para acessar seus dados, com autenticação em duas etapas (MFA) disponível.</p>
       <ul>
         <li>Cadastro com validação de e-mail e senha</li>
-        <li>Login com proteção segura</li>
+        <li>Login seguro com JWT e segundo fator (TOTP)</li>
         <li>Perfis diferentes para administrador e cliente</li>
       </ul>
     </div>
 
-    <div class="feature-item now">
-      <h4>Controle de acesso e privacidade <span class="phase-tag now">Em execução</span></h4>
+    <div class="feature-item done">
+      <h4>Controle de acesso e privacidade <span class="phase-tag done">Concluído</span></h4>
       <p>Cada usuário vê e altera apenas o que lhe pertence. O administrador tem visibilidade ampla; o cliente, só o próprio cadastro. A senha é armazenada com proteção criptográfica.</p>
       <ul>
         <li>Clientes acessam apenas os próprios dados</li>
@@ -553,117 +557,119 @@
       </ul>
     </div>
 
-    <div class="feature-item now">
-      <h4>Auditoria automática <span class="phase-tag now">Em execução</span></h4>
-      <p>Toda alteração fica registrada: quem criou, quem alterou, quando aconteceu. Isso cria rastreabilidade desde o primeiro dia — base essencial para operações financeiras.</p>
+    <div class="feature-item done">
+      <h4>Auditoria automática <span class="phase-tag done">Concluído</span></h4>
+      <p>Toda alteração fica registrada: quem criou, quem alterou, quando aconteceu. Isso cria rastreabilidade desde o primeiro dia — base essencial para operações financeiras e para a conformidade regulatória.</p>
     </div>
 
-    <div class="feature-item now">
-      <h4>Plataforma pronta para integração <span class="phase-tag now">Em execução</span></h4>
-      <p>A API nasce documentada, com contratos claros, para que o aplicativo web (frontend) e parceiros futuros possam integrar com previsibilidade.</p>
+    <div class="feature-item done">
+      <h4>Plataforma pronta para integração <span class="phase-tag done">Concluído</span></h4>
+      <p>A API nasceu documentada, com contratos claros, e já alimenta a aplicação web e o aplicativo mobile. Parceiros futuros podem integrar com previsibilidade.</p>
     </div>
   </div>
 
   <h3>📄 Jornada de contratação do empréstimo</h3>
   <div class="feature-block">
-    <div class="feature-item next">
-      <h4>Onboarding da tomadora (KYC/KYB) <span class="phase-tag next">Próxima onda</span></h4>
-      <p>A empresa que busca crédito envia os documentos obrigatórios, passa por validações de identidade e recebe acompanhamento de eventuais pendências cadastrais.</p>
+    <div class="feature-item done">
+      <h4>Onboarding da tomadora (KYC/KYB) <span class="phase-tag done">Concluído</span></h4>
+      <p>A empresa que busca crédito envia os documentos obrigatórios, passa por validações de identidade (KYC para pessoas e KYB para empresas) e por verificações de prevenção à lavagem de dinheiro, com acompanhamento de pendências cadastrais.</p>
       <ul>
         <li>Coleta e conferência de documentos</li>
-        <li>Verificação de identidade</li>
+        <li>Verificação de identidade e checagens PLD</li>
         <li>Trilha de aprovação, rejeição e pendências</li>
       </ul>
     </div>
 
-    <div class="feature-item next">
-      <h4>Análise de crédito <span class="phase-tag next">Próxima onda</span></h4>
-      <p>A proposta passa por uma esteira de análise com score interno e parecer operacional. O time financeiro pode aprovar, rejeitar ou pedir ajustes, sempre com o fundamento registrado.</p>
+    <div class="feature-item done">
+      <h4>Análise de crédito <span class="phase-tag done">Concluído</span></h4>
+      <p>A proposta passa por uma esteira de análise com score interno, motor de regras e parecer operacional, apoiada por dados de Open Finance. O time financeiro pode aprovar, rejeitar ou pedir ajustes, sempre com o fundamento registrado.</p>
       <ul>
         <li>Parecer e score da proposta</li>
-        <li>Decisão com fundamentação registrada</li>
-        <li>Histórico completo das alterações</li>
+        <li>Enriquecimento por Open Finance</li>
+        <li>Decisão fundamentada com histórico completo</li>
       </ul>
     </div>
 
-    <div class="feature-item next">
-      <h4>Formalização do contrato <span class="phase-tag next">Próxima onda</span></h4>
-      <p>Com a proposta aprovada, o contrato é gerado, aceito e assinado. Sem essa etapa concluída, nenhum valor sai da plataforma — garantia de segurança jurídica.</p>
+    <div class="feature-item done">
+      <h4>Formalização do contrato <span class="phase-tag done">Concluído</span></h4>
+      <p>Com a proposta aprovada, o contrato é gerado, aceito e assinado digitalmente, incluindo a emissão da CCB. Sem essa etapa concluída, nenhum valor sai da plataforma — garantia de segurança jurídica.</p>
       <ul>
         <li>Geração automática do contrato</li>
         <li>Aceite e assinatura digital</li>
-        <li>Preparação para CCB e assinatura eletrônica</li>
+        <li>Emissão de CCB e trilha de assinatura</li>
       </ul>
     </div>
 
-    <div class="feature-item next">
-      <h4>Cobrança e acompanhamento <span class="phase-tag next">Próxima onda</span></h4>
-      <p>Após a liberação, a plataforma acompanha parcelas, registra recebimentos, sinaliza atrasos e apoia o time na conciliação financeira.</p>
+    <div class="feature-item done">
+      <h4>Cobrança e acompanhamento <span class="phase-tag done">Concluído</span></h4>
+      <p>Após a liberação, a plataforma acompanha parcelas, registra recebimentos, sinaliza atrasos, apoia a renegociação e dá suporte ao time na conciliação financeira, com notificações ao cliente.</p>
       <ul>
         <li>Agenda de parcelas e recebimentos</li>
-        <li>Acompanhamento de inadimplência</li>
-        <li>Suporte ao financeiro na conciliação</li>
+        <li>Acompanhamento de inadimplência e renegociação</li>
+        <li>Notificações e suporte à conciliação</li>
       </ul>
     </div>
   </div>
 
   <h3>🏦 Operação ampliada e jornadas completas</h3>
   <div class="feature-block">
-    <div class="feature-item later">
-      <h4>Backoffice operacional <span class="phase-tag later">Expansão</span></h4>
-      <p>Uma central de operação para o time financeiro lidar com propostas, pendências, exceções e reprocessos. Organiza a operação assistida antes da automação ampla.</p>
+    <div class="feature-item done">
+      <h4>Backoffice operacional <span class="phase-tag done">Concluído</span></h4>
+      <p>Uma central de operação para o time financeiro lidar com propostas, pendências, exceções e reprocessos, com fila de operações e visão consolidada. Organiza a operação assistida.</p>
     </div>
 
-    <div class="feature-item later">
-      <h4>Jornada da empresa credora <span class="phase-tag later">Expansão</span></h4>
-      <p>O ambiente completo para quem investe na plataforma: onboarding próprio, acompanhamento da carteira, visão das operações financiadas e governança dos aportes.</p>
+    <div class="feature-item done">
+      <h4>Jornada da empresa credora <span class="phase-tag done">Concluído</span></h4>
+      <p>O ambiente para quem investe na plataforma: cadastro, elegibilidade, acompanhamento da carteira, oportunidades de investimento, manifestação de interesse e governança dos aportes.</p>
     </div>
 
-    <div class="feature-item later">
-      <h4>Governança e administração <span class="phase-tag later">Expansão</span></h4>
-      <p>Controles avançados de acesso, cadastros mestres, parametrizações e auditoria administrativa. À medida que a operação cresce, o admin ganha ferramentas mais robustas.</p>
+    <div class="feature-item done">
+      <h4>Governança e administração <span class="phase-tag done">Concluído</span></h4>
+      <p>Controles de acesso com perfis cumulativos (ex.: Financeiro + Backoffice), parâmetros operacionais versionados, cadastros mestres e auditoria administrativa para a operação crescer com segurança.</p>
     </div>
 
-    <div class="feature-item later">
-      <h4>Aplicação web (frontend) <span class="phase-tag later">Expansão</span></h4>
-      <p>A interface visual da plataforma, construída em Angular 20 sobre dois design systems próprios — um para as telas públicas (landing, login, cadastro) e outro para todas as telas autenticadas (dashboard e demais jornadas) —, adaptada a cada uma das quatro jornadas de usuário.</p>
+    <div class="feature-item done">
+      <h4>Aplicação web (frontend) <span class="phase-tag done">Concluído</span></h4>
+      <p>A interface visual da plataforma, em Angular 20, com o <strong>novo design system próprio da SEP</strong> aplicado em login, cadastro, dashboard, shell e nas telas de cada jornada — incluindo as telas de Pix.</p>
+    </div>
+
+    <div class="feature-item now">
+      <h4>Aplicativo mobile <span class="phase-tag now">Em finalização</span></h4>
+      <p>App em Ionic + Angular + Capacitor, voltado às jornadas externas (tomador e credora). A fundação, a autenticação e o novo design system já estão aplicados; as telas das jornadas de negócio estão em construção.</p>
     </div>
   </div>
 
   <h3>💸 Movimentação financeira integrada</h3>
   <div class="feature-block">
-    <div class="feature-item later">
-      <h4>Pix integrado <span class="phase-tag later">Fase posterior</span></h4>
-      <p>A plataforma ganha movimentação financeira nativa via Pix — desembolso dos empréstimos aprovados e recebimento das parcelas, tudo rastreado e conciliado automaticamente.</p>
+    <div class="feature-item done">
+      <h4>Pix integrado <span class="phase-tag done">Concluído</span></h4>
+      <p>A plataforma já tem movimentação financeira via Pix — desembolso dos empréstimos aprovados e recebimento das parcelas, com segregação em conta escrow, rastreamento e conciliação. O desembolso exige confirmação reforçada (step-up de segurança).</p>
       <ul>
         <li>Pix de desembolso ao tomador</li>
-        <li>Pix de recebimento de parcelas</li>
-        <li>Conciliação e tratamento de eventos</li>
+        <li>Pix de recebimento e baixa de parcelas</li>
+        <li>Conciliação e tratamento de divergências</li>
       </ul>
     </div>
 
     <div class="feature-item later">
-      <h4>Ambientes e infraestrutura completos <span class="phase-tag later">Fase posterior</span></h4>
-      <p>Ambientes dedicados de homologação e produção, publicação automática e monitoramento contínuo — a plataforma passa de uma base de desenvolvimento para uma operação em escala.</p>
+      <h4>Ambientes e infraestrutura em nuvem <span class="phase-tag later">Planejado</span></h4>
+      <p>Ambientes dedicados de homologação e produção na AWS, publicação automática e monitoramento contínuo. Hoje a plataforma opera em ambiente de desenvolvimento; esta é a trilha que a leva para operação em escala.</p>
     </div>
   </div>
 </section>
 
 <section id="cronograma">
   <h2>4. Cronograma de Entrega</h2>
-  <div class="subtitle">Visão aproximada das fases e dos prazos previstos. Os tempos são estimativas; podem variar conforme prioridades e validações.</div>
+  <div class="subtitle">Visão das fases e dos prazos. As fases já entregues estão marcadas como concluídas; os tempos restantes são estimativas e podem variar conforme prioridades e validações.</div>
 
   <div class="diagram-wrapper">
     <svg viewBox="0 0 940 420" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="barDone" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#047857"/><stop offset="100%" stop-color="#10b981"/>
+        </linearGradient>
         <linearGradient id="barNow" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stop-color="#0369a1"/><stop offset="100%" stop-color="#0ea5e9"/>
-        </linearGradient>
-        <linearGradient id="barNext" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#b45309"/><stop offset="100%" stop-color="#f59e0b"/>
-        </linearGradient>
-        <linearGradient id="barExp" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#6d28d9"/><stop offset="100%" stop-color="#8b5cf6"/>
         </linearGradient>
         <linearGradient id="barLater" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stop-color="#475569"/><stop offset="100%" stop-color="#94a3b8"/>
@@ -671,7 +677,7 @@
       </defs>
 
       <!-- Título -->
-      <text x="470" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#0c4a6e">Linha do tempo estimada · meses a partir do início (3 devs + agentes IA, 6h/dia)</text>
+      <text x="470" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#0c4a6e">Linha do tempo · Fases 1 e 2 concluídas, Fase 3 em finalização (3 devs + agentes IA, 6h/dia)</text>
 
       <!-- Eixo -->
       <line x1="210" y1="60" x2="900" y2="60" stroke="#cbd5e1" stroke-width="2"/>
@@ -699,34 +705,34 @@
         <line x1="814" y1="60" x2="814" y2="390"/>
       </g>
 
-      <!-- Fase 1 · Fundação (M0 → M1, ~1 mês) -->
-      <text x="200" y="100" text-anchor="end" font-size="13" font-weight="700" fill="#0369a1">Fundação técnica</text>
-      <text x="200" y="116" text-anchor="end" font-size="10" fill="#64748b">Fase 1 · ~1 mês</text>
-      <rect x="210" y="82" width="86" height="36" rx="6" fill="url(#barNow)"/>
-      <text x="253" y="105" text-anchor="middle" fill="white" font-size="11" font-weight="700">Em execução</text>
+      <!-- Fase 1 · Fundação (M0 → M1, concluída) -->
+      <text x="200" y="100" text-anchor="end" font-size="13" font-weight="700" fill="#047857">Fundação técnica</text>
+      <text x="200" y="116" text-anchor="end" font-size="10" fill="#64748b">Fase 1 · concluída</text>
+      <rect x="210" y="82" width="86" height="36" rx="6" fill="url(#barDone)"/>
+      <text x="253" y="105" text-anchor="middle" fill="white" font-size="11" font-weight="700">Concluída</text>
 
-      <!-- Fase 2 · Contratação (M1 → M4, ~3 meses) -->
-      <text x="200" y="168" text-anchor="end" font-size="13" font-weight="700" fill="#b45309">Jornada de contratação</text>
-      <text x="200" y="184" text-anchor="end" font-size="10" fill="#64748b">Fase 2 · ~3 meses</text>
-      <rect x="296" y="150" width="259" height="36" rx="6" fill="url(#barNext)"/>
+      <!-- Fase 2 · Contratação (M1 → M4, concluída) -->
+      <text x="200" y="168" text-anchor="end" font-size="13" font-weight="700" fill="#047857">Jornada de contratação</text>
+      <text x="200" y="184" text-anchor="end" font-size="10" fill="#64748b">Fase 2 · concluída</text>
+      <rect x="296" y="150" width="259" height="36" rx="6" fill="url(#barDone)"/>
       <text x="425" y="173" text-anchor="middle" fill="white" font-size="11" font-weight="700">Onboarding · Crédito · Contrato · Cobrança</text>
 
-      <!-- Fase 3 · Operação ampla (M4 → M6, ~2 meses) -->
-      <text x="200" y="236" text-anchor="end" font-size="13" font-weight="700" fill="#6d28d9">Operação ampla e jornadas</text>
-      <text x="200" y="252" text-anchor="end" font-size="10" fill="#64748b">Fase 3 · ~2 meses</text>
-      <rect x="555" y="218" width="173" height="36" rx="6" fill="url(#barExp)"/>
-      <text x="641" y="241" text-anchor="middle" fill="white" font-size="11" font-weight="700">Backoffice · Credora · Frontend</text>
+      <!-- Fase 3 · Operação ampla + Pix (M4 → M6, em finalização) -->
+      <text x="200" y="236" text-anchor="end" font-size="13" font-weight="700" fill="#0369a1">Operação ampla, credora e Pix</text>
+      <text x="200" y="252" text-anchor="end" font-size="10" fill="#64748b">Fase 3 · em finalização</text>
+      <rect x="555" y="218" width="173" height="36" rx="6" fill="url(#barNow)"/>
+      <text x="641" y="241" text-anchor="middle" fill="white" font-size="11" font-weight="700">Backoffice · Credora · Web · Pix</text>
 
-      <!-- Fase 4 · Pix + Infra (M6 → M7.5, ~1.5 meses) -->
-      <text x="200" y="304" text-anchor="end" font-size="13" font-weight="700" fill="#475569">Pix e infra completa</text>
-      <text x="200" y="320" text-anchor="end" font-size="10" fill="#64748b">Fase 4 · ~1,5 mês</text>
+      <!-- Fase 4 · Mobile final + Infra (M6 → M7.5, planejado) -->
+      <text x="200" y="304" text-anchor="end" font-size="13" font-weight="700" fill="#475569">Mobile final e infra em nuvem</text>
+      <text x="200" y="320" text-anchor="end" font-size="10" fill="#64748b">Fase 4 · planejado</text>
       <rect x="728" y="286" width="129" height="36" rx="6" fill="url(#barLater)"/>
-      <text x="792" y="309" text-anchor="middle" fill="white" font-size="11" font-weight="700">Pix · Ambientes</text>
+      <text x="792" y="309" text-anchor="middle" fill="white" font-size="11" font-weight="700">Mobile · Ambientes</text>
 
-      <!-- Marco atual -->
-      <line x1="210" y1="60" x2="210" y2="390" stroke="#10b981" stroke-width="3"/>
-      <circle cx="210" cy="60" r="6" fill="#10b981"/>
-      <text x="210" y="405" text-anchor="middle" font-size="11" font-weight="700" fill="#047857">AGORA</text>
+      <!-- Marco atual (~M6) -->
+      <line x1="728" y1="60" x2="728" y2="390" stroke="#10b981" stroke-width="3"/>
+      <circle cx="728" cy="60" r="6" fill="#10b981"/>
+      <text x="728" y="405" text-anchor="middle" font-size="11" font-weight="700" fill="#047857">AGORA (~M6)</text>
 
       <!-- Marco final -->
       <line x1="857" y1="60" x2="857" y2="390" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,3"/>
@@ -734,33 +740,31 @@
       <text x="857" y="405" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">~M7,5</text>
 
       <!-- Legenda -->
-      <g transform="translate(210, 360)">
-        <rect x="0" y="0" width="14" height="14" fill="url(#barNow)"/>
-        <text x="20" y="11" font-size="11" fill="#334155">Fase atual</text>
-        <rect x="100" y="0" width="14" height="14" fill="url(#barNext)"/>
-        <text x="120" y="11" font-size="11" fill="#334155">Próxima onda</text>
-        <rect x="230" y="0" width="14" height="14" fill="url(#barExp)"/>
-        <text x="250" y="11" font-size="11" fill="#334155">Expansão</text>
-        <rect x="340" y="0" width="14" height="14" fill="url(#barLater)"/>
-        <text x="360" y="11" font-size="11" fill="#334155">Fase posterior</text>
+      <g transform="translate(230, 360)">
+        <rect x="0" y="0" width="14" height="14" fill="url(#barDone)"/>
+        <text x="20" y="11" font-size="11" fill="#334155">Concluído</text>
+        <rect x="120" y="0" width="14" height="14" fill="url(#barNow)"/>
+        <text x="140" y="11" font-size="11" fill="#334155">Em finalização</text>
+        <rect x="270" y="0" width="14" height="14" fill="url(#barLater)"/>
+        <text x="290" y="11" font-size="11" fill="#334155">Planejado</text>
       </g>
     </svg>
-    <div class="caption">Cronograma estimado em meses, considerando 3 desenvolvedores apoiados por agentes de IA (≈6h/dia cada) e especificação SDD já pronta. O projeto termina em torno de M7,5. Estimativas podem variar conforme priorização conjunta.</div>
+    <div class="caption">Cronograma em meses, considerando 3 desenvolvedores apoiados por agentes de IA (≈6h/dia cada) e especificação SDD já pronta. Hoje o projeto está em torno de M6, na finalização da Fase 3. Conclusão prevista em torno de M7,5. Estimativas podem variar conforme priorização conjunta.</div>
   </div>
 
   <div class="phase-timeline">
     <div class="phase">
       <div class="phase-left">
         <div class="phase-num">Fase 1</div>
-        <div class="phase-time">~1 mês</div>
-        <span class="phase-status phase-tag now">Em execução</span>
+        <div class="phase-time">concluída</div>
+        <span class="phase-status phase-tag done">Concluída</span>
       </div>
       <div class="phase-right">
         <h3>Fundação técnica da plataforma</h3>
-        <p class="phase-goal">Construir a base segura, auditável e documentada sobre a qual todas as jornadas de negócio serão construídas. Sem essa fundação, nenhuma outra entrega é possível com segurança.</p>
+        <p class="phase-goal">A base segura, auditável e documentada sobre a qual todas as jornadas de negócio foram construídas. Entregue por completo, incluindo o endurecimento de segurança que liberou o avanço para a contratação.</p>
         <div class="phase-list">
           <span>Cadastro de usuário</span>
-          <span>Login seguro</span>
+          <span>Login seguro (JWT + MFA)</span>
           <span>Controle de acesso</span>
           <span>Troca de senha</span>
           <span>Auditoria automática</span>
@@ -772,19 +776,20 @@
     <div class="phase">
       <div class="phase-left">
         <div class="phase-num">Fase 2</div>
-        <div class="phase-time">~3 meses</div>
-        <span class="phase-status phase-tag next">Próxima onda</span>
+        <div class="phase-time">concluída</div>
+        <span class="phase-status phase-tag done">Concluída</span>
       </div>
       <div class="phase-right">
         <h3>Jornada de contratação do empréstimo</h3>
-        <p class="phase-goal">Abrir a operação de ponta a ponta: da entrada da empresa tomadora até a cobrança das parcelas. Essa é a fase que transforma a plataforma em produto operacional.</p>
+        <p class="phase-goal">A operação de ponta a ponta: da entrada da empresa tomadora até a cobrança das parcelas. Esta é a fase que transformou a plataforma em produto operacional — concluída no backend e na aplicação web.</p>
         <div class="phase-list">
-          <span>Onboarding documental</span>
+          <span>Onboarding KYC/KYB/PLD</span>
           <span>Análise de crédito</span>
-          <span>Contrato digital</span>
+          <span>Contrato digital + CCB</span>
           <span>Assinatura eletrônica</span>
           <span>Cobrança e parcelas</span>
-          <span>Acompanhamento de atraso</span>
+          <span>Inadimplência e renegociação</span>
+          <span>Backoffice operacional</span>
         </div>
       </div>
     </div>
@@ -792,18 +797,19 @@
     <div class="phase">
       <div class="phase-left">
         <div class="phase-num">Fase 3</div>
-        <div class="phase-time">~2 meses</div>
-        <span class="phase-status phase-tag later">Expansão</span>
+        <div class="phase-time">em finalização</div>
+        <span class="phase-status phase-tag now">Em execução</span>
       </div>
       <div class="phase-right">
-        <h3>Operação ampla e jornadas completas</h3>
-        <p class="phase-goal">Ampliar a plataforma para suportar a jornada da empresa credora, o backoffice operacional, a governança administrativa e a interface visual completa.</p>
+        <h3>Operação ampla, empresa credora e Pix</h3>
+        <p class="phase-goal">Ampliar a plataforma para a jornada da empresa credora, a governança administrativa, a interface web completa e a movimentação financeira via Pix. Backend e web concluídos; resta finalizar as telas das jornadas no aplicativo mobile.</p>
         <div class="phase-list">
-          <span>Backoffice</span>
           <span>Jornada da credora</span>
-          <span>Governança avançada</span>
-          <span>Interface web (Angular)</span>
-          <span>Cadastros mestres</span>
+          <span>Governança avançada (RBAC)</span>
+          <span>Interface web (novo design system)</span>
+          <span>Pix desembolso e recebimento</span>
+          <span>Conciliação</span>
+          <span>Mobile (em finalização)</span>
         </div>
       </div>
     </div>
@@ -812,202 +818,272 @@
       <div class="phase-left">
         <div class="phase-num">Fase 4</div>
         <div class="phase-time">~1,5 mês</div>
-        <span class="phase-status phase-tag later">Fase posterior</span>
+        <span class="phase-status phase-tag later">Planejado</span>
       </div>
       <div class="phase-right">
-        <h3>Movimentação financeira e infra completa</h3>
-        <p class="phase-goal">Integrar movimentação Pix para desembolso e recebimento, e estruturar os ambientes de homologação e produção com operação em escala.</p>
+        <h3>Conclusão mobile e infraestrutura em nuvem</h3>
+        <p class="phase-goal">Concluir as jornadas no aplicativo mobile e estruturar os ambientes de homologação e produção na AWS, com publicação automática e monitoramento — preparando a operação em escala. As integrações em modo produção (ex.: Pix e assinatura digital) também são consolidadas nesta trilha.</p>
         <div class="phase-list">
-          <span>Pix desembolso</span>
-          <span>Pix recebimento</span>
-          <span>Conciliação automática</span>
+          <span>Jornadas mobile (tomador/credora)</span>
           <span>Ambiente de homologação</span>
           <span>Ambiente de produção</span>
+          <span>Publicação automática</span>
+          <span>Monitoramento</span>
         </div>
       </div>
     </div>
   </div>
 
   <div class="callout">
-    <strong>Sobre os prazos:</strong> os tempos apresentados são estimativas com base no escopo atual e na composição da equipe. Podem variar conforme validações de produto, ajustes de prioridade, dependências externas e decisões tomadas durante a execução.
+    <strong>Sobre os prazos:</strong> os tempos restantes são estimativas com base no escopo atual e na composição da equipe. Podem variar conforme validações de produto, ajustes de prioridade, dependências externas e decisões tomadas durante a execução.
   </div>
 </section>
 
 <section id="roadmap-epics">
   <h2>Visão Completa do Roadmap</h2>
-  <div class="subtitle">Confira todas as grandes etapas planejadas para a evolução da plataforma SEP. Cada bloco representa uma entrega relevante para o negócio.</div>
+  <div class="subtitle">As grandes etapas planejadas para a plataforma SEP. Cada bloco representa uma entrega relevante para o negócio, com seu status atual.</div>
   <div class="feature-block">
     <div class="feature-item done">
-      <h4>Epic 1 · Fundação da API</h4>
+      <h4>Epic 1 · Fundação da API <span class="phase-tag done">Concluído</span></h4>
       <p>Base técnica: ambiente local, banco, auditoria, segurança, documentação e padrões para crescer com segurança.</p>
     </div>
     <div class="feature-item done">
-      <h4>Epic 2 · Gestão de Usuários</h4>
+      <h4>Epic 2 · Gestão de Usuários <span class="phase-tag done">Concluído</span></h4>
       <p>Cadastro, perfis, controle de acesso, auditoria e proteção de dados dos usuários.</p>
     </div>
     <div class="feature-item done">
-      <h4>Epic 3 · Segurança e Autenticação</h4>
-      <p>Login seguro, autenticação JWT, autorização por perfil, alteração de senha e rastreabilidade de ações.</p>
+      <h4>Epic 3 · Segurança e Autenticação <span class="phase-tag done">Concluído</span></h4>
+      <p>Login seguro, autenticação JWT, MFA (TOTP), step-up, autorização por perfil, alteração de senha e rastreabilidade de ações.</p>
     </div>
     <div class="feature-item done">
-      <h4>Epic 4 · Erros, Documentação e Testes</h4>
-      <p>Tratamento padronizado de erros, documentação interativa da API e testes automatizados dos fluxos críticos.</p>
+      <h4>Epic 4 · Erros, Documentação e Testes <span class="phase-tag done">Concluído</span></h4>
+      <p>Tratamento padronizado de erros, documentação interativa da API, recebimento de webhooks e testes automatizados dos fluxos críticos.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 5 · Onboarding KYC/KYB</h4>
-      <p>Envio e validação de documentos, verificação de identidade e trilha de aprovação para empresas tomadoras.</p>
+    <div class="feature-item done">
+      <h4>Epic 5 · Onboarding KYC/KYB <span class="phase-tag done">Concluído</span></h4>
+      <p>Envio e validação de documentos, verificação de identidade, checagens de PLD e trilha de aprovação para empresas tomadoras.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 6 · Análise de Crédito</h4>
-      <p>Esteira de análise, score, decisão fundamentada e integração ao fluxo de propostas.</p>
+    <div class="feature-item done">
+      <h4>Epic 6 · Análise de Crédito <span class="phase-tag done">Concluído</span></h4>
+      <p>Esteira de análise, score interno, motor de regras, enriquecimento por Open Finance e decisão fundamentada.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 7 · Formalização Contratual</h4>
-      <p>Geração, aceite e assinatura de contratos, bloqueio de desembolso e integração futura com assinatura eletrônica.</p>
+    <div class="feature-item done">
+      <h4>Epic 7 · Formalização Contratual <span class="phase-tag done">Concluído</span></h4>
+      <p>Geração, aceite e assinatura digital de contratos, emissão de CCB e bloqueio de desembolso sem formalização.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 8 · Cobrança e Inadimplência</h4>
-      <p>Gestão de parcelas, status, histórico, acompanhamento de atrasos e suporte ao financeiro.</p>
+    <div class="feature-item done">
+      <h4>Epic 8 · Cobrança e Inadimplência <span class="phase-tag done">Concluído</span></h4>
+      <p>Gestão de parcelas, status, histórico, acompanhamento de atrasos, renegociação, notificações e suporte ao financeiro.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 9 · Backoffice Operacional</h4>
+    <div class="feature-item done">
+      <h4>Epic 9 · Backoffice Operacional <span class="phase-tag done">Concluído</span></h4>
       <p>Fila operacional, visibilidade consolidada, tratamento manual de exceções e organização da operação assistida.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 10 · Jornada da Empresa Credora</h4>
-      <p>Onboarding, governança, aportes, visão de carteira e acompanhamento das operações financiadas.</p>
+    <div class="feature-item done">
+      <h4>Epic 10 · Jornada da Empresa Credora <span class="phase-tag done">Concluído</span></h4>
+      <p>Cadastro, elegibilidade, aportes, oportunidades de investimento, visão de carteira e operações financiadas (backend e web).</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 11 · Administração e Governança</h4>
-      <p>Controles avançados, perfis internos, parametrizações, auditoria administrativa e cadastros mestres.</p>
+    <div class="feature-item done">
+      <h4>Epic 11 · Administração e Governança <span class="phase-tag done">Concluído</span></h4>
+      <p>Perfis cumulativos, parâmetros operacionais versionados, auditoria administrativa e cadastros mestres (backend e web).</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 12 · Fundação Frontend</h4>
-      <p>Setup do projeto Angular 20, tokens SCSS dos dois design systems, telas públicas (Apple), shell autenticado (Notion), biblioteca de componentes e telas iniciais que consomem as APIs das Sprints 1-4 (perfil, alterar senha, admin de usuários, dashboard inicial). Entrega o "Frontend MVP" navegável e independente das jornadas de negócio.</p>
+    <div class="feature-item done">
+      <h4>Epic 12 · Fundação Frontend <span class="phase-tag done">Concluído</span></h4>
+      <p>Setup do projeto Angular 20, design tokens, telas públicas, shell autenticado, biblioteca de componentes e telas iniciais que consomem as APIs da fundação.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 13 · Frontend de Jornadas</h4>
-      <p>Implementação das telas funcionais de cada jornada (tomador, empresa credora, financeiro interno, backoffice e governança avançada) sobre a Fundação Frontend, consumindo as APIs publicadas pelas Epics 5-11.</p>
+    <div class="feature-item now">
+      <h4>Epic 13 · Frontend de Jornadas <span class="phase-tag now">Em finalização</span></h4>
+      <p>Telas funcionais de cada jornada (tomador, credora, financeiro, backoffice e governança) sobre a Fundação Frontend. Todas as jornadas foram entregues na web; em curso a integração e os ajustes finais.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 14 · Mobile SEP</h4>
-      <p>App mobile em Angular 20 + Ionic 8.4+ + Capacitor 6, seguindo o design system Notion. Cobre apenas as jornadas externas (tomador e empresa credora); financeiro, backoffice e administração permanecem no web.</p>
+    <div class="feature-item now">
+      <h4>Epic 14 · Mobile SEP <span class="phase-tag now">Em finalização</span></h4>
+      <p>App em Angular 20 + Ionic 8.4+ + Capacitor, com o novo design system aplicado. Fundação e autenticação concluídas; as telas das jornadas externas (tomador e credora) estão em construção.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 15 · Movimentação Pix</h4>
-      <p>Desembolso, recebimento, conciliação, rastreabilidade e integração operacional do Pix.</p>
+    <div class="feature-item done">
+      <h4>Epic 15 · Movimentação Pix <span class="phase-tag done">Concluído</span></h4>
+      <p>Desembolso, recebimento, conciliação, conta escrow e rastreabilidade (backend e telas web). Operação em modo produção é consolidada na trilha de infraestrutura.</p>
     </div>
-    <div class="feature-item">
-      <h4>Epic 16 · Infraestrutura AWS Futura</h4>
-      <p>Planejamento de ambientes remotos (EC2 + RDS), deploy, seeds e estrutura para escalar a operação. Trilha técnica habilitadora; só inicia após a conclusão do login, autenticação e autorização.</p>
+    <div class="feature-item later">
+      <h4>Epic 16 · Infraestrutura AWS <span class="phase-tag later">Planejado</span></h4>
+      <p>Ambientes remotos (EC2 + RDS), deploy, seeds e estrutura para escalar a operação. Trilha técnica habilitadora; ainda não iniciada.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Epic 17 · Novo Design System SEP <span class="phase-tag done">Concluído</span></h4>
+      <p>Linguagem visual própria da SEP, com tokens, temas e modo escuro, aplicada na web (login, cadastro, dashboard, shell e jornadas) e no aplicativo mobile.</p>
     </div>
   </div>
-</section>
 </section>
 
 <section id="sprints">
   <h2>Resumo das Sprints de Entrega</h2>
-  <div class="subtitle">Veja abaixo as etapas técnicas já planejadas e validadas para a construção da plataforma SEP.</div>
+  <div class="subtitle">As etapas técnicas já concluídas na construção da plataforma. O backend percorreu 21 sprints; web e mobile evoluíram em paralelo.</div>
+
+  <h3>⚙️ Backend (API) — 21 sprints concluídas</h3>
   <div class="feature-block">
     <div class="feature-item done">
-      <h4>Sprint 1 · Fundação Técnica</h4>
-      <p>Criação da base técnica do backend: projeto Java 21 + Spring Boot, ambiente local com PostgreSQL em Docker, configuração regional do Brasil, CORS, endpoint de saúde e migrations Flyway. Tudo pronto para as próximas jornadas.</p>
+      <h4>Sprints 1-4 · Fundação técnica <span class="phase-tag done">Concluído</span></h4>
+      <p>Projeto Java 21 + Spring Boot, ambiente local, gestão de usuários, autenticação JWT, controle de acesso, tratamento de erros, documentação OpenAPI, webhooks e testes dos fluxos críticos.</p>
     </div>
     <div class="feature-item done">
-      <h4>Sprint 2 · Gestão de Usuários</h4>
-      <p>Modelagem da entidade de usuário, contratos de DTO, mapeamento, cadastro público com validação, persistência segura de senha (BCrypt), auditoria automática e controle de perfis (admin/cliente).</p>
+      <h4>Sprint 5 · Endurecimento de segurança <span class="phase-tag done">Concluído</span></h4>
+      <p>MFA (TOTP), refresh token rotativo, rate limiting, step-up de autenticação e bloqueio de conta — o portão de segurança que liberou a Fase 2.</p>
     </div>
     <div class="feature-item done">
-      <h4>Sprint 3 · Segurança e Autenticação</h4>
-      <p>Implementação de login com JWT, filtro de autenticação, controle de acesso por perfil e ownership, endpoints de autenticação e consulta do usuário autenticado, além de auditoria persistindo o responsável por cada ação.</p>
+      <h4>Sprints 6-7 · Onboarding e PLD <span class="phase-tag done">Concluído</span></h4>
+      <p>Onboarding de pessoas (KYC) e empresas (KYB), verificação de identidade e checagens de prevenção à lavagem de dinheiro, com webhooks de provedores e auditoria reforçada.</p>
     </div>
     <div class="feature-item done">
-      <h4>Sprint 4 · Erros, Documentação e Testes</h4>
-      <p>Tratamento centralizado de erros com payload padronizado, documentação OpenAPI completa via Swagger UI e cobertura mínima de testes automatizados para cenários críticos de autenticação e autorização.</p>
+      <h4>Sprints 8-9 · Crédito <span class="phase-tag done">Concluído</span></h4>
+      <p>Proposta de crédito, motor de regras, score interno, papel de Financeiro e enriquecimento da análise por Open Finance.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprints 10-11 · Formalização <span class="phase-tag done">Concluído</span></h4>
+      <p>Geração do contrato, aceite do tomador, assinatura digital e emissão de CCB, com trilha completa de eventos de assinatura.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprints 12-13 · Cobrança <span class="phase-tag done">Concluído</span></h4>
+      <p>Agenda de parcelas (Price/SAC), recebimentos, workflow de inadimplência, renegociação e notificações ao cliente, com controle de idempotência.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprint 14 · Backoffice <span class="phase-tag done">Concluído</span></h4>
+      <p>Fila de operações, comentários, reprocesso e dashboard interno para a operação assistida.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprint 15 · Hardening pós-Fase-2 <span class="phase-tag done">Concluído</span></h4>
+      <p>Caça a bugs, correções de qualidade e elevação da cobertura de testes a uma linha de base formal antes de avançar.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprints 16-17 · Empresa credora <span class="phase-tag done">Concluído</span></h4>
+      <p>Cadastro e elegibilidade da credora, oportunidades de investimento, manifestação de interesse, operações financiadas e carteira.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprint 18 · Governança e RBAC <span class="phase-tag done">Concluído</span></h4>
+      <p>Perfis cumulativos (ex.: Financeiro + Backoffice) e parâmetros operacionais versionados.</p>
+    </div>
+    <div class="feature-item done">
+      <h4>Sprints 19-21 · Pix <span class="phase-tag done">Concluído</span></h4>
+      <p>Fundação Pix e conta escrow, desembolso assistido com confirmação reforçada e recebimento com conciliação e tratamento de divergências.</p>
+    </div>
+  </div>
+
+  <h3>🖥️ Web e 📱 Mobile — em paralelo</h3>
+  <div class="feature-block">
+    <div class="feature-item done">
+      <h4>Web · 15 sprints (F-0 a F-15) <span class="phase-tag done">Concluído</span></h4>
+      <p>Da fundação Angular às jornadas de tomador, credora, financeiro, backoffice e governança, incluindo as telas de Pix. O novo design system próprio da SEP foi aplicado em todas as superfícies principais.</p>
+    </div>
+    <div class="feature-item now">
+      <h4>Mobile · fundação + design (M-0 a M-5, M-12) <span class="phase-tag now">Em finalização</span></h4>
+      <p>Fundação Ionic/Capacitor, autenticação real (com MFA) e o novo design system com modo escuro já aplicados. As telas das jornadas externas (M-6 a M-11) estão em construção.</p>
     </div>
   </div>
 </section>
-</section>
 
 <section id="fase-atual">
-  <h2>5. O que Está Sendo Construído Agora</h2>
-  <div class="subtitle">Detalhes da fase em execução — a fundação técnica da plataforma.</div>
+  <h2>5. Onde Estamos Agora</h2>
+  <div class="subtitle">A plataforma já cobre a jornada de crédito de ponta a ponta. O foco atual é a finalização do aplicativo mobile e a preparação da operação em nuvem.</div>
 
-  <p>Esta é a fase mais silenciosa para quem olha de fora, mas a mais crítica para o sucesso do produto. Estamos preparando <strong>o chão</strong> sobre o qual todas as funcionalidades serão construídas: a segurança, a identidade dos usuários, a auditoria de cada ação, a documentação da API e o ambiente operacional.</p>
+  <p>Diferente da fase inicial — quando o trabalho ficava "embaixo do capô" —, hoje há produto visível e operável: empresas podem ser cadastradas, analisadas, ter contratos assinados e parcelas cobradas, e os valores se movimentam via <strong>Pix</strong> com segregação em conta escrow. A aplicação web já apresenta tudo isso com o novo design system. O que resta é, sobretudo, levar essas jornadas ao <strong>aplicativo mobile</strong> e estruturar os <strong>ambientes de homologação e produção</strong> em nuvem.</p>
+
+  <h3>Maturidade do que já foi entregue</h3>
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="num">21</div>
+      <div class="label">Sprints de Backend</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">48</div>
+      <div class="label">Sprints no Total</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">1.400+</div>
+      <div class="label">Testes Automatizados</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">86–96%</div>
+      <div class="label">Cobertura de Código</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">30+</div>
+      <div class="label">Endpoints da API</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">CMN 4.656</div>
+      <div class="label">Marco Regulatório</div>
+    </div>
+  </div>
 
   <div class="highlight-row">
     <div class="highlight-card">
       <span class="big-icon">🔒</span>
-      <h4>Segurança desde o dia um</h4>
-      <p>Senhas protegidas criptograficamente, acesso controlado por perfil, sessões seguras.</p>
+      <h4>Segurança em profundidade</h4>
+      <p>Senhas criptografadas, acesso por perfil, autenticação em duas etapas e confirmação reforçada para movimentar dinheiro.</p>
     </div>
     <div class="highlight-card">
       <span class="big-icon">📝</span>
       <h4>Tudo auditável</h4>
-      <p>Cada criação e alteração registra automaticamente quem fez, quando e em qual recurso.</p>
+      <p>Cada ação registra quem fez, quando e em qual recurso — base para a conformidade regulatória.</p>
     </div>
     <div class="highlight-card">
-      <span class="big-icon">🔌</span>
-      <h4>Pronta para integrar</h4>
-      <p>Documentação automática e contratos claros para o frontend e parceiros futuros.</p>
+      <span class="big-icon">💸</span>
+      <h4>Dinheiro em movimento</h4>
+      <p>Pix de desembolso e recebimento, com conta escrow e conciliação automática das parcelas.</p>
     </div>
   </div>
 
-  <h3>Em quatro blocos curtos de cerca de uma semana</h3>
-  <p>A fase atual é executada em quatro blocos curtos, cada um com um objetivo específico. Com a equipe apoiada por agentes de IA e especificação detalhada pronta, cada bloco roda em aproximadamente uma semana. Ao final de cada bloco, há validação para garantir que a base está firme antes de avançar.</p>
-
+  <h3>O que está em foco agora</h3>
   <div class="feature-block">
-    <div class="feature-item done">
-      <h4>Bloco 1 · Preparação do ambiente <span class="phase-tag done">~1 semana</span></h4>
-      <p>Configuração do ambiente de desenvolvimento, banco de dados local, aspectos regionais brasileiros (idioma e fuso horário) e preparo do sistema de versionamento do banco.</p>
+    <div class="feature-item now">
+      <h4>Jornadas no aplicativo mobile <span class="phase-tag now">Em andamento</span></h4>
+      <p>Levar as jornadas externas (tomador e credora) ao app, sobre a fundação e o design system já aplicados. Onboarding, crédito, formalização, cobrança e Pix no celular.</p>
     </div>
-    <div class="feature-item done">
-      <h4>Bloco 2 · Usuários e cadastro <span class="phase-tag done">~1 semana</span></h4>
-      <p>Primeira capacidade de negócio: permitir que alguém se cadastre na plataforma. Inclui validações, armazenamento seguro da senha e auditoria do registro.</p>
+    <div class="feature-item now">
+      <h4>Integração e ajustes finais na web <span class="phase-tag now">Em andamento</span></h4>
+      <p>Refinamento da integração entre as telas das jornadas e a API, fechando os detalhes finais da experiência web.</p>
     </div>
-    <div class="feature-item done">
-      <h4>Bloco 3 · Login e controle de acesso <span class="phase-tag done">~1 semana</span></h4>
-      <p>O usuário passa a poder entrar na plataforma, acessar seus dados, trocar a própria senha, e o administrador passa a poder listar e consultar todos os usuários.</p>
+    <div class="feature-item later">
+      <h4>Ambientes de homologação e produção <span class="phase-tag later">Planejado</span></h4>
+      <p>Estruturar a infraestrutura em nuvem (AWS) para sair do ambiente de desenvolvimento e operar em escala, com publicação automática e monitoramento.</p>
     </div>
-    <div class="feature-item done">
-      <h4>Bloco 4 · Qualidade e documentação <span class="phase-tag done">~1 semana</span></h4>
-      <p>Padronização de mensagens de erro, documentação interativa da API acessível em uma página dedicada e cobertura dos cenários críticos com testes automatizados.</p>
+    <div class="feature-item later">
+      <h4>Integrações em modo produção <span class="phase-tag later">Planejado</span></h4>
+      <p>Consolidar as conexões reais com provedores externos (movimentação Pix, assinatura digital, verificações) à medida que os ambientes em nuvem entram no ar.</p>
     </div>
   </div>
 
   <div class="callout success">
-    <strong>Por que entregar em blocos curtos:</strong> cada bloco é testado e validado antes do próximo começar. Isso reduz retrabalho, permite ajustes rápidos e dá visibilidade constante do progresso.
+    <strong>Por que entregamos em blocos curtos:</strong> cada sprint é testada e validada antes da próxima começar. Isso reduziu retrabalho, permitiu ajustes rápidos e deu visibilidade constante do progresso ao longo das 48 sprints já concluídas.
   </div>
 </section>
 
 <section id="proximos">
   <h2>6. Próximos Marcos</h2>
-  <div class="subtitle">O que vem logo depois da fundação técnica.</div>
+  <div class="subtitle">O que vem a seguir, agora que a jornada de crédito já está construída de ponta a ponta.</div>
 
   <div class="feature-block">
-    <div class="feature-item next">
-      <h4>Onboarding da empresa tomadora <span class="phase-tag next">Fase 2</span></h4>
-      <p>Primeira onda funcional depois da fundação. A empresa que quer tomar o empréstimo começa a jornada enviando documentos e passando por validações cadastrais. Marca simbólico: primeira <em>proposta</em> entra na plataforma.</p>
+    <div class="feature-item now">
+      <h4>App mobile com as jornadas completas <span class="phase-tag now">Em andamento</span></h4>
+      <p>As empresas tomadoras e credoras passam a operar pelo celular, e não só pela web. Marco simbólico: primeira <em>jornada completa concluída no aplicativo</em>.</p>
     </div>
 
-    <div class="feature-item next">
-      <h4>Primeira análise de crédito <span class="phase-tag next">Fase 2</span></h4>
-      <p>Com a tomadora cadastrada, começa a esteira de análise. O time financeiro interno conduz a decisão com apoio da plataforma. Marco simbólico: primeira <em>aprovação</em> registrada.</p>
+    <div class="feature-item later">
+      <h4>Ambiente de homologação no ar <span class="phase-tag later">Planejado</span></h4>
+      <p>Um ambiente dedicado para validação antes da produção, espelhando a operação real. Marco simbólico: primeira <em>operação validada fora do ambiente de desenvolvimento</em>.</p>
     </div>
 
-    <div class="feature-item next">
-      <h4>Primeiro contrato formalizado <span class="phase-tag next">Fase 2</span></h4>
-      <p>A proposta aprovada vira contrato, com aceite e assinatura registrados. Marco simbólico: primeira <em>operação fechada</em>.</p>
+    <div class="feature-item later">
+      <h4>Produção e integrações reais <span class="phase-tag later">Planejado</span></h4>
+      <p>Entrada em produção com as integrações externas em modo real (Pix, assinatura digital, verificações). Marco simbólico: primeira <em>operação real de ponta a ponta</em>.</p>
     </div>
 
-    <div class="feature-item next">
-      <h4>Primeira cobrança acompanhada <span class="phase-tag next">Fase 2</span></h4>
-      <p>Com o contrato vivo, as parcelas passam a ser acompanhadas. Marco simbólico: primeiro <em>recebimento conciliado</em>.</p>
+    <div class="feature-item later">
+      <h4>Operação em escala <span class="phase-tag later">Planejado</span></h4>
+      <p>Monitoramento contínuo, publicação automática e ajustes de capacidade conforme o volume cresce. Marco simbólico: plataforma <em>pronta para crescer com segurança</em>.</p>
     </div>
   </div>
 
   <div class="callout info">
-    <strong>Sobre a prioridade:</strong> decidimos conscientemente priorizar <em>a jornada de contratação do empréstimo</em> antes de capacidades financeiras expandidas como Pix. Isso garante que a plataforma entregue seu valor essencial primeiro — fechar operações de empréstimo de ponta a ponta — antes de ganhar recursos adicionais.
+    <strong>Sobre a prioridade que seguimos:</strong> priorizamos conscientemente a <em>jornada de contratação do empréstimo</em> antes da entrada em produção e da infraestrutura em nuvem. Isso garantiu que a plataforma entregasse seu valor essencial primeiro — fechar operações de crédito de ponta a ponta, incluindo Pix — antes de investir na operação em escala.
   </div>
 </section>
 
@@ -1016,33 +1092,38 @@
   <div class="subtitle">Respostas diretas para o que costuma surgir na visão executiva do projeto.</div>
 
   <div class="faq-item">
-    <h4>Quando vou ver o sistema funcionando para usuário real?</h4>
-    <p>O uso real por empresas tomadoras e credoras começa na <strong>Fase 2</strong>, com o onboarding e a análise de crédito. A Fase 1 é a fundação técnica — invisível do lado do usuário final, mas indispensável para o resto.</p>
+    <h4>Já dá para usar o sistema com fluxos reais?</h4>
+    <p>Sim. A jornada de crédito completa — cadastro, onboarding, análise, contrato, cobrança e Pix — já está construída no backend e disponível na <strong>aplicação web</strong>. O uso em <em>produção</em> com clientes reais depende da entrada no ar dos ambientes em nuvem e das integrações externas em modo real, que são os próximos marcos.</p>
   </div>
 
   <div class="faq-item">
-    <h4>Por que Pix não entra desde o início?</h4>
-    <p>Porque o valor da plataforma não é o meio de pagamento — é a <em>jornada de crédito</em>. Entregar Pix antes de ter operações de crédito fechadas seria construir o meio de transporte sem a mercadoria para transportar. Pix entra depois que já houver empréstimos prontos para desembolsar e parcelas para receber.</p>
+    <h4>O Pix já está pronto?</h4>
+    <p>Sim. O Pix de <strong>desembolso</strong> (liberação ao tomador) e de <strong>recebimento</strong> (parcelas), com conta escrow e conciliação automática, já está implementado no backend e nas telas web. A conexão em modo produção com o provedor é consolidada junto da infraestrutura em nuvem.</p>
   </div>
 
   <div class="faq-item">
-    <h4>Como sei que o que está sendo construído está certo?</h4>
-    <p>Cada bloco termina com testes de validação manual. A Fase 1 também entrega uma <em>documentação interativa</em> da API, onde é possível ver todos os recursos disponíveis e, se quiser, testá-los. Auditoria automática garante que cada ação no sistema fica registrada.</p>
+    <h4>Como sei que o que foi construído está sólido?</h4>
+    <p>São mais de <strong>1.400 testes automatizados</strong>, com cobertura de código entre 86% e 96% nos módulos de negócio, além de uma <em>documentação interativa</em> da API onde é possível ver e testar os recursos. A auditoria automática registra cada ação, e o projeto segue o marco regulatório <strong>CMN 4.656/2018</strong> (KYC/KYB, PLD e segregação patrimonial via escrow).</p>
   </div>
 
   <div class="faq-item">
-    <h4>O que é o "frontend" mencionado na Fase 3?</h4>
-    <p>É a <strong>aplicação web</strong> — a interface visual pela qual os usuários realmente vão acessar a plataforma (tela de login, dashboards, formulários). Ela será construída em Angular 20 sobre <strong>dois design systems próprios da SEP</strong>: um para as telas públicas (landing, login, cadastro) e outro para todas as telas autenticadas. A escolha por design systems próprios, em vez de um template de mercado, foi feita para preservar a flexibilidade do produto a mudanças ao longo do tempo.</p>
+    <h4>O frontend já está com a identidade visual definitiva?</h4>
+    <p>Sim. A <strong>aplicação web</strong> (Angular 20) recebeu o <strong>novo design system próprio da SEP</strong> — com tokens, temas e modo escuro — aplicado em login, cadastro, dashboard, shell e nas telas das jornadas. O <strong>aplicativo mobile</strong> também já adota esse design system; suas telas de jornada estão em finalização.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>O que ainda falta para concluir o projeto?</h4>
+    <p>Principalmente dois blocos: concluir as <em>telas das jornadas no aplicativo mobile</em> e estruturar a <em>infraestrutura em nuvem</em> (ambientes de homologação e produção na AWS), com as integrações externas em modo produção. O ambiente de desenvolvimento atual já roda a plataforma completa.</p>
   </div>
 
   <div class="faq-item">
     <h4>Os prazos podem mudar?</h4>
-    <p>Sim. Os tempos apresentados são estimativas com base no escopo atual e na equipe prevista. Prioridades podem ser ajustadas em conjunto ao longo do projeto, e o cronograma é revisitado a cada fase. O compromisso é com <em>transparência</em> sobre desvios, não com a rigidez de uma data.</p>
+    <p>Os tempos restantes são estimativas com base no escopo atual e na equipe prevista. Prioridades podem ser ajustadas em conjunto, e o cronograma é revisitado a cada fase. O compromisso é com <em>transparência</em> sobre desvios, não com a rigidez de uma data.</p>
   </div>
 
   <div class="faq-item">
     <h4>Quem acompanha o dia a dia?</h4>
-    <p>A execução técnica é conduzida por um time com um desenvolvedor sênior responsável pelo backend e dois desenvolvedores focados no frontend. Do lado do produto, o acompanhamento executivo fica com a liderança do projeto, com pontos regulares de status.</p>
+    <p>A execução técnica é conduzida por um time de 3 desenvolvedores apoiados por agentes de IA. Do lado do produto, o acompanhamento executivo fica com a liderança do projeto, com pontos regulares de status.</p>
   </div>
 </section>
 
@@ -1051,7 +1132,7 @@
 <footer>
   <div style="max-width: 1180px; margin: 0 auto;">
     <strong>Plataforma SEP</strong> · Apresentação Executiva ao Cliente<br>
-    Documento elaborado para visão de negócio, prazos e entregas · Atualizado em 24/04/2026
+    Documento elaborado para visão de negócio, prazos e entregas · Atualizado em 16/06/2026
   </div>
 </footer>
 
