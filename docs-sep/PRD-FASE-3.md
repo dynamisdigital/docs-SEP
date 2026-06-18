@@ -382,7 +382,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | Sprint | Epic/frente | Tema | Spec | Tasks impl. |
 |--------|-------------|------|------|-------------|
 | M-12 | Epic 17 | Aplicacao do design system mobile (**concluida em 2026-06-15; desbloqueia M-6/206**) | [`212`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`steps`](../steps-fase-3/mobile/212-msprint-12-steps.md) | 5 |
-| M-6 | Epic 14 | Tomador: onboarding mobile | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) | 6 |
+| M-6 | Epic 14 | Tomador: onboarding mobile (**implementada em 2026-06-18 na branch `feature/msprint-6-onboarding-mobile`; push/PR/merge manuais pendentes**) | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) + [`steps`](../steps-fase-3/mobile/206-msprint-6-steps.md) | 6 |
 | M-7 | Epic 14 | Tomador: proposta, credito e Open Finance | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) | 6 |
 | M-8 | Epic 14 | Tomador: formalizacao e contrato | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) | 5 |
 | M-9 | Epic 14 | Tomador: parcelas e cobranca | [`209`](../specs/fase-3/209-msprint-9-cobranca-mobile.md) | 6 |

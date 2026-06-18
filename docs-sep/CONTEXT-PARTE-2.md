@@ -653,6 +653,16 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - decisoes: frontend so apresenta status do backend; representante exibido apenas com `cpfMascarado`; upload nao persiste arquivo em storage local; campos PJ opcionais omitidos quando vazios; `401/403/423` tratados pelo `errorInterceptor` global, paginas tratam `400/404/409/5xx`.
   - doc operacional: `repos/sep-app/README.md` (secao Onboarding) atualizado.
 
+- **M-Sprint 6 (Onboarding mobile do tomador) implementada na branch `feature/msprint-6-onboarding-mobile` (2026-06-18); push/PR/merge manuais pendentes**:
+  - spec de origem: `specs/fase-3/206-msprint-6-onboarding-mobile.md`; steps em `steps-fase-3/mobile/206-msprint-6-steps.md`. Primeira jornada funcional do Epic 14 (Fase Mobile 2), desbloqueada pela M-Sprint 12 (design system mobile).
+  - consome as APIs reais de onboarding PF (`/api/v1/onboarding/pessoa`) e PJ (`/api/v1/onboarding/empresa`) das Sprints 6-7; o app coleta dados, envia documentos e apresenta o status, sem replicar regras KYC/KYB/PLD (decisoes no backend).
+  - entregue (M-6.1 a M-6.6): DTOs de borda + `OnboardingMobileService` (transporte HTTP, multipart `tipo`+`arquivo`, Promise via `firstValueFrom`); rota lazy `/app/onboarding` sob `authGuard` + CTA na home do tomador; `onboarding-shell` (orquestrador: selecao PF/PJ, progresso por etapas, inicio, upload, verificacao, status, reload/retry, erro, recomecar); formularios PF/PJ apresentacionais (tipo societario/porte opcionais, alinhados a colunas nullable); `document-upload` (limite local 10 MB); `onboarding-status` (badge + resultado).
+  - persistencia: `onboarding-journey.store` guarda o ponteiro `{tipo, onboardingId}` via Capacitor Preferences (com validacao de forma na leitura). Necessario porque o backend nao expoe consulta do onboarding corrente por usuario (apenas por id); sem o ponteiro, recarregar o app perderia a jornada e um novo `POST` do mesmo CPF/CNPJ retornaria 409. Nao persiste PII.
+  - verificacao: 154 testes Vitest; `lint`/`lint:scss`/`format:check`/`build` verdes; smoke Playwright PWA `e2e/onboarding-mobile.spec.ts` (login -> onboarding -> dados PF -> documento -> status) servido por MSW, verde em viewport Pixel 5 (4/4 com o smoke publico). `golden-path-mobile`/`profile-actions` seguem vermelhos por exigirem backend real `:8080` (preexistente).
+  - decisoes: componentes com `ion-input`/`ion-select` testados por instancia (`runInInjectionContext`), pois o happy-dom nao monta esses web components (convencao de `login`/`register`); tipos de documento PF/PJ seguem o contrato real (PF nao inclui `COMPROVANTE_ENDERECO`); `verificar` retorna 202; MSW de onboarding com cenarios feliz/pendencia/erro por documento de entrada.
+  - divida aceita: `onboarding-shell.component.scss` acima do budget de warning (3.59 kB), abaixo do de erro (4 kB).
+  - doc operacional: `repos/sep-mobile/README.md` (secao Onboarding do tomador — M-Sprint 6) atualizado.
+
 ## Observacao importante para outro agente
 
 Se outro agente assumir este trabalho, ele deve:
