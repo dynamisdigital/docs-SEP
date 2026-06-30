@@ -151,3 +151,92 @@ Testes:
 Spec e steps:
 - [`specs/fase-3/207-msprint-7-credito-mobile.md`](../../specs/fase-3/207-msprint-7-credito-mobile.md)
 - [`steps-fase-3/mobile/207-msprint-7-steps.md`](../../steps-fase-3/mobile/207-msprint-7-steps.md)
+
+## Formalizacao e contrato do tomador (M-Sprint 8)
+
+Jornada PWA de formalizacao que consome os contratos reais de `sep-api` (contratos Sprints
+10-11). O tomador localiza o contrato a partir de uma proposta propria, le a versao vigente,
+registra o aceite com step-up e acompanha assinatura/CCB. **Ownership, versionamento, regra
+contratual, assinatura e validade juridica permanecem no backend** — o app apenas apresenta os
+snapshots recebidos e nunca calcula status, hash ou validade.
+
+Rotas (lazy, sob o shell autenticado, `roleGuard` com `roles: ['CLIENTE']`, `data.tab = 'propostas'`):
+- `/app/formalizacao` — entrada: lista as propostas `APROVADA` do tomador (fonte
+  `CreditoMobileService`), sem N+1 e sem inventar lista global de contratos.
+- `/app/formalizacao/proposta/:propostaId` — detalhe resolvido por proposta.
+- `/app/formalizacao/contratos/:contratoId` — detalhe resolvido por contrato (usado tambem como
+  `next` do step-up).
+
+Entradas: atalho "Formalizacao" na home do tomador (`/app/formalizacao`) e CTA "Ver
+formalizacao" no detalhe da proposta, exibido apenas para proposta `APROVADA` (a existencia do
+contrato e confirmada pelo backend; nao e inferida pelo status).
+
+Nao existe `GET /api/v1/contratos` global: a entrada lista propostas e o contrato so e
+consultado ao abrir uma proposta. Proposta aprovada ainda sem contrato retorna `404` (mensagem
+"contrato ainda indisponivel" com retry; o app nunca gera contrato).
+
+Telas/componentes (`src/app/features/tomador/formalizacao/`):
+- `formalizacao-list.component` — entrada paginada (filtro fixo `APROVADA`), estados
+  loading/vazio/erro+retry, pull-to-refresh; token de geracao descarta respostas obsoletas.
+- `contrato-detail.component` — orquestra carga (por proposta ou id, usando `contrato.id` como
+  identidade), leitura, historico, aceite com step-up, status de assinatura e download. Trata
+  `403` (ownership, mensagem neutra), `404` (indisponivel) e rede com retry.
+- `contrato-content.component` — apresentacional: renderiza a versao (cabecalho, hash SHA-256
+  com quebra/copia, `conteudoTexto` e clausulas) **somente como texto** (interpolacao, nunca
+  `innerHTML`); o hash nao e recalculado nem validado.
+
+Leitura e historico: a versao vigente e exibida por padrao; o historico
+(`GET /contratos/{id}/versoes`) e carregado sob demanda preservando a ordem ascendente.
+Selecionar uma versao historica muda apenas a leitura, nunca a vigente, e nunca habilita aceite.
+Falha no historico nao impede a leitura da versao vigente embutida no contrato.
+
+Aceite com step-up: o CTA "Aceitar contrato" so aparece para a versao vigente em
+`AGUARDANDO_ACEITE` e ao titular `CLIENTE`. A confirmacao mostra numero da versao e hash, sem
+checkbox pre-marcado; cancelar nao chama API e o duplo submit e bloqueado. Sem MFA o aceite e
+bloqueado com orientacao (o mobile **nao** usa o bypass legado do backend). Com MFA e sem token,
+o app navega para `/app/step-up?next=/app/formalizacao/contratos/{id}` e, ao voltar, exige novo
+toque explicito (nenhum aceite automatico). O `stepUpInterceptor` anexa `X-Step-Up-Token` apenas
+no `PATCH /contratos/{id}/aceite` (uso unico). Concorrencia/erros: `403` de step-up limpa o token
+e reabre a verificacao, `403` de ownership nao entra em loop, `409` recarrega e exige nova
+leitura, rede/`5xx` nao assume aceite.
+
+Status e documento: pos-aceite, a fase de assinatura exibe `statusContrato` e, quando presente,
+o `statusEnvelope` (`RASCUNHO`/`ENVIADO`/`VISUALIZADO`/`ASSINADO`/`RECUSADO`/`EXPIRADO`),
+atualizados por acao do usuario (sem polling). Quando `ASSINADO`, o CTA baixa o PDF assinado pela
+API autenticada do SEP como blob transitorio: a URL de objeto e criada no momento do download e
+revogada em seguida; nada (blob, hash, token) e persistido ou logado, e o conteudo do PDF nunca
+entra no DOM. Corpo `200` vazio e tratado como erro explicito, nunca como download bem-sucedido.
+
+Servico (`src/app/core/contratos/contratos-mobile.service.ts`): transporte HTTP de
+`/api/v1/contratos` (consulta por proposta/id, versoes, aceite, status de assinatura e download
+binario). Os DTOs de borda ficam em `src/app/core/api/api.models.ts`.
+
+Limites de seguranca: `idEnvelopeExterno`, `tomadorId`, `parecerOrigemId`, IP e User-Agent do
+aceite chegam nos DTOs por fidelidade ao backend, mas nunca sao exibidos. O step-up token fica
+apenas em memoria (`StepUpTokenStore`, uso unico) — nunca em `localStorage`, `sessionStorage` ou
+Capacitor Preferences. Operacoes `FINANCEIRO`/`ADMIN` (cancelar, reenviar, reprocessar) e o
+webhook/provider Clicksign ficam fora do app.
+
+MSW (`src/mocks/handlers.ts`): handlers de step-up (`initiate`/`complete`) e de formalizacao
+respondem apenas para a proposta/contrato semeados pelo smoke (demais ids => `404`, sem afetar os
+outros smokes). O estado avanca o envelope a cada consulta ate `ASSINADO`; dados e PDF
+integralmente ficticios, sem token/PII persistidos. O usuario mock passa a ter `mfaHabilitado`
+para exercitar o step-up.
+
+Testes:
+- Vitest: `ContratosMobileService`, rotas, entrada, CTA da proposta, detalhe, conteudo,
+  historico, interceptor de step-up, aceite (MFA/token/concorrencia/erros), status e
+  blob/headers/revogacao da URL — componentes Ionic testados por instancia.
+- E2E PWA (`e2e/formalizacao-mobile.spec.ts`): jornada completa por MSW (entrada -> leitura ->
+  historico -> aceite com step-up -> retorno sem aceite automatico -> aceite efetivo -> status ->
+  download), em Pixel 5 e 320px, com assercoes negativas (sem envelope externo, sem operacoes
+  internas, sem token em storage).
+
+Gap conhecido: o controller de contratos ainda usa `@RequireStepUp` legado, que tem bypass
+server-side para usuario sem MFA. O mobile exige MFA antes do aceite, mas isso **nao** substitui
+enforcement server-side; o go-live da jornada exige confirmar a politica operacional de MFA ou
+aprovar hardening backend para step-up estrito.
+
+Spec e steps:
+- [`specs/fase-3/208-msprint-8-formalizacao-mobile.md`](../../specs/fase-3/208-msprint-8-formalizacao-mobile.md)
+- [`steps-fase-3/mobile/208-msprint-8-steps.md`](../../steps-fase-3/mobile/208-msprint-8-steps.md)

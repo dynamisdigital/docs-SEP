@@ -390,8 +390,8 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 |--------|-------------|------|------|-------------|
 | M-12 | Epic 17 | Aplicacao do design system mobile (**concluida em 2026-06-15; desbloqueia M-6/206**) | [`212`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`steps`](../steps-fase-3/mobile/212-msprint-12-steps.md) | 5 |
 | M-6 | Epic 14 | Tomador: onboarding mobile (**mergeada em `origin/develop` via PR #79, commit `4f495f3`**) | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) + [`steps`](../steps-fase-3/mobile/206-msprint-6-steps.md) | 6 |
-| M-7 | Epic 14 | Tomador: proposta, credito e Open Finance (**implementada na branch `feature/msprint-7-credito-mobile`; push/PR/merge manuais pendentes**) | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) + [`steps`](../steps-fase-3/mobile/207-msprint-7-steps.md) | 6 |
-| M-8 | Epic 14 | Tomador: formalizacao e contrato | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) | 5 |
+| M-7 | Epic 14 | Tomador: proposta, credito e Open Finance (**mergeada em `develop` (PR #100) e promovida a `main` (PR #104); develop==main**) | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) + [`steps`](../steps-fase-3/mobile/207-msprint-7-steps.md) | 6 |
+| M-8 | Epic 14 | Tomador: formalizacao e contrato (**mergeada em `origin/develop` via PR #105, squash `be792df`**) | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) + [`steps`](../steps-fase-3/mobile/208-msprint-8-steps.md) | 5 |
 | M-9 | Epic 14 | Tomador: parcelas e cobranca | [`209`](../specs/fase-3/209-msprint-9-cobranca-mobile.md) | 6 |
 | M-10 | Epic 14 | Empresa credora mobile | [`210`](../specs/fase-3/210-msprint-10-credora-mobile.md) | 6 |
 | M-11 | Epic 14/15 | Pix visivel ao usuario | [`211`](../specs/fase-3/211-msprint-11-pix-mobile.md) | 5 |
