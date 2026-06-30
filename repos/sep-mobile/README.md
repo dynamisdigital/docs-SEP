@@ -93,3 +93,61 @@ Testes:
 Spec e steps:
 - [`specs/fase-3/206-msprint-6-onboarding-mobile.md`](../../specs/fase-3/206-msprint-6-onboarding-mobile.md)
 - [`steps-fase-3/mobile/206-msprint-6-steps.md`](../../steps-fase-3/mobile/206-msprint-6-steps.md)
+
+## Credito e Open Finance do tomador (M-Sprint 7)
+
+Jornada PWA de credito que consome as APIs reais de `sep-api` (credito Sprints 8-9). O app
+permite ao tomador criar, listar e acompanhar propostas e concluir o consentimento Open
+Finance; **motor de credito, score, elegibilidade, juros e decisoes permanecem no backend** —
+o app apenas apresenta os estados recebidos.
+
+Rotas (lazy, sob o shell autenticado, `roleGuard` com `roles: ['CLIENTE']`, `data.tab = 'propostas'`):
+- `/app/propostas` — lista paginada das propostas do tomador.
+- `/app/propostas/nova` — criacao de proposta.
+- `/app/propostas/:id` — detalhe e status.
+- `/app/propostas/:id/open-finance` — consentimento.
+- `/app/propostas/:id/open-finance/retorno` — retorno do handoff (mesmo componente, `data.retorno`).
+
+Entradas: atalhos da home do tomador "Solicitar emprestimo" (`/app/propostas/nova`) e
+"Acompanhar proposta" (`/app/propostas`), alem da tab "Propostas".
+
+Telas/componentes (`src/app/features/tomador/credito/`):
+- `propostas-list.component` — lista paginada (`page/size`), filtro por status, estados
+  loading/vazio/erro+retry, pull-to-refresh; toque abre o detalhe. Token de geracao descarta
+  respostas concorrentes obsoletas. Nunca envia `tomadorId`.
+- `proposta-create.component` — formulario (`tipoOperacao`, `valorSolicitado`, `prazoMeses`)
+  reutilizando o ponteiro do `OnboardingJourneyStore` (M-6) como `solicitacaoOnboardingId`,
+  sem expor UUID. Trata `400/403/404/422`; `422` oferece CTA para revisar o onboarding.
+- `proposta-detail.component` — detalhe + status; quando ha parecer, exibe apenas decisao,
+  justificativa e data. Nao exibe score, `pareceristaId`, IDs internos nem trilha de regras.
+- `proposta-status.component` — badge de status compartilhado por lista e detalhe;
+  `PRE_APROVADA` nunca e apresentada como aprovacao final.
+- `open-finance.component` — fluxo opt-in (consentimento + retorno na mesma tela via
+  `data.retorno`): `redirectUri` sempre gerada pelo app, handoff so para `http(s)`, retorno
+  consulta a API SEP (query params do provider sao ignorados), `409` consulta o status em vez
+  de criar outro consentimento. Exibe apenas agregados sanitizados.
+
+Servico (`src/app/core/credito/credito-mobile.service.ts`): transporte HTTP de
+`/api/v1/credito/propostas` e `/open-finance/consentimento`; centraliza URLs e omite query
+params vazios. Os DTOs de borda ficam em `src/app/core/api/api.models.ts`.
+
+Limites LGPD / seguranca: documento (CPF/CNPJ) fica apenas no estado do formulario e e limpo
+apos o handoff — nunca persistido. Agregados Open Finance exibidos apenas como
+`mediaEntradasMensal`, `mediaSaidasMensal`, `saldoMedio`, `numeroMesesAvaliados` e
+`dataRecebimento`; nunca payload bruto, transacoes, conta, agencia, titular ou documento.
+
+MSW (`src/mocks/handlers.ts`): estado de credito/Open Finance persistido em `localStorage`
+(sobrevive ao reload do handoff no e2e; node cai para memoria via guarda). Gatilhos por
+`solicitacaoOnboardingId`: so zeros => `422`, `inexistente` => `404`, demais => `201`. O
+consentimento simula autorizacao instantanea (status `AUTORIZADO` com agregados ficticios).
+
+Testes:
+- Vitest: componentes com `ion-input`/`ion-select` testados por instancia
+  (`runInInjectionContext`); `proposta-status` (so `<span>`) testado com render real.
+- E2E PWA (`e2e/credito-mobile.spec.ts`): jornada completa por MSW (login -> lista vazia ->
+  criar -> detalhe -> Open Finance -> handoff -> retorno `AUTORIZADO`), em Pixel 5 e em 320px,
+  com assercoes negativas (sem `parecerista`, agencia ou documento apos o handoff).
+
+Spec e steps:
+- [`specs/fase-3/207-msprint-7-credito-mobile.md`](../../specs/fase-3/207-msprint-7-credito-mobile.md)
+- [`steps-fase-3/mobile/207-msprint-7-steps.md`](../../steps-fase-3/mobile/207-msprint-7-steps.md)

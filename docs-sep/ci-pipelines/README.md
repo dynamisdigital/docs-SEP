@@ -40,6 +40,17 @@ Os arquivos em `docs-sep/ci-pipelines/templates/` sao templates versionados. Cad
 - [`aws-deploy-homologacao.yml`](./templates/aws-deploy-homologacao.yml)
 - [`aws-deploy-producao.yml`](./templates/aws-deploy-producao.yml)
 
+### CloudWatch Agent (Sprint 22 — inativo ate existir EC2)
+
+- [`cloudwatch-agent-sep-api-dev.json`](./templates/cloudwatch-agent-sep-api-dev.json) — log group `/sep/dev/sep-api`, retencao de 30 dias.
+- [`cloudwatch-agent-sep-api-hml.json`](./templates/cloudwatch-agent-sep-api-hml.json) — log group `/sep/hml/sep-api`, retencao de 30 dias.
+- [`cloudwatch-agent-sep-api-prod.json`](./templates/cloudwatch-agent-sep-api-prod.json) — log group `/sep/prod/sep-api`, retencao de 90 dias.
+
+Esses arquivos coletam `/var/log/sep-api/application.json` com stream `{instance_id}`. Instalacao,
+IAM, filtros e alarmes estao no runbook
+[`OBSERVABILIDADE.md`](../OBSERVABILIDADE.md). Nao executar os templates antes do provisionamento
+do Epic 16.
+
 ## Como promover um template
 
 1. Copiar o arquivo `.template.yml` para `.github/workflows/<arquivo>.yml` no repo correspondente (remover o sufixo `.template`).

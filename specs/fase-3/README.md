@@ -23,6 +23,7 @@ As tabelas usam a ordem recomendada de execucao. A numeracao dos specs continua 
 | 19 | [`019-sprint-19-pix-foundation-escrow-provider.md`](./019-sprint-19-pix-foundation-escrow-provider.md) | Pix foundation + EscrowProvider | 6 |
 | 20 | [`020-sprint-20-pix-desembolso-assistido.md`](./020-sprint-20-pix-desembolso-assistido.md) | Pix desembolso assistido | 5 |
 | 21 | [`021-sprint-21-pix-recebimento-conciliacao.md`](./021-sprint-21-pix-recebimento-conciliacao.md) | Pix recebimento e conciliacao | 6 |
+| 22 | [`022-sprint-22-observabilidade-operacional.md`](./022-sprint-22-observabilidade-operacional.md) | Observabilidade operacional MVP + CloudWatch ready | 6 |
 
 ## Web (`sep-app`)
 

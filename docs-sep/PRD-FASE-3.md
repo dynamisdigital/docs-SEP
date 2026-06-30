@@ -181,7 +181,13 @@ Apos a conclusao das M-Sprints 0-4, a Epic 14 entra nas Fases Mobile 2-4 (jornad
 - automacao ampla com minima intervencao humana
 
 ### Epic 16 - Infraestrutura AWS futura
-- manter apenas como planejamento nesta fase
+
+**Status: primeiro incremento implementado pela Sprint 22 — Observabilidade Operacional MVP.** A
+aplicacao passa a produzir logs JSON correlacionaveis, proteger Actuator, apresentar codigo de
+suporte nos clientes e versionar configuracoes do CloudWatch Agent. Como ainda nao existe ambiente
+AWS, EC2/RDS/IAM/SNS e alarmes permanecem planejados, sem provisionamento.
+
+- manter provisionamento AWS apenas como planejamento ate existir conta/ambiente aprovado
 - iniciar somente apos a conclusao completa do sistema de login, autenticacao e autorizacao
 - usar PostgreSQL local via Docker Compose como banco oficial ate esse marco
 - preferencialmente iniciar apos a Sprint 4, caso a equipe queira levar documentacao, tratamento de erros e testes criticos ja estabilizados para o ambiente remoto
@@ -362,6 +368,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | 19 | Epic 15 | Pix foundation + EscrowProvider (**implementada**) | [`019`](../specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) | 6 |
 | 20 | Epic 15 | Pix desembolso assistido (**implementada**) | [`020`](../specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) | 5 |
 | 21 | Epic 15 | Pix recebimento e conciliacao (**implementada**) | [`021`](../specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 6 |
+| 22 | Epic 16 | Observabilidade operacional MVP + CloudWatch ready (**implementada**) | [`022`](../specs/fase-3/022-sprint-22-observabilidade-operacional.md) + [`steps`](../steps-fase-3/backend/022-sprint-22-steps.md) | 6 |
 
 ### Web (`sep-app`)
 
@@ -382,8 +389,8 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | Sprint | Epic/frente | Tema | Spec | Tasks impl. |
 |--------|-------------|------|------|-------------|
 | M-12 | Epic 17 | Aplicacao do design system mobile (**concluida em 2026-06-15; desbloqueia M-6/206**) | [`212`](../specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`steps`](../steps-fase-3/mobile/212-msprint-12-steps.md) | 5 |
-| M-6 | Epic 14 | Tomador: onboarding mobile (**implementada em 2026-06-18 na branch `feature/msprint-6-onboarding-mobile`; push/PR/merge manuais pendentes**) | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) + [`steps`](../steps-fase-3/mobile/206-msprint-6-steps.md) | 6 |
-| M-7 | Epic 14 | Tomador: proposta, credito e Open Finance | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) | 6 |
+| M-6 | Epic 14 | Tomador: onboarding mobile (**mergeada em `origin/develop` via PR #79, commit `4f495f3`**) | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) + [`steps`](../steps-fase-3/mobile/206-msprint-6-steps.md) | 6 |
+| M-7 | Epic 14 | Tomador: proposta, credito e Open Finance (**implementada na branch `feature/msprint-7-credito-mobile`; push/PR/merge manuais pendentes**) | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) + [`steps`](../steps-fase-3/mobile/207-msprint-7-steps.md) | 6 |
 | M-8 | Epic 14 | Tomador: formalizacao e contrato | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) | 5 |
 | M-9 | Epic 14 | Tomador: parcelas e cobranca | [`209`](../specs/fase-3/209-msprint-9-cobranca-mobile.md) | 6 |
 | M-10 | Epic 14 | Empresa credora mobile | [`210`](../specs/fase-3/210-msprint-10-credora-mobile.md) | 6 |

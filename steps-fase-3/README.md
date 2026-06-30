@@ -11,6 +11,7 @@ Steps just-in-time das sprints da Fase 3.
 | 19 | [`backend/019-sprint-19-steps.md`](./backend/019-sprint-19-steps.md) | Pix foundation, provider pattern e EscrowProvider |
 | 20 | [`backend/020-sprint-20-steps.md`](./backend/020-sprint-20-steps.md) | Pix desembolso assistido |
 | 21 | [`backend/021-sprint-21-steps.md`](./backend/021-sprint-21-steps.md) | Pix recebimento e conciliacao |
+| 22 | [`backend/022-sprint-22-steps.md`](./backend/022-sprint-22-steps.md) | Observabilidade operacional MVP e preparacao CloudWatch |
 
 ## Web (`sep-app`)
 

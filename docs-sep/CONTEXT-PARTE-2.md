@@ -575,6 +575,14 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - relatorios de acompanhamento de entregas foram removidos do `docs-SEP` em 2026-06-02 (nao recriar).
   - proxima execucao recomendada historica: continuar a trilha web com a F-Sprint 9 (cobranca, parcelas e inadimplencia, spec `109`) ou abrir a trilha mobile. **Atualizacao de ordem mobile**: M-Sprint 12 (`212`, aplicacao do design system mobile) foi concluida antes da M-Sprint 6 (`206`), evitando retrabalho visual nas jornadas funcionais.
 
+- **Sprint 22 (Observabilidade Operacional MVP) implementada em 2026-06-30** — primeiro incremento do Epic 16, sem provisionar AWS (codigo commitado nas feature branches; PR/merge em `develop` pendente, manual):
+  - ADR 0016, spec `022`, steps e `docs-sep/OBSERVABILIDADE.md` formalizam a separacao entre log tecnico e `audit_log_seguranca`.
+  - backend: profile `prod`, Logback JSON rotativo, request log estruturado, `X-Correlation-Id` validado, eventos `unhandled_exception`/`provider_failed`/`job_failed`, sanitizacao e management local.
+  - web/mobile: respostas 5xx com `traceId` valido recebem `Codigo de suporte`; 4xx permanecem inalterados e nenhum SDK remoto foi adicionado.
+  - CloudWatch: templates por ambiente e runbook versionados; ativacao depende de EC2, IAM, log groups e SNS futuros.
+  - code review por area (4 revisores) + validacao manual: corrigido P1 de sanitizacao — `idempotencyKey` vazava em ~13 logs de webhooks/callbacks (Assinatura/KYB/KYC/PLD); `./gradlew check` verde apos a correcao. Pendencia registrada no step 022 (§Pendencias conhecidas): IDs externos Celcoin (`consent_id` no Open Finance, `verification_id` no KYC) ainda em log, a decidir; + teste-guarda recomendado.
+  - branches: `sep-api` `feature/sprint-22-observabilidade-operacional` (3 commits por task, base `origin/develop`) e `sep-app` `feature/fsprint-observabilidade-suporte` (1 commit); mobile (Task 22.5) integrado na branch da M-Sprint 7 (`3cda599`). PR description em `repos/sep-api/SPRINT-22-PR.md`.
+
 - **M-Sprint 12 (Aplicacao do New Design System Mobile) concluida em 2026-06-15; mergeada em `develop` e promovida a `main`**:
   - spec de origem: `specs/fase-3/212-msprint-12-new-design-system-mobile.md`; steps em `steps-fase-3/mobile/212-msprint-12-steps.md`. Epic 17, pareada com a melhoria visual da F-Sprint 15.
   - aplicou o New Design System SEP no `sep-mobile` mantendo Ionic + Angular + Capacitor + SCSS: splash/welcome, login/TOTP, registro, homes, perfil/step-up, header, tabs, estados globais e showcase. `Splash/welcome` cumprem o papel da landing publica mobile; nenhuma rota landing separada foi criada.
@@ -653,7 +661,7 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - decisoes: frontend so apresenta status do backend; representante exibido apenas com `cpfMascarado`; upload nao persiste arquivo em storage local; campos PJ opcionais omitidos quando vazios; `401/403/423` tratados pelo `errorInterceptor` global, paginas tratam `400/404/409/5xx`.
   - doc operacional: `repos/sep-app/README.md` (secao Onboarding) atualizado.
 
-- **M-Sprint 6 (Onboarding mobile do tomador) implementada na branch `feature/msprint-6-onboarding-mobile` (2026-06-18); push/PR/merge manuais pendentes**:
+- **M-Sprint 6 (Onboarding mobile do tomador) mergeada em `origin/develop` via PR #79 (`4f495f3`)**; implementacao concluida em 2026-06-18:
   - spec de origem: `specs/fase-3/206-msprint-6-onboarding-mobile.md`; steps em `steps-fase-3/mobile/206-msprint-6-steps.md`. Primeira jornada funcional do Epic 14 (Fase Mobile 2), desbloqueada pela M-Sprint 12 (design system mobile).
   - consome as APIs reais de onboarding PF (`/api/v1/onboarding/pessoa`) e PJ (`/api/v1/onboarding/empresa`) das Sprints 6-7; o app coleta dados, envia documentos e apresenta o status, sem replicar regras KYC/KYB/PLD (decisoes no backend).
   - entregue (M-6.1 a M-6.6): DTOs de borda + `OnboardingMobileService` (transporte HTTP, multipart `tipo`+`arquivo`, Promise via `firstValueFrom`); rota lazy `/app/onboarding` sob `authGuard` + CTA na home do tomador; `onboarding-shell` (orquestrador: selecao PF/PJ, progresso por etapas, inicio, upload, verificacao, status, reload/retry, erro, recomecar); formularios PF/PJ apresentacionais (tipo societario/porte opcionais, alinhados a colunas nullable); `document-upload` (limite local 10 MB); `onboarding-status` (badge + resultado).
@@ -662,6 +670,15 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - decisoes: componentes com `ion-input`/`ion-select` testados por instancia (`runInInjectionContext`), pois o happy-dom nao monta esses web components (convencao de `login`/`register`); tipos de documento PF/PJ seguem o contrato real (PF nao inclui `COMPROVANTE_ENDERECO`); `verificar` retorna 202; MSW de onboarding com cenarios feliz/pendencia/erro por documento de entrada.
   - divida aceita: `onboarding-shell.component.scss` acima do budget de warning (3.59 kB), abaixo do de erro (4 kB).
   - doc operacional: `repos/sep-mobile/README.md` (secao Onboarding do tomador — M-Sprint 6) atualizado.
+
+- **M-Sprint 7 (Credito e Open Finance mobile) implementada na branch `feature/msprint-7-credito-mobile` (2026-06-30); push/PR/merge manuais pendentes**:
+  - spec de origem: `specs/fase-3/207-msprint-7-credito-mobile.md`; steps em `steps-fase-3/mobile/207-msprint-7-steps.md`. Segunda jornada funcional do Epic 14, consome as APIs reais de `credito` (Sprints 8-9).
+  - **reconciliacao Git resolvida antes do codigo**: `origin/main` estava divergente de `origin/develop` (so bumps Dependabot). Reconciliado por PR #92 (a automacao do usuario mergeou o back-merge `main -> develop` na develop, com titulo enganoso "Feature/msprint 7 credito mobile"; conteudo = apenas deps, sem codigo M-7). Branch M-7 partiu da `origin/develop` reconciliada.
+  - entregue (M-7.1 a M-7.6): DTOs de borda + `CreditoMobileService`; lista paginada com filtro/estados/refresh + token de geracao anti-resposta-obsoleta; criacao reutilizando o ponteiro do `OnboardingJourneyStore` (M-6) sem expor UUID; detalhe + status + parecer (sem score/`pareceristaId`/IDs internos); `proposta-status` compartilhado (`PRE_APROVADA` nunca como aprovacao final); fluxo Open Finance opt-in (consentimento + retorno numa unica tela via `data.retorno`) com `redirectUri` gerada pelo app, handoff so `http(s)`, retorno consultando a API SEP (ignora query params do provider), `409` consulta status, agregados sanitizados sem PII bancaria; rotas com `roleGuard ['CLIENTE']`.
+  - decisoes: componentes Ionic testados por instancia (happy-dom nao monta `ion-select`/`ion-input`); MSW de credito persistido em `localStorage` para sobreviver ao reload do handoff no e2e; documento (CPF/CNPJ) nunca persistido; smoke Playwright cobre a jornada completa (login -> lista vazia -> criar -> detalhe -> Open Finance -> handoff -> retorno AUTORIZADO) em Pixel 5 e 320px, com assercoes negativas LGPD.
+  - fixes de code review manual absorvidos: `roleGuard CLIENTE` nas rotas de proposta (ADMIN nao ve propostas alheias), token de geracao na lista, `ScoreInternoResponse.valor` espelhando o backend, teste de `403` no detalhe.
+  - verificacao: 212 testes Vitest + `lint`/`lint:scss`/`format:check`/`build` verdes; `e2e/credito-mobile.spec.ts` (2) + `smoke`/`onboarding-mobile` verdes. `golden-path-mobile`/`profile-actions` seguem vermelhos por exigirem backend real `:8080` (preexistente).
+  - doc operacional: `repos/sep-mobile/README.md` (secao Credito e Open Finance do tomador — M-Sprint 7) atualizado.
 
 ## Observacao importante para outro agente
 
