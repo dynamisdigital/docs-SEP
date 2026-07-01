@@ -59,7 +59,10 @@ Dar ao tomador visibilidade mobile das parcelas, vencimentos, historico e renego
 ## Status de execucao (2026-07-01)
 
 Recorte **M-9.1 → M-9.3 implementado e pausado** na branch
-`feature/msprint-9-cobranca-mobile` do `sep-mobile` (base `origin/develop`; nao mergeada).
+`feature/msprint-9-cobranca-mobile` do `sep-mobile` (base `origin/develop`). A branch foi
+**pushada para `origin` (`1937cfe`, em sync com o local)**, mas **nao mergeada**. Ao retomar,
+M-9.4/M-9.5/M-9.6 continuam na **mesma branch** — nao criar branch nova (sprint viva = mesma
+branch).
 
 - **Gate M-9.0**: cadeia Git validada (M-8 em `develop`/`main`, conteudo igual), baseline
   verde (lint/scss/format, Vitest 274, build AOT), gates B1/B2 classificados como
