@@ -59,7 +59,7 @@ Apenas backend. Web e Mobile da Fase 2 entram em planejamento separado depois qu
 
 Ver tambem: [PRD §22 (Backlog Tecnico)](../docs-sep/PRD.md), [PRD §29 (Mapeamento Fase 2)](../docs-sep/PRD.md).
 
-## Fase 3 — Jornadas e capacidades pos-Fase-2 (22 specs)
+## Fase 3 — Jornadas e capacidades pos-Fase-2 (25 specs)
 
 Specs separados por projeto, com ate 6 tasks de implementacao por sprint. Precheck, E2E/smoke e docs nao contam no limite.
 
@@ -67,7 +67,7 @@ As tabelas da Fase 3 abaixo seguem a ordem recomendada de execucao, nao a ordena
 
 Ver indice completo em [`fase-3/README.md`](./fase-3/README.md).
 
-### Backend (6 specs)
+### Backend (9 specs)
 | Sprint | Arquivo | Tema |
 |--------|---------|------|
 | 16 | [`fase-3/016-sprint-16-credora-foundation.md`](./fase-3/016-sprint-16-credora-foundation.md) | Jornada credora foundation |
@@ -76,6 +76,9 @@ Ver indice completo em [`fase-3/README.md`](./fase-3/README.md).
 | 19 | [`fase-3/019-sprint-19-pix-foundation-escrow-provider.md`](./fase-3/019-sprint-19-pix-foundation-escrow-provider.md) | Pix foundation + EscrowProvider |
 | 20 | [`fase-3/020-sprint-20-pix-desembolso-assistido.md`](./fase-3/020-sprint-20-pix-desembolso-assistido.md) | Pix desembolso assistido |
 | 21 | [`fase-3/021-sprint-21-pix-recebimento-conciliacao.md`](./fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | Pix recebimento e conciliacao |
+| 22 | [`fase-3/022-sprint-22-observabilidade-operacional.md`](./fase-3/022-sprint-22-observabilidade-operacional.md) | Observabilidade operacional MVP |
+| 23 | [`fase-3/023-sprint-23-cobranca-historico-tomador.md`](./fase-3/023-sprint-23-cobranca-historico-tomador.md) | Historico de recebimentos do tomador |
+| 24 | [`fase-3/024-sprint-24-cobranca-renegociacao-tomador.md`](./fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) | Consulta de renegociacao ativa do tomador |
 
 ### Web (9 specs)
 | Sprint | Arquivo | Tema |

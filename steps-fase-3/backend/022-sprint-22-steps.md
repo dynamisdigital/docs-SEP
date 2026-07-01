@@ -5,7 +5,7 @@
 
 **ADR**: [`0016-observabilidade-operacional-cloudwatch.md`](../../adr/0016-observabilidade-operacional-cloudwatch.md)
 
-**Status**: implementada (2026-06-30). Codigo commitado nas feature branches; PR/merge em `develop` manual e pendente. Code review por area concluido; P1 de sanitizacao (idempotencyKey) corrigido; pendencias em §Pendencias conhecidas.
+**Status**: mergeada em `origin/develop` via PR #79 (`406eef8`) e promovida a `origin/main` via PR #80 (`7983c87`). Code review por area concluido; P1 de sanitizacao corrigido; pendencias em §Pendencias conhecidas.
 
 **Objetivo geral**: tornar erros pesquisaveis por correlation id, proteger dados sensiveis e
 preparar coleta/alertas CloudWatch sem provisionar AWS.

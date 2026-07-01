@@ -240,3 +240,65 @@ aprovar hardening backend para step-up estrito.
 Spec e steps:
 - [`specs/fase-3/208-msprint-8-formalizacao-mobile.md`](../../specs/fase-3/208-msprint-8-formalizacao-mobile.md)
 - [`steps-fase-3/mobile/208-msprint-8-steps.md`](../../steps-fase-3/mobile/208-msprint-8-steps.md)
+
+## Parcelas e cobranca do tomador (M-Sprint 9 — recorte M-9.1 a M-9.3)
+
+Jornada PWA de parcelas que consome os contratos reais de cobranca de `sep-api` (Sprints
+12-13). O tomador parte de uma proposta propria; o app resolve o contrato e a agenda sob
+demanda e apresenta parcelas, vencimentos, valores atualizados e estados. **Ownership, calculo
+de saldo/juros/mora/multa, dias de atraso, status e transicoes permanecem no backend** — o app
+apenas apresenta os snapshots e nunca recalcula valor monetario nem deriva status por data.
+
+**Status**: M-9.1 a M-9.3 implementadas na branch `feature/msprint-9-cobranca-mobile` (nao
+mergeada). M-9.4 (historico de recebimentos) e M-9.5 (renegociacao) dependem das Sprints 23
+(B1) e 24 (B2) do `sep-api`; M-9.6 (MSW/smoke/docs) fecha a sprint. A sprint nao esta concluida
+enquanto B1/B2 permanecerem bloqueados.
+
+Rotas (lazy, shell autenticado, `roleGuard` com `roles: ['CLIENTE']`, `data.tab = 'parcelas'`):
+- `/app/parcelas` — entrada: lista as propostas `APROVADA` do tomador, sem N+1.
+- `/app/parcelas/proposta/:propostaId` — agenda resolvida por proposta.
+- `/app/parcelas/contratos/:contratoId` — agenda resolvida por contrato.
+- `/app/parcelas/contratos/:contratoId/parcelas/:parcelaId` — detalhe da parcela.
+- (`.../parcelas/:parcelaId/renegociacao` fica para a M-9.5, apos a Sprint 24.)
+
+Entrada: a tab "Parcelas" aponta para `/app/parcelas`; o detalhe do contrato exibe o CTA "Ver
+parcelas" apenas quando o contrato esta `ASSINADO`. Nao existe lista global de
+contratos/agendas: a agenda so e consultada ao abrir uma proposta e apenas quando o contrato
+esta `ASSINADO` (o backend so gera agenda pos-assinatura); contrato nao assinado nao dispara
+chamada de agenda.
+
+Telas/componentes (`src/app/features/tomador/cobranca/`):
+- `parcelas-entry.component` — entrada paginada (filtro fixo `APROVADA`), estados
+  loading/vazio/erro+retry, pull-to-refresh; token de geracao descarta respostas obsoletas.
+  Lista vazia significa ausencia de proposta elegivel, nunca divida quitada.
+- `agenda-detail.component` — resolve contrato→agenda (por proposta ou id, usando `contrato.id`
+  como identidade) e lista as parcelas (numero, vencimento, valor da agenda, status). `404` =
+  "parcelas ainda indisponiveis" com retry (nunca lista vazia); `403` neutro; rede com retry.
+- `parcela-detail.component` — valor atualizado (`ValorAtualizadoParcelaResponse`): principal,
+  juros, mora, multa, valor devido, total recebido e valor em aberto, sem recalculo local.
+  Atualizacao sob demanda (sem polling); token de geracao descarta resposta obsoleta. `403`
+  neutro, `404` com retorno a agenda, `409`/rede mantem o ultimo snapshot marcado como
+  desatualizado. `RENEGOCIADA` oferece voltar a agenda; `EM_NEGOCIACAO` sinaliza a negociacao
+  (o CTA de termos fica para a M-9.5).
+- `parcela-status.component` — badge reutilizado por lista e detalhe; mapeia os 7
+  `StatusParcela` para texto + tom acessivel (o texto sempre acompanha a cor).
+
+Servico (`src/app/core/cobranca/cobranca-mobile.service.ts`): transporte HTTP de
+`/api/v1/cobranca` — `consultarAgenda(contratoId)` e `consultarParcela(parcelaId)`. Os metodos
+de historico e renegociacao (B1/B2) so serao adicionados apos as Sprints 23/24. Os DTOs de
+borda ficam em `src/app/core/api/api.models.ts`.
+
+Limites de seguranca: endpoints internos `FINANCEIRO/ADMIN` (recebimento manual, listagem de
+recebimentos, inadimplencia, contato, proposta de renegociacao) nao sao chamados nem expostos.
+Nenhum dado financeiro e persistido em `localStorage`, `sessionStorage` ou Capacitor
+Preferences. `403` de ownership usa mensagem neutra, sem enumerar existencia.
+
+Testes: Vitest cobre o service, as rotas (`roleGuard CLIENTE`), a entrada (sem N+1), a agenda
+(descoberta, gate `ASSINADO`, `403`/`404`/rede), o detalhe (valor sem recalculo, erros,
+concorrencia) e o `ParcelaStatusComponent` (mapa exaustivo) — componentes Ionic testados por
+instancia. MSW, smoke PWA e regressao entram na M-9.6.
+
+Spec e steps:
+- [`specs/fase-3/209-msprint-9-cobranca-mobile.md`](../../specs/fase-3/209-msprint-9-cobranca-mobile.md)
+- [`steps-fase-3/mobile/209-msprint-9-steps.md`](../../steps-fase-3/mobile/209-msprint-9-steps.md)
+- backend desbloqueio: [`023`](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) (B1) e [`024`](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) (B2).

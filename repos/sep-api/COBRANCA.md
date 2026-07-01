@@ -3,6 +3,7 @@
 Documento operacional do modulo `cobranca` (Epic 8).
 Sprint 12 — implementada: parcelas, agenda, recebimento manual, escrow, job de atraso e audit reforcado.
 Sprint 13 — implementada na branch: inadimplencia, workflow de cobranca, notificacoes, renegociacao basica e auditoria reforcada.
+Sprints 23-24 — planejadas: consultas owner-scoped de historico de recebimentos e renegociacao ativa para desbloquear a M-Sprint 9.
 
 > Specs: [`012-sprint-12-cobranca-parcelas-agenda.md`](../../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md) e [`013-sprint-13-cobranca-inadimplencia.md`](../../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md).
 > Steps: [`012-sprint-12-steps.md`](../../steps-fase-2/backend/012-sprint-12-steps.md) e [`013-sprint-13-steps.md`](../../steps-fase-2/backend/013-sprint-13-steps.md).
@@ -292,6 +293,9 @@ Suite de cobranca/inadimplencia:
 Validacoes focadas usadas na Task 13.9: `./gradlew test --tests "*InadimplenciaIT" --tests "*RenegociacaoIT"` e `./gradlew test --tests "*Cobranca*"`.
 
 ## Limitacoes conhecidas / pendencias futuras
+
+- **Historico do tomador bloqueado**: Sprint 23 ([spec](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) + [steps](../../steps-fase-3/backend/023-sprint-23-steps.md)) planeja endpoint por parcela com DTO publico minimo; ate o merge, `GET /recebimentos` permanece interno.
+- **Descoberta da renegociacao bloqueada**: Sprint 24 ([spec](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [steps](../../steps-fase-3/backend/024-sprint-24-steps.md)) planeja leitura de proposta ativa/nao expirada; os PATCHes existentes nao bastam para decisao mobile consciente.
 
 - **Recebimento manual** apenas. Automacao por Pix fica pra Epic 15 (Celcoin).
 - **Sem boleto** e sem conciliacao automatica. Cobranca ativa da Sprint 13 cobre notificacao e contato manual, mas negativacao/juridico ficam fora do escopo.

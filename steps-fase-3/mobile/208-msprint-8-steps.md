@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`specs/fase-3/208-msprint-8-formalizacao-mobile.md`](../../specs/fase-3/208-msprint-8-formalizacao-mobile.md)
 
-**Status**: mergeada em `origin/develop` via PR #105 (squash `be792df`, 2026-06-30). Gate M-8.0 e
+**Status**: mergeada em `origin/develop` via PR #105 (`be792df`) e promovida a `origin/main` via PR #106 (`e009d50`, 2026-06-30). Gate M-8.0 e
 Tasks M-8.1 a M-8.5 concluidos; suite (lint/scss/format/Vitest 274/build/e2e 8) verde e reconfirmada
 em `origin/develop` pos-merge (`npm ci` limpo). Bug pre-existente de step-up (`type="submit"`/Enter
 sem `[formGroup]`) corrigido.

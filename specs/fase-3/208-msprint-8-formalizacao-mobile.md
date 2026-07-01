@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 208
 - **Titulo**: M-Sprint 8 - Formalizacao e contrato mobile
-- **Status**: planejada
+- **Status**: mergeada em `origin/develop` via PR #105 (`be792df`) e promovida a `origin/main` via PR #106 (`e009d50`)
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 2+
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; APIs contratos Sprints 10-11

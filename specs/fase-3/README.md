@@ -24,6 +24,8 @@ As tabelas usam a ordem recomendada de execucao. A numeracao dos specs continua 
 | 20 | [`020-sprint-20-pix-desembolso-assistido.md`](./020-sprint-20-pix-desembolso-assistido.md) | Pix desembolso assistido | 5 |
 | 21 | [`021-sprint-21-pix-recebimento-conciliacao.md`](./021-sprint-21-pix-recebimento-conciliacao.md) | Pix recebimento e conciliacao | 6 |
 | 22 | [`022-sprint-22-observabilidade-operacional.md`](./022-sprint-22-observabilidade-operacional.md) | Observabilidade operacional MVP + CloudWatch ready | 6 |
+| 23 | [`023-sprint-23-cobranca-historico-tomador.md`](./023-sprint-23-cobranca-historico-tomador.md) | Historico de recebimentos do tomador (B1 da M-9) | 4 |
+| 24 | [`024-sprint-24-cobranca-renegociacao-tomador.md`](./024-sprint-24-cobranca-renegociacao-tomador.md) | Consulta de renegociacao ativa do tomador (B2 da M-9) | 4 |
 
 ## Web (`sep-app`)
 
@@ -59,7 +61,8 @@ As tabelas usam a ordem recomendada de execucao. A numeracao dos specs continua 
 - Web F-12 depende da Sprint backend 18 e da F-Sprint 14.
 - Web F-13 depende das Sprints backend 19-21 e da F-Sprint 14.
 - Mobile M-12 depende da base tecnica mobile M-Sprints 0-5 e do alinhamento com a aplicacao visual da F-Sprint 15; deve ser executada antes de M-6/206 para evitar retrabalho visual.
-- Mobile M-6/206 a M-9 dependem das APIs backend da Fase 2 e da M-Sprint 12 concluida.
+- Mobile M-6/206 a M-8 dependem das APIs backend da Fase 2 e da M-Sprint 12 concluida.
+- Mobile M-9 depende adicionalmente das Sprints backend 23-24 para historico owner-scoped e leitura de renegociacao ativa.
 - Mobile M-10 depende das Sprints backend 16-17 e do contrato de autorizacao/ownership da credora, entregue na Sprint 16 ou complementado pela Sprint 18.
 - Mobile M-11 depende das Sprints backend 19-21.
 - Mobile M-10 e M-11 tambem dependem da M-Sprint 12.

@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 022
 - **Titulo**: Sprint 22 - Observabilidade operacional e preparacao CloudWatch
-- **Status**: implementada (PR/merge em `develop` pendente — manual)
+- **Status**: mergeada em `origin/develop` via PR #79 (`406eef8`) e promovida a `origin/main` via PR #80 (`7983c87`)
 - **Fase do produto**: Fase 3 - Epic 16
 - **Trilha**: Cross-stack (`sep-api`, `sep-app`, `sep-mobile`, `docs-SEP`)
 - **Origem**: PRD Epic 16 e ADR 0016
