@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 023
 - **Titulo**: Sprint 23 - Consulta owner-scoped do historico de recebimentos
-- **Status**: planejada
+- **Status**: mergeada em `develop` (PR #81) e promovida a `main` (PR #82)
 - **Fase do produto**: Fase 3 - Epic 8/14, desbloqueio backend B1 da M-Sprint 9
 - **Trilha**: Backend (`sep-api`)
 - **Origem**: M-Sprint 9, Task M-9.4; APIs de cobranca das Sprints 12-13

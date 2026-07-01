@@ -86,6 +86,8 @@ O endpoint atual `GET /api/v1/cobranca/recebimentos` e restrito a
 
 A [`Spec 023`](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) e os [`steps 023`](../backend/023-sprint-23-steps.md) formalizam o contrato bloqueante:
 
+> **Status (2026-07-01)**: B1 mergeado em `develop` via PR #81 (e `main` via PR #82) — Sprint 23. M-9.4 liberada.
+
 ```http
 GET /api/v1/cobranca/parcelas/{parcelaId}/recebimentos
 ```

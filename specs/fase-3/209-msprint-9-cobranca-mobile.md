@@ -31,7 +31,7 @@ Dar ao tomador visibilidade mobile das parcelas, vencimentos, historico e renego
 
 ## Dependencias backend bloqueantes
 
-- **B1 / Sprint 23**: `GET /api/v1/cobranca/parcelas/{parcelaId}/recebimentos`, exclusivo de `CLIENTE`, com `RecebimentoTomadorResponse[]`. Desbloqueia M-9.4 apos merge em `develop`.
+- **B1 / Sprint 23**: `GET /api/v1/cobranca/parcelas/{parcelaId}/recebimentos`, exclusivo de `CLIENTE`, com `RecebimentoTomadorResponse[]`. **Mergeado em `develop` (PR #81) e `main` (PR #82)** — M-9.4 liberada.
 - **B2 / Sprint 24**: `GET /api/v1/cobranca/parcelas/{parcelaId}/renegociacao-ativa`, exclusivo de `CLIENTE`, com `RenegociacaoTomadorResponse`. Desbloqueia M-9.5 apos merge em `develop`.
 - Nenhuma das Tasks pode reutilizar endpoints/DTOs internos para contornar o gate.
 

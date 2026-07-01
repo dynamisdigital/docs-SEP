@@ -3,7 +3,7 @@
 Documento operacional do modulo `cobranca` (Epic 8).
 Sprint 12 — implementada: parcelas, agenda, recebimento manual, escrow, job de atraso e audit reforcado.
 Sprint 13 — implementada na branch: inadimplencia, workflow de cobranca, notificacoes, renegociacao basica e auditoria reforcada.
-Sprints 23-24 — planejadas: consultas owner-scoped de historico de recebimentos e renegociacao ativa para desbloquear a M-Sprint 9.
+Sprint 23 — mergeada em `develop` (PR #81) e promovida a `main` (PR #82): consulta owner-scoped do historico de recebimentos do tomador (B1 da M-Sprint 9). Sprint 24 — planejada: renegociacao ativa owner-scoped (B2).
 
 > Specs: [`012-sprint-12-cobranca-parcelas-agenda.md`](../../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md) e [`013-sprint-13-cobranca-inadimplencia.md`](../../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md).
 > Steps: [`012-sprint-12-steps.md`](../../steps-fase-2/backend/012-sprint-12-steps.md) e [`013-sprint-13-steps.md`](../../steps-fase-2/backend/013-sprint-13-steps.md).
@@ -232,6 +232,7 @@ Arquitetura (ADR 0007):
 | `GET` | `/api/v1/cobranca/parcelas/{id}` | owner ou `ROLE_FINANCEIRO/ADMIN` | retorna valor atualizado com mora/multa pro-rata contra Clock; CLIENTE alheio 403 unificado mesmo se parcela inexistir |
 | `POST` | `/api/v1/cobranca/parcelas/{id}/recebimentos` | `ROLE_FINANCEIRO/ADMIN` | `Idempotency-Key` pattern obrigatorio |
 | `GET` | `/api/v1/cobranca/recebimentos` | `ROLE_FINANCEIRO/ADMIN` | listagem `dataRecebimento DESC` com `@EntityGraph` (anti N+1); sem paginacao |
+| `GET` | `/api/v1/cobranca/parcelas/{parcelaId}/recebimentos` | `ROLE_CLIENTE` (owner) | Sprint 23: historico owner-scoped do tomador em `CobrancaTomadorController` dedicado; `RecebimentoTomadorResponse[]` (4 campos publicos) ordenado `dataRecebimento DESC`; parcela inexistente ou de outro tomador retorna 403 uniforme sem UUID (anti-enumeracao) |
 | `GET` | `/api/v1/cobranca/inadimplencia` | `ROLE_FINANCEIRO/ADMIN` | filtros `dias_atraso_min`, `dias_atraso_max`, `status`; retorna ATRASADA/INADIMPLENTE |
 | `POST` | `/api/v1/cobranca/parcelas/{id}/contato` | `ROLE_FINANCEIRO/ADMIN` | registra `EventoCobranca CONTATO_MANUAL`; nao muda status |
 | `POST` | `/api/v1/cobranca/parcelas/{id}/renegociacao` | `ROLE_FINANCEIRO/ADMIN` + step-up | cria proposta, parcela vira EM_NEGOCIACAO; conflito se proposta ativa |
@@ -294,7 +295,7 @@ Validacoes focadas usadas na Task 13.9: `./gradlew test --tests "*InadimplenciaI
 
 ## Limitacoes conhecidas / pendencias futuras
 
-- **Historico do tomador bloqueado**: Sprint 23 ([spec](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) + [steps](../../steps-fase-3/backend/023-sprint-23-steps.md)) planeja endpoint por parcela com DTO publico minimo; ate o merge, `GET /recebimentos` permanece interno.
+- **Historico do tomador (Sprint 23 — mergeada em `develop` PR #81 / `main` PR #82)**: `GET /api/v1/cobranca/parcelas/{parcelaId}/recebimentos` exclusivo de `CLIENTE`, com `RecebimentoTomadorResponse` (recebimentoId, valorRecebido, dataRecebimento, meioPagamento), ownership validada no use case e 403 uniforme sem UUID. `GET /recebimentos` segue interno (`FINANCEIRO/ADMIN`). Desbloqueia B1 da M-Sprint 9 (M-9.4 liberada). Sem paginacao (recorte por parcela). Ver [spec](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) + [steps](../../steps-fase-3/backend/023-sprint-23-steps.md).
 - **Descoberta da renegociacao bloqueada**: Sprint 24 ([spec](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [steps](../../steps-fase-3/backend/024-sprint-24-steps.md)) planeja leitura de proposta ativa/nao expirada; os PATCHes existentes nao bastam para decisao mobile consciente.
 
 - **Recebimento manual** apenas. Automacao por Pix fica pra Epic 15 (Celcoin).

@@ -1984,6 +1984,17 @@
       "metaSortKey": -1749982600000
     },
     {
+      "_id": "req_cob_recebimentos_tomador",
+      "_type": "request",
+      "parentId": "fld_cobranca",
+      "name": "GET /cobranca/parcelas/{id}/recebimentos (tomador)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/recebimentos",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ clienteToken }}"}],
+      "description": "Sprint 23: historico owner-scoped do tomador. Exclusivo ROLE_CLIENTE (FINANCEIRO/ADMIN -> 403). RecebimentoTomadorResponse[] (recebimentoId, valorRecebido, dataRecebimento, meioPagamento) DESC. Cenarios: 200 com itens; 200 []; 403 nao-owner (parcela inexistente/alheia, uniforme sem UUID).",
+      "metaSortKey": -1749982500000
+    },
+    {
       "_id": "req_bof_fila_list",
       "_type": "request",
       "parentId": "fld_backoffice",

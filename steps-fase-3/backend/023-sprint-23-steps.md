@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`023-sprint-23-cobranca-historico-tomador.md`](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md)
 
-**Status**: planejada. Desbloqueio backend B1 da M-Sprint 9.
+**Status**: mergeada em `develop` (PR #81) e promovida a `main` (PR #82). Desbloqueio backend B1 da M-Sprint 9 concluido.
 
 **Objetivo geral**: expor uma consulta read-only de recebimentos por parcela para o
 tomador owner, com resposta publica minima e sem reutilizar a listagem operacional de
