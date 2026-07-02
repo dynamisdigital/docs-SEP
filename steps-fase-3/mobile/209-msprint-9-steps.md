@@ -2,10 +2,9 @@
 
 **Spec de origem**: [`specs/fase-3/209-msprint-9-cobranca-mobile.md`](../../specs/fase-3/209-msprint-9-cobranca-mobile.md)
 
-**Status**: planejada em 2026-07-01. Steps criados a partir dos contratos reais do
-`sep-api` e do estado de `sep-mobile` apos a M-Sprint 8. M-9.4 depende da Sprint 23/B1
-e M-9.5 depende da Sprint 24/B2; ambas devem estar mergeadas em `develop` antes da
-respectiva Task mobile.
+**Status**: concluida — mergeada em `develop` via PR #107 (`7162b67`) e promovida a `main`
+via PR #108 (2026-07-02; develop==main). Gates atendidos: B1/Sprint 23 (PR #81) e
+B2/Sprint 24 (PR #83) mergeados em `develop` no `sep-api` antes das Tasks M-9.4/M-9.5.
 
 **Objetivo geral**: permitir que o tomador autenticado localize a agenda de um contrato
 proprio, consulte parcelas, vencimentos, valores atualizados e estados de atraso, veja o
@@ -313,12 +312,12 @@ sed -n '1,240p' src/main/java/com/dynamis/sep_api/cobranca/web/dto/RenegociacaoR
 ### Step 209.0.5 - Classificar gates B1 e B2
 
 **Checklist**:
-- [ ] B1 possui endpoint owner-scoped integrado em `develop` do `sep-api`.
-- [ ] B1 possui teste de owner, nao-owner, parcela inexistente e lista vazia.
-- [ ] B2 possui endpoint de descoberta/leitura integrado em `develop` do `sep-api`.
-- [ ] B2 devolve termos completos antes da decisao.
-- [ ] B2 possui teste de owner, nao-owner, sem proposta ativa e proposta expirada.
-- [ ] OpenAPI e `COBRANCA.md` refletem os novos contratos.
+- [x] B1 possui endpoint owner-scoped integrado em `develop` do `sep-api`.
+- [x] B1 possui teste de owner, nao-owner, parcela inexistente e lista vazia.
+- [x] B2 possui endpoint de descoberta/leitura integrado em `develop` do `sep-api`.
+- [x] B2 devolve termos completos antes da decisao.
+- [x] B2 possui teste de owner, nao-owner, sem proposta ativa e proposta expirada.
+- [x] OpenAPI e `COBRANCA.md` refletem os novos contratos.
 
 **Regra**:
 - B1 ausente: M-9.4 permanece bloqueada.
@@ -344,13 +343,13 @@ npm run build
 
 ### Definicao de pronto do Gate M-9.0
 
-- [ ] M-8 presente em `origin/develop` e `origin/main`.
-- [ ] Cadeia Git validada por conteudo e historico.
-- [ ] Branch M-9 criada da base correta.
-- [ ] Artefato temporario M-8 tratado conforme `AGENT.md`.
-- [ ] Contratos backend atuais reconfirmados.
-- [ ] B1 e B2 classificados como liberados ou bloqueados com evidencia.
-- [ ] Stack, estrutura e baseline confirmadas.
+- [x] M-8 presente em `origin/develop` e `origin/main`.
+- [x] Cadeia Git validada por conteudo e historico.
+- [x] Branch M-9 criada da base correta.
+- [x] Artefato temporario M-8 tratado conforme `AGENT.md`.
+- [x] Contratos backend atuais reconfirmados.
+- [x] B1 e B2 classificados como liberados ou bloqueados com evidencia.
+- [x] Stack, estrutura e baseline confirmadas.
 
 **Commit sugerido**: nenhum; prechecks nao geram commit.
 
@@ -431,11 +430,11 @@ npm run format:check
 
 ### Definicao de pronto da Task M-9.1
 
-- [ ] DTOs espelham contratos reais.
-- [ ] Service contem somente transporte HTTP.
-- [ ] Endpoints internos nao foram expostos.
-- [ ] Metodos B1/B2 so existem se os gates estiverem liberados.
-- [ ] Testes focados, lint e format passam.
+- [x] DTOs espelham contratos reais.
+- [x] Service contem somente transporte HTTP.
+- [x] Endpoints internos nao foram expostos.
+- [x] Metodos B1/B2 so existem se os gates estiverem liberados.
+- [x] Testes focados, lint e format passam.
 
 ### Commit sugerido
 
@@ -562,12 +561,12 @@ npm run build
 
 ### Definicao de pronto da Task M-9.2
 
-- [ ] Placeholder de Parcelas removido.
-- [ ] Rotas protegidas por `CLIENTE`.
-- [ ] Descoberta proposta -> contrato -> agenda ocorre sob demanda.
-- [ ] Nenhuma lista global ou N+1 foi inventada.
-- [ ] Lista apresenta somente snapshots do backend.
-- [ ] Testes, lint, SCSS, format e build passam.
+- [x] Placeholder de Parcelas removido.
+- [x] Rotas protegidas por `CLIENTE`.
+- [x] Descoberta proposta -> contrato -> agenda ocorre sob demanda.
+- [x] Nenhuma lista global ou N+1 foi inventada.
+- [x] Lista apresenta somente snapshots do backend.
+- [x] Testes, lint, SCSS, format e build passam.
 
 ### Commit sugerido
 
@@ -666,12 +665,12 @@ npm run build
 
 ### Definicao de pronto da Task M-9.3
 
-- [ ] Detalhe usa `ValorAtualizadoParcelaResponse`.
-- [ ] Todos os status possuem rotulo acessivel.
-- [ ] Nenhum calculo financeiro foi duplicado.
-- [ ] Estados de atraso/inadimplencia sao claros e nao constrangedores.
-- [ ] Erros nao vazam existencia/ownership.
-- [ ] Testes, lint, SCSS, format e build passam.
+- [x] Detalhe usa `ValorAtualizadoParcelaResponse`.
+- [x] Todos os status possuem rotulo acessivel.
+- [x] Nenhum calculo financeiro foi duplicado.
+- [x] Estados de atraso/inadimplencia sao claros e nao constrangedores.
+- [x] Erros nao vazam existencia/ownership.
+- [x] Testes, lint, SCSS, format e build passam.
 
 ### Commit sugerido
 
@@ -750,12 +749,12 @@ npm run build
 
 ### Definicao de pronto da Task M-9.4
 
-- [ ] B1 integrado e reconfirmado.
-- [ ] Mobile nao chama endpoint interno.
-- [ ] Historico e owner-scoped e carregado sob demanda.
-- [ ] Nenhum dado operacional sensivel e exibido.
-- [ ] Nenhum total e recalculado.
-- [ ] Testes e suite estatica passam.
+- [x] B1 integrado e reconfirmado.
+- [x] Mobile nao chama endpoint interno.
+- [x] Historico e owner-scoped e carregado sob demanda.
+- [x] Nenhum dado operacional sensivel e exibido.
+- [x] Nenhum total e recalculado.
+- [x] Testes e suite estatica passam.
 
 ### Commit sugerido
 
@@ -888,14 +887,14 @@ npm run build
 
 ### Definicao de pronto da Task M-9.5
 
-- [ ] B2 integrado e reconfirmado.
-- [ ] Termos completos aparecem antes da decisao.
-- [ ] Aceite exige confirmacao, MFA e step-up de uso unico.
-- [ ] Retorno do step-up nao dispara aceite.
-- [ ] Recusa e explicita e nao consome step-up.
-- [ ] Agenda/parcela sao recarregadas apos sucesso.
-- [ ] Erros nunca viram sucesso presumido.
-- [ ] Testes e suite estatica passam.
+- [x] B2 integrado e reconfirmado.
+- [x] Termos completos aparecem antes da decisao.
+- [x] Aceite exige confirmacao, MFA e step-up de uso unico.
+- [x] Retorno do step-up nao dispara aceite.
+- [x] Recusa e explicita e nao consome step-up.
+- [x] Agenda/parcela sao recarregadas apos sucesso.
+- [x] Erros nunca viram sucesso presumido.
+- [x] Testes e suite estatica passam.
 
 ### Commit sugerido
 
@@ -1036,13 +1035,13 @@ Aguardar aprovacao antes de staging/commit. Push e PR continuam manuais.
 
 ### Definicao de pronto da Task M-9.6
 
-- [ ] MSW cobre estados e erros entregues.
-- [ ] Vitest cobre services, rotas, componentes e step-up.
-- [ ] Smoke PWA completo passa em Pixel 5 e 320 px.
-- [ ] Smokes anteriores nao regrediram.
-- [ ] Suite estatica e build AOT passam.
-- [ ] Docs e PR temporario atualizados.
-- [ ] Checkpoint final apresentado.
+- [x] MSW cobre estados e erros entregues.
+- [x] Vitest cobre services, rotas, componentes e step-up.
+- [x] Smoke PWA completo passa em Pixel 5 e 320 px.
+- [x] Smokes anteriores nao regrediram.
+- [x] Suite estatica e build AOT passam.
+- [x] Docs e PR temporario atualizados.
+- [x] Checkpoint final apresentado.
 
 ### Commit sugerido
 
@@ -1054,19 +1053,19 @@ test(mobile): consolidar cobranca e smoke PWA
 
 ## Definition of Done da M-Sprint 9
 
-- [ ] Tomador acessa apenas propostas, contratos, agendas e parcelas proprias.
-- [ ] Entrada proposta -> contrato -> agenda nao faz N+1.
-- [ ] Lista e detalhe apresentam status e valores do backend sem recalculo.
-- [ ] Atraso, inadimplencia, pagamento parcial e renegociacao sao claros e acessiveis.
-- [ ] Historico usa endpoint owner-scoped; endpoint interno nunca e chamado.
-- [ ] Renegociacao exibe termos completos antes de aceitar/recusar.
-- [ ] Aceite exige MFA, confirmacao e step-up de uso unico.
-- [ ] Recusa nao consome step-up e exige confirmacao.
-- [ ] Nenhuma operacao interna aparece no mobile.
-- [ ] Nenhum dado financeiro/sensivel e persistido localmente.
-- [ ] New Design System SEP funciona em tema claro/escuro e 320 px.
-- [ ] Lint, SCSS, format, Vitest, build AOT e smokes passam.
-- [ ] Documentacao e PR temporario refletem a implementacao real.
+- [x] Tomador acessa apenas propostas, contratos, agendas e parcelas proprias.
+- [x] Entrada proposta -> contrato -> agenda nao faz N+1.
+- [x] Lista e detalhe apresentam status e valores do backend sem recalculo.
+- [x] Atraso, inadimplencia, pagamento parcial e renegociacao sao claros e acessiveis.
+- [x] Historico usa endpoint owner-scoped; endpoint interno nunca e chamado.
+- [x] Renegociacao exibe termos completos antes de aceitar/recusar.
+- [x] Aceite exige MFA, confirmacao e step-up de uso unico.
+- [x] Recusa nao consome step-up e exige confirmacao.
+- [x] Nenhuma operacao interna aparece no mobile.
+- [x] Nenhum dado financeiro/sensivel e persistido localmente.
+- [x] New Design System SEP funciona em tema claro/escuro e 320 px.
+- [x] Lint, SCSS, format, Vitest, build AOT e smokes passam.
+- [x] Documentacao e PR temporario refletem a implementacao real.
 
 **A sprint nao esta concluida enquanto B1 ou B2 permanecer bloqueado**, mesmo que
 M-9.1 a M-9.3 estejam implementadas.
@@ -1074,33 +1073,33 @@ M-9.1 a M-9.3 estejam implementadas.
 ## Checklist de code review da M-Sprint 9
 
 ### Contratos e arquitetura
-- [ ] DTOs espelham JSON real.
-- [ ] Components chamam services; nao acessam `HttpClient` diretamente.
-- [ ] Services nao contem regra financeira.
-- [ ] Nao ha N+1 nem lista global inventada.
-- [ ] Nenhum endpoint interno e chamado pelo mobile.
+- [x] DTOs espelham JSON real.
+- [x] Components chamam services; nao acessam `HttpClient` diretamente.
+- [x] Services nao contem regra financeira.
+- [x] Nao ha N+1 nem lista global inventada.
+- [x] Nenhum endpoint interno e chamado pelo mobile.
 
 ### Seguranca e regulatorio
-- [ ] `roleGuard ['CLIENTE']` em todas as rotas.
-- [ ] Ownership permanece no backend.
-- [ ] `403` nao enumera recurso.
-- [ ] Step-up token fica em memoria e e consumido uma vez.
-- [ ] Aceite e recusa seguem a assimetria do backend.
-- [ ] Termos completos precedem decisao financeira.
-- [ ] Copy de cobranca nao e constrangedora.
-- [ ] Nenhum dado bancario, operador, escrow ou token aparece/loga/persiste.
+- [x] `roleGuard ['CLIENTE']` em todas as rotas.
+- [x] Ownership permanece no backend.
+- [x] `403` nao enumera recurso.
+- [x] Step-up token fica em memoria e e consumido uma vez.
+- [x] Aceite e recusa seguem a assimetria do backend.
+- [x] Termos completos precedem decisao financeira.
+- [x] Copy de cobranca nao e constrangedora.
+- [x] Nenhum dado bancario, operador, escrow ou token aparece/loga/persiste.
 
 ### UX e acessibilidade
-- [ ] Todos os status possuem texto, nao apenas cor.
-- [ ] Loading, vazio, erro e retry existem por superficie.
-- [ ] Falha de historico nao bloqueia detalhe.
-- [ ] Duplo submit bloqueado.
-- [ ] Tema claro/escuro, foco, toque e 320 px validados.
+- [x] Todos os status possuem texto, nao apenas cor.
+- [x] Loading, vazio, erro e retry existem por superficie.
+- [x] Falha de historico nao bloqueia detalhe.
+- [x] Duplo submit bloqueado.
+- [x] Tema claro/escuro, foco, toque e 320 px validados.
 
 ### Testes e fechamento
-- [ ] Services, rotas, estados e erros cobertos.
-- [ ] Interceptor cobre aceite e exclui recusa/GET.
-- [ ] Smoke cobre retorno do step-up sem efeito automatico.
-- [ ] Build AOT executado.
-- [ ] Smokes M-6, M-7 e M-8 sem regressao.
-- [ ] Docs refletem somente comportamento entregue.
+- [x] Services, rotas, estados e erros cobertos.
+- [x] Interceptor cobre aceite e exclui recusa/GET.
+- [x] Smoke cobre retorno do step-up sem efeito automatico.
+- [x] Build AOT executado.
+- [x] Smokes M-6, M-7 e M-8 sem regressao.
+- [x] Docs refletem somente comportamento entregue.

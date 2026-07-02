@@ -241,25 +241,28 @@ Spec e steps:
 - [`specs/fase-3/208-msprint-8-formalizacao-mobile.md`](../../specs/fase-3/208-msprint-8-formalizacao-mobile.md)
 - [`steps-fase-3/mobile/208-msprint-8-steps.md`](../../steps-fase-3/mobile/208-msprint-8-steps.md)
 
-## Parcelas e cobranca do tomador (M-Sprint 9 — recorte M-9.1 a M-9.3)
+## Parcelas e cobranca do tomador (M-Sprint 9)
 
 Jornada PWA de parcelas que consome os contratos reais de cobranca de `sep-api` (Sprints
-12-13). O tomador parte de uma proposta propria; o app resolve o contrato e a agenda sob
-demanda e apresenta parcelas, vencimentos, valores atualizados e estados. **Ownership, calculo
-de saldo/juros/mora/multa, dias de atraso, status e transicoes permanecem no backend** — o app
-apenas apresenta os snapshots e nunca recalcula valor monetario nem deriva status por data.
+12-13 + desbloqueios 23/B1 e 24/B2). O tomador parte de uma proposta propria; o app resolve o
+contrato e a agenda sob demanda e apresenta parcelas, vencimentos, valores atualizados,
+historico de recebimentos e a decisao de renegociacao. **Ownership, calculo de
+saldo/juros/mora/multa, dias de atraso, status, total renegociado e transicoes permanecem no
+backend** — o app apenas apresenta os snapshots e nunca recalcula valor monetario nem deriva
+status por data.
 
-**Status**: M-9.1 a M-9.3 implementadas na branch `feature/msprint-9-cobranca-mobile` (nao
-mergeada). M-9.4 (historico de recebimentos) e M-9.5 (renegociacao) dependem das Sprints 23
-(B1) e 24 (B2) do `sep-api`; M-9.6 (MSW/smoke/docs) fecha a sprint. A sprint nao esta concluida
-enquanto B1/B2 permanecerem bloqueados.
+**Status**: M-Sprint 9 concluida — mergeada em `origin/develop` via PR #107 (`7162b67`) e
+promovida a `origin/main` via PR #108 (`1454818`), 2026-07-02 (develop==main; pos-merge
+`npm ci` + `format:check` + Vitest 355 verdes). B1 (Sprint 23, PR #81) e B2 (Sprint 24,
+PR #83) mergeados no `sep-api`.
 
 Rotas (lazy, shell autenticado, `roleGuard` com `roles: ['CLIENTE']`, `data.tab = 'parcelas'`):
 - `/app/parcelas` — entrada: lista as propostas `APROVADA` do tomador, sem N+1.
 - `/app/parcelas/proposta/:propostaId` — agenda resolvida por proposta.
 - `/app/parcelas/contratos/:contratoId` — agenda resolvida por contrato.
 - `/app/parcelas/contratos/:contratoId/parcelas/:parcelaId` — detalhe da parcela.
-- (`.../parcelas/:parcelaId/renegociacao` fica para a M-9.5, apos a Sprint 24.)
+- `/app/parcelas/contratos/:contratoId/parcelas/:parcelaId/renegociacao` — termos e decisao
+  da renegociacao ativa (M-9.5).
 
 Entrada: a tab "Parcelas" aponta para `/app/parcelas`; o detalhe do contrato exibe o CTA "Ver
 parcelas" apenas quando o contrato esta `ASSINADO`. Nao existe lista global de
@@ -278,27 +281,58 @@ Telas/componentes (`src/app/features/tomador/cobranca/`):
   juros, mora, multa, valor devido, total recebido e valor em aberto, sem recalculo local.
   Atualizacao sob demanda (sem polling); token de geracao descarta resposta obsoleta. `403`
   neutro, `404` com retorno a agenda, `409`/rede mantem o ultimo snapshot marcado como
-  desatualizado. `RENEGOCIADA` oferece voltar a agenda; `EM_NEGOCIACAO` sinaliza a negociacao
-  (o CTA de termos fica para a M-9.5).
+  desatualizado. `RENEGOCIADA` oferece voltar a agenda; `EM_NEGOCIACAO` exibe o CTA "Ver
+  termos da renegociacao". Secao "Historico de recebimentos" (M-9.4, contrato B1) recolhida
+  por padrao e carregada sob demanda: ordem DESC do backend preservada, `totalRecebido` do
+  detalhe segue autoritativo (o app nao soma o historico) e falha do historico e isolada
+  (erro proprio + retry, sem bloquear o detalhe). Reentrada via stack do `ion-router-outlet`
+  reconsulta a parcela (`ionViewWillEnter`) para nunca exibir snapshot obsoleto.
+- `renegociacao-detail.component` — termos da renegociacao ativa (M-9.5, contrato B2): valor
+  por parcela, quantidade, **total calculado no backend** (nunca `valor x quantidade` local),
+  primeiro vencimento, desconto, proposta/expiracao. Termos reconsultados ao entrar, na
+  reentrada da stack e imediatamente antes de cada confirmacao. Aceite exige confirmacao
+  explicita + MFA habilitado (bloqueia sem MFA, sem bypass) + step-up de uso unico; o retorno
+  do step-up nunca aceita automaticamente. Recusa explicita nao inicia nem consome step-up.
+  `403` de step-up limpa o token e reinicia a verificacao; `403` de ownership e neutro;
+  `404`/`409` recarregam os termos; rede/5xx nunca vira sucesso presumido; duplo submit
+  bloqueado. Pos-aceite navega para a agenda ativa (substituta); pos-recusa volta ao detalhe
+  da parcela.
 - `parcela-status.component` — badge reutilizado por lista e detalhe; mapeia os 7
   `StatusParcela` para texto + tom acessivel (o texto sempre acompanha a cor).
 
 Servico (`src/app/core/cobranca/cobranca-mobile.service.ts`): transporte HTTP de
-`/api/v1/cobranca` — `consultarAgenda(contratoId)` e `consultarParcela(parcelaId)`. Os metodos
-de historico e renegociacao (B1/B2) so serao adicionados apos as Sprints 23/24. Os DTOs de
-borda ficam em `src/app/core/api/api.models.ts`.
+`/api/v1/cobranca` — `consultarAgenda(contratoId)`, `consultarParcela(parcelaId)`,
+`consultarRecebimentos(parcelaId)` (B1), `consultarRenegociacaoAtiva(parcelaId)` (B2) e
+`aceitarRenegociacao`/`recusarRenegociacao` (PATCHes da Sprint 13; corpo interno descartado —
+o app usa o status HTTP e reconsulta). Os DTOs de borda (`RecebimentoTomadorResponse`,
+`RenegociacaoTomadorResponse`, `StatusRenegociacao`) ficam em
+`src/app/core/api/api.models.ts` e espelham os contratos owner-scoped — nunca os DTOs
+internos `RecebimentoResponse`/`RenegociacaoResponse`.
+
+Step-up: o `stepUpInterceptor` anexa `X-Step-Up-Token` por matching exato tambem em
+`PATCH /api/v1/cobranca/renegociacoes/{id}/aceite`; a recusa e os GETs de
+agenda/parcela/historico/renegociacao nunca recebem nem consomem o token (uso unico, apenas
+em memoria).
 
 Limites de seguranca: endpoints internos `FINANCEIRO/ADMIN` (recebimento manual, listagem de
 recebimentos, inadimplencia, contato, proposta de renegociacao) nao sao chamados nem expostos.
 Nenhum dado financeiro e persistido em `localStorage`, `sessionStorage` ou Capacitor
-Preferences. `403` de ownership usa mensagem neutra, sem enumerar existencia.
+Preferences. `403` de ownership usa mensagem neutra, sem enumerar existencia. O JSON publico
+nao contem `tomadorId`, `propostaPor`, IDs de agenda, escrow, operador ou justificativa.
 
-Testes: Vitest cobre o service, as rotas (`roleGuard CLIENTE`), a entrada (sem N+1), a agenda
-(descoberta, gate `ASSINADO`, `403`/`404`/rede), o detalhe (valor sem recalculo, erros,
-concorrencia) e o `ParcelaStatusComponent` (mapa exaustivo) — componentes Ionic testados por
-instancia. MSW, smoke PWA e regressao entram na M-9.6.
+Testes: Vitest (355) cobre o service (incl. B1/B2 e PATCHes), as rotas (`roleGuard CLIENTE`),
+a entrada (sem N+1), a agenda, o detalhe (valor sem recalculo, historico lazy/isolado, erros,
+concorrencia, `ionViewWillEnter`), a renegociacao (termos completos, MFA/step-up/retorno sem
+auto-aceite, recusa, 403/404/409/rede, duplo submit) e o `stepUpInterceptor` (aceite anexa e
+consome; recusa/GET/URL parecida nao) — componentes Ionic testados por instancia. MSW cobre a
+agenda com os 7 status, historico vazio/com recebimentos, renegociacao ativa e os PATCHes com
+estado observavel (aceite exige `X-Step-Up-Token` e substitui a agenda; recusa restaura o
+status anterior). Smoke Playwright `e2e/cobranca-mobile.spec.ts`: jornada completa
+login → parcelas → agenda → detalhe/historico → termos → step-up → retorno sem aceite
+automatico → aceite → agenda substituta; recusa sem step-up; viewport Pixel 5 e 320 px; sem
+token em storage e sem campos proibidos no DOM.
 
 Spec e steps:
 - [`specs/fase-3/209-msprint-9-cobranca-mobile.md`](../../specs/fase-3/209-msprint-9-cobranca-mobile.md)
 - [`steps-fase-3/mobile/209-msprint-9-steps.md`](../../steps-fase-3/mobile/209-msprint-9-steps.md)
-- backend desbloqueio: [`023`](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) (B1) e [`024`](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) (B2).
+- backend desbloqueio: [`023`](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) (B1, mergeada PR #81) e [`024`](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) (B2, mergeada PR #83).

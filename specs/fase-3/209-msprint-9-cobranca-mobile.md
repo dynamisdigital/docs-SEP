@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 209
 - **Titulo**: M-Sprint 9 - Parcelas e cobranca do tomador mobile
-- **Status**: planejada
+- **Status**: concluida — mergeada em `develop` via PR #107 (`7162b67`) e promovida a `main` via PR #108 (2026-07-02)
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 2+
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; APIs de cobranca das Sprints 12-13 e desbloqueios backend 23-24
