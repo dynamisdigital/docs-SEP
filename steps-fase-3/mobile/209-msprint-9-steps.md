@@ -102,6 +102,11 @@ Requisitos minimos:
 
 ### Gap B2 - Descoberta e leitura da renegociacao (Sprint 24)
 
+> **Status B2 (2026-07-02)**: contrato entregue no `sep-api` — `GET /parcelas/{parcelaId}/renegociacao-ativa`
+> + `RenegociacaoTomadorResponse`. **Mergeado em `develop` via PR #83 (`2a41c51`); M-9.5 liberada.**
+> Ao implementar a renegociacao mobile, espelhar `RenegociacaoTomadorResponse`, nao o
+> `RenegociacaoResponse` interno.
+
 Os PATCHes atuais exigem `renegociacaoId`, mas o tomador nao consegue descobrir esse ID
 nem ler os termos antes da decisao. `ParcelaResponse` informa apenas
 `status=EM_NEGOCIACAO`. Implementar aceite/recusa nessas condicoes seria uma decisao

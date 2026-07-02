@@ -1995,6 +1995,17 @@
       "metaSortKey": -1749982500000
     },
     {
+      "_id": "req_cob_renegociacao_ativa_tomador",
+      "_type": "request",
+      "parentId": "fld_cobranca",
+      "name": "GET /cobranca/parcelas/{id}/renegociacao-ativa (tomador)",
+      "method": "GET",
+      "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/renegociacao-ativa",
+      "headers": [{"name": "Authorization", "value": "Bearer {{ clienteToken }}"}],
+      "description": "Sprint 24: termos da renegociacao ativa owner-scoped. Exclusivo ROLE_CLIENTE (FINANCEIRO/ADMIN -> 403). Read-only, sem step-up. RenegociacaoTomadorResponse (10 campos; valorTotalRenegociado calculado no backend; sem justificativa/operador/IDs de agenda/statusParcelaAnterior). Cenarios: 200 proposta ativa; 404 sem proposta ativa; 403 nao-owner (inexistente/alheia, uniforme sem UUID).",
+      "metaSortKey": -1749982499000
+    },
+    {
       "_id": "req_bof_fila_list",
       "_type": "request",
       "parentId": "fld_backoffice",

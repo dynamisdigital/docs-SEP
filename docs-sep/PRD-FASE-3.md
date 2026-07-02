@@ -370,7 +370,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | 21 | Epic 15 | Pix recebimento e conciliacao (**implementada**) | [`021`](../specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 6 |
 | 22 | Epic 16 | Observabilidade operacional MVP + CloudWatch ready (**implementada**) | [`022`](../specs/fase-3/022-sprint-22-observabilidade-operacional.md) + [`steps`](../steps-fase-3/backend/022-sprint-22-steps.md) | 6 |
 | 23 | Epic 8/14 | Historico owner-scoped de recebimentos do tomador (B1 da M-9) (**mergeada em `develop` (PR #81) e promovida a `main` (PR #82); develop==main**) | [`023`](../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) + [`steps`](../steps-fase-3/backend/023-sprint-23-steps.md) | 4 |
-| 24 | Epic 8/14 | Consulta owner-scoped de renegociacao ativa (B2 da M-9) | [`024`](../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [`steps`](../steps-fase-3/backend/024-sprint-24-steps.md) | 4 |
+| 24 | Epic 8/14 | Consulta owner-scoped de renegociacao ativa (B2 da M-9) (**mergeada em `develop` via PR #83 (`2a41c51`); ainda nao promovida a `main`**) | [`024`](../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [`steps`](../steps-fase-3/backend/024-sprint-24-steps.md) | 4 |
 
 ### Web (`sep-app`)
 
@@ -394,7 +394,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | M-6 | Epic 14 | Tomador: onboarding mobile (**mergeada em `origin/develop` via PR #79, commit `4f495f3`**) | [`206`](../specs/fase-3/206-msprint-6-onboarding-mobile.md) + [`steps`](../steps-fase-3/mobile/206-msprint-6-steps.md) | 6 |
 | M-7 | Epic 14 | Tomador: proposta, credito e Open Finance (**mergeada em `develop` (PR #100) e promovida a `main` (PR #104); develop==main**) | [`207`](../specs/fase-3/207-msprint-7-credito-mobile.md) + [`steps`](../steps-fase-3/mobile/207-msprint-7-steps.md) | 6 |
 | M-8 | Epic 14 | Tomador: formalizacao e contrato (**mergeada em `origin/develop` via PR #105 (`be792df`) e promovida a `origin/main` via PR #106 (`e009d50`)**) | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) + [`steps`](../steps-fase-3/mobile/208-msprint-8-steps.md) | 5 |
-| M-9 | Epic 14 | Tomador: parcelas e cobranca (**M-9.1→M-9.3 implementadas na branch `feature/msprint-9-cobranca-mobile` (commits `71c6acf`/`393d927`/`1937cfe`); sprint pausada — M-9.4 depende da Sprint 23 (B1, **mergeada PR #81 — liberada**) e M-9.5 da Sprint 24 (B2, pendente); M-9.6 fecha a sprint apos ambas**) | [`209`](../specs/fase-3/209-msprint-9-cobranca-mobile.md) + [`steps`](../steps-fase-3/mobile/209-msprint-9-steps.md) | 6 |
+| M-9 | Epic 14 | Tomador: parcelas e cobranca (**M-9.1→M-9.3 implementadas na branch `feature/msprint-9-cobranca-mobile` (commits `71c6acf`/`393d927`/`1937cfe`); sprint pausada — M-9.4 depende da Sprint 23 (B1, **mergeada PR #81 — liberada**) e M-9.5 da Sprint 24 (B2, **mergeada em `develop` PR #83 — liberada**); ambos os gates backend abertos; M-9.6 fecha a sprint apos M-9.4/M-9.5**) | [`209`](../specs/fase-3/209-msprint-9-cobranca-mobile.md) + [`steps`](../steps-fase-3/mobile/209-msprint-9-steps.md) | 6 |
 | M-10 | Epic 14 | Empresa credora mobile | [`210`](../specs/fase-3/210-msprint-10-credora-mobile.md) | 6 |
 | M-11 | Epic 14/15 | Pix visivel ao usuario | [`211`](../specs/fase-3/211-msprint-11-pix-mobile.md) | 5 |
 

@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`024-sprint-24-cobranca-renegociacao-tomador.md`](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md)
 
-**Status**: planejada. Desbloqueio backend B2 da M-Sprint 9.
+**Status**: mergeada em `develop` via PR #83 (squash `2a41c51`); ainda nao promovida a `main`. Desbloqueio backend B2 da M-Sprint 9 (M-9.5 liberada).
 
 **Objetivo geral**: permitir que o tomador owner descubra e leia uma proposta de
 renegociacao ativa antes da decisao, com termos financeiros calculados no backend e sem
@@ -122,11 +122,11 @@ cd <sep-api-root>
 
 ### Definicao de pronto do Gate 24.0
 
-- [ ] Sprint 23 integrada.
-- [ ] Branch Sprint 24 criada.
-- [ ] PR temporario anterior tratado.
-- [ ] Contrato atual reconfirmado.
-- [ ] Baseline verde ou falha preexistente documentada.
+- [x] Sprint 23 integrada.
+- [x] Branch Sprint 24 criada.
+- [x] PR temporario anterior tratado.
+- [x] Contrato atual reconfirmado.
+- [x] Baseline verde ou falha preexistente documentada.
 
 ---
 
@@ -205,12 +205,12 @@ Nao chamar o job de expiracao nem persistir mudanca durante o GET.
 
 ### Definicao de pronto da Task 24.1
 
-- [ ] Ownership ocorre antes da busca da proposta.
-- [ ] Clock controla expiracao.
-- [ ] Estados finais nao sao ativos.
-- [ ] Total usa BigDecimal no backend.
-- [ ] Result nao expoe campos internos.
-- [ ] Testes focados passam.
+- [x] Ownership ocorre antes da busca da proposta.
+- [x] Clock controla expiracao.
+- [x] Estados finais nao sao ativos.
+- [x] Total usa BigDecimal no backend.
+- [x] Result nao expoe campos internos.
+- [x] Testes focados passam.
 
 ### Commit sugerido
 
@@ -283,11 +283,11 @@ Cobrir:
 
 ### Definicao de pronto da Task 24.2
 
-- [ ] Endpoint exclusivo de cliente.
-- [ ] GET read-only e sem step-up.
-- [ ] DTO dedicado e minimo.
-- [ ] PATCHes preservados.
-- [ ] Testes e Spotless passam.
+- [x] Endpoint exclusivo de cliente.
+- [x] GET read-only e sem step-up.
+- [x] DTO dedicado e minimo.
+- [x] PATCHes preservados.
+- [x] Testes e Spotless passam.
 
 ### Commit sugerido
 
@@ -339,11 +339,11 @@ Confirmar que:
 
 ### Definicao de pronto da Task 24.3
 
-- [ ] Descoberta e decisao funcionam em sequencia.
-- [ ] GET nao altera estado.
-- [ ] Expiracao por Clock coberta.
-- [ ] PATCHes nao regrediram.
-- [ ] Regressao focada passa.
+- [x] Descoberta e decisao funcionam em sequencia.
+- [x] GET nao altera estado.
+- [x] Expiracao por Clock coberta.
+- [x] PATCHes nao regrediram.
+- [x] Regressao focada passa.
 
 ### Commit sugerido
 
@@ -399,11 +399,11 @@ pendencias e mensagem sugerida. Aguardar aprovacao antes de staging/commit.
 
 ### Definicao de pronto da Task 24.4
 
-- [ ] OpenAPI e collection atualizados.
-- [ ] Docs refletem contrato entregue.
-- [ ] M-9.5 marcada como desbloqueada somente apos merge.
-- [ ] `check` e `bootJar` passam.
-- [ ] PR description e checkpoint apresentados.
+- [x] OpenAPI e collection atualizados.
+- [x] Docs refletem contrato entregue.
+- [x] M-9.5 marcada como desbloqueada somente apos merge.
+- [x] `check` e `bootJar` passam.
+- [x] PR description e checkpoint apresentados.
 
 ### Commit sugerido
 
@@ -413,12 +413,12 @@ docs(cobranca): documentar consulta de renegociacao ativa
 
 ## Definition of Done da Sprint 24
 
-- [ ] Contrato B2 implementado exatamente como na spec.
-- [ ] Termos completos e total chegam do backend.
-- [ ] Ownership, nao enumeracao e expiracao comprovadas.
-- [ ] GET sem step-up e sem mutacao.
-- [ ] PATCHes de aceite/recusa preservados.
-- [ ] Resposta publica minima.
-- [ ] Testes focados, `check` e `bootJar` verdes.
-- [ ] Docs e collection atualizados.
-- [ ] Merge em `develop` registrado antes de executar M-9.5.
+- [x] Contrato B2 implementado exatamente como na spec.
+- [x] Termos completos e total chegam do backend.
+- [x] Ownership, nao enumeracao e expiracao comprovadas.
+- [x] GET sem step-up e sem mutacao.
+- [x] PATCHes de aceite/recusa preservados.
+- [x] Resposta publica minima.
+- [x] Testes focados, `check` e `bootJar` verdes.
+- [x] Docs e collection atualizados.
+- [x] Merge em `develop` registrado antes de executar M-9.5. (PR #83, `2a41c51`)

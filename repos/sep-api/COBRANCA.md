@@ -3,7 +3,7 @@
 Documento operacional do modulo `cobranca` (Epic 8).
 Sprint 12 — implementada: parcelas, agenda, recebimento manual, escrow, job de atraso e audit reforcado.
 Sprint 13 — implementada na branch: inadimplencia, workflow de cobranca, notificacoes, renegociacao basica e auditoria reforcada.
-Sprint 23 — mergeada em `develop` (PR #81) e promovida a `main` (PR #82): consulta owner-scoped do historico de recebimentos do tomador (B1 da M-Sprint 9). Sprint 24 — planejada: renegociacao ativa owner-scoped (B2).
+Sprint 23 — mergeada em `develop` (PR #81) e promovida a `main` (PR #82): consulta owner-scoped do historico de recebimentos do tomador (B1 da M-Sprint 9). Sprint 24 — mergeada em `develop` (PR #83, squash `2a41c51`): consulta owner-scoped da renegociacao ativa do tomador (B2 da M-Sprint 9). Ainda nao promovida a `main`.
 
 > Specs: [`012-sprint-12-cobranca-parcelas-agenda.md`](../../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md) e [`013-sprint-13-cobranca-inadimplencia.md`](../../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md).
 > Steps: [`012-sprint-12-steps.md`](../../steps-fase-2/backend/012-sprint-12-steps.md) e [`013-sprint-13-steps.md`](../../steps-fase-2/backend/013-sprint-13-steps.md).
@@ -209,6 +209,8 @@ ExpirarRenegociacaoJob
 
 Aceite exige step-up porque cria nova obrigacao financeira. Recusa nao exige step-up porque apenas rejeita a proposta e reverte status. A agenda substituta usa `agenda_substituida_id` (V31) para manter a cadeia auditavel.
 
+**Descoberta pelo tomador (Sprint 24 — B2 da M-Sprint 9)**: antes de decidir, o tomador le os termos via `GET /parcelas/{parcelaId}/renegociacao-ativa` (owner-scoped). O `ConsultarRenegociacaoAtivaTomadorUseCase` valida ownership antes de revelar a proposta (mesma `CobrancaOwnershipException` generica sem UUID do B1), retorna apenas `PROPOSTA` ainda nao expirada pelo `Clock` (proposta vencida antes do job sai como 404) e calcula `valorTotalRenegociado = novoValorParcela * numeroParcelas` com `BigDecimal`. O `RenegociacaoTomadorResponse` nao expoe `justificativa`, operador, IDs de agenda nem `statusParcelaAnterior`. GET read-only, sem step-up, sem mutacao — os PATCHes de aceite/recusa seguem inalterados.
+
 ## Integracao com escrow
 
 Sprint 12 entrega versao local da segregacao patrimonial (CMN 4.656/2018 + ADR 0005). Sprint Epic 15 substituira por Celcoin via `EscrowProvider`.
@@ -238,6 +240,7 @@ Arquitetura (ADR 0007):
 | `POST` | `/api/v1/cobranca/parcelas/{id}/renegociacao` | `ROLE_FINANCEIRO/ADMIN` + step-up | cria proposta, parcela vira EM_NEGOCIACAO; conflito se proposta ativa |
 | `PATCH` | `/api/v1/cobranca/renegociacoes/{id}/aceite` | tomador owner + step-up | aceita proposta, cria agenda substituta, parcela vira RENEGOCIADA |
 | `PATCH` | `/api/v1/cobranca/renegociacoes/{id}/recusa` | tomador owner | recusa proposta, parcela volta ao status anterior |
+| `GET` | `/api/v1/cobranca/parcelas/{parcelaId}/renegociacao-ativa` | `ROLE_CLIENTE` (owner) | Sprint 24: termos da renegociacao ativa (PROPOSTA nao expirada pelo Clock) em `CobrancaTomadorController`; `RenegociacaoTomadorResponse` (10 campos publicos, `valorTotalRenegociado` calculado no backend); read-only, sem step-up; 404 sem proposta ativa; 403 uniforme sem UUID para parcela inexistente/alheia |
 
 OpenAPI/Swagger UI: tag `cobranca` atualizada para Sprints 12/13, DTOs com `@Schema` e endpoints documentados com `@Operation`/`@ApiResponses`. `ApiExceptionHandler` shared cobre header ausente, ownership, validacao, conflitos e entidades nao encontradas.
 
@@ -290,13 +293,14 @@ Suite de cobranca/inadimplencia:
 - **Listeners**: `ContratoAssinadoListenerTest`, `ParcelaAtrasouListenerTest`, `RenegociacaoPropostaListenerTest`, `CobrancaAuditListenerTest`.
 - **Web**: `CobrancaControllerTest`, `CobrancaInadimplenciaControllerTest`.
 - **IT**: `CobrancaIT`, `InadimplenciaIT`, `RenegociacaoIT`.
+- **Consultas owner-scoped do tomador (Sprints 23/24)**: `ConsultarRecebimentosParcelaUseCaseTest`, `ConsultarRenegociacaoAtivaTomadorUseCaseTest`, `CobrancaTomadorControllerTest`, IT `CobrancaTomadorConsultaIT` e os cenarios de renegociacao ativa adicionados ao `RenegociacaoIT` (descoberta -> leitura -> aceite/recusa, expiracao por Clock, ownership e minimizacao do JSON).
 
 Validacoes focadas usadas na Task 13.9: `./gradlew test --tests "*InadimplenciaIT" --tests "*RenegociacaoIT"` e `./gradlew test --tests "*Cobranca*"`.
 
 ## Limitacoes conhecidas / pendencias futuras
 
 - **Historico do tomador (Sprint 23 — mergeada em `develop` PR #81 / `main` PR #82)**: `GET /api/v1/cobranca/parcelas/{parcelaId}/recebimentos` exclusivo de `CLIENTE`, com `RecebimentoTomadorResponse` (recebimentoId, valorRecebido, dataRecebimento, meioPagamento), ownership validada no use case e 403 uniforme sem UUID. `GET /recebimentos` segue interno (`FINANCEIRO/ADMIN`). Desbloqueia B1 da M-Sprint 9 (M-9.4 liberada). Sem paginacao (recorte por parcela). Ver [spec](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) + [steps](../../steps-fase-3/backend/023-sprint-23-steps.md).
-- **Descoberta da renegociacao bloqueada**: Sprint 24 ([spec](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [steps](../../steps-fase-3/backend/024-sprint-24-steps.md)) planeja leitura de proposta ativa/nao expirada; os PATCHes existentes nao bastam para decisao mobile consciente.
+- **Descoberta da renegociacao (Sprint 24 — mergeada em `develop`, PR #83)**: `GET /api/v1/cobranca/parcelas/{parcelaId}/renegociacao-ativa` entrega os termos da proposta ativa/nao expirada ao tomador, resolvendo o gap de descoberta antes dos PATCHes ([spec](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [steps](../../steps-fase-3/backend/024-sprint-24-steps.md)). Desbloqueou B2 da M-Sprint 9 (M-9.5 liberada). Ainda nao promovida a `main`.
 
 - **Recebimento manual** apenas. Automacao por Pix fica pra Epic 15 (Celcoin).
 - **Sem boleto** e sem conciliacao automatica. Cobranca ativa da Sprint 13 cobre notificacao e contato manual, mas negativacao/juridico ficam fora do escopo.
@@ -309,6 +313,7 @@ Validacoes focadas usadas na Task 13.9: `./gradlew test --tests "*InadimplenciaI
 - **Jobs single-instance**: Epic 15 AWS multi-instance requer ShedLock ou advisory lock para atraso, escalonamento, inadimplencia e expiracao.
 - **`RecebimentoResponse.movimentacaoEscrowId` null** em listagem em massa (evita N+1 join). POST recebimento preenche o id.
 - **Test `payload_naoVazaDadosBancariosOuPessoais`** usa blacklist de substrings — schema validation completa em sprint de hardening.
+- **Use cases injetam Spring Data repositories de `infrastructure.persistence` diretamente** (padrao de todo o modulo `cobranca` — 14/14 use cases, incluindo `ConsultarRenegociacaoAtivaTomadorUseCase` da Sprint 24 e o irmao B1 `ConsultarRecebimentosParcelaUseCase`). O ADR 0007 pediria portas em `application.port.out` para a persistencia propria do modulo; hoje so as dependencias externas/cross-modulo usam porta (`ContratoCobrancaQueryPort`, `PropostaCobrancaQueryPort`, `RegistrarMovimentacaoEscrowPort`, `NotificationProvider`). Divida aceita: a extracao de portas de persistencia deve ser feita module-wide (nao pontual, para nao divergir do padrao existente), em tarefa dedicada ou melhoria de fim-de-fase — nao na Sprint 24, que preserva consistencia com o codigo ja mergeado.
 
 ## Referencias
 
