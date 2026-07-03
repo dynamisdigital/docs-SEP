@@ -724,6 +724,8 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - Validacoes: Vitest **355** verdes (54 files), lint/lint:scss/format:check verdes, build AOT verde, smoke cobranca 3/3 (Pixel 5 + 320 px) e regressao dos smokes M-2/6/7/8 8/8 verdes.
   - `SPRINT-M-9-PR.md` em `repos/sep-mobile/` (apagar no inicio da proxima sprint, apos uso no PR — regra fixa).
 
+- **M-Sprint 10 (Jornada da empresa credora mobile) planejada em 2026-07-02**: steps criados em `steps-fase-3/mobile/210-msprint-10-steps.md`, derivados da Spec 210 e dos contratos reais das Sprints backend 16-17. Modelo de acesso confirmado: nao existe role `CREDORA`; a jornada usa autenticacao + presenca em `GET /api/v1/credores/me`, com ownership/elegibilidade no backend. A M-10 nao inclui cadastro/KYB, endpoints ADMIN, aporte ou Pix. Gate I1 aberto: o backend nao expoe leitura do interesse ativo por oportunidade; M-10.4 (manifestar/cancelar com estado correto apos reload) nao fecha o DoD antes de contrato de descoberta aprovado e integrado. Sequencia: prechecks -> borda/contexto -> dashboard/perfil -> oportunidades -> I1 -> interesse -> carteira -> tabs/guards/MSW/smoke/docs.
+
 ## Observacao importante para outro agente
 
 Se outro agente assumir este trabalho, ele deve:

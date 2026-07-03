@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 210
 - **Titulo**: M-Sprint 10 - Jornada da empresa credora mobile
-- **Status**: planejada
+- **Status**: planejada; steps de implementacao criados (Gate I1 aberto)
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 3
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; backend Sprints 16-17
@@ -28,6 +28,12 @@ Implementar a experiencia mobile simplificada da empresa credora: status, oportu
 - Financeiro/backoffice/admin.
 - Aporte financeiro real.
 - Pix operacional interno.
+
+## Gate backend bloqueante
+
+- **I1 - descoberta do interesse ativo**: o backend atual permite registrar e cancelar interesse, mas nao expoe `GET /oportunidades/{id}/interesses/me` nem estado equivalente em `OportunidadeResponse`. Sem leitura autoritativa, o mobile nao distingue corretamente manifestar/cancelar apos reload ou novo login.
+- M-10.1, M-10.2, M-10.3 e M-10.5 podem avancar; M-10.4 nao fecha o DoD antes de I1 possuir contrato aprovado e integrado.
+- Nao persistir nem inferir interesse localmente para contornar o gate. Detalhamento em [`210-msprint-10-steps.md`](../../steps-fase-3/mobile/210-msprint-10-steps.md).
 
 ## Tasks de implementacao
 
