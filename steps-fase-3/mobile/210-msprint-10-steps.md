@@ -2,7 +2,12 @@
 
 **Spec de origem**: [`210-msprint-10-credora-mobile.md`](../../specs/fase-3/210-msprint-10-credora-mobile.md)
 
-**Status**: planejada.
+**Status**: **concluída — mergeada em `origin/develop` via PR #109 (`f51e6be`), 2026-07-03**; não
+promovida a `main`. Gate I1 fechado pela Sprint 25 backend (PR #85; em `develop` e `main`).
+Vitest 423 + smoke `credora-mobile` 6/6 verdes; regressao e2e verde (golden-path preexistente red,
+alheio a esta sprint). Bug real corrigido: navegacao da tab Credora — o `ion-tab-button` da tab
+adicionada apos a presenca async nao e registrada pelo `ion-tabs` no init e caia em reload de pagina
+inteira; a navegacao passou a ser via `router` (sem `[tab]`/`[href]`) com destaque por `estaAtiva`.
 
 **Objetivo geral**: substituir a casca da empresa credora por uma jornada mobile simplificada
 de perfil/elegibilidade, oportunidades, interesse e carteira, consumindo os contratos reais do
@@ -174,7 +179,13 @@ sao administrativos; `carteira/operacoes` exige ADMIN + step-up. A M-10 nao alte
 
 ## Gate I1 - Descoberta do interesse ativo
 
-O contrato atual nao informa se a credora autenticada possui interesse ativo:
+**Status: em resolucao pela Sprint 25 backend (Opcao A).** `GET /api/v1/credores/oportunidades/{id}/interesses/me`
+foi implementado na branch `feature/sprint-25-credora-interesse-ativo` do `sep-api` (steps
+[`025-sprint-25-steps.md`](../backend/025-sprint-25-steps.md)). O Gate fecha ao mergear a Sprint 25
+em `origin/develop`; so entao a Task M-10.4 pode fechar o DoD. As opcoes de contrato abaixo ficam
+como registro historico da decisao (Opcao A escolhida).
+
+O contrato original nao informava se a credora autenticada possui interesse ativo:
 - `OportunidadeResponse` nao possui `interesseAtual` ou flag equivalente.
 - nao existe `GET /oportunidades/{id}/interesses/me`.
 - `POST` devolve `409` quando ja existe interesse.

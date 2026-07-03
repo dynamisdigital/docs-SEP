@@ -336,3 +336,81 @@ Spec e steps:
 - [`specs/fase-3/209-msprint-9-cobranca-mobile.md`](../../specs/fase-3/209-msprint-9-cobranca-mobile.md)
 - [`steps-fase-3/mobile/209-msprint-9-steps.md`](../../steps-fase-3/mobile/209-msprint-9-steps.md)
 - backend desbloqueio: [`023`](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) (B1, mergeada PR #81) e [`024`](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) (B2, mergeada PR #83).
+
+## Jornada da empresa credora (M-Sprint 10)
+
+Jornada PWA da empresa credora que consome os contratos reais do modulo `credores` de `sep-api`
+(Sprints 16-17 + Sprint 25, que fecha o Gate I1 com a leitura autoritativa do interesse ativo).
+**Nao existe role `CREDORA`**: o acesso e governado por autenticacao + presenca de credora
+confirmada por `GET /api/v1/credores/me`. **Ownership, elegibilidade, regras de interesse,
+associacao de carteira, auditoria e calculos financeiros permanecem no backend** — o app apenas
+apresenta snapshots, formata na borda (`Intl`) e nunca recalcula valor/taxa/saldo.
+
+**Status**: concluída — mergeada em `origin/develop` via PR #109 (`f51e6be`), 2026-07-03; não
+promovida a `main` (develop ⊃ main). Depende da Sprint 25 backend (Gate I1), mergeada em
+`origin/develop` e `main` (PR #85).
+
+Modelo de acesso (sem role): `GET /credores/me` → 200 libera; 404 = usuario sem credora (nao
+libera); rede/5xx = estado tecnico com retry, nunca conclui "nao e credora". O `credoraPresenceGuard`
+governa as rotas e a tab Credora aparece apenas apos a presenca confirmada.
+
+Rotas (lazy, shell autenticado, `credoraPresenceGuard`, `data.tab = 'credora'`):
+- `/app/credora/inicio` — dashboard.
+- `/app/credora/perfil` — perfil/elegibilidade.
+- `/app/credora/oportunidades` e `/app/credora/oportunidades/:oportunidadeId`.
+- `/app/credora/carteira` e `/app/credora/carteira/:operacaoId`.
+
+Entrada: uma unica tab "Credora" (inserida antes de "Perfil", mantendo no maximo 5 tabs para um
+`CLIENTE` que tambem possui credora), exibida somente com presenca confirmada. A navegacao das tabs
+passa pelo `router` (o `ion-tab-button` nao usa mais `[tab]`/`[href]`): a tab Credora e adicionada
+apos a presenca async e nao seria registrada pelo `ion-tabs` no init, o que fazia o clique cair no
+comportamento de ancora do `[href]` (reload de pagina inteira). O destaque da tab ativa vem de
+`estaAtiva` (compara o `router.url`).
+
+Telas/componentes (`src/app/features/credora/`):
+- `home/home.component` — dashboard: razao social, tipo, status/elegibilidade (pills semanticas) e
+  atalhos para perfil/oportunidades/carteira. Contagens sao apenas o tamanho das listas (carga
+  paralela tolerante a falha parcial); nao calcula total aportado/rentabilidade/exposicao.
+- `perfil/credora-profile.component` — snapshot do `/me`: razao, CNPJ (formatado pelo backend),
+  tipo, capacidade de aporte (quando presente), status/elegibilidade, motivo de inelegibilidade
+  (quando retornado) e datas. Nao edita, nao reexecuta KYB/PLD, nao exibe `usuarioId`/`onboardingId`.
+- `oportunidades/opportunity-list.component` e `opportunity-detail.component` — lista (ordem do
+  backend, sem paginacao) e detalhe read-only; `ionViewWillEnter` reconsulta na reentrada; token de
+  geracao descarta resposta obsoleta; `404` neutro + retorno; nao expoe `propostaId`/`contratoId`.
+  O detalhe manifesta/cancela interesse com **estado autoritativo** (`GET .../interesses/me`, Sprint
+  25): confirmacao explicita, duplo submit bloqueado, reconsulta pos-mutacao, `201`/`204` reconsultam,
+  `409`/`404` reconsultam sem presumir, `422` informa sem alterar, rede/5xx nunca vira sucesso. **Sem
+  step-up.** Copy deixa claro que interesse nao gera aporte/reserva/matching/alocacao/carteira.
+- `carteira/portfolio-list.component` e `portfolio-detail.component` — carteira simplificada: campos
+  nullable viram "Nao informado" (sem zero inventado); agregados de cobranca (parcelas pagas/atrasadas,
+  total recebido, proximo vencimento) exibidos diretamente, sem recalculo; nao soma "total aportado";
+  nao exibe `justificativa` operacional nem IDs de contrato/oportunidade; lista vazia explica que
+  interesse nao gera carteira automaticamente (associacao assistida, fora do app).
+- `shared/` — `credora-status`/`oportunidade-status`/`operacao-status` (pills semanticas) e
+  `credora-format` (moeda/taxa/data; taxa como fracao via `Intl percent`, igual ao consumidor web).
+
+Borda (`src/app/core/credores/`): `credora-mobile.service` (9 endpoints permitidos; sem
+cadastro/sync/associacao admin; `POST` interesses sem corpo; `DELETE` 204 sem DTO; propaga 404/409/422)
+e `credora-context.store` — presenca **efemera em memoria** (sem storage), deduplica chamadas
+concorrentes, distingue 404 de rede/5xx, escopa presenca/credora ao usuario autenticado (troca de
+usuario/logout invalidam) e descarta resposta de usuario trocado durante a requisicao.
+
+Limites de seguranca/regulatorio: endpoints ADMIN (`POST /credores`, `.../sync`,
+`.../carteira/operacoes`) nao sao chamados nem expostos. Nada de credora/interesse e persistido em
+`localStorage`/`sessionStorage`/Preferences. `404` de detalhe e neutro (nao enumera recurso alheio).
+Nenhum dado do tomador, `justificativa`, ID interno, escrow ou payload de provider aparece no DOM.
+
+Testes: Vitest cobre o service (URLs/metodos, 204, propagacao 404/409/422, ausencia de admin), o
+store (presente/ausente/erro, dedup, troca de usuario/logout, descarte de resposta trocada), o guard
+(presente/ausente/erro), a tab condicional, dashboard/perfil, oportunidades/detalhe (formatacao,
+`404`, obsoleta, IDs ausentes, encerrada) e o interesse (201/409/422/404/rede, cancelamento, duplo
+submit, sem step-up, inelegivel/encerrada desabilitam) e a carteira (nullable, agregados sem
+recalculo, sem justificativa/IDs). Smoke Playwright `e2e/credora-mobile.spec.ts`: jornada dashboard
+→ perfil → oportunidades → interesse → carteira; tomador sem credora (guard + sem tab); inelegivel
+nao manifesta; carteira vazia; 320 px; tema escuro; assercoes negativas (sem admin/aporte/escrow/
+tomador/IDs/justificativa) e storage sem dados persistidos.
+
+Spec e steps:
+- [`specs/fase-3/210-msprint-10-credora-mobile.md`](../../specs/fase-3/210-msprint-10-credora-mobile.md)
+- [`steps-fase-3/mobile/210-msprint-10-steps.md`](../../steps-fase-3/mobile/210-msprint-10-steps.md)
+- backend Gate I1: [`025`](../../steps-fase-3/backend/025-sprint-25-steps.md) (Sprint 25, `GET .../interesses/me`, mergeada PR #85).

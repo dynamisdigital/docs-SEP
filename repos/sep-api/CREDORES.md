@@ -171,6 +171,7 @@ JPA):
 | GET | `/api/v1/credores/oportunidades` | `isAuthenticated()` | Lista oportunidades disponiveis da credora |
 | GET | `/api/v1/credores/oportunidades/{id}` | `isAuthenticated()` | Detalhe de oportunidade |
 | POST | `/api/v1/credores/oportunidades/{id}/interesses` | `isAuthenticated()` | Registra interesse (201) |
+| GET | `/api/v1/credores/oportunidades/{id}/interesses/me` | `isAuthenticated()` | Consulta o interesse ativo proprio (200/404) — Sprint 25 |
 | DELETE | `/api/v1/credores/oportunidades/{id}/interesses/me` | `isAuthenticated()` | Cancela interesse proprio (204) |
 | POST | `/api/v1/credores/oportunidades/sync` | `hasRole('ADMIN')` | Sincroniza oportunidades |
 | GET | `/api/v1/credores/carteira` | `isAuthenticated()` | Lista carteira da credora |
@@ -204,6 +205,31 @@ JPA):
   nao de ports de persistencia em `application.port.out`. Mantem o padrao herdado da Sprint 16 e
   o precedente de `cobranca`. Refator para ports de persistencia fica como divida aceita, a ser
   tratada em sprint de hardening junto com os demais modulos.
+
+## Sprint 25 — Leitura do interesse ativo (Gate I1 da M-10)
+
+Fecha o Gate backend bloqueante I1 da M-Sprint 10 mobile: expor uma leitura autoritativa do
+interesse ativo da credora numa oportunidade, sem a qual o app nao distingue `Manifestar` de
+`Cancelar` apos reload/novo login. Contrato aprovado = Opcao A (GET dedicado), simetrico ao
+`DELETE .../interesses/me`.
+
+- `GET /api/v1/credores/oportunidades/{id}/interesses/me` (`isAuthenticated()`, sem step-up):
+  `200 InteresseResponse` (sempre `status ATIVO`) quando existe interesse ativo da credora do
+  usuario; `404` neutro quando o usuario nao possui credora **ou** nao possui interesse ativo.
+- `ConsultarInteresseAtivoCredoraUseCase` — read-only (`@Transactional(readOnly = true)`). Resolve
+  a credora por `usuarioId` **antes** de buscar o interesse (nao revela existencia a quem nao possui
+  credora) e reusa `InteresseCredoraRepository.findByEmpresaCredoraIdAndOportunidadeIdAndStatus(...,
+  ATIVO)`. Sem evento, mutacao, lock ou auditoria.
+- Sem migration, sem novo DTO (reusa `InteresseResponse` + `InteresseView` + mapper), sem novo
+  metodo de repository, sem novo padrao GoF.
+- Testes: `CarteiraCredoraUseCaseTest` (unit — sucesso/sem-interesse/sem-credora + ordem de
+  ownership) e `CarteiraCredoraIT` (E2E — 200 com apenas 4 campos, 404 neutro, ciclo
+  registrar->ler->cancelar->ler 404 provando o filtro JPA `ATIVO`, GET sem auditoria, ownership
+  entre credoras).
+- Ao mergear a Sprint 25 em `develop`, o Gate I1 fecha e libera a Task M-10.4 (spec/steps 210).
+
+> Collection: o modulo `credores` ainda nao esta na `sep-api.postman_collection.json` (gap herdado
+> das Sprints 16-17). Nao retrofitado aqui para evitar scope creep; registrado como followup.
 
 ## Pendencias / proximos passos
 
