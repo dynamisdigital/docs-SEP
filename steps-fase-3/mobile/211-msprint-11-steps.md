@@ -8,7 +8,8 @@
 Os endpoints Pix das Sprints 19-21 continuam restritos a operacao interna; o mobile consome apenas os
 tres contratos publicos abaixo. **M-Sprint 11 mobile implementada na branch
 `feature/msprint-11-pix-mobile` (Tasks M-11.1-M-11.5: borda, desembolso P1, hotfix, parcela P2,
-carteira P3, MSW+smoke; mais hotfix do code review); pendente de merge em `origin/develop`.**
+carteira P3, MSW+smoke; mais hotfix do code review); **mergeada em `origin/develop` via PR #111
+(squash `34f4f0f`), NAO em `main`.**
 
 **Objetivo geral**: exibir ao tomador e a empresa credora o estado Pix das operacoes que lhes
 pertencem, integrado as telas existentes de contrato, parcela e carteira, sem expor comandos

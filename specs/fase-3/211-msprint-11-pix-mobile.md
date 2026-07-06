@@ -4,8 +4,8 @@
 
 - **ID da Spec**: 211
 - **Titulo**: M-Sprint 11 - Pix visivel ao usuario mobile
-- **Status**: implementada na branch `feature/msprint-11-pix-mobile` (Tasks M-11.1-M-11.5 + hotfix do
-  code review); pendente de merge
+- **Status**: mergeada em `origin/develop` via PR #111 (squash `34f4f0f`, 2026-07-06); **NAO em
+  `main`** (develop ⊃ main). Tasks M-11.1-M-11.5 + hotfix do code review
   em `origin/develop`. Gates P1-P3 entregues pela Sprint 26 backend (mergeada `develop`/`main`, PR
   #87/#88)
 - **Fase do produto**: Fase 3 - Epic 14 + Epic 15

@@ -1,6 +1,7 @@
 # M-Sprint 11 — Pix visivel ao usuario (Epic 14/15)
 
-Branch: `feature/msprint-11-pix-mobile` → `develop` (squash).
+Branch: `feature/msprint-11-pix-mobile` → `develop` (squash). **Mergeada via PR #111 (`34f4f0f`),
+2026-07-06; NAO em `main`** (develop ⊃ main).
 Depende da **Sprint 26 backend** (Gates P1-P3, mergeada `develop`/`main`, PR #87/#88).
 
 ## Objetivo
