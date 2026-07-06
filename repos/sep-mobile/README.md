@@ -414,3 +414,63 @@ Spec e steps:
 - [`specs/fase-3/210-msprint-10-credora-mobile.md`](../../specs/fase-3/210-msprint-10-credora-mobile.md)
 - [`steps-fase-3/mobile/210-msprint-10-steps.md`](../../steps-fase-3/mobile/210-msprint-10-steps.md)
 - backend Gate I1: [`025`](../../steps-fase-3/backend/025-sprint-25-steps.md) (Sprint 25, `GET .../interesses/me`, mergeada PR #85).
+
+## Pix visivel ao usuario (M-Sprint 11)
+
+Exibe ao tomador e a credora o estado Pix das operacoes que lhes pertencem, integrado as telas
+existentes de contrato, parcela e carteira, **sem** expor comandos financeiros internos, conciliacao,
+provider, escrow ou dados de outra parte. Consome os tres contratos backend owner-scoped da **Sprint
+26** (Gates P1-P3): desembolso do tomador, status Pix da parcela e status Pix da operacao da credora.
+Leituras read-only, sem step-up, sem persistencia; ownership, status e valor vem do backend e o app
+apenas apresenta.
+
+**Status**: implementada na branch `feature/msprint-11-pix-mobile` (Tasks M-11.1-M-11.5 + hotfix do
+code review); pendente de merge em
+`origin/develop`. Depende da Sprint 26 backend (Gates P1-P3), mergeada em `origin/develop` e `main`
+(PR #87/#88).
+
+Borda (`src/app/core/`):
+- `api/api.models` — `StatusPixPublico` (P1/P3), `StatusPixParcelaPublico` (P2) e as respostas
+  `PixDesembolsoTomadorResponse`/`PixPagamentoParcelaResponse`/`PixOperacaoCredoraResponse` (espelham
+  o JSON real; so `mensagemPublica` nullable).
+- `pix/pix-mobile.service` — tres GET read-only (`consultarDesembolsoDoContrato`,
+  `consultarStatusPixDaParcela`, `consultarStatusPixDaOperacao`). Sem step-up, `Idempotency-Key` ou
+  header financeiro; `403`/`404`/`5xx` propagam para a UI. Nenhum endpoint operacional Pix e exposto.
+
+Componentes (`src/app/features/pix/`):
+- `pix-status-publico.component` — badge de `StatusPixPublico` (reusado por P1 e P3).
+- `pix-status-parcela.component` — badge de `StatusPixParcelaPublico` (P2). DIVERGENTE orienta
+  verificacao; FALHOU nunca vira pago.
+
+Integracao nas telas existentes:
+- **P1 — desembolso do tomador** (`features/tomador/formalizacao/contrato-detail`): card "Desembolso
+  Pix" apos o contrato ASSINADO (o desembolso so existe pos-assinatura). Consulta apos o contrato
+  carregar e reconsulta em `ionViewWillEnter` + refresh; `404` = "ainda nao disponivel"; rede/5xx =
+  erro isolado com retry; a consulta ocorre apos liberar o spinner do contrato (falha do card nao
+  bloqueia a tela).
+- **P2 — parcela do tomador** (`features/tomador/cobranca/parcela-detail`): card "Pagamento Pix" que
+  **complementa, nao substitui** o status autoritativo de cobranca. Estado derivado no backend por
+  precedencia; `mensagemPublica` sanitizada so em DIVERGENTE/FALHOU. O historico liquidado da M-9 e
+  reutilizado com destaque visual para `meioPagamento=PIX` (sem nova chamada). Token de geracao
+  descarta resposta obsoleta.
+- **P3 — operacao da credora** (`features/credora/carteira/portfolio-detail`): card "Status Pix da
+  operacao" (so status/valor/data). Acesso por presenca de credora (sem role `CREDORA`).
+
+Limites de seguranca: nenhuma rota operacional Pix (desembolsos, referencias, recebimentos internos)
+e chamada; nenhum `txid`, copia-cola, `endToEndId`, chave, escrow, provider ou ID interno aparece no
+DOM ou em storage; nenhuma rota M-11 entra no allowlist do `stepUpInterceptor`; nada de estado Pix e
+persistido.
+
+Testes: Vitest cobre os mappers (rotulo/tom exaustivos), o service (URLs/metodos, ausencia de
+step-up/Idempotency, 403/404) e a integracao nas tres telas (estados, 404 neutro vs erro+retry,
+reentrada, concorrencia por token de geracao, falha isolada, ausencia de campos proibidos). Smoke
+Playwright `e2e/pix-mobile.spec.ts`: tomador ve desembolso no contrato + status Pix na parcela +
+destaque PIX no historico + ausencia neutra; credora ve status Pix da operacao; 5xx com retry; `404`
+neutro; tema escuro; 320 px; assercoes negativas (sem txid/copia-cola/endToEndId/escrow, storage sem
+estado Pix) e interceptacao provando que nenhuma rota operacional Pix e chamada. Handlers MSW
+`pixHandlers` reseedaveis por `mock.pix`.
+
+Spec e steps:
+- [`specs/fase-3/211-msprint-11-pix-mobile.md`](../../specs/fase-3/211-msprint-11-pix-mobile.md)
+- [`steps-fase-3/mobile/211-msprint-11-steps.md`](../../steps-fase-3/mobile/211-msprint-11-steps.md)
+- backend Gates P1-P3: [`026`](../../steps-fase-3/backend/026-sprint-26-steps.md) (Sprint 26, mergeada PR #87/#88).

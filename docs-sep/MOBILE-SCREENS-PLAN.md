@@ -208,6 +208,14 @@ Dependencias:
 Observacao:
 - O mobile nao deve iniciar desembolso Pix assistido nem tratar conciliacao operacional.
 
+Entregue (M-Sprint 11, 2026-07-06 — branch `feature/msprint-11-pix-mobile`, pendente de merge em
+`develop`): a fatia read-only visivel ao usuario, consumindo os tres contratos owner-scoped da Sprint
+26 backend (Gates P1-P3) integrados as telas existentes — desembolso do tomador (contrato ASSINADO),
+status Pix da parcela (complementa, nao substitui, o status de cobranca; destaque `meioPagamento=PIX`
+no historico) e status Pix da operacao da credora (so status/valor/data). Sem iniciar desembolso, sem
+conciliacao, sem dado tecnico (txid/copia-cola/endToEndId/chave/escrow) nem endpoint operacional.
+"Instrucoes de pagamento" e "comprovantes" seguem futuros (dependem de contrato backend aprovado).
+
 ## 6. Telas Detalhadas - Base Mobile
 
 ### 6.1 Splash / Carregamento Inicial

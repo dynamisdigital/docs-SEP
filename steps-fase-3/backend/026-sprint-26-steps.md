@@ -2,9 +2,9 @@
 
 **Spec de origem**: [`026-sprint-26-pix-leitura-owner-scoped.md`](../../specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md)
 
-**Status**: planejada. Desbloqueia os Gates P1-P3 da
-[`M-Sprint 11`](../mobile/211-msprint-11-steps.md). O trabalho mobile so inicia apos estes tres
-contratos integrados em `origin/develop`.
+**Status**: mergeada em `origin/develop` via PR #87 (`b351596`) e promovida a `origin/main` via
+PR #88 (`e443047`); develop==main. Desbloqueia os Gates P1-P3 da
+[`M-Sprint 11`](../mobile/211-msprint-11-steps.md) — Task M-11.1 liberada.
 
 **Objetivo geral**: entregar tres leituras Pix owner-scoped (desembolso do tomador, Pix da
 parcela do tomador, Pix da operacao da credora), minimas e read-only, sem liberar rotas
@@ -59,8 +59,9 @@ operacionais nem expor dados internos.
 - `atualizadoEm` usa `dataModificacao` (`EntidadeAuditavel`), sem fallback para `dataCriacao`. No
   P2, e a `dataModificacao` da fonte que determinou o status vencedor (referencia ou recebimento).
 - `mensagemPublica` (P2) e copy fixa sanitizada no backend, sem `motivoDivergencia` bruto.
-- Sem migration, sem novo status interno, sem evento, sem auditoria, sem step-up, sem lock, sem
-  chamada a provider e sem novo padrao GoF.
+- Sem novo status interno, evento, auditoria, step-up, lock, chamada a provider ou padrao GoF. Unica
+  migration: indice de leitura `V53` em `pix_recebimento (referencia_id, data_criacao)` (adicionado no
+  code review para a consulta da P2); nao ha mudanca de schema de dominio.
 
 ## Protocolo obrigatorio por Task
 
@@ -489,9 +490,11 @@ Atualizar:
 - `docs-sep/CONTEXT-PARTE-2.md`.
 - `AI-ROADMAP.md`.
 
-### Step 026.5.2 - Atualizar collection
+### Step 026.5.2 - Collection (adiada)
 
-Adicionar, com exemplos `200`/`403`/`404`:
+Colecao NAO atualizada nesta sprint (divida aceita, aprovada no code review): congelada no Sprint 14,
+refresh completo e backlog separado. Contrato vigente = OpenAPI/springdoc. Endpoints que entrariam no
+refresh, com exemplos `200`/`403`/`404`:
 
 ```text
 GET /api/v1/pix/contratos/{{contratoId}}/desembolso
@@ -516,7 +519,7 @@ mensagem sugerida. Aguardar aprovacao antes de staging/commit.
 
 ### Definicao de pronto da Task 26.5
 
-- [ ] OpenAPI e collection atualizados.
+- [ ] OpenAPI atualizado; collection adiada (divida aceita).
 - [ ] `PIX.md` e docs refletem os contratos entregues.
 - [ ] Gates P1-P3 do step 211 preenchidos e marcados como fechados apos merge.
 - [ ] `check` e `bootJar` passam.
@@ -539,5 +542,5 @@ docs(pix): documentar leitura pix owner-scoped
 - [ ] Cada estado publico coberto por teste; ownership e ausencia de side effect comprovadas.
 - [ ] Testes de integracao cobrem auth real, owner/nao-owner, roles internas, ordenacao e payload.
 - [ ] `check` e `bootJar` verdes.
-- [ ] OpenAPI, `PIX.md`, collection e Gates do step 211 atualizados.
+- [ ] OpenAPI, `PIX.md` e Gates do step 211 atualizados; collection adiada (divida aceita).
 - [ ] Merge em `develop` registrado antes de liberar a M-Sprint 11 mobile.

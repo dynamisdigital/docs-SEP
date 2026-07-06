@@ -4,8 +4,10 @@
 
 - **ID da Spec**: 211
 - **Titulo**: M-Sprint 11 - Pix visivel ao usuario mobile
-- **Status**: planejada — bloqueada pelos Gates P1-P3 de leitura Pix owner-scoped definidos no
-  [`step 211`](../../steps-fase-3/mobile/211-msprint-11-steps.md)
+- **Status**: implementada na branch `feature/msprint-11-pix-mobile` (Tasks M-11.1-M-11.5 + hotfix do
+  code review); pendente de merge
+  em `origin/develop`. Gates P1-P3 entregues pela Sprint 26 backend (mergeada `develop`/`main`, PR
+  #87/#88)
 - **Fase do produto**: Fase 3 - Epic 14 + Epic 15
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epics 14 e 15

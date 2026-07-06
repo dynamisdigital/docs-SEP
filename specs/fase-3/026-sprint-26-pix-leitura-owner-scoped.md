@@ -4,7 +4,8 @@
 
 - **ID da Spec**: 026
 - **Titulo**: Sprint 26 - Leitura Pix owner-scoped para tomador e credora
-- **Status**: planejada
+- **Status**: mergeada em `origin/develop` via PR #87 (`b351596`) e promovida a `origin/main` via
+  PR #88 (`e443047`); develop==main
 - **Fase do produto**: Fase 3 - Epic 14/15, desbloqueio backend dos Gates P1-P3 da M-Sprint 11
 - **Trilha**: Backend (`sep-api`)
 - **Origem**: M-Sprint 11 (Pix mobile), secao "Gates backend obrigatorios" do
@@ -106,16 +107,21 @@ PixPagamentoParcelaResponse
 Fontes: referencia mais recente da parcela (`StatusPixReferenciaRecebimento`, ultima por
 `dataCriacao`) e, quando houver, o recebimento mais recente DAQUELA referencia
 (`StatusPixRecebimento` buscado por `referenciaId`, nunca o recebimento mais recente da parcela de
-forma independente). Precedencia (primeira regra que casar vence):
+forma independente). Estados terminais da referencia sao autoritativos e vencem qualquer
+recebimento posterior; so quando a referencia esta `ATIVA` o recebimento orienta o estado.
+Precedencia (primeira regra que casar vence):
 
 ```text
-referencia CANCELADA                                  -> CANCELADO
-referencia EXPIRADA                                   -> EXPIRADO
-referencia DIVERGENTE | recebimento NAO_IDENTIFICADO  -> DIVERGENTE
-recebimento FALHOU                                    -> FALHOU
-referencia PAGA | recebimento CONCILIADO              -> LIQUIDADO
-recebimento RECEBIDO | EM_PROCESSAMENTO               -> EM_PROCESSAMENTO
-referencia ATIVA (default)                            -> AGUARDANDO
+referencia CANCELADA                     -> CANCELADO
+referencia EXPIRADA                      -> EXPIRADO
+referencia PAGA                          -> LIQUIDADO
+referencia DIVERGENTE                    -> DIVERGENTE
+(referencia ATIVA a partir daqui)
+recebimento NAO_IDENTIFICADO             -> DIVERGENTE
+recebimento FALHOU                       -> FALHOU
+recebimento CONCILIADO                   -> LIQUIDADO
+recebimento RECEBIDO | EM_PROCESSAMENTO  -> EM_PROCESSAMENTO
+default (referencia ATIVA sem recebimento) -> AGUARDANDO
 ```
 
 ### P3 - Status Pix da operacao financiada da credora
@@ -183,7 +189,9 @@ Em qualquer das tres respostas:
 - Metodos de consulta derivados por `contratoId`/`parcelaId` no repositorio quando faltarem.
 - Testes de ownership, nao-enumeracao, cada estado publico, ausencia de Pix e ausencia de side
   effect.
-- Atualizar OpenAPI, `PIX.md`, collection e a secao de Gates do step 211.
+- Indice de leitura `V53` em `pix_recebimento (referencia_id, data_criacao)` (adicionado no code
+  review) para a consulta da P2.
+- Atualizar OpenAPI, `PIX.md` e a secao de Gates do step 211.
 
 ### Fora de escopo
 
@@ -191,7 +199,8 @@ Em qualquer das tres respostas:
 - Gerar referencia, Pix copia-cola, iniciar/cancelar/reprocessar desembolso, conciliar ou baixar
   parcela.
 - Consultar provider sob demanda; qualquer chamada Celcoin.
-- Novo status, evento de dominio, auditoria, step-up, lock ou migration.
+- Novo status interno, evento de dominio, auditoria, step-up ou lock. (A unica migration e o indice
+  de leitura `V53`; nao ha mudanca de schema de dominio.)
 - Painel financeiro/backoffice, webhook ou gestao de chaves.
 - Qualquer mudanca no mobile (fica na M-11) ou nova role.
 
@@ -205,7 +214,8 @@ Em qualquer das tres respostas:
    endpoint na carteira.
 4. Testes de integracao reais (auth, ownership, roles internas, ordenacao, payload minimo,
    fronteiras entre modulos) e regressao dos endpoints operacionais.
-5. OpenAPI, `PIX.md`, collection, atualizacao dos Gates do step 211 e fechamento.
+5. OpenAPI, `PIX.md`, atualizacao dos Gates do step 211 e fechamento (collection adiada — ver
+   dividas aceitas).
 
 ## Gates que nao contam como task
 
@@ -214,6 +224,13 @@ Em qualquer das tres respostas:
 - Rodar baseline `./gradlew check`.
 - Confirmar ownership antes de qualquer leitura Pix nos tres contratos.
 - Checkpoint e PR description da Sprint 26.
+
+## Dividas aceitas
+
+- **Collection Postman/Insomnia nao atualizada nesta sprint** (adiamento aprovado pelo usuario no
+  code review). A collection esta congelada no Sprint 14; o refresh completo (Sprints 16-26) e um
+  backlog separado — retrofitar apenas a Sprint 26 deixaria a collection inconsistente. Contrato
+  vigente = OpenAPI/springdoc em runtime.
 
 ## Definition of Done
 
@@ -226,7 +243,7 @@ Em qualquer das tres respostas:
 - GETs permanecem read-only, sem step-up, evento, auditoria ou mutacao.
 - Cada estado publico e coberto por teste; ownership e ausencia de side effect comprovadas.
 - Testes de integracao cobrem auth real, owner/nao-owner, roles internas, ordenacao e payload.
-- OpenAPI, `PIX.md`, collection e a secao de Gates do step 211 atualizados com paths, DTOs, enums
-  e status HTTP finais.
+- OpenAPI, `PIX.md` e a secao de Gates do step 211 atualizados com paths, DTOs, enums e status HTTP
+  finais. Collection adiada (divida aceita).
 - `./gradlew check` e `bootJar` verdes.
 - Apos merge em `develop`, os Gates P1-P3 da M-Sprint 11 ficam documentalmente fechados.

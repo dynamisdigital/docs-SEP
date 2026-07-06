@@ -2,9 +2,13 @@
 
 **Spec de origem**: [`211-msprint-11-pix-mobile.md`](../../specs/fase-3/211-msprint-11-pix-mobile.md)
 
-**Status**: planejada e bloqueada pelos Gates P1, P2 e P3 de leitura Pix owner-scoped.
-Os endpoints Pix das Sprints 19-21 atendem apenas a operacao interna e nao podem ser consumidos
-pelo mobile.
+**Status**: desbloqueada. Os Gates P1, P2 e P3 de leitura Pix owner-scoped foram entregues pela
+**Sprint 26 backend** (spec/step [`026`](../backend/026-sprint-26-steps.md)), **mergeada em
+`origin/develop` (PR #87, `b351596`) e promovida a `origin/main` (PR #88, `e443047`); develop==main**.
+Os endpoints Pix das Sprints 19-21 continuam restritos a operacao interna; o mobile consome apenas os
+tres contratos publicos abaixo. **M-Sprint 11 mobile implementada na branch
+`feature/msprint-11-pix-mobile` (Tasks M-11.1-M-11.5: borda, desembolso P1, hotfix, parcela P2,
+carteira P3, MSW+smoke; mais hotfix do code review); pendente de merge em `origin/develop`.**
 
 **Objetivo geral**: exibir ao tomador e a empresa credora o estado Pix das operacoes que lhes
 pertencem, integrado as telas existentes de contrato, parcela e carteira, sem expor comandos
@@ -73,7 +77,14 @@ Task M-11.1.
 
 ### Gate P1 - Status de desembolso do tomador
 
-**Status**: aberto.
+**Status**: FECHADO na Sprint 26 backend (mergeada em `develop` PR #87 / `main` PR #88).
+
+**Contrato final**: `GET /api/v1/pix/contratos/{contratoId}/desembolso` (`ROLE_CLIENTE`, read-only,
+sem step-up). Resposta `PixDesembolsoTomadorResponse { status, valor, atualizadoEm }` com
+`StatusPixPublico = EM_PROCESSAMENTO | LIQUIDADO | FALHOU | CANCELADO`. `404` neutro sem UUID para
+contrato inexistente, alheio ou sem desembolso; `403` para papel operacional. Mapa interno->publico:
+`CRIADA|SOLICITADA|PROCESSANDO -> EM_PROCESSAMENTO`, `CONCLUIDA -> LIQUIDADO`, `FALHOU -> FALHOU`,
+`CANCELADA -> CANCELADO`.
 
 Capacidade minima:
 
@@ -96,7 +107,15 @@ Regras:
 
 ### Gate P2 - Status Pix da parcela do tomador
 
-**Status**: aberto.
+**Status**: FECHADO na Sprint 26 backend (mergeada em `develop` PR #87 / `main` PR #88).
+
+**Contrato final**: `GET /api/v1/pix/parcelas/{parcelaId}/status` (`ROLE_CLIENTE`, read-only, sem
+step-up). Resposta `PixPagamentoParcelaResponse { status, valor, atualizadoEm, mensagemPublica }` com
+`StatusPixParcelaPublico = AGUARDANDO | EM_PROCESSAMENTO | LIQUIDADO | DIVERGENTE | FALHOU | EXPIRADO
+| CANCELADO`. `mensagemPublica` (String|null) sanitizada, so em `DIVERGENTE`/`FALHOU`. Estado derivado
+por precedencia (referencia atual + recebimento por `referenciaId`); estados terminais da referencia
+sao autoritativos. `404` neutro sem UUID; historico liquidado continua em
+`GET /api/v1/cobranca/parcelas/{parcelaId}/recebimentos` (B1 da M-9).
 
 Capacidade minima:
 
@@ -123,7 +142,13 @@ inclui-los, atualizar primeiro a spec, a analise de seguranca e este step.
 
 ### Gate P3 - Status Pix da operacao financiada da credora
 
-**Status**: aberto.
+**Status**: FECHADO na Sprint 26 backend (mergeada em `develop` PR #87 / `main` PR #88).
+
+**Contrato final**: `GET /api/v1/credores/carteira/{operacaoId}/pix` (`isAuthenticated()`, sem role
+`CREDORA` — acesso por presenca de credora, read-only, sem step-up). Resposta
+`PixOperacaoCredoraResponse { status: String, valor, atualizadoEm }` (status = nome do
+`StatusPixPublico`). Mesmo mapa do P1. `404` neutro sem UUID para usuario sem credora, operacao
+alheia/inexistente ou sem desembolso Pix; nunca expoe tomador, contrato, chave ou IDs internos.
 
 Capacidade minima:
 
@@ -154,7 +179,8 @@ Regras:
 
 ## Contratos mobile esperados
 
-Os nomes orientam a borda TypeScript, mas somente podem ser fixados apos P1-P3:
+Os nomes abaixo estao FIXADOS pela Sprint 26 backend (espelham as respostas REST reais); no P3 o
+`status` chega como `String` (nome do `StatusPixPublico`):
 
 ```text
 StatusPixPublico:

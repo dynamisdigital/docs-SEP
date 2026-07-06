@@ -191,6 +191,39 @@ Self-service do tomador (CLIENTE owner) fica para o front das jornadas (follow-u
 
 Toda divergencia (referencia desconhecida, nao-ATIVA, `endToEndId` ausente, valor parcial/maior, falha de baixa) publica `PixRecebimentoDivergenteEvent`; `RecebimentoPixDivergenteListener` (AFTER_COMMIT) cria item idempotente `RECEBIMENTO_PIX_DIVERGENTE`/`PIX_RECEBIMENTO` (`V52` estende os CHECKs). Detalhe por `PixRecebimentoObjetoOriginalAdapter` (status/valor/parcela — nunca payload/chave). **Sem reprocesso de provider**: o Pix ja foi recebido; o tratamento eh operacao assistida (assumir/comentar/resolver/ignorar). Nenhum caso divergente fica apenas em log.
 
+## Leitura owner-scoped (Sprint 26 — Gates P1-P3 da M-Sprint 11)
+
+> Spec: [`specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md`](../../specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md). Steps: [`steps-fase-3/backend/026-sprint-26-steps.md`](../../steps-fase-3/backend/026-sprint-26-steps.md).
+
+Tres leituras publicas, minimas e read-only que expoem o estado Pix ao tomador e a credora **donos** da operacao, sem liberar nenhuma rota operacional das Sprints 19-21 a `CLIENTE`. Destravam a M-Sprint 11 (Pix mobile). Ownership validada ANTES de revelar; recurso inexistente e recurso alheio retornam o mesmo `404` neutro (sem UUID, anti-enumeracao). Sem step-up, provider, evento ou auditoria (mesma postura das leituras do tomador em `cobranca`). Unica migration: indice de leitura `V53` em `pix_recebimento (referencia_id, data_criacao)` (P2), sem mudanca de schema de dominio.
+
+### Enums publicos
+
+- `StatusPixPublico` (P1/P3): `EM_PROCESSAMENTO | LIQUIDADO | FALHOU | CANCELADO`.
+- `StatusPixParcelaPublico` (P2): `AGUARDANDO | EM_PROCESSAMENTO | LIQUIDADO | DIVERGENTE | FALHOU | EXPIRADO | CANCELADO`.
+
+Nunca reutilizam os enums/DTOs operacionais. Mapa transferencia->publico em fonte unica (`StatusPixPublicoMapper`): `CRIADA|SOLICITADA|PROCESSANDO -> EM_PROCESSAMENTO`, `CONCLUIDA -> LIQUIDADO`, `FALHOU -> FALHOU`, `CANCELADA -> CANCELADO`.
+
+### Endpoints
+
+| Gate | Rota | Auth | Modulo |
+| ---- | ---- | ---- | ------ |
+| P1 | `GET /api/v1/pix/contratos/{contratoId}/desembolso` | `hasRole('CLIENTE')` | `pix` |
+| P2 | `GET /api/v1/pix/parcelas/{parcelaId}/status` | `hasRole('CLIENTE')` | `pix` |
+| P3 | `GET /api/v1/credores/carteira/{operacaoId}/pix` | `isAuthenticated()` (sem role `CREDORA`) | `credores` |
+
+- **P1** (`PixDesembolsoTomadorResponse { status: StatusPixPublico, valor, atualizadoEm }`): ownership por `ContratoDesembolsoQueryPort` (contrato -> `tomadorId`); transferencia mais recente do contrato via novo finder **sem filtro** `findFirstByContratoIdOrderByDataCriacaoDesc` (reflete a tentativa corrente inclusive `FALHOU`/`CANCELADA`; o finder filtrado da Sprint 20 segue so para bloqueio de novo desembolso).
+- **P2** (`PixPagamentoParcelaResponse { status: StatusPixParcelaPublico, valor, atualizadoEm, mensagemPublica }`): ownership por `ParcelaTomadorQueryPort` (parcela -> `agenda.contratoId` -> `tomadorId`). Estado derivado por `StatusPixParcelaPublicoMapper` a partir da referencia atual da parcela + recebimento buscado pela `referenciaId` dessa referencia (nunca o mais recente da parcela). Precedencia: estados terminais da referencia (`CANCELADA|EXPIRADA|PAGA|DIVERGENTE`) sao autoritativos; so com referencia `ATIVA` o recebimento orienta (`NAO_IDENTIFICADO->DIVERGENTE`, `FALHOU`, `CONCILIADO->LIQUIDADO`, `RECEBIDO|EM_PROCESSAMENTO->EM_PROCESSAMENTO`); default `AGUARDANDO`. `atualizadoEm` = `dataModificacao` da fonte vencedora. `mensagemPublica` fixa/sanitizada so em `DIVERGENTE`/`FALHOU`. Historico liquidado segue no B1 da M-9.
+- **P3** (`PixOperacaoCredoraResponse { status: String, valor, atualizadoEm }`): no modulo `credores`; resolve a credora por `usuarioId` e valida a posse da operacao (`findByIdAndEmpresaCredoraId`) antes de consultar o Pix por `operacao.contratoId` via porta consumer-driven `PixOperacaoStatusQueryPort` (adapter delega ao `ConsultarStatusPixPorContratoUseCase` de `pix`; `status` cruza como `String` para `credores` nao depender do dominio de `pix`). Excecao 404 **generica sem UUID** (`StatusPixOperacaoNaoEncontradoException`), ao contrario das excecoes de carteira que ecoam o UUID.
+
+Nenhuma resposta expoe chave Pix, `txid`, `endToEndId`, IDs internos, provider, escrow, motivo tecnico ou dados do tomador (na jornada da credora).
+
+### Testes
+
+- Unit: `StatusPixPublicoMapperTest`, `StatusPixParcelaPublicoMapperTest` (precedencia exaustiva + referencia terminal vence recebimento posterior), `ConsultarDesembolsoTomadorUseCaseTest`, `ConsultarStatusPixParcelaUseCaseTest`, `ConsultarStatusPixPorContratoUseCaseTest`, `ConsultarStatusPixOperacaoCredoraUseCaseTest`.
+- Web (`@WebMvcTest`): `PixTomadorControllerTest`, `EmpresaCredoraCarteiraControllerTest` (200/404/400/403, campos proibidos).
+- Integracao E2E (auth real + Postgres): `PixTomadorLeituraIT` (P1/P2 — ownership, 404 anti-enumeracao, finder sem filtro, ordenacao, pareamento por `referenciaId`, isolamento operacional) e `CredoraOperacaoPixIT` (P3).
+
 ## Auditoria
 
 `PixWebhookAuditListener` (`@TransactionalEventListener` AFTER_COMMIT + `@Transactional` REQUIRES_NEW, padrao `CobrancaAuditListener`) grava em `audit_log_seguranca`:
