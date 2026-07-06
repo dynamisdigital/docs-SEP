@@ -4,11 +4,14 @@
 
 - **ID da Spec**: 211
 - **Titulo**: M-Sprint 11 - Pix visivel ao usuario mobile
-- **Status**: planejada
+- **Status**: planejada — bloqueada pelos Gates P1-P3 de leitura Pix owner-scoped definidos no
+  [`step 211`](../../steps-fase-3/mobile/211-msprint-11-steps.md)
 - **Fase do produto**: Fase 3 - Epic 14 + Epic 15
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epics 14 e 15
-- **Depende de**: [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md) + backend Sprints 19-21
+- **Depende de**: [`212-msprint-12-new-design-system-mobile.md`](./212-msprint-12-new-design-system-mobile.md)
+  + backend Sprints 19-21 + contratos owner-scoped P1-P3 do
+  [`step 211`](../../steps-fase-3/mobile/211-msprint-11-steps.md)
 - **Responsavel principal**: Dev Mobile
 
 ## Objetivo
