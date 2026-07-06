@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 024
 - **Titulo**: Sprint 24 - Descoberta e leitura owner-scoped de renegociacao ativa
-- **Status**: mergeada em `develop` via PR #83 (squash `2a41c51`); ainda nao promovida a `main`
+- **Status**: mergeada em `develop` via PR #83 (squash `2a41c51`) e promovida a `main` via PR #84 (`eaaa365`)
 - **Fase do produto**: Fase 3 - Epic 8/14, desbloqueio backend B2 da M-Sprint 9
 - **Trilha**: Backend (`sep-api`)
 - **Origem**: M-Sprint 9, Task M-9.5; renegociacao da Sprint 13

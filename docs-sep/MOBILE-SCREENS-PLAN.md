@@ -208,8 +208,8 @@ Dependencias:
 Observacao:
 - O mobile nao deve iniciar desembolso Pix assistido nem tratar conciliacao operacional.
 
-Entregue (M-Sprint 11, 2026-07-06 — mergeada em `develop` via PR #111 (squash `34f4f0f`), NAO em
-`main`): a fatia read-only visivel ao usuario, consumindo os tres contratos owner-scoped da Sprint
+Entregue (M-Sprint 11, 2026-07-06 — mergeada em `develop` via PR #111 (squash `34f4f0f`) e
+promovida a `main` via PR #112 (`ec74f5e`)): a fatia read-only visivel ao usuario, consumindo os tres contratos owner-scoped da Sprint
 26 backend (Gates P1-P3) integrados as telas existentes — desembolso do tomador (contrato ASSINADO),
 status Pix da parcela (complementa, nao substitui, o status de cobranca; destaque `meioPagamento=PIX`
 no historico) e status Pix da operacao da credora (so status/valor/data). Sem iniciar desembolso, sem

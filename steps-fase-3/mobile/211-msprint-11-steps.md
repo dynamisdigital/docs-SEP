@@ -9,7 +9,7 @@ Os endpoints Pix das Sprints 19-21 continuam restritos a operacao interna; o mob
 tres contratos publicos abaixo. **M-Sprint 11 mobile implementada na branch
 `feature/msprint-11-pix-mobile` (Tasks M-11.1-M-11.5: borda, desembolso P1, hotfix, parcela P2,
 carteira P3, MSW+smoke; mais hotfix do code review); **mergeada em `origin/develop` via PR #111
-(squash `34f4f0f`), NAO em `main`.**
+(squash `34f4f0f`) e promovida a `origin/main` via PR #112 (`ec74f5e`).**
 
 **Objetivo geral**: exibir ao tomador e a empresa credora o estado Pix das operacoes que lhes
 pertencem, integrado as telas existentes de contrato, parcela e carteira, sem expor comandos
@@ -567,20 +567,20 @@ aprovacao antes de staging/commit.
 
 ## Definition of Done da M-Sprint 11
 
-- [ ] P1-P3 integrados e testados.
-- [ ] Tomador ve apenas desembolso do proprio contrato.
-- [ ] Tomador ve apenas Pix da propria parcela.
-- [ ] Credora ve apenas Pix da propria operacao.
-- [ ] Estados possuem copy acessivel.
-- [ ] Ausencia e erro tecnico sao distintos.
-- [ ] Nenhum endpoint/comando operacional e acessivel.
-- [ ] Nenhum status, valor, ownership ou conciliacao e calculado no app.
-- [ ] Nenhum dado Pix interno e exibido, logado ou persistido.
-- [ ] Nenhum step-up e usado.
-- [ ] Tema claro/escuro e 320 px validados.
-- [ ] Lint, SCSS, format, Vitest, build AOT e smokes passam.
-- [ ] M-11 promovida a `main`.
-- [ ] Documentacao registra o fechamento da Fase 3.
+- [x] P1-P3 integrados e testados.
+- [x] Tomador ve apenas desembolso do proprio contrato.
+- [x] Tomador ve apenas Pix da propria parcela.
+- [x] Credora ve apenas Pix da propria operacao.
+- [x] Estados possuem copy acessivel.
+- [x] Ausencia e erro tecnico sao distintos.
+- [x] Nenhum endpoint/comando operacional e acessivel.
+- [x] Nenhum status, valor, ownership ou conciliacao e calculado no app.
+- [x] Nenhum dado Pix interno e exibido, logado ou persistido.
+- [x] Nenhum step-up e usado.
+- [x] Tema claro/escuro e 320 px validados.
+- [x] Lint, SCSS, format, Vitest, build AOT e smokes passam.
+- [x] M-11 promovida a `main`.
+- [x] Documentacao registra o fechamento da Fase 3.
 
 ## Checklist de code review
 

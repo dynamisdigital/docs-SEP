@@ -3,7 +3,7 @@
 Documento operacional do modulo `cobranca` (Epic 8).
 Sprint 12 — implementada: parcelas, agenda, recebimento manual, escrow, job de atraso e audit reforcado.
 Sprint 13 — implementada na branch: inadimplencia, workflow de cobranca, notificacoes, renegociacao basica e auditoria reforcada.
-Sprint 23 — mergeada em `develop` (PR #81) e promovida a `main` (PR #82): consulta owner-scoped do historico de recebimentos do tomador (B1 da M-Sprint 9). Sprint 24 — mergeada em `develop` (PR #83, squash `2a41c51`): consulta owner-scoped da renegociacao ativa do tomador (B2 da M-Sprint 9). Ainda nao promovida a `main`.
+Sprint 23 — mergeada em `develop` (PR #81) e promovida a `main` (PR #82): consulta owner-scoped do historico de recebimentos do tomador (B1 da M-Sprint 9). Sprint 24 — mergeada em `develop` (PR #83, squash `2a41c51`) e promovida a `main` (PR #84, `eaaa365`): consulta owner-scoped da renegociacao ativa do tomador (B2 da M-Sprint 9).
 
 > Specs: [`012-sprint-12-cobranca-parcelas-agenda.md`](../../specs/fase-2/012-sprint-12-cobranca-parcelas-agenda.md) e [`013-sprint-13-cobranca-inadimplencia.md`](../../specs/fase-2/013-sprint-13-cobranca-inadimplencia.md).
 > Steps: [`012-sprint-12-steps.md`](../../steps-fase-2/backend/012-sprint-12-steps.md) e [`013-sprint-13-steps.md`](../../steps-fase-2/backend/013-sprint-13-steps.md).
@@ -300,7 +300,7 @@ Validacoes focadas usadas na Task 13.9: `./gradlew test --tests "*InadimplenciaI
 ## Limitacoes conhecidas / pendencias futuras
 
 - **Historico do tomador (Sprint 23 — mergeada em `develop` PR #81 / `main` PR #82)**: `GET /api/v1/cobranca/parcelas/{parcelaId}/recebimentos` exclusivo de `CLIENTE`, com `RecebimentoTomadorResponse` (recebimentoId, valorRecebido, dataRecebimento, meioPagamento), ownership validada no use case e 403 uniforme sem UUID. `GET /recebimentos` segue interno (`FINANCEIRO/ADMIN`). Desbloqueia B1 da M-Sprint 9 (M-9.4 liberada). Sem paginacao (recorte por parcela). Ver [spec](../../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) + [steps](../../steps-fase-3/backend/023-sprint-23-steps.md).
-- **Descoberta da renegociacao (Sprint 24 — mergeada em `develop`, PR #83)**: `GET /api/v1/cobranca/parcelas/{parcelaId}/renegociacao-ativa` entrega os termos da proposta ativa/nao expirada ao tomador, resolvendo o gap de descoberta antes dos PATCHes ([spec](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [steps](../../steps-fase-3/backend/024-sprint-24-steps.md)). Desbloqueou B2 da M-Sprint 9 (M-9.5 liberada). Ainda nao promovida a `main`.
+- **Descoberta da renegociacao (Sprint 24 — mergeada em `develop`, PR #83; promovida a `main`, PR #84)**: `GET /api/v1/cobranca/parcelas/{parcelaId}/renegociacao-ativa` entrega os termos da proposta ativa/nao expirada ao tomador, resolvendo o gap de descoberta antes dos PATCHes ([spec](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [steps](../../steps-fase-3/backend/024-sprint-24-steps.md)). Desbloqueou B2 da M-Sprint 9 (M-9.5 liberada).
 
 - **Recebimento manual** apenas. Automacao por Pix fica pra Epic 15 (Celcoin).
 - **Sem boleto** e sem conciliacao automatica. Cobranca ativa da Sprint 13 cobre notificacao e contato manual, mas negativacao/juridico ficam fora do escopo.

@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 210
 - **Titulo**: M-Sprint 10 - Jornada da empresa credora mobile
-- **Status**: **concluída — mergeada em `origin/develop` via PR #109 (`f51e6be`), 2026-07-03**; não promovida a `main` (develop ⊃ main). Gate I1 fechado pela Sprint 25 backend (Opcao A, `GET .../interesses/me`, em `develop` e `main`). Vitest 423 + smoke `credora-mobile` 6/6 verdes; regressão e2e verde (golden-path preexistente red, alheio).
+- **Status**: **concluída — mergeada em `origin/develop` via PR #109 (`f51e6be`), 2026-07-03, e promovida a `origin/main` via PR #110 (`4f88c6b`)**. Gate I1 fechado pela Sprint 25 backend (Opcao A, `GET .../interesses/me`, em `develop` e `main`). Vitest 423 + smoke `credora-mobile` 6/6 verdes; regressão e2e verde (golden-path preexistente red, alheio).
 - **Fase do produto**: Fase 3 - Epic 14 Fase Mobile 3
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD Epic 14; backend Sprints 16-17

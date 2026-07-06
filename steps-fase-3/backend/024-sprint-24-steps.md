@@ -2,7 +2,7 @@
 
 **Spec de origem**: [`024-sprint-24-cobranca-renegociacao-tomador.md`](../../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md)
 
-**Status**: mergeada em `develop` via PR #83 (squash `2a41c51`); ainda nao promovida a `main`. Desbloqueio backend B2 da M-Sprint 9 (M-9.5 liberada).
+**Status**: mergeada em `develop` via PR #83 (squash `2a41c51`) e promovida a `main` via PR #84 (`eaaa365`). Desbloqueio backend B2 da M-Sprint 9 (M-9.5 liberada).
 
 **Objetivo geral**: permitir que o tomador owner descubra e leia uma proposta de
 renegociacao ativa antes da decisao, com termos financeiros calculados no backend e sem

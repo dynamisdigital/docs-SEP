@@ -424,8 +424,8 @@ provider, escrow ou dados de outra parte. Consome os tres contratos backend owne
 Leituras read-only, sem step-up, sem persistencia; ownership, status e valor vem do backend e o app
 apenas apresenta.
 
-**Status**: mergeada em `origin/develop` via PR #111 (squash `34f4f0f`, 2026-07-06); **NAO em `main`**
-(develop ⊃ main). Tasks M-11.1-M-11.5 + hotfix do code review. Depende da Sprint 26 backend (Gates
+**Status**: mergeada em `origin/develop` via PR #111 (squash `34f4f0f`, 2026-07-06) e promovida a
+`origin/main` via PR #112 (`ec74f5e`). Tasks M-11.1-M-11.5 + hotfix do code review. Depende da Sprint 26 backend (Gates
 P1-P3), mergeada em `origin/develop` e `main` (PR #87/#88).
 
 Borda (`src/app/core/`):

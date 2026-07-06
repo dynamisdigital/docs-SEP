@@ -370,7 +370,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | 21 | Epic 15 | Pix recebimento e conciliacao (**implementada**) | [`021`](../specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) | 6 |
 | 22 | Epic 16 | Observabilidade operacional MVP + CloudWatch ready (**implementada**) | [`022`](../specs/fase-3/022-sprint-22-observabilidade-operacional.md) + [`steps`](../steps-fase-3/backend/022-sprint-22-steps.md) | 6 |
 | 23 | Epic 8/14 | Historico owner-scoped de recebimentos do tomador (B1 da M-9) (**mergeada em `develop` (PR #81) e promovida a `main` (PR #82); develop==main**) | [`023`](../specs/fase-3/023-sprint-23-cobranca-historico-tomador.md) + [`steps`](../steps-fase-3/backend/023-sprint-23-steps.md) | 4 |
-| 24 | Epic 8/14 | Consulta owner-scoped de renegociacao ativa (B2 da M-9) (**mergeada em `develop` via PR #83 (`2a41c51`); ainda nao promovida a `main`**) | [`024`](../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [`steps`](../steps-fase-3/backend/024-sprint-24-steps.md) | 4 |
+| 24 | Epic 8/14 | Consulta owner-scoped de renegociacao ativa (B2 da M-9) (**mergeada em `develop` via PR #83 (`2a41c51`) e promovida a `main` via PR #84 (`eaaa365`)**) | [`024`](../specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md) + [`steps`](../steps-fase-3/backend/024-sprint-24-steps.md) | 4 |
 | 26 | Epic 14/15 | Leitura Pix owner-scoped (Gates P1-P3 da M-11): desembolso do tomador, Pix da parcela do tomador e Pix da operacao da credora — 3 GET read-only, 404 neutro, sem step-up/migration (**mergeada em `develop` (PR #87, `b351596`) e promovida a `main` (PR #88, `e443047`); develop==main**) | [`026`](../specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md) + [`steps`](../steps-fase-3/backend/026-sprint-26-steps.md) | 5 |
 
 ### Web (`sep-app`)
@@ -397,7 +397,7 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 | M-8 | Epic 14 | Tomador: formalizacao e contrato (**mergeada em `origin/develop` via PR #105 (`be792df`) e promovida a `origin/main` via PR #106 (`e009d50`)**) | [`208`](../specs/fase-3/208-msprint-8-formalizacao-mobile.md) + [`steps`](../steps-fase-3/mobile/208-msprint-8-steps.md) | 5 |
 | M-9 | Epic 14 | Tomador: parcelas e cobranca (**concluida — mergeada em `develop` PR #107 e promovida a `main` PR #108, 2026-07-02; consome B1/Sprint 23 (PR #81) e B2/Sprint 24 (PR #83); historico owner-scoped + decisao de renegociacao com step-up + MSW/smoke PWA**) | [`209`](../specs/fase-3/209-msprint-9-cobranca-mobile.md) + [`steps`](../steps-fase-3/mobile/209-msprint-9-steps.md) | 6 |
 | M-10 | Epic 14 | Empresa credora mobile (**concluida — mergeada em `develop` via PR #109 (`f51e6be`) e promovida a `main` via PR #110 (`4f88c6b`); Gate I1 fechado pela Sprint 25 backend PR #85; tab por presenca sem role, interesse autoritativo, carteira read-only**) | [`210`](../specs/fase-3/210-msprint-10-credora-mobile.md) + [`steps`](../steps-fase-3/mobile/210-msprint-10-steps.md) | 6 |
-| M-11 | Epic 14/15 | Pix visivel ao usuario — desembolso do tomador (P1), status Pix da parcela (P2) e status Pix da operacao da credora (P3), integrados as telas de contrato/parcela/carteira (**mergeada em `develop` via PR #111 (squash `34f4f0f`), NAO em `main`; Tasks M-11.1-M-11.5 + hotfix do review; consome os Gates P1-P3 da Sprint 26**) | [`211`](../specs/fase-3/211-msprint-11-pix-mobile.md) + [`steps`](../steps-fase-3/mobile/211-msprint-11-steps.md) | 5 |
+| M-11 | Epic 14/15 | Pix visivel ao usuario — desembolso do tomador (P1), status Pix da parcela (P2) e status Pix da operacao da credora (P3), integrados as telas de contrato/parcela/carteira (**mergeada em `develop` via PR #111 (squash `34f4f0f`) e promovida a `main` via PR #112 (`ec74f5e`); Tasks M-11.1-M-11.5 + hotfix do review; consome os Gates P1-P3 da Sprint 26**) | [`211`](../specs/fase-3/211-msprint-11-pix-mobile.md) + [`steps`](../steps-fase-3/mobile/211-msprint-11-steps.md) | 5 |
 
 **Decisoes de planejamento**:
 - **Separacao por projeto**: backend, web e mobile possuem specs proprios e podem evoluir com dependencias explicitas.
@@ -408,3 +408,37 @@ As tabelas abaixo usam a ordem recomendada de execucao. Em Epic 17, a numeracao 
 - **Design system web/mobile**: a F-Sprint 14 + M-Sprint 12/Epic 17 substituem Apple/Notion como design vigente por [`New Design System Sep.md`](<./New Design System Sep.md>), mantendo Angular/SCSS no web e Ionic/Angular/SCSS no mobile salvo ADR explicita.
 - **Infraestrutura AWS**: permanece trilha paralela candidata, nao mapeada como sprint funcional nesta tabela.
 - **Gates de seguranca e operacao**: desembolso Pix assistido depende da decisao de step-up estrito sem bypass MFA; reprocessos web dependem de handlers reais backend por provider/event; jornadas credora web/mobile dependem de contrato explicito de autorizacao/ownership.
+
+
+## 31. Encerramento da Fase 3
+
+**Status: concluida tecnicamente em 2026-07-06.** O escopo funcional planejado foi entregue nos
+tres repositorios, e a M-Sprint 11 foi promovida a `main` pela PR #112 (`ec74f5e`). Os back-merges
+`main -> develop` foram concluidos localmente sem conflitos: `sep-api` (`b2200c0`), `sep-app`
+(`197676d`) e `sep-mobile` (`efa8f0d`). Pushes/PRs permanecem manuais conforme `AGENT.md`.
+
+O fechamento encontrou e corrigiu o hardening web que impedia uma instalacao estrita:
+
+- pacotes Angular de runtime alinhados em 20.3.25, removendo cinco vulnerabilidades altas, incluindo
+  XSS;
+- Vitest e coverage alinhados em 3.2.7, compativeis com `@angular/build` 20;
+- `@eslint/js` mantido em 9.39.4, compativel com ESLint 9 e `angular-eslint` 21;
+- CI alterada de `npm ci --legacy-peer-deps` para `npm ci`;
+- E2E obsoletos de cadastro/admin atualizados para a canalizacao e personas MSW vigentes.
+
+Validacao final: backend `./gradlew check`; mobile lint/SCSS/format, 464 testes e build; web
+`npm ci` estrito, lint/SCSS/format, 453 testes, build, 23/23 Playwright e
+`npm audit --omit=dev` com zero vulnerabilidades. O audit completo ainda aponta dez ocorrencias
+exclusivas de tooling (3 baixas, 2 moderadas e 5 altas); as correcoes sugeridas exigem Angular 22 e
+ficam como hardening futuro, pois a baseline aprovada permanece Angular 20 e o bundle de producao
+esta limpo.
+
+Itens adiados ou dividas aceitas:
+
+- infraestrutura AWS e ambientes remotos permanecem em fase futura;
+- renegociacao do tomador no web permanece follow-up;
+- refresh consolidado da collection Postman para `credores` e leituras Pix permanece backlog;
+- enforcement server-side de step-up estrito no aceite de contrato permanece requisito de go-live;
+- extracao de portas de persistencia do modulo `cobranca` permanece refactor module-wide futuro;
+- adapters reais de providers e validacoes com ambientes externos dependem de infraestrutura e
+  credenciais aprovadas.
