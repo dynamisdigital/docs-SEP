@@ -696,7 +696,7 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - spec de origem: `specs/fase-3/208-msprint-8-formalizacao-mobile.md`; steps em `steps-fase-3/mobile/208-msprint-8-steps.md`. Terceira jornada do Epic 14, consome os contratos reais (Sprints 10-11). Base: `origin/develop` (M-7 + fixes #102/#103 confirmados por conteudo, nao so contagem).
   - entregue (M-8.1 a M-8.5): DTOs de borda + `ContratosMobileService` (consulta por proposta/id, versoes, aceite, status, download binario com sanitizacao de filename e erro em corpo vazio); rotas lazy `/app/formalizacao` (entrada por propostas `APROVADA` sem N+1; CTA no detalhe da proposta; atalho na home); leitura como texto puro (componente apresentacional `contrato-content`, nunca `innerHTML`) + historico sob demanda (versao historica nao muda a vigente nem habilita aceite); aceite com confirmacao explicita (numero + hash) e step-up de uso unico (sem MFA bloqueia sem bypass; sem token navega ao step-up e exige novo toque; `403` step-up/ownership, `409`, rede tratados); status de assinatura sob demanda (sem polling) e download do PDF assinado como blob transitorio (URL revogada, nada persistido/logado, PDF fora do DOM).
   - **bug pre-existente corrigido**: `StepUpComponent` usava `type="submit"` num `<form (ngSubmit)>` sem `[formGroup]`/`FormsModule`, entao o `ngSubmit` nunca era ligado e o clique recarregava a pagina (perdia o `?next`) — step-up nunca concluia. Trocado para `type="button"` + `(click)`. Bloqueava o aceite e (latente) o change-password; sem cobertura e2e ate o smoke de formalizacao.
-  - ~~**gap/go-live**: o controller de contratos usa `@RequireStepUp` legado com bypass server-side para usuario sem MFA~~ — **FECHADO** (Sprint 27): `@RequireStepUpEstrito` aplicado em aceite, cancelamento, envio para assinatura, propor renegociacao e aceitar renegociacao. Sem `GET /contratos` global: entrada por propostas.
+  - **gap/go-live**: o controller de contratos usa `@RequireStepUp` legado com bypass server-side para usuario sem MFA; o mobile exige MFA mas nao substitui enforcement server-side (registrado como bloqueio de go-live). Sem `GET /contratos` global: entrada por propostas.
   - verificacoes: lint/scss/format verdes; Vitest 272; build AOT verde; e2e 8 (smoke/onboarding/credito/formalizacao) verdes, smoke de formalizacao em Pixel 5 e 320px com assercoes negativas.
   - doc operacional: `repos/sep-mobile/README.md` atualizado; o PR temporario M-8 foi usado no PR #105 e removido no inicio do planejamento da M-9.
 
@@ -786,12 +786,12 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   empacotamento nativo Android/iOS + biometria nativa) e 15 (aporte real da credora, matching e
   recorte de Pix avancado **sobre provider fake**); entrega o Epic 16 como **documento de
   planejamento** (arquitetura AWS + CI/CD de deploy, sem provisionar); e salda os quatro follow-ups
-  da Fase 3 (step-up estrito server-side — **FECHADO Sprint 27**, renegociacao web, portas de persistencia de `cobranca`,
+  da Fase 3 (step-up estrito server-side, renegociacao web, portas de persistencia de `cobranca`,
   refresh Postman + hardening).
 - **Marco `v1.0-local`** (PRD-FASE-4 §37): produto inteiro navegavel/testavel em ambiente local
-  (PostgreSQL Docker Compose + Fake/WireMock), "tudo menos AWS e Celcoin". O bloqueio de
-  go-live que **nao** dependia de acesso externo — o step-up estrito server-side no aceite de
-  contrato — **foi fechado na Sprint 27** (`@RequireStepUpEstrito` em aceite/cancelamento/assinatura/renegociacao). Sobram apenas dois gates externos: credenciais Celcoin/BaaS e
+  (PostgreSQL Docker Compose + Fake/WireMock), "tudo menos AWS e Celcoin". O unico bloqueio de
+  go-live que **nao** depende de acesso externo — o step-up estrito server-side no aceite de
+  contrato — fica dentro da Fase 4. Sobram apenas dois gates externos: credenciais Celcoin/BaaS e
   conta AWS.
 - **Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)) e a fase de fechamento, sem jornada nova: liga o
   que ja existe a provedores reais e a ambientes remotos. Frente A (integracao real Celcoin/BaaS,

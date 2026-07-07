@@ -42,7 +42,6 @@ Leitura base para qualquer agente:
 > [`specs/fase-4/`](specs/fase-4/README.md) (14 arquivos: backend `027`-`032`, web `116`-`119`,
 > mobile `213`-`216`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
 > Sprint 27+, web F-16+, mobile M-13+.
-> **Sprint 27 implementada** ([`027`](steps-fase-4/backend/027-sprint-27-steps.md)): step-up estrito server-side — `@RequireStepUpEstrito` em aceite/cancelamento/assinatura/propor-renegociacao/aceitar-renegociacao; follow-up 1 da Fase 3 FECHADO.
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em

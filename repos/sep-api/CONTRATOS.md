@@ -32,7 +32,7 @@ PropostaCredito APROVADA (Sprint 8)
 GET /api/v1/contratos/{id} | proposta/{propostaId}            # CLIENTE dono ou FINANCEIRO/ADMIN
 GET /api/v1/contratos/{id}/versoes                            # lista versoes em ordem ascendente
 
-PATCH /api/v1/contratos/{id}/aceite                           # CLIENTE dono + @RequireStepUpEstrito (Sprint 27)
+PATCH /api/v1/contratos/{id}/aceite                           # CLIENTE dono + @RequireStepUp
   -> RegistrarAceiteUseCase (@Transactional)
      - findByIdForUpdate (PESSIMISTIC_WRITE)                   # serializa aceite vs cancelamento
      - valida ownership -> ContratoOwnershipException 403
@@ -41,7 +41,7 @@ PATCH /api/v1/contratos/{id}/aceite                           # CLIENTE dono + @
      - contrato.marcarAceito -> ACEITO
      - publish ContratoAceitoEvent (hash + ip + user-agent)
 
-POST /api/v1/contratos/{id}/cancelar                          # FINANCEIRO/ADMIN + @RequireStepUpEstrito (Sprint 27)
+POST /api/v1/contratos/{id}/cancelar                          # FINANCEIRO/ADMIN + @RequireStepUp
   -> CancelarContratoUseCase (@Transactional)
      - findByIdForUpdate (PESSIMISTIC_WRITE)
      - valida GERADO/AGUARDANDO_ACEITE -> 409 se ACEITO+
@@ -185,7 +185,7 @@ POST /api/v1/webhooks/assinatura/{provider}
      - case VISUALIZADO -> envelope.marcarVisualizado -> publish AssinaturaVisualizadaEvent
      - default -> log.warn (defensivo contra novos StatusEnvelope futuros)
 
-POST /api/v1/contratos/{id}/assinar                   # FINANCEIRO/ADMIN + @RequireStepUpEstrito (Sprint 27)
+POST /api/v1/contratos/{id}/assinar                   # FINANCEIRO/ADMIN + @RequireStepUp
   -> Reprocessamento operacional idempotente do envio (envelope ja existente eh devolvido)
 
 GET /api/v1/contratos/{id}/assinatura/status          # ownership ou FINANCEIRO/ADMIN
@@ -294,9 +294,13 @@ DTOs (records imutaveis com `@Schema`):
 - `Content-Disposition: attachment; filename="contrato-<id>-assinado.pdf"`
 - `X-Document-Hash-Sha256: <hex>` (integridade local conferida pelo cliente)
 
-### Step-up estrito (Sprint 27)
+### Step-up — limitacao conhecida
 
-`PATCH /aceite`, `POST /cancelar` e `POST /assinar` usam `@RequireStepUpEstrito` (sem bypass de migracao pre-MFA): exigem `mfaHabilitado=true` + token `X-Step-Up-Token` valido. Usuario sem MFA ativo recebe `403` sem possibilidade de bypass. Divida de go-live de step-up fechada.
+`StepUpEnforcementAspect` (Sprint 5 Task 5.6) libera operacoes `@RequireStepUp` quando o usuario tem `mfaHabilitado=false`. Como aceite/cancelamento sao operacoes legais, esse bypass enfraquece a garantia.
+
+**Mitigacao operacional:** em producao, todo usuario com role `CLIENTE`, `FINANCEIRO` ou `ADMIN` DEVE ter MFA habilitado antes de liberar formalizacao.
+
+**Fix arquitetural** via `@RequireStepUpEstrita` (sem bypass) fica em sprint futura de hardening do modulo `identity`.
 
 ## Auditoria reforcada
 
