@@ -41,7 +41,7 @@ Operacoes hoje com `@RequireStepUp` (com bypass) que sao atos legais/financeiros
 | `POST /contratos/{id}/cancelar` | `ContratoController.cancelar` | FIN/ADMIN | **-> estrito** (Javadoc ja cita aceite+cancelamento) |
 | `POST /contratos/{id}/assinar` | `ContratoController.enviarParaAssinatura` | FIN/ADMIN | **-> estrito** (consistencia com desembolso Pix) |
 | `POST /cobranca/parcelas/{id}/renegociacao` | `CobrancaController.proporRenegociacao` | FIN/ADMIN | **-> estrito** (muta acordo financeiro) |
-| `POST /cobranca/parcelas/{id}/renegociacao/aceitar` | `CobrancaController.aceitarRenegociacao` | CLIENTE | **-> estrito** (equivalente ao aceite de contrato) |
+| `PATCH /cobranca/renegociacoes/{id}/aceite` | `CobrancaController.aceitarRenegociacao` | CLIENTE | **-> estrito** (equivalente ao aceite de contrato) |
 
 Mantem `@RequireStepUp` (bypass de migracao) o que **nao** e ato legal/financeiro e ainda pode ter
 usuario pre-MFA em migracao (fora de escopo desta sprint; confirmar na auditoria): ex. alterar role
@@ -70,8 +70,7 @@ step-up hoje e permanece sem (recusa nao e ato de comprometimento).
 **Skills obrigatorias**:
 - `coding-guidelines`: simplicidade, mudancas cirurgicas e verificacao orientada a meta.
 - `clean-code`: nomes intencionais, funcoes pequenas e testes F.I.R.S.T.
-- `clean-architecture`: enforcement na borda (aspecto/controller); dominio e use case intactos.
-- `design-patterns-java`: recusar pattern-itis; reutilizar a annotation existente, sem novo padrao.
+- `design-patterns-java`: recusar pattern-itis; reutilizar a annotation existente, sem novo padrao; enforcement na borda (aspecto/controller), dominio e use case intactos.
 
 ## Ordem de execucao
 
