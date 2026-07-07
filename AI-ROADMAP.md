@@ -38,9 +38,10 @@ Leitura base para qualquer agente:
 > **Fase 4 (planejamento)**: escopo em [`docs-sep/PRD-FASE-4.md`](docs-sep/PRD-FASE-4.md) — conclusao
 > das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
 > planejamento de infraestrutura AWS (Epic 16) e follow-ups de go-live. Fecha o marco `v1.0-local`
-> (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). Specs e steps just-in-time em
-> `specs/fase-4/` e `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend Sprint 27+, web F-16+,
-> mobile M-13+.
+> (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). **Specs criadas** em
+> [`specs/fase-4/`](specs/fase-4/README.md) (14 arquivos: backend `027`-`032`, web `116`-`119`,
+> mobile `213`-`216`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
+> Sprint 27+, web F-16+, mobile M-13+.
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em

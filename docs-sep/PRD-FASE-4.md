@@ -162,39 +162,39 @@ AWS.
 ## 36. Mapeamento Fase 4: Projetos x Sprints
 
 Planejamento de alto nivel. Todas as sprints estao **planejadas** (nada implementado). Cada sprint
-mantem no maximo 6 tasks de implementacao; precheck, E2E/smoke e documentacao nao entram na
-contagem. Specs e steps sao criados **just-in-time** antes de cada execucao, em `specs/fase-4/` e
-`steps-fase-4/{backend,web,mobile}/`. A numeracao continua a sequencia da Fase 3 (backend ate 26,
-web ate F-15, mobile ate M-12).
+mantem no maximo 7 tasks de implementacao; precheck, E2E/smoke, documentacao e collections nao entram
+na contagem. As **specs ja existem** em [`specs/fase-4/`](../specs/fase-4/README.md) (14 arquivos); os
+**steps** continuam **just-in-time** em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada
+execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-15, mobile ate M-12).
 
 ### Backend (`sep-api`)
 
 | Sprint | Epic/frente | Tema | Spec | Status |
 |--------|-------------|------|------|--------|
-| 27 | Follow-up / go-live | Step-up estrito server-side no aceite de contrato (enforcement, remove bypass) | a criar | planejada |
-| 28 | Follow-up / refactor | Extracao de portas de persistencia do modulo `cobranca` (ADR 0007) | a criar | planejada |
-| 29 | Epic 15 | Aporte real da credora + escrow (foundation) | a criar | planejada (gate produto) |
-| 30 | Epic 15 | Matching credora <-> operacao (recorte controlado) | a criar | planejada (gate produto) |
-| 31 | Epic 15 | Pix avancado — recorte inicial aprovado (split / chaves / automatico) | a criar | planejada (gate produto) |
-| 32 | Epic 15 / integracao | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar; Fake segue default) | a criar | planejada (ativacao real -> Fase 5) |
+| 27 | Follow-up / go-live | Step-up estrito server-side no aceite de contrato (enforcement, remove bypass) | [`027`](../specs/fase-4/027-sprint-27-step-up-server-side-aceite.md) | planejada |
+| 28 | Follow-up / refactor | Extracao de portas de persistencia do modulo `cobranca` (ADR 0007) | [`028`](../specs/fase-4/028-sprint-28-cobranca-portas-persistencia.md) | planejada |
+| 29 | Epic 15 | Aporte da credora + escrow (foundation, assistido) | [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md) | planejada (gate produto) |
+| 30 | Epic 15 | Matching credora <-> operacao (assistido) | [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md) | planejada (gate produto) |
+| 31 | Epic 15 | Pix avancado — recorte inicial: gestao de chaves Pix (assistido) | [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md) | planejada |
+| 32 | Epic 15 / integracao | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar; Fake segue default) | [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) | planejada (ativacao real -> Fase 5) |
 
 ### Web (`sep-app`)
 
 | Sprint | Epic/frente | Tema | Spec | Status |
 |--------|-------------|------|------|--------|
-| F-16 | Epic 13 | Renegociacao do tomador no web (fecha gap F-9) | a criar | planejada |
-| F-17 | Epic 13 | Aprofundamento financeiro/conciliacao web (se houver gap) | a criar | planejada |
-| F-18 | Epic 15/10 | Aporte e matching da credora no web (quando backend existir) | a criar | planejada (dep. backend 29-30) |
-| F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | a criar | planejada |
+| F-16 | Epic 13 | Renegociacao do tomador no web (fecha gap F-9) | [`116`](../specs/fase-4/116-fsprint-16-renegociacao-tomador-web.md) | planejada |
+| F-17 | Epic 13 | Aprofundamento financeiro/conciliacao web (se houver gap) | [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) | planejada |
+| F-18 | Epic 15/10 | Aporte e matching da credora no web (quando backend existir) | [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) | planejada (dep. backend 29-30) |
+| F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | planejada |
 
 ### Mobile (`sep-mobile`)
 
 | Sprint | Epic/frente | Tema | Spec | Status |
 |--------|-------------|------|------|--------|
-| M-13 | Epic 14 | Empacotamento nativo Android (Capacitor 8) + ADR baseline Cap 8 | a criar | planejada |
-| M-14 | Epic 14 | Empacotamento nativo iOS (Capacitor 8) | a criar | planejada |
-| M-15 | Epic 14 | Biometria nativa (substitui stub PWA) + hardening nativo | a criar | planejada |
-| M-16 | Epic 14/15 | Aporte/matching e Pix avancado visiveis ao usuario (quando backend existir) | a criar | planejada (dep. backend 29-31) |
+| M-13 | Epic 14 | Empacotamento nativo Android (Capacitor 8) + ADR baseline Cap 8 | [`213`](../specs/fase-4/213-msprint-13-empacotamento-nativo-android.md) | planejada |
+| M-14 | Epic 14 | Empacotamento nativo iOS (Capacitor 8) | [`214`](../specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) | planejada |
+| M-15 | Epic 14 | Biometria nativa (substitui stub PWA) + hardening nativo | [`215`](../specs/fase-4/215-msprint-15-biometria-nativa.md) | planejada |
+| M-16 | Epic 14/15 | Aporte/matching e Pix avancado visiveis ao usuario (quando backend existir) | [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) | planejada (dep. backend 29-31) |
 
 **Decisoes de planejamento**:
 
