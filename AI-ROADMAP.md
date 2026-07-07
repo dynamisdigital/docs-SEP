@@ -30,10 +30,24 @@ O `AI-ROADMAP.md` deve estar sempre atualizado.
 
 Leitura base para qualquer agente:
 
-1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - indice do PRD; leia o arquivo de fase relevante (`PRD-FASE-1.md`, `PRD-FASE-2.md` ou `PRD-FASE-3.md`).
+1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - indice do PRD; leia o arquivo de fase relevante (`PRD-FASE-1.md`, `PRD-FASE-2.md`, `PRD-FASE-3.md`, `PRD-FASE-4.md` ou `PRD-FASE-5.md`).
 2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto; leia `CONTEXT-PARTE-1.md` e/ou `CONTEXT-PARTE-2.md` conforme a tarefa.
 3. [`AGENT.md`](AGENT.md)
 4. Este arquivo (`AI-ROADMAP.md`)
+
+> **Fase 4 (planejamento)**: escopo em [`docs-sep/PRD-FASE-4.md`](docs-sep/PRD-FASE-4.md) — conclusao
+> das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
+> planejamento de infraestrutura AWS (Epic 16) e follow-ups de go-live. Fecha o marco `v1.0-local`
+> (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). Specs e steps just-in-time em
+> `specs/fase-4/` e `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend Sprint 27+, web F-16+,
+> mobile M-13+.
+>
+> **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
+> real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
+> lojas e go-live de producao (conformidade CMN 4.656/LGPD). Cada frente e **gated** pelo acesso
+> correspondente (credenciais Celcoin, conta AWS, contas de loja). Specs e steps just-in-time em
+> `specs/fase-5/` e `steps-fase-5/`. Numeracao: backend Sprint 33+, infra I-Sprint 1+, mobile M-17+,
+> go-live G-1+.
 
 ## Pacotes de leitura por tarefa
 

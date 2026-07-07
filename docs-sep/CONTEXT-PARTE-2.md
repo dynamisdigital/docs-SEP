@@ -766,3 +766,35 @@ Angular 20 e nao ha vulnerabilidade no conjunto de producao. As demais dividas a
 adiados estao consolidados no PRD da Fase 3: infraestrutura AWS, renegociacao web, refresh da
 collection Postman, step-up estrito server-side, portas de persistencia de `cobranca` e providers/
 ambientes externos reais.
+
+## Planejamento das Fases 4 e 5 (2026-07-07)
+
+Apos o fechamento da Fase 3, o planejamento das Fases 4 e 5 foi criado (documental; **nada
+implementado**). Nenhuma spec/step novo foi gerado — seguem just-in-time. Decisao motivada pela
+falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma versao local completa
+(Fase 4) e uma fase de fechamento gated (Fase 5).
+
+- **Fase 4** ([`PRD-FASE-4.md`](./PRD-FASE-4.md)) nao cria epic novo: completa o escopo remanescente
+  dos Epics 13 (jornadas web — renegociacao do tomador e gaps financeiro/conciliacao), 14 (mobile —
+  empacotamento nativo Android/iOS + biometria nativa) e 15 (aporte real da credora, matching e
+  recorte de Pix avancado **sobre provider fake**); entrega o Epic 16 como **documento de
+  planejamento** (arquitetura AWS + CI/CD de deploy, sem provisionar); e salda os quatro follow-ups
+  da Fase 3 (step-up estrito server-side, renegociacao web, portas de persistencia de `cobranca`,
+  refresh Postman + hardening).
+- **Marco `v1.0-local`** (PRD-FASE-4 §37): produto inteiro navegavel/testavel em ambiente local
+  (PostgreSQL Docker Compose + Fake/WireMock), "tudo menos AWS e Celcoin". O unico bloqueio de
+  go-live que **nao** depende de acesso externo — o step-up estrito server-side no aceite de
+  contrato — fica dentro da Fase 4. Sobram apenas dois gates externos: credenciais Celcoin/BaaS e
+  conta AWS.
+- **Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)) e a fase de fechamento, sem jornada nova: liga o
+  que ja existe a provedores reais e a ambientes remotos. Frente A (integracao real Celcoin/BaaS,
+  gate credenciais), Frente B (provisionamento AWS + deploy remoto / Epic 16 execucao, gate conta
+  AWS), Frente C (publicacao mobile em lojas, gate contas de loja) e Frente D (go-live de producao +
+  conformidade CMN 4.656/LGPD + validacao financeira real). A app entra em producao **sem
+  reescrita**: muda provider (fake -> real) e ambiente (local -> AWS), por feature flag.
+- **Numeracao planejada**: Fase 4 — backend Sprint 27+, web F-16+, mobile M-13+; Fase 5 — backend
+  Sprint 33+, infra I-Sprint 1+, mobile M-17+, go-live G-1+. Specs/steps just-in-time em
+  `specs/fase-4/`, `steps-fase-4/`, `specs/fase-5/` e `steps-fase-5/`.
+- **Docs atualizados no mesmo ciclo**: `PRD.md` (indice de fases + como navegar), `PRD-FASE-3.md`
+  (referencia a Fase 4 no encerramento — via handoff), `AI-ROADMAP.md` (leitura base + notas Fases
+  4/5) e este arquivo. Operacao git em `docs-SEP` permanece manual (working tree apenas).

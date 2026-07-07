@@ -11,7 +11,7 @@ Antes de implementar, revisar codigo ou responder duvidas, leia:
 3. Este arquivo (`AGENT.md`) - regras operacionais para agentes.
 4. [`AI-ROADMAP.md`](AI-ROADMAP.md) - indice por tipo de tarefa.
 5. Spec relevante em `specs/`.
-6. Step correspondente em `steps-fase-1/` ou `steps-fase-2/`, quando existir.
+6. Step correspondente em `steps-fase-1/` a `steps-fase-5/`, quando existir.
 7. Docs operacionais em `repos/<repo>/` e ADRs relevantes em `adr/`.
 
 Hierarquia em caso de conflito: PRD + ADRs prevalecem; depois specs; depois steps; depois docs operacionais em `repos/`; por fim `AI-ROADMAP.md` e este arquivo.
@@ -172,7 +172,7 @@ Atualize `AI-ROADMAP.md` no mesmo ciclo quando criar, mover, remover ou alterar 
 - templates;
 - estrutura de repos.
 
-Docs globais de produto, contexto, seguranca transversal e operacao cross-repo ficam em `docs-SEP/docs-sep/`. ADRs ficam em `docs-SEP/adr/`. Specs ficam em `docs-SEP/specs/`. Steps ficam em `docs-SEP/steps-fase-1/` ou `docs-SEP/steps-fase-2/`.
+Docs globais de produto, contexto, seguranca transversal e operacao cross-repo ficam em `docs-SEP/docs-sep/`. ADRs ficam em `docs-SEP/adr/`. Specs ficam em `docs-SEP/specs/` (subpastas `fase-1/` a `fase-5/`). Steps ficam em `docs-SEP/steps-fase-1/` a `docs-SEP/steps-fase-5/` (subpastas `backend/`, `web/`, `mobile/`).
 
 ## Como trabalhar
 

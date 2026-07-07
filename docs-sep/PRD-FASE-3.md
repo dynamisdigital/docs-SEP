@@ -442,3 +442,9 @@ Itens adiados ou dividas aceitas:
 - extracao de portas de persistencia do modulo `cobranca` permanece refactor module-wide futuro;
 - adapters reais de providers e validacoes com ambientes externos dependem de infraestrutura e
   credenciais aprovadas.
+
+Esses itens adiados sao endereçados no planejamento das fases seguintes: a **Fase 4**
+([`PRD-FASE-4.md`](./PRD-FASE-4.md)) completa as jornadas remanescentes, salda os follow-ups (inclui
+o step-up estrito server-side) e entrega o produto no marco `v1.0-local` (tudo sobre providers
+Fake/WireMock); a **Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)) faz o fechamento gated — integracao
+real Celcoin/BaaS, provisionamento AWS + deploy remoto, publicacao em lojas e go-live de producao.
