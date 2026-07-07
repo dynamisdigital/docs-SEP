@@ -32,7 +32,7 @@ PropostaCredito APROVADA (Sprint 8)
 GET /api/v1/contratos/{id} | proposta/{propostaId}            # CLIENTE dono ou FINANCEIRO/ADMIN
 GET /api/v1/contratos/{id}/versoes                            # lista versoes em ordem ascendente
 
-PATCH /api/v1/contratos/{id}/aceite                           # CLIENTE dono + @RequireStepUp
+PATCH /api/v1/contratos/{id}/aceite                           # CLIENTE dono + @RequireStepUpEstrito (Sprint 27)
   -> RegistrarAceiteUseCase (@Transactional)
      - findByIdForUpdate (PESSIMISTIC_WRITE)                   # serializa aceite vs cancelamento
      - valida ownership -> ContratoOwnershipException 403
@@ -41,7 +41,7 @@ PATCH /api/v1/contratos/{id}/aceite                           # CLIENTE dono + @
      - contrato.marcarAceito -> ACEITO
      - publish ContratoAceitoEvent (hash + ip + user-agent)
 
-POST /api/v1/contratos/{id}/cancelar                          # FINANCEIRO/ADMIN + @RequireStepUp
+POST /api/v1/contratos/{id}/cancelar                          # FINANCEIRO/ADMIN + @RequireStepUpEstrito (Sprint 27)
   -> CancelarContratoUseCase (@Transactional)
      - findByIdForUpdate (PESSIMISTIC_WRITE)
      - valida GERADO/AGUARDANDO_ACEITE -> 409 se ACEITO+
@@ -185,7 +185,7 @@ POST /api/v1/webhooks/assinatura/{provider}
      - case VISUALIZADO -> envelope.marcarVisualizado -> publish AssinaturaVisualizadaEvent
      - default -> log.warn (defensivo contra novos StatusEnvelope futuros)
 
-POST /api/v1/contratos/{id}/assinar                   # FINANCEIRO/ADMIN + @RequireStepUp
+POST /api/v1/contratos/{id}/assinar                   # FINANCEIRO/ADMIN + @RequireStepUpEstrito (Sprint 27)
   -> Reprocessamento operacional idempotente do envio (envelope ja existente eh devolvido)
 
 GET /api/v1/contratos/{id}/assinatura/status          # ownership ou FINANCEIRO/ADMIN
@@ -294,13 +294,9 @@ DTOs (records imutaveis com `@Schema`):
 - `Content-Disposition: attachment; filename="contrato-<id>-assinado.pdf"`
 - `X-Document-Hash-Sha256: <hex>` (integridade local conferida pelo cliente)
 
-### Step-up — limitacao conhecida
+### Step-up estrito (Sprint 27)
 
-`StepUpEnforcementAspect` (Sprint 5 Task 5.6) libera operacoes `@RequireStepUp` quando o usuario tem `mfaHabilitado=false`. Como aceite/cancelamento sao operacoes legais, esse bypass enfraquece a garantia.
-
-**Mitigacao operacional:** em producao, todo usuario com role `CLIENTE`, `FINANCEIRO` ou `ADMIN` DEVE ter MFA habilitado antes de liberar formalizacao.
-
-**Fix arquitetural** via `@RequireStepUpEstrita` (sem bypass) fica em sprint futura de hardening do modulo `identity`.
+`PATCH /aceite`, `POST /cancelar` e `POST /assinar` usam `@RequireStepUpEstrito` (sem bypass de migracao pre-MFA): exigem `mfaHabilitado=true` + token `X-Step-Up-Token` valido. Usuario sem MFA ativo recebe `403` sem possibilidade de bypass. Divida de go-live de step-up fechada.
 
 ## Auditoria reforcada
 
@@ -361,7 +357,7 @@ Contratos, versoes, clausulas, aceites e audit log relacionado sao documentos le
 - Sem multiplos signatarios (avalistas, garantidores) — Sprint futura.
 - Validacao avancada de certificado ICP-Brasil eh responsabilidade do provider (Clicksign suporta como opcional).
 - Dados cadastrais reais do tomador (nome, endereco, CPF/CNPJ) ainda nao entram no template — placeholders UUID enquanto modulo `onboarding` (Epic 5) nao expor (ver `CCB.md` §Limitacoes).
-- Step-up bypassa quando MFA nao habilitado (mitigacao operacional documentada; fix em sprint de hardening identity).
+- Dados cadastrais reais do tomador (nome, CPF/CNPJ) ainda nao entram no template — placeholders UUID enquanto modulo `onboarding` nao expor (ver `CCB.md`).
 - WireMock E2E completo (provider=clicksign + stubs HTTP do ciclo aceite->callback) ficou como follow-up — coberturas atuais: `ClicksignAssinaturaDigitalProviderIT` (HTTP wiring isolado, Task 11.4) + `AssinaturaIT` (E2E via Fake, Task 11.9).
 
 ## Runbook: reprocessamento de envio para assinatura (Sprint 11)

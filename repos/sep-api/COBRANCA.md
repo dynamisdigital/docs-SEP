@@ -184,20 +184,20 @@ O endpoint `POST /api/v1/cobranca/parcelas/{id}/contato` nao altera status da pa
 Renegociacao nasce a partir de parcela `ATRASADA` ou `INADIMPLENTE`. O fluxo eh:
 
 ```text
-FINANCEIRO/ADMIN + step-up
+FINANCEIRO/ADMIN + @RequireStepUpEstrito (Sprint 27, sem bypass de MFA)
   -> POST /parcelas/{id}/renegociacao
   -> cria Renegociacao(PROPOSTA)
   -> parcela original vira EM_NEGOCIACAO
   -> notifica tomador por email/SMS
 
-Tomador + ownership + step-up
+Tomador + ownership + @RequireStepUpEstrito (Sprint 27, sem bypass de MFA)
   -> PATCH /renegociacoes/{id}/aceite
   -> Renegociacao(ACEITA)
   -> parcela original vira RENEGOCIADA
   -> cria AgendaPagamento substituta ativa
   -> agenda original fica inativa
 
-Tomador + ownership
+Tomador + ownership (sem step-up — recusa nao gera obrigacao financeira)
   -> PATCH /renegociacoes/{id}/recusa
   -> Renegociacao(RECUSADA)
   -> parcela volta ao status anterior (ATRASADA ou INADIMPLENTE)
@@ -207,7 +207,7 @@ ExpirarRenegociacaoJob
   -> parcela volta ao status anterior
 ```
 
-Aceite exige step-up porque cria nova obrigacao financeira. Recusa nao exige step-up porque apenas rejeita a proposta e reverte status. A agenda substituta usa `agenda_substituida_id` (V31) para manter a cadeia auditavel.
+Aceite exige `@RequireStepUpEstrito` (MFA ativo + token valido, sem bypass) porque cria nova obrigacao financeira. Recusa nao exige step-up porque apenas rejeita a proposta e reverte status. A agenda substituta usa `agenda_substituida_id` (V31) para manter a cadeia auditavel.
 
 **Descoberta pelo tomador (Sprint 24 — B2 da M-Sprint 9)**: antes de decidir, o tomador le os termos via `GET /parcelas/{parcelaId}/renegociacao-ativa` (owner-scoped). O `ConsultarRenegociacaoAtivaTomadorUseCase` valida ownership antes de revelar a proposta (mesma `CobrancaOwnershipException` generica sem UUID do B1), retorna apenas `PROPOSTA` ainda nao expirada pelo `Clock` (proposta vencida antes do job sai como 404) e calcula `valorTotalRenegociado = novoValorParcela * numeroParcelas` com `BigDecimal`. O `RenegociacaoTomadorResponse` nao expoe `justificativa`, operador, IDs de agenda nem `statusParcelaAnterior`. GET read-only, sem step-up, sem mutacao — os PATCHes de aceite/recusa seguem inalterados.
 

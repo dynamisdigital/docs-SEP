@@ -188,12 +188,17 @@ Aplicada em:
 
 ### Step-up estrito (`@RequireStepUpEstrito`, Sprint 20)
 
-Variante **sem bypass de MFA** de `@RequireStepUp`, para operacoes financeiras de alto risco. O `StepUpEnforcementAspect` ganhou o ramo `aplicarEstrito`: carrega o usuario autenticado e **nega (403) se MFA nao estiver habilitado** antes de validar o token — fecha a janela de emitir step-up, desabilitar MFA dentro do TTL (5 min) e reusar o token. Na pratica, exige que o operador (`FINANCEIRO`/`ADMIN`) tenha MFA ativo.
+Variante **sem bypass de MFA** de `@RequireStepUp`, para operacoes financeiras de alto risco. O `StepUpEnforcementAspect` ganhou o ramo `aplicarEstrito`: carrega o usuario autenticado e **nega (403) se MFA nao estiver habilitado** antes de validar o token — fecha a janela de emitir step-up, desabilitar MFA dentro do TTL (5 min) e reusar o token. Na pratica, exige que o operador/tomador tenha MFA ativo.
 
-Aplicada em:
-- `POST /api/v1/pix/desembolsos` (desembolso Pix assistido — operacao financeira sensivel, CMN 4.656/2018).
+Aplicada em (Sprint 20 + Sprint 27):
+- `POST /api/v1/pix/desembolsos` (desembolso Pix assistido — Sprint 20).
+- `PATCH /api/v1/contratos/{id}/aceite` — aceite de contrato (CMN 4.656/2018 Art. 11; Sprint 27).
+- `POST /api/v1/contratos/{id}/cancelar` — cancelamento pre-aceite (Sprint 27).
+- `POST /api/v1/contratos/{id}/assinar` — envio manual para assinatura (Sprint 27).
+- `POST /api/v1/cobranca/parcelas/{id}/renegociacao` — proposta de renegociacao (Sprint 27).
+- `PATCH /api/v1/cobranca/renegociacoes/{id}/aceite` — aceite de renegociacao (Sprint 27).
 
-O `@RequireStepUp` legado mantem o bypass de migracao pre-MFA inalterado. Provada por `PixDesembolsoControllerTest` (`@WebMvcTest` com o aspect real: operador sem MFA -> 403).
+O `@RequireStepUp` legado mantem o bypass de migracao pre-MFA inalterado para operacoes nao-legais (alterar role, registrar parecer, reprocessos, etc.). Provado por `ContratoControllerTest` e `CobrancaControllerTest` (`@WebMvcTest` com o aspect real; sem MFA -> 403 em todas as operacoes estritas).
 
 ## 7. Audit log de seguranca
 

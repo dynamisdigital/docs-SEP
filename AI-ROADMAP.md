@@ -35,13 +35,14 @@ Leitura base para qualquer agente:
 3. [`AGENT.md`](AGENT.md)
 4. Este arquivo (`AI-ROADMAP.md`)
 
-> **Fase 4 (planejamento)**: escopo em [`docs-sep/PRD-FASE-4.md`](docs-sep/PRD-FASE-4.md) — conclusao
+> **Fase 4 (em andamento)**: escopo em [`docs-sep/PRD-FASE-4.md`](docs-sep/PRD-FASE-4.md) — conclusao
 > das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
 > planejamento de infraestrutura AWS (Epic 16) e follow-ups de go-live. Fecha o marco `v1.0-local`
 > (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). **Specs criadas** em
 > [`specs/fase-4/`](specs/fase-4/README.md) (14 arquivos: backend `027`-`032`, web `116`-`119`,
 > mobile `213`-`216`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
 > Sprint 27+, web F-16+, mobile M-13+.
+> **Sprint 27 implementada** ([`027`](steps-fase-4/backend/027-sprint-27-steps.md)): step-up estrito server-side — `@RequireStepUpEstrito` em aceite/cancelamento/assinatura/propor-renegociacao/aceitar-renegociacao; follow-up 1 da Fase 3 FECHADO.
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
@@ -79,8 +80,8 @@ Leitura base para qualquer agente:
 | PLD | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) | Sprint 7 | 0004, 0007, 0008 |
 | `credito` | [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) | Sprints 8 e 9 | 0007, 0012 |
 | Open Finance | [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) | Sprint 9 | 0004, 0008 |
-| `contratos` | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) + [`CCB.md`](repos/sep-api/CCB.md) | [`010`](steps-fase-2/backend/010-sprint-10-steps.md), [`011`](steps-fase-2/backend/011-sprint-11-steps.md) | 0004, 0006, 0007, 0013 |
-| `cobranca` | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) | [`012`](steps-fase-2/backend/012-sprint-12-steps.md) + [`013`](steps-fase-2/backend/013-sprint-13-steps.md) + [`023`](specs/fase-3/023-sprint-23-cobranca-historico-tomador.md)/[`steps`](steps-fase-3/backend/023-sprint-23-steps.md) (mergeada, PR #81) + [`024`](specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md)/[`steps`](steps-fase-3/backend/024-sprint-24-steps.md) (mergeada, PR #83) + mobile [`209`](specs/fase-3/209-msprint-9-cobranca-mobile.md)/[`steps`](steps-fase-3/mobile/209-msprint-9-steps.md) | 0001, 0005, 0007, 0014 |
+| `contratos` | [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) + [`CCB.md`](repos/sep-api/CCB.md) | [`010`](steps-fase-2/backend/010-sprint-10-steps.md), [`011`](steps-fase-2/backend/011-sprint-11-steps.md), [`027`](steps-fase-4/backend/027-sprint-27-steps.md) (step-up estrito) | 0004, 0006, 0007, 0013 |
+| `cobranca` | [`repos/sep-api/COBRANCA.md`](repos/sep-api/COBRANCA.md) + [`NOTIFICACOES.md`](repos/sep-api/NOTIFICACOES.md) | [`012`](steps-fase-2/backend/012-sprint-12-steps.md) + [`013`](steps-fase-2/backend/013-sprint-13-steps.md) + [`023`](specs/fase-3/023-sprint-23-cobranca-historico-tomador.md)/[`steps`](steps-fase-3/backend/023-sprint-23-steps.md) (mergeada, PR #81) + [`024`](specs/fase-3/024-sprint-24-cobranca-renegociacao-tomador.md)/[`steps`](steps-fase-3/backend/024-sprint-24-steps.md) (mergeada, PR #83) + mobile [`209`](specs/fase-3/209-msprint-9-cobranca-mobile.md)/[`steps`](steps-fase-3/mobile/209-msprint-9-steps.md) + [`027`](steps-fase-4/backend/027-sprint-27-steps.md) (step-up estrito renegociacao) | 0001, 0005, 0007, 0014 |
 | `backoffice` | [`repos/sep-api/BACKOFFICE.md`](repos/sep-api/BACKOFFICE.md) | [`014`](steps-fase-2/backend/014-sprint-14-steps.md) + [`110`](steps-fase-3/web/110-fsprint-10-steps.md) | 0001, 0007 |
 | Hardening pos-Fase-2 | [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) + PRD/CONTEXT Fase 2 | [`015`](steps-fase-2/backend/015-sprint-15-hardening-steps.md) | 0001, 0007, 0015 |
 | `credores` | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + PRD Epic 10 | [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) (implementada), [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) (implementada), backend [`025`](steps-fase-3/backend/025-sprint-25-steps.md) (Gate I1 — `GET .../interesses/me`, mergeada em `develop` e `main` via PR #85), mobile [`210`](specs/fase-3/210-msprint-10-credora-mobile.md)/[`steps`](steps-fase-3/mobile/210-msprint-10-steps.md) (mergeada em `develop` PR #109 e `main` PR #110) | 0001, 0004, 0007 |

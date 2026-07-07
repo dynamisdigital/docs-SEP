@@ -8,7 +8,8 @@ Este arquivo detalha o planejamento da Fase 4. A Fase 4 parte da Fase 3 concluid
 13 (Frontend de Jornadas), 14 (Mobile SEP) e 15 (Movimentacao Pix), **planeja** o Epic 16
 (Infraestrutura AWS) sem provisionar e **salda quatro dividas aceitas** herdadas da Fase 3.
 
-O corte de entrega da Fase 4 e o marco **`v1.0-local`** (§37): produto inteiro funcionando em
+O corte de entrega da Fase 4 e o ma
+rco **`v1.0-local`** (§37): produto inteiro funcionando em
 ambiente local com providers Fake/WireMock, "tudo menos AWS e Celcoin". Os dois gates externos que
 sobram (credenciais Celcoin/BaaS e conta AWS), a integracao real fim-a-fim, a publicacao em lojas e
 o go-live de producao sao o escopo da **Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)).
@@ -148,9 +149,7 @@ AWS.
 
 ### Follow-ups da Fase 3 (dividas aceitas)
 
-1. **Step-up estrito server-side no aceite de contrato** (`sep-api`) — hoje o controller de
-   `contratos` usa `@RequireStepUp` legado com bypass server-side para usuario sem MFA; o enforcement
-   server-side estrito e **bloqueio de go-live** e deve ser fechado antes de qualquer producao.
+1. ~~**Step-up estrito server-side no aceite de contrato**~~ — **FECHADO** (Sprint 27, mergeada em `develop`). `ContratoController` e `CobrancaController` usam `@RequireStepUpEstrito`; bypass removido para todos os atos legais/financeiros. Bloqueio de go-live removido.
 2. **Renegociacao do tomador no web** — ja detalhada no Epic 13 acima (rastreada aqui como divida
    aceita da F-Sprint 9).
 3. **Extracao de portas de persistencia do modulo `cobranca`** (ADR 0007) — refactor module-wide;
@@ -171,7 +170,7 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 
 | Sprint | Epic/frente | Tema | Spec | Status |
 |--------|-------------|------|------|--------|
-| 27 | Follow-up / go-live | Step-up estrito server-side no aceite de contrato (enforcement, remove bypass) | [`027`](../specs/fase-4/027-sprint-27-step-up-server-side-aceite.md) | planejada |
+| 27 | Follow-up / go-live | Step-up estrito server-side no aceite de contrato (enforcement, remove bypass) | [`027`](../specs/fase-4/027-sprint-27-step-up-server-side-aceite.md) | **implementada** |
 | 28 | Follow-up / refactor | Extracao de portas de persistencia do modulo `cobranca` (ADR 0007) | [`028`](../specs/fase-4/028-sprint-28-cobranca-portas-persistencia.md) | planejada |
 | 29 | Epic 15 | Aporte da credora + escrow (foundation, assistido) | [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md) | planejada (gate produto) |
 | 30 | Epic 15 | Matching credora <-> operacao (assistido) | [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md) | planejada (gate produto) |
