@@ -31,7 +31,7 @@ O `AI-ROADMAP.md` deve estar sempre atualizado.
 Leitura base para qualquer agente:
 
 1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - indice do PRD; leia o arquivo de fase relevante (`PRD-FASE-1.md`, `PRD-FASE-2.md`, `PRD-FASE-3.md`, `PRD-FASE-4.md` ou `PRD-FASE-5.md`).
-2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto; leia `CONTEXT-PARTE-1.md` e/ou `CONTEXT-PARTE-2.md` conforme a tarefa.
+2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto. Para **estado atual/proximo passo/gates**, leia [`CONTEXT-ESTADO-ATUAL.md`](docs-sep/CONTEXT-ESTADO-ATUAL.md) (pequeno; sempre). Fundacao em `CONTEXT-PARTE-1.md`; historico por sprint em `CONTEXT-PARTE-2.md` (grande; so sob demanda).
 3. [`AGENT.md`](AGENT.md)
 4. Este arquivo (`AI-ROADMAP.md`)
 
@@ -160,6 +160,7 @@ Leitura base para qualquer agente:
 - Atualizar doc operacional do modulo em `repos/<repo>/`.
 - Criar PR description temporaria quando aplicavel; se materializada como `repos/<repo>/SPRINT-*-PR.md`, apagar esse arquivo ao iniciar a sprint seguinte.
 - Atualizar PRD quando a sprint for concluida.
+- **Atualizar o estado**: sobrescrever [`docs-sep/CONTEXT-ESTADO-ATUAL.md`](docs-sep/CONTEXT-ESTADO-ATUAL.md) (estado + proximo passo + gates) e apendar uma entrada curta ao historico em `docs-sep/CONTEXT-PARTE-2.md`. Nao inchar o log; nao duplicar detalhe do PRD.
 - Atualizar collections Postman/Insomnia se endpoints mudaram.
 - Revisar este roadmap.
 

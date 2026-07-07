@@ -7,7 +7,7 @@ Este arquivo e o guia operacional curto para qualquer agente de IA que trabalhe 
 Antes de implementar, revisar codigo ou responder duvidas, leia:
 
 1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - indice do PRD por fase. Conteudo detalhado em [`PRD-FASE-1.md`](docs-sep/PRD-FASE-1.md), [`PRD-FASE-2.md`](docs-sep/PRD-FASE-2.md) e [`PRD-FASE-3.md`](docs-sep/PRD-FASE-3.md).
-2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto consolidado. Conteudo detalhado em [`CONTEXT-PARTE-1.md`](docs-sep/CONTEXT-PARTE-1.md) e [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md).
+2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto. Para **estado atual, proximo passo e gates**, leia [`CONTEXT-ESTADO-ATUAL.md`](docs-sep/CONTEXT-ESTADO-ATUAL.md) (pequeno; sempre). Fundacao em [`CONTEXT-PARTE-1.md`](docs-sep/CONTEXT-PARTE-1.md); historico de execucao por sprint em [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md) (grande; so sob demanda).
 3. Este arquivo (`AGENT.md`) - regras operacionais para agentes.
 4. [`AI-ROADMAP.md`](AI-ROADMAP.md) - indice por tipo de tarefa.
 5. Spec relevante em `specs/`.
@@ -173,6 +173,8 @@ Atualize `AI-ROADMAP.md` no mesmo ciclo quando criar, mover, remover ou alterar 
 - estrutura de repos.
 
 Docs globais de produto, contexto, seguranca transversal e operacao cross-repo ficam em `docs-SEP/docs-sep/`. ADRs ficam em `docs-SEP/adr/`. Specs ficam em `docs-SEP/specs/` (subpastas `fase-1/` a `fase-5/`). Steps ficam em `docs-SEP/steps-fase-1/` a `docs-SEP/steps-fase-5/` (subpastas `backend/`, `web/`, `mobile/`).
+
+Contexto (regra fixa para nao inchar o arquivo de estado): o **estado atual, o proximo passo e os gates** vivem em `docs-sep/CONTEXT-ESTADO-ATUAL.md` (pequeno; fonte unica; sempre lido). Ao **fechar uma sprint**, sobrescreva esse arquivo (estado + proximo passo) e apende uma entrada curta ao historico em `docs-sep/CONTEXT-PARTE-2.md` (log por sprint; grande; lido so sob demanda). Nao trate `CONTEXT-PARTE-2.md` como fonte de estado; `CONTEXT-PARTE-1.md` e a fundacao estavel.
 
 ## Como trabalhar
 
