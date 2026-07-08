@@ -50,7 +50,7 @@ POST /api/v1/cobranca/parcelas/{id}/recebimentos
   -> RegistrarRecebimentoUseCase
      - idempotencia em 3 camadas: pre-lock + pos-lock + UNIQUE DB
      - valida consistencia da key (parcelaId + valorRecebido)
-     - lock pessimista em ParcelaCobranca (findByIdForUpdate)
+     - lock pessimista em ParcelaCobranca (ParcelaCobrancaPort.buscarPorIdComLock)
      - calcula valorDevidoAtualizado contra parcela lockada
      - persiste Recebimento e atualiza status (PAGA / PARCIALMENTE_PAGA)
      - RegistrarMovimentacaoEscrowPort -> escrow use case publico
@@ -184,13 +184,13 @@ O endpoint `POST /api/v1/cobranca/parcelas/{id}/contato` nao altera status da pa
 Renegociacao nasce a partir de parcela `ATRASADA` ou `INADIMPLENTE`. O fluxo eh:
 
 ```text
-FINANCEIRO/ADMIN + step-up
+FINANCEIRO/ADMIN + step-up estrito (MFA ativo, sem bypass — Sprint 27)
   -> POST /parcelas/{id}/renegociacao
   -> cria Renegociacao(PROPOSTA)
   -> parcela original vira EM_NEGOCIACAO
   -> notifica tomador por email/SMS
 
-Tomador + ownership + step-up
+Tomador + ownership + step-up estrito (MFA ativo, sem bypass — Sprint 27)
   -> PATCH /renegociacoes/{id}/aceite
   -> Renegociacao(ACEITA)
   -> parcela original vira RENEGOCIADA
@@ -208,6 +208,8 @@ ExpirarRenegociacaoJob
 ```
 
 Aceite exige step-up porque cria nova obrigacao financeira. Recusa nao exige step-up porque apenas rejeita a proposta e reverte status. A agenda substituta usa `agenda_substituida_id` (V31) para manter a cadeia auditavel.
+
+**Step-up estrito (Sprint 27)**: propor e aceitar renegociacao usam `@RequireStepUpEstrito` — MFA ativo + `X-Step-Up-Token` de uso unico, **sem bypass pre-MFA**; usuario sem MFA recebe `403` generico sem tocar o use case. Nos use cases de aceite/recusa, ownership e validada **antes** do estado (nao-dono nao descobre status alheio via `409`) e o `403` de ownership usa a variante neutra de `CobrancaOwnershipException` (sem UUID interno de agenda). Cobertura: 4 cenarios em `CobrancaInadimplenciaControllerTest` (aspect real) + `RenegociacaoIT` com token real.
 
 **Descoberta pelo tomador (Sprint 24 — B2 da M-Sprint 9)**: antes de decidir, o tomador le os termos via `GET /parcelas/{parcelaId}/renegociacao-ativa` (owner-scoped). O `ConsultarRenegociacaoAtivaTomadorUseCase` valida ownership antes de revelar a proposta (mesma `CobrancaOwnershipException` generica sem UUID do B1), retorna apenas `PROPOSTA` ainda nao expirada pelo `Clock` (proposta vencida antes do job sai como 404) e calcula `valorTotalRenegociado = novoValorParcela * numeroParcelas` com `BigDecimal`. O `RenegociacaoTomadorResponse` nao expoe `justificativa`, operador, IDs de agenda nem `statusParcelaAnterior`. GET read-only, sem step-up, sem mutacao — os PATCHes de aceite/recusa seguem inalterados.
 
@@ -237,8 +239,8 @@ Arquitetura (ADR 0007):
 | `GET` | `/api/v1/cobranca/parcelas/{parcelaId}/recebimentos` | `ROLE_CLIENTE` (owner) | Sprint 23: historico owner-scoped do tomador em `CobrancaTomadorController` dedicado; `RecebimentoTomadorResponse[]` (4 campos publicos) ordenado `dataRecebimento DESC`; parcela inexistente ou de outro tomador retorna 403 uniforme sem UUID (anti-enumeracao) |
 | `GET` | `/api/v1/cobranca/inadimplencia` | `ROLE_FINANCEIRO/ADMIN` | filtros `dias_atraso_min`, `dias_atraso_max`, `status`; retorna ATRASADA/INADIMPLENTE |
 | `POST` | `/api/v1/cobranca/parcelas/{id}/contato` | `ROLE_FINANCEIRO/ADMIN` | registra `EventoCobranca CONTATO_MANUAL`; nao muda status |
-| `POST` | `/api/v1/cobranca/parcelas/{id}/renegociacao` | `ROLE_FINANCEIRO/ADMIN` + step-up | cria proposta, parcela vira EM_NEGOCIACAO; conflito se proposta ativa |
-| `PATCH` | `/api/v1/cobranca/renegociacoes/{id}/aceite` | tomador owner + step-up | aceita proposta, cria agenda substituta, parcela vira RENEGOCIADA |
+| `POST` | `/api/v1/cobranca/parcelas/{id}/renegociacao` | `ROLE_FINANCEIRO/ADMIN` + step-up estrito | cria proposta, parcela vira EM_NEGOCIACAO; conflito se proposta ativa |
+| `PATCH` | `/api/v1/cobranca/renegociacoes/{id}/aceite` | tomador owner + step-up estrito | aceita proposta, cria agenda substituta, parcela vira RENEGOCIADA |
 | `PATCH` | `/api/v1/cobranca/renegociacoes/{id}/recusa` | tomador owner | recusa proposta, parcela volta ao status anterior |
 | `GET` | `/api/v1/cobranca/parcelas/{parcelaId}/renegociacao-ativa` | `ROLE_CLIENTE` (owner) | Sprint 24: termos da renegociacao ativa (PROPOSTA nao expirada pelo Clock) em `CobrancaTomadorController`; `RenegociacaoTomadorResponse` (10 campos publicos, `valorTotalRenegociado` calculado no backend); read-only, sem step-up; 404 sem proposta ativa; 403 uniforme sem UUID para parcela inexistente/alheia |
 
@@ -313,7 +315,7 @@ Validacoes focadas usadas na Task 13.9: `./gradlew test --tests "*InadimplenciaI
 - **Jobs single-instance**: Epic 15 AWS multi-instance requer ShedLock ou advisory lock para atraso, escalonamento, inadimplencia e expiracao.
 - **`RecebimentoResponse.movimentacaoEscrowId` null** em listagem em massa (evita N+1 join). POST recebimento preenche o id.
 - **Test `payload_naoVazaDadosBancariosOuPessoais`** usa blacklist de substrings — schema validation completa em sprint de hardening.
-- **Use cases injetam Spring Data repositories de `infrastructure.persistence` diretamente** (padrao de todo o modulo `cobranca` — 14/14 use cases, incluindo `ConsultarRenegociacaoAtivaTomadorUseCase` da Sprint 24 e o irmao B1 `ConsultarRecebimentosParcelaUseCase`). O ADR 0007 pediria portas em `application.port.out` para a persistencia propria do modulo; hoje so as dependencias externas/cross-modulo usam porta (`ContratoCobrancaQueryPort`, `PropostaCobrancaQueryPort`, `RegistrarMovimentacaoEscrowPort`, `NotificationProvider`). Divida aceita: a extracao de portas de persistencia deve ser feita module-wide (nao pontual, para nao divergir do padrao existente), em tarefa dedicada ou melhoria de fim-de-fase — nao na Sprint 24, que preserva consistencia com o codigo ja mergeado.
+- **Portas de persistencia (Sprint 28, ADR 0007 — divida FECHADA)**: os 14 use cases dependem de portas em `application.port.out` (`ParcelaCobrancaPort`, `AgendaPagamentoCobrancaPort`, `RecebimentoCobrancaPort`, `RenegociacaoCobrancaPort`, `EventoCobrancaPort`), implementadas por adapters de delegacao pura em `infrastructure.adapter.persistence`. Queries/locks/`@EntityGraph` permanecem nos repositories JPA (repository tests intactos); jobs/listeners/seeder seguem usando repositories direto (fora do escopo da spec 028, proxima iteracao se houver dor real). Metodos de porta nomeados por intencao (`buscarPorIdComLock`, `salvarEFlush`, `listarTodosComParcelaOrdenadoPorDataDesc`, `jaNotificado`); `Recebimento` persiste por cascade da parcela — `RecebimentoCobrancaPort` e read-only.
 
 ## Referencias
 

@@ -149,13 +149,16 @@ AWS.
 
 ### Follow-ups da Fase 3 (dividas aceitas)
 
-1. **Step-up estrito server-side no aceite de contrato** (`sep-api`) — hoje o controller de
-   `contratos` usa `@RequireStepUp` legado com bypass server-side para usuario sem MFA; o enforcement
-   server-side estrito e **bloqueio de go-live** e deve ser fechado antes de qualquer producao.
+1. **Step-up estrito server-side no aceite de contrato** (`sep-api`) — **FECHADO na Sprint 27**:
+   `@RequireStepUpEstrito` aplicado ao aceite/cancelamento/assinatura de contrato e a proposta/aceite
+   de renegociacao (sem bypass pre-MFA); 403 generico distinto do 409 de estado; ownership antes do
+   estado na renegociacao. O bloqueio de go-live deixou de existir.
 2. **Renegociacao do tomador no web** — ja detalhada no Epic 13 acima (rastreada aqui como divida
    aceita da F-Sprint 9).
-3. **Extracao de portas de persistencia do modulo `cobranca`** (ADR 0007) — refactor module-wide;
-   hoje 14/14 use cases injetam repositorios de `infrastructure.persistence` direto.
+3. **Extracao de portas de persistencia do modulo `cobranca`** (ADR 0007) — **FECHADO na Sprint
+   28**: 14/14 use cases dependem de portas em `application.port.out` com adapters de delegacao
+   pura em `infrastructure.adapter.persistence`; refactor 100% behavior-preserving (suite identica,
+   1840 testes). Jobs/listeners seguem com repositories direto (fora do escopo da spec 028).
 4. **Refresh da collection Postman + hardening de tooling** — atualizar a collection para `credores`
    e leituras Pix (congelada desde a Sprint 14) e reavaliar o hardening de tooling que exige
    Angular 22 (dez ocorrencias de audit exclusivas de tooling), condicionado a ADR de major.
@@ -172,8 +175,8 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 
 | Sprint | Epic/frente | Tema | Spec | Status |
 |--------|-------------|------|------|--------|
-| 27 | Follow-up / go-live | Step-up estrito server-side no aceite de contrato (enforcement, remove bypass) | [`027`](../specs/fase-4/027-sprint-27-step-up-server-side-aceite.md) | planejada |
-| 28 | Follow-up / refactor | Extracao de portas de persistencia do modulo `cobranca` (ADR 0007) | [`028`](../specs/fase-4/028-sprint-28-cobranca-portas-persistencia.md) | planejada |
+| 27 | Follow-up / go-live | Step-up estrito server-side no aceite de contrato (enforcement, remove bypass) | [`027`](../specs/fase-4/027-sprint-27-step-up-server-side-aceite.md) | concluida (PR #89 develop / #90 main, 2026-07-08) |
+| 28 | Follow-up / refactor | Extracao de portas de persistencia do modulo `cobranca` (ADR 0007) | [`028`](../specs/fase-4/028-sprint-28-cobranca-portas-persistencia.md) | concluida (PR #91 develop / #92 main, 2026-07-08) |
 | 29 | Epic 15 | Aporte da credora + escrow (foundation, assistido) | [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md) | planejada (gate produto) |
 | 30 | Epic 15 | Matching credora <-> operacao (assistido) | [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md) | planejada (gate produto) |
 | 31 | Epic 15 | Pix avancado — recorte inicial: gestao de chaves Pix (assistido) | [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md) | planejada |
@@ -228,9 +231,9 @@ Este e o corte que permite "implementar tudo menos AWS e Celcoin".
   avancado implementados, testados e visiveis no web e no mobile; skeleton dos adapters reais
   Celcoin/BaaS escrito e coberto por WireMock, com Fake como default.
 - Epic 16 entregue como **documento de planejamento** (arquitetura AWS + CI/CD de deploy).
-- Follow-ups da Fase 3 saldados: step-up estrito server-side no aceite (fecha o bloqueio de go-live
-  que **nao** depende de acesso externo), renegociacao web, portas de persistencia de `cobranca`,
-  refresh da collection Postman + hardening de tooling.
+- Follow-ups da Fase 3 saldados: step-up estrito server-side no aceite (**fechado na Sprint 27** —
+  bloqueio de go-live que **nao** depende de acesso externo eliminado), renegociacao web, portas de
+  persistencia de `cobranca`, refresh da collection Postman + hardening de tooling.
 - Suite verde nos tres repos (lint/scss/format, testes, build; smokes E2E/PWA); `main` e `develop`
   em paridade; audit de producao limpo.
 

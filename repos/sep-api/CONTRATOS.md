@@ -271,9 +271,9 @@ Em caso de falha persistindo `DocumentoAssinado` apos storage salvar, o use case
 | `GET`   | `/api/v1/contratos/{id}`                          | ownership ou FINANCEIRO/ADMIN     | `contratos` |
 | `GET`   | `/api/v1/contratos/proposta/{propostaId}`         | ownership ou FINANCEIRO/ADMIN     | `contratos` |
 | `GET`   | `/api/v1/contratos/{id}/versoes`                  | ownership ou FINANCEIRO/ADMIN     | `contratos` |
-| `PATCH` | `/api/v1/contratos/{id}/aceite`                   | CLIENTE dono + step-up            | `contratos` |
-| `POST`  | `/api/v1/contratos/{id}/cancelar`                 | FINANCEIRO/ADMIN + step-up        | `contratos` |
-| `POST`  | `/api/v1/contratos/{id}/assinar` (Sprint 11)      | FINANCEIRO/ADMIN + step-up        | `contratos` |
+| `PATCH` | `/api/v1/contratos/{id}/aceite`                   | CLIENTE dono + step-up estrito    | `contratos` |
+| `POST`  | `/api/v1/contratos/{id}/cancelar`                 | FINANCEIRO/ADMIN + step-up estrito | `contratos` |
+| `POST`  | `/api/v1/contratos/{id}/assinar` (Sprint 11)      | FINANCEIRO/ADMIN + step-up estrito | `contratos` |
 | `GET`   | `/api/v1/contratos/{id}/assinatura/status`        | ownership ou FINANCEIRO/ADMIN     | `contratos` |
 | `GET`   | `/api/v1/contratos/{id}/documento-assinado`       | ownership ou FINANCEIRO/ADMIN     | `contratos` |
 | `POST`  | `/api/v1/webhooks/assinatura/{provider}`          | publico + HMAC (sem JWT)          | `webhooks`  |
@@ -294,13 +294,9 @@ DTOs (records imutaveis com `@Schema`):
 - `Content-Disposition: attachment; filename="contrato-<id>-assinado.pdf"`
 - `X-Document-Hash-Sha256: <hex>` (integridade local conferida pelo cliente)
 
-### Step-up — limitacao conhecida
+### Step-up estrito (Sprint 27)
 
-`StepUpEnforcementAspect` (Sprint 5 Task 5.6) libera operacoes `@RequireStepUp` quando o usuario tem `mfaHabilitado=false`. Como aceite/cancelamento sao operacoes legais, esse bypass enfraquece a garantia.
-
-**Mitigacao operacional:** em producao, todo usuario com role `CLIENTE`, `FINANCEIRO` ou `ADMIN` DEVE ter MFA habilitado antes de liberar formalizacao.
-
-**Fix arquitetural** via `@RequireStepUpEstrita` (sem bypass) fica em sprint futura de hardening do modulo `identity`.
+Aceite, cancelamento e envio para assinatura usam `@RequireStepUpEstrito` (**sem bypass pre-MFA**): exigem MFA ativo + `X-Step-Up-Token` valido de uso unico; usuario sem MFA recebe `403` sem tocar o use case. A "limitacao conhecida" do bypass (Sprints 10-26) foi eliminada — nao ha mais mitigacao operacional necessaria. `403` de step-up/MFA (corpo generico, sem UUID) e distinto do `409` de estado (`ContratoEstadoInvalidoException`). Cobertura: 4 cenarios em `ContratoControllerTest` (aspect real) + `ContratoIT`/`AssinaturaIT` com token real.
 
 ## Auditoria reforcada
 

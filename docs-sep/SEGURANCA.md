@@ -186,14 +186,21 @@ Aplicada em:
 - `PATCH /api/v1/usuarios/{id}/senha`
 - `POST /api/v1/auth/totp/disable`
 
-### Step-up estrito (`@RequireStepUpEstrito`, Sprint 20)
+### Step-up estrito (`@RequireStepUpEstrito`, Sprint 20; ampliado na Sprint 27)
 
-Variante **sem bypass de MFA** de `@RequireStepUp`, para operacoes financeiras de alto risco. O `StepUpEnforcementAspect` ganhou o ramo `aplicarEstrito`: carrega o usuario autenticado e **nega (403) se MFA nao estiver habilitado** antes de validar o token — fecha a janela de emitir step-up, desabilitar MFA dentro do TTL (5 min) e reusar o token. Na pratica, exige que o operador (`FINANCEIRO`/`ADMIN`) tenha MFA ativo.
+Variante **sem bypass de MFA** de `@RequireStepUp`, para operacoes financeiras de alto risco. O `StepUpEnforcementAspect` ganhou o ramo `aplicarEstrito`: carrega o usuario autenticado e **nega (403) se MFA nao estiver habilitado** antes de validar o token — fecha a janela de emitir step-up, desabilitar MFA dentro do TTL (5 min) e reusar o token. Na pratica, exige MFA ativo do usuario (CLIENTE no aceite; `FINANCEIRO`/`ADMIN` nas operacoes de operador).
 
 Aplicada em:
-- `POST /api/v1/pix/desembolsos` (desembolso Pix assistido — operacao financeira sensivel, CMN 4.656/2018).
+- `POST /api/v1/pix/desembolsos` (Sprint 20 — desembolso Pix assistido, CMN 4.656/2018);
+- `PATCH /api/v1/contratos/{id}/aceite` (Sprint 27 — aceite de contrato pelo tomador);
+- `POST /api/v1/contratos/{id}/cancelar` (Sprint 27);
+- `POST /api/v1/contratos/{id}/assinar` (Sprint 27 — envio para assinatura digital);
+- `POST /api/v1/cobranca/parcelas/{id}/renegociacao` (Sprint 27 — propor renegociacao);
+- `PATCH /api/v1/cobranca/renegociacoes/{id}/aceite` (Sprint 27 — aceite de renegociacao).
 
-O `@RequireStepUp` legado mantem o bypass de migracao pre-MFA inalterado. Provada por `PixDesembolsoControllerTest` (`@WebMvcTest` com o aspect real: operador sem MFA -> 403).
+A Sprint 27 fechou o bloqueio de go-live da Fase 3: os atos legais/financeiros acima **nao tem mais bypass server-side pre-MFA**. O `403` de step-up/MFA usa corpo generico ("Acesso negado", sem UUID nem detalhe interno) e e distinto do `409` de estado dos use cases. `recusarRenegociacao` segue sem step-up (recusa nao gera obrigacao nova).
+
+O `@RequireStepUp` legado mantem o bypass de migracao pre-MFA para operacoes **nao-legais** (parecer de credito, reprocessos backoffice, resolver/ignorar fila, gestao de roles, parametros de governanca, associacao de carteira de credora, reconciliacao de status Pix). Enforcement estrito provado por `PixDesembolsoControllerTest`, `ContratoControllerTest` e `CobrancaInadimplenciaControllerTest` (`@WebMvcTest` com o aspect real: usuario sem MFA -> 403 sem tocar o use case) + `ContratoIT`/`AssinaturaIT`/`RenegociacaoIT` com token real de uso unico.
 
 ## 7. Audit log de seguranca
 

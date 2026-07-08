@@ -805,3 +805,44 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
 - **Docs atualizados no mesmo ciclo**: `PRD.md` (indice de fases + como navegar), `PRD-FASE-3.md`
   (referencia a Fase 4 no encerramento — via handoff), `AI-ROADMAP.md` (leitura base + notas Fases
   4/5) e este arquivo. Operacao git em `docs-SEP` permanece manual (working tree apenas).
+
+## Sprint 27 — Step-up estrito server-side no aceite (2026-07-08)
+
+- Primeira sprint da Fase 4 (`sep-api`, branch `feature/sprint-27-step-up-server-side-aceite`).
+  Aplica `@RequireStepUpEstrito` (Sprint 20, sem bypass pre-MFA) aos atos legais/financeiros:
+  aceite/cancelamento/assinatura de contrato + proposta/aceite de renegociacao. Recusa segue sem
+  step-up. Fecha o follow-up 1 da Fase 3 (**bloqueio de go-live**).
+- Task 27.4 corrigiu vazamentos na renegociacao: ownership validada antes do estado (nao-dono nao
+  descobre status alheio via 409) e 403 de ownership com variante neutra de
+  `CobrancaOwnershipException` (sem UUID interno de agenda). 403 de step-up ja era generico no
+  `ApiExceptionHandler`.
+- Testes: matriz de 4 cenarios (MFA+token 200; sem MFA 403 sem bypass; sem token 403; token
+  invalido/alheio 403) nos slices com aspect real + ITs com token de uso unico real; suite 1832 ->
+  1840. ITs `ContratoIT`/`AssinaturaIT` deixaram de depender do bypass (fixtures com MFA + token).
+- 6 commits (349526b, 1bf86c7, dd2bf10, 9162d9f, 3beab5f, d0dfa62); `check` + `bootJar` verdes.
+  Mergeada em `origin/develop` via PR #89 (squash `774c6ca`) e promovida a `main` via PR #90
+  (`fd66fdf`, `develop` == `main`) em 2026-07-08. Docs: SEGURANCA.md §6, CONTRATOS.md, COBRANCA.md,
+  PRD-FASE-4 (follow-up 1 fechado, §37), PRD-FASE-5 (Frente D), SPRINT-27-PR.md.
+- Follow-up registrado: enumeracao de `renegociacaoId` por nao-dono via 403-existe/404-nao-existe
+  (alinhar ao 404-neutro mudaria contrato OpenAPI; decidir em hardening).
+
+## Sprint 28 — Portas de persistencia do modulo cobranca (2026-07-08)
+
+- Segunda sprint da Fase 4 (`sep-api`, branch `feature/sprint-28-cobranca-portas-persistencia`).
+  Fecha o follow-up 3 da Fase 3 (ADR 0007): os 14 use cases de `cobranca` deixam de injetar
+  repositories JPA e passam a depender de 5 portas em `application.port.out`
+  (`ParcelaCobrancaPort`, `AgendaPagamentoCobrancaPort`, `RecebimentoCobrancaPort`,
+  `RenegociacaoCobrancaPort`, `EventoCobrancaPort`), com adapters de delegacao pura em
+  `infrastructure.adapter.persistence`. Queries/locks/`@EntityGraph` permanecem nos repositories.
+- Metodos de porta nomeados por intencao (lock/flush/fetch-join/idempotencia explicitos);
+  `Recebimento` persiste por cascade da parcela (porta read-only). Jobs/listeners/seeder seguem
+  com repositories direto — fora do escopo da spec 028.
+- 100% behavior-preserving: idempotencia em 3 camadas do recebimento, races de UNIQUE
+  (agenda/renegociacao) atravessando adapters, ownership-antes-de-estado (Sprint 27), Clock de
+  expiracao e eventos intactos. Suite identica: 1840 testes, 0 falhas; `check` + `bootJar` verdes.
+- 5 commits (03b068b, 8f0fab7, bd8fd1a, 386e9ca, 80a10e0); reviews por task (1 finding na 28.2 —
+  retorno de entidade nas escritas — corrigido; demais zero). Mergeada em `origin/develop` via
+  PR #91 (`6a4f5d6`) e promovida a `main` via PR #92 (`1f111e2`, `develop` == `main`) em
+  2026-07-08. Docs:
+  COBRANCA.md (divida removida, portas registradas), PRD-FASE-4 (follow-up 3 fechado),
+  SPRINT-28-PR.md.

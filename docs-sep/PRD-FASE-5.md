@@ -95,7 +95,7 @@ mantido ate decisao de produto.
 
 **Gate**: Frentes A e B concluidas.
 
-- checklist de go-live: gates de seguranca (step-up estrito ja server-side desde a Fase 4, MFA,
+- checklist de go-live: gates de seguranca (step-up estrito server-side fechado na Sprint 27, MFA,
   rate limiting, account lockout), conformidade CMN 4.656/2018 (KYC/KYB, segregacao patrimonial via
   escrow, PLD com trilha auditavel), LGPD e retencao legal de documentos;
 - teste de recuperacao (backup/restore, rollback de deploy, failover de RDS);

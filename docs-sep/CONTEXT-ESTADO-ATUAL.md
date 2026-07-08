@@ -9,30 +9,40 @@
 > passo) e **apende** uma entrada curta no historico ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)).
 > Mantenha este arquivo pequeno; ele nao duplica historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-07._
+_Atualizado em: 2026-07-08._
 
 ## Onde estamos
 
+- **Sprint 28 (backend) MERGEADA em 2026-07-08** — portas de persistencia do modulo `cobranca`
+  (ADR 0007). Os 14 use cases dependem de portas em `application.port.out` (parcela, agenda,
+  recebimento, renegociacao, evento) com adapters de delegacao pura em
+  `infrastructure.adapter.persistence`; refactor 100% behavior-preserving (1840 testes, contagem
+  identica a baseline; zero mudanca de endpoint/DTO/migration/regra). Jobs/listeners seguem com
+  repositories direto (fora do escopo da spec 028). **Fecha o follow-up 3 da Fase 3.** Em
+  `origin/develop` via PR #91 (`6a4f5d6`) e promovida a `main` via PR #92 (`1f111e2`);
+  `develop` == `main`. PR description em [`repos/sep-api/SPRINT-28-PR.md`](../repos/sep-api/SPRINT-28-PR.md).
+- **Sprint 27 (backend) MERGEADA em 2026-07-08** — abre a Fase 4. Step-up estrito server-side
+  (`@RequireStepUpEstrito`, sem bypass pre-MFA) aplicado ao aceite/cancelamento/assinatura de
+  contrato e a proposta/aceite de renegociacao; 403 generico distinto do 409 de estado; ownership
+  antes do estado na renegociacao (sem vazar status/UUID a nao-dono). **Fecha o follow-up 1
+  (bloqueio de go-live) da Fase 3.** Em `origin/develop` via PR #89 (squash `774c6ca`) e promovida
+  a `main` via PR #90 (`fd66fdf`); `develop` == `main`. 1840 testes verdes, `check` + `bootJar` ok.
+  PR description em [`repos/sep-api/SPRINT-27-PR.md`](../repos/sep-api/SPRINT-27-PR.md).
 - **Fase 3 concluida tecnicamente em 2026-07-06**: escopo funcional entregue nos 3 repos; `develop`
   e `main` em paridade de conteudo em `sep-api`, `sep-app` e `sep-mobile` (back-merges locais feitos).
-- **Fase 4 planejada** (nada implementado): 14 specs em [`specs/fase-4/`](../specs/fase-4/README.md)
-  (backend `027`-`032`, web `116`-`119`, mobile `213`-`216`). Corte de entrega = marco `v1.0-local`
-  (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). Detalhe em
+- **Fase 4 em execucao**: 14 specs em [`specs/fase-4/`](../specs/fase-4/README.md) (backend
+  `027`-`032`, web `116`-`119`, mobile `213`-`216`). Corte de entrega = marco `v1.0-local` (tudo
+  sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). Detalhe em
   [`PRD-FASE-4.md`](./PRD-FASE-4.md).
 - **Fase 5 planejada** (fechamento gated): integracao real Celcoin, provisionamento AWS, publicacao
   em lojas e go-live de producao. Detalhe em [`PRD-FASE-5.md`](./PRD-FASE-5.md).
-- **Sprint 27** ja tem steps prontos:
-  [`steps-fase-4/backend/027-sprint-27-steps.md`](../steps-fase-4/backend/027-sprint-27-steps.md).
 
 ## Proximo passo
 
-1. **Executar a Sprint 27** (backend): step-up estrito server-side no aceite de contrato e operacoes
-   legais/financeiras equivalentes — aplica `@RequireStepUpEstrito` (ja existente); fecha o follow-up
-   1 (bloqueio de go-live) da Fase 3.
-2. Seguir a ordem da Fase 4: backend 28 (portas cobranca) e 29-32 (Epic 15 assistido + skeleton
-   adapters); web F-16-19; mobile M-13-16. Ver dependencias em
+1. **Sprint 29** (backend): aporte da credora + escrow (Epic 15 assistido, gate produto) — spec
+   [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md); steps just-in-time.
+2. Seguir a ordem da Fase 4: backend 30-32; web F-16-19; mobile M-13-16. Ver dependencias em
    [`specs/fase-4/README.md`](../specs/fase-4/README.md).
-3. Steps sao criados **just-in-time** antes de cada sprint.
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
 
