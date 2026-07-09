@@ -231,11 +231,84 @@ interesse ativo da credora numa oportunidade, sem a qual o app nao distingue `Ma
 > Collection: o modulo `credores` ainda nao esta na `sep-api.postman_collection.json` (gap herdado
 > das Sprints 16-17). Nao retrofitado aqui para evitar scope creep; registrado como followup.
 
+## Sprint 29 — Aporte assistido da credora + escrow (Epic 15, Fase 4)
+
+Modela e expoe o aporte da credora em operacao financiada da carteira, iniciado de forma
+**assistida** por `FINANCEIRO`/`ADMIN` e registrado no escrow **fake/local** — nenhum dinheiro real
+e movido; a ativacao Celcoin/BaaS fica na Fase 5. Detalhe do lado escrow em
+[`PIX.md`](./PIX.md) (secao "Aporte da credora no escrow").
+
+### Modelo e estados
+
+- `AporteCredora` (`aporte_credora`, V54): `operacaoId`, `empresaCredoraId`, `valor` (scale 2),
+  `moeda` (fixa `BRL`), `status`, `idempotencyKey`, `referenciaEscrow` (interna — nunca exposta),
+  `motivoFalhaSanitizado`. Transicoes encapsuladas no dominio:
+  `PENDENTE -> EM_PROCESSAMENTO -> LIQUIDADO | FALHOU` (`FALHOU` tambem de `PENDENTE`).
+- Idempotencia: `UNIQUE (operacao_id, idempotency_key)` — replay do mesmo POST retorna o mesmo
+  aporte; FKs sem `ON DELETE CASCADE` (trilha CMN 4.656/LGPD).
+
+### Endpoints (`/api/v1/credores/operacoes/{operacaoId}/aportes`)
+
+- `POST` — `hasAnyRole('FINANCEIRO','ADMIN')` + `@RequireStepUpEstrito` (sem bypass de MFA) +
+  header `Idempotency-Key` obrigatorio. `201` novo / `200` replay idempotente (mesmo valor);
+  `400` (key ausente/valor invalido), `404` neutro (operacao inexistente, sem UUID), `409`
+  (operacao encerrada ou contrato nao `ASSINADO`; key reutilizada com valor divergente). DTO
+  publico minimo: `id`, `operacaoId`, `status`, `valor`, `dataCriacao`, `dataAtualizacao`.
+- `GET` — `isAuthenticated()`, read-only, **sem step-up**. Owner-scoped: financeiro/admin (visao
+  operacional) ou credora dona (presenca de credora, posse via `findByIdAndEmpresaCredoraId`
+  antes de listar). Usuario sem credora, operacao alheia e inexistente = `404` neutro
+  indistinguivel. Lista vazia valida; ordenacao por criacao decrescente.
+
+### Fluxo e use cases
+
+- `RegistrarAporteCredoraUseCase` — valida comando (400), resolve operacao com
+  `SELECT FOR UPDATE` (serializa concorrentes: replay paralelo vira `200`, nao violacao de
+  UNIQUE), checa idempotencia **antes** da elegibilidade (replay estavel), valida operacao
+  `ASSOCIADA` + contrato `ASSINADO` via `ConsultarContratoParaCarteiraCredoraPort`, persiste
+  `PENDENTE`, registra no escrow via `RegistrarAporteEscrowPort` e avanca para
+  `EM_PROCESSAMENTO`. Falha do escrow desfaz tudo na mesma tx (`AporteEscrowException`
+  sanitizada).
+- `ReconciliarAporteCredoraUseCase` — **sem endpoint REST** nesta fase: o escrow e local e nao ha
+  provider externo emitindo callback; o "webhook do provider fake" e chamada direta ao use case
+  (testes/smoke). A Fase 5 pluga o webhook real aqui. Le o aporte por `referenciaEscrow` com
+  `FOR UPDATE`; replay identico = no-op sem auditoria; resultado divergente apos terminal =
+  `409`; `404` neutro para referencia desconhecida. Liquidacao credita a wallet (uma vez) via
+  `ReconciliarAporteEscrowPort`.
+- `ConsultarAportesOperacaoUseCase` — leitura owner-scoped (read-only) dos aportes da operacao.
+
+### Auditoria (Sprint 29)
+
+`CREDORA_APORTE_REGISTRADO` (ator financeiro/admin, 1x por aporte novo),
+`CREDORA_APORTE_LIQUIDADO` e `CREDORA_APORTE_FALHOU` (terminais, 1x, sem ator — sistema), via
+eventos de dominio + `CredoresAuditListener` (AFTER_COMMIT + REQUIRES_NEW). Payloads sem
+idempotency key nem referencia de escrow. CHECK ampliado na V55.
+
+### Migrations (Sprint 29)
+
+- `V54__criar_aporte_credora.sql` — tabela + UNIQUE de idempotencia + indices de leitura.
+- `V55__ampliar_audit_seguranca_tipo_aporte_credora.sql` — 3 tipos `CREDORA_APORTE_*`.
+
+### Testes (Sprint 29)
+
+- Dominio: `AporteCredoraDomainTest` (transicoes, validacoes, sem vazamento em mensagens).
+- Use cases: `RegistrarAporteCredoraUseCaseTest`, `ReconciliarAporteCredoraUseCaseTest`,
+  `ConsultarAportesOperacaoUseCaseTest`; escrow: `ReconciliarAporteEscrowUseCaseTest` +
+  aportes em `RegistrarMovimentacaoEscrowUseCaseTest`; adapter: `AporteEscrowAdapterTest`.
+- Web (`@WebMvcTest` + aspect real): `AporteCredoraControllerTest` (roles, step-up estrito sem
+  bypass, 201/200/400/403/404/409, campos proibidos).
+- E2E (`AporteCredoraIT`, auth real + Postgres `sep_test`): fluxo completo POST -> replay ->
+  reconciliacao (liquida e falha) -> GET owner-scoped, wallet creditada so na liquidacao,
+  auditoria unica, contrato nao assinado 409, sem step-up 403, credora alheia 404 neutro.
+
+> Collection: gap herdado (congelada no Sprint 14) — nao retrofitada; contrato vigente =
+> springdoc runtime (`/v3/api-docs`).
+
 ## Pendencias / proximos passos
 
 - Divida tecnica de ports de persistencia (acima) — sprint de hardening.
 - N+1 na agregacao de cobranca da carteira (carteira pequena na foundation; avaliar
   `@EntityGraph` se escalar) e sync sem paginacao das propostas `APROVADA` (admin, volume
   controlado).
-- Movimentacao financeira real (aporte/Pix/escrow), matching e marketplace — fora do Epic 10;
-  dependem do Epic 15 (Pix) e de decisao de produto.
+- Aporte assistido entregue na Sprint 29 (fake/local). Matching (Sprint 30, assistido),
+  marketplace e movimentacao financeira real (Celcoin/BaaS) seguem pendentes — Fase 4/5 e
+  decisao de produto.

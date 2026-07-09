@@ -9,10 +9,21 @@
 > passo) e **apende** uma entrada curta no historico ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)).
 > Mantenha este arquivo pequeno; ele nao duplica historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-08._
+_Atualizado em: 2026-07-09._
 
 ## Onde estamos
 
+- **Sprint 29 (backend) MERGEADA em 2026-07-09** — aporte assistido da credora + escrow fake
+  (Epic 15). Em `origin/develop` via PR #93 (squash `3d10968`; 11 commits absorvidos); **NAO
+  promovida a `main`** (main segue `1f111e2`/#92). `POST/GET
+  /api/v1/credores/operacoes/{id}/aportes` (POST `FINANCEIRO`/`ADMIN` + `@RequireStepUpEstrito` +
+  `Idempotency-Key`, 201/200 idempotente; GET owner-scoped sem step-up, 404 neutro), estados
+  `PENDENTE -> EM_PROCESSAMENTO -> LIQUIDADO|FALHOU`, reconciliacao por use case interno (sem
+  endpoint — escrow local; Fase 5 pluga webhook real), wallet creditada so na liquidacao,
+  auditoria `CREDORA_APORTE_*` (V54/V55), concorrencia por `SELECT FOR UPDATE`. Nenhum dinheiro
+  real; `EscrowProvider`/Celcoin intocados. 1906 testes verdes (`check`). PR description em
+  [`repos/sep-api/SPRINT-29-PR.md`](../repos/sep-api/SPRINT-29-PR.md). Desbloqueia F-Sprint 18
+  (aporte web) e M-Sprint 16 (aporte mobile).
 - **Sprint 28 (backend) MERGEADA em 2026-07-08** — portas de persistencia do modulo `cobranca`
   (ADR 0007). Os 14 use cases dependem de portas em `application.port.out` (parcela, agenda,
   recebimento, renegociacao, evento) com adapters de delegacao pura em
@@ -39,8 +50,9 @@ _Atualizado em: 2026-07-08._
 
 ## Proximo passo
 
-1. **Sprint 29** (backend): aporte da credora + escrow (Epic 15 assistido, gate produto) — spec
-   [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md); steps just-in-time.
+1. **Sprint 30** (backend): matching assistido credora-operacao — spec
+   [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md); steps just-in-time.
+   Promocao da Sprint 29 a `main` fica a criterio da cadeia (hoje `develop` a frente de `main`).
 2. Seguir a ordem da Fase 4: backend 30-32; web F-16-19; mobile M-13-16. Ver dependencias em
    [`specs/fase-4/README.md`](../specs/fase-4/README.md).
 

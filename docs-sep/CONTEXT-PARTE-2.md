@@ -846,3 +846,26 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   2026-07-08. Docs:
   COBRANCA.md (divida removida, portas registradas), PRD-FASE-4 (follow-up 3 fechado),
   SPRINT-28-PR.md.
+
+
+## Sprint 29 — Aporte assistido da credora + escrow fake (2026-07-09)
+
+- Terceira sprint da Fase 4 (`sep-api`, branch `feature/sprint-29-credora-aporte-escrow`, 11
+  commits). Mergeada em `origin/develop` via PR #93 (squash `3d10968`) em 2026-07-09; nao
+  promovida a `main` no fechamento. Epic 15: `POST/GET /api/v1/credores/operacoes/{id}/aportes`.
+  POST assistido (`FINANCEIRO`/`ADMIN` + `@RequireStepUpEstrito` + `Idempotency-Key`; 201/200
+  idempotente, 404 neutro, 409 elegibilidade/conflito); GET owner-scoped (financeiro/admin ou
+  credora dona por presenca, 404 neutro indistinguivel, sem step-up).
+- Dominio `AporteCredora` (V54: UNIQUE operacao+key, FKs sem CASCADE) com estados
+  `PENDENTE -> EM_PROCESSAMENTO -> LIQUIDADO|FALHOU`; escrow local reusado
+  (`registrarAporte` — movimentacao `Aporte` nasce `EM_PROCESSAMENTO` sem creditar wallet;
+  chave `aporte:<aporteId>`); reconciliacao por use case interno (sem endpoint — escrow local,
+  Fase 5 pluga webhook real) com replay no-op, conflito pos-terminal 409 e credito de wallet
+  unico na liquidacao. `EscrowProvider`/adapter Celcoin intocados; nenhum dinheiro real.
+- Auditoria `CREDORA_APORTE_REGISTRADO/LIQUIDADO/FALHOU` (V55) via eventos + listener; erros
+  neutros sem UUID/dado de escrow. Concorrencia fechada com `SELECT FOR UPDATE` (operacao no
+  registro; aporte na reconciliacao; movimentacao+wallet no escrow) apos reviews.
+- Reviews: 1 por task (subagente) + review manual (2 Medium de concorrencia, corrigidos); IT
+  E2E `AporteCredoraIT` pegou bug real de merge/detached (mutacao pos-save perdida — corrigido
+  usando a instancia managed do `save`). `check` verde: 1906 testes (baseline 1840). Docs:
+  CREDORES.md, PIX.md (secao aporte no escrow), SPRINT-29-PR.md.

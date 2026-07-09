@@ -22,7 +22,7 @@ Pacote `com.dynamis.sep_api.pix`, monolito modular DDD + Hexagonal:
 - `infrastructure.adapter` — `FakePixProvider`, `celcoin.CelcoinPixProvider`, `PixWebhookNormalizer`.
 - `web.controller` — `PixWebhookController`.
 
-O `EscrowProvider` foi criado no modulo `escrow` (nao em `pix`): Pix consome escrow por porta; escrow continua capacidade transversal. O `RegistrarMovimentacaoEscrowUseCase` local (Sprint 12) **nao** foi alterado.
+O `EscrowProvider` foi criado no modulo `escrow` (nao em `pix`): Pix consome escrow por porta; escrow continua capacidade transversal. O `RegistrarMovimentacaoEscrowUseCase` local (Sprint 12) nao foi alterado na Sprint 19; a Sprint 29 o ampliou com `registrarAporte` (ver secao de aporte abaixo).
 
 ## Dominio
 
@@ -223,6 +223,28 @@ Nenhuma resposta expoe chave Pix, `txid`, `endToEndId`, IDs internos, provider, 
 - Unit: `StatusPixPublicoMapperTest`, `StatusPixParcelaPublicoMapperTest` (precedencia exaustiva + referencia terminal vence recebimento posterior), `ConsultarDesembolsoTomadorUseCaseTest`, `ConsultarStatusPixParcelaUseCaseTest`, `ConsultarStatusPixPorContratoUseCaseTest`, `ConsultarStatusPixOperacaoCredoraUseCaseTest`.
 - Web (`@WebMvcTest`): `PixTomadorControllerTest`, `EmpresaCredoraCarteiraControllerTest` (200/404/400/403, campos proibidos).
 - Integracao E2E (auth real + Postgres): `PixTomadorLeituraIT` (P1/P2 — ownership, 404 anti-enumeracao, finder sem filtro, ordenacao, pareamento por `referenciaId`, isolamento operacional) e `CredoraOperacaoPixIT` (P3).
+
+## Aporte da credora no escrow (Sprint 29 — Epic 15)
+
+O aporte assistido da credora (modulo `credores`, ver [`CREDORES.md`](./CREDORES.md)) movimenta o
+escrow **local** (fake) — nenhum dinheiro real; o port `EscrowProvider` e o adapter Celcoin ficam
+intocados (ativacao real na Fase 5).
+
+- `RegistrarMovimentacaoEscrowUseCase.registrarAporte(cmd)` — mesmo contrato de idempotencia do
+  recebimento (`idempotency_key` UNIQUE global; replay retorna a movimentacao existente), mas a
+  movimentacao `Aporte` nasce `EM_PROCESSAMENTO` e **nao credita** o saldo da wallet no registro.
+- Chave de idempotencia no escrow e namespaced: `aporte:<aporteId>` (evita colisao com o UNIQUE
+  global e cabe no `VARCHAR(100)`); `external_reference_id` = id do `AporteCredora`.
+- `ReconciliarAporteEscrowUseCase` — `liquidar` transiciona `EM_PROCESSAMENTO -> LIQUIDADA` e
+  credita a wallet **uma unica vez**; `falhar` transiciona para `FALHOU` sem credito. Ambos
+  idempotentes e serializados por `SELECT FOR UPDATE` na movimentacao + lock da wallet via
+  `findByPropostaIdForUpdate` (mesmo lock do recebimento — sem credito duplo nem lost update).
+- `MovimentacaoEscrow` ganhou `criarAporte`, `marcarLiquidada` e `marcarFalhou` (guardas de estado;
+  mensagens de erro so com o status).
+- O modulo `credores` consome tudo por portas consumer-driven (`RegistrarAporteEscrowPort`,
+  `ReconciliarAporteEscrowPort`) com adapter unico (`AporteEscrowAdapter`) que sanitiza erro bruto
+  (`AporteEscrowException`, mensagem fixa).
+- Wallet reusada: a mesma wallet por proposta da Sprint 12 (sem wallet nova por operacao).
 
 ## Auditoria
 
