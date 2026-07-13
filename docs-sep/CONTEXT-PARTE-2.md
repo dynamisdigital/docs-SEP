@@ -868,3 +868,37 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   E2E `AporteCredoraIT` pegou bug real de merge/detached (mutacao pos-save perdida — corrigido
   usando a instancia managed do `save`). `check` verde: 1906 testes (baseline 1840). Docs:
   CREDORES.md, PIX.md (secao aporte no escrow), SPRINT-29-PR.md.
+
+
+## Sprint 30 — Matching assistido credora-operacao (2026-07-13)
+
+- Quarta sprint da Fase 4 (`sep-api`, branch `feature/sprint-30-credora-matching-operacao`, 11
+  commits). Mergeada em `origin/develop` via PR #95 (squash `7bff870`) e promovida a `main` via
+  PR #96 (`07f0347`) em 2026-07-13; back-merge `main -> develop` (`a173e5c`), `develop` ==
+  `main`. Epic 15: `GET /api/v1/credores/matching/sugestoes` (refresh-on-read idempotente,
+  `FINANCEIRO`/`ADMIN`, sem step-up), `GET /{sugestaoId}` e `POST /{sugestaoId}/decisao`
+  (`@RequireStepUpEstrito`; `CONFIRMAR|REJEITAR`). Sistema sugere; decisao sempre assistida —
+  nada e confirmado automaticamente, confirmacao nao cria aporte/Pix/escrow (aporte segue
+  Sprint 29).
+- Elegibilidade explicita em validador puro (padrao `ValidadorElegibilidadeDesembolso`):
+  credora ATIVA+ELEGIVEL, operacao ASSOCIADA, contrato ASSINADO (porta batch nova
+  `consultarPorIds`), valor da `OportunidadeInvestimento` presente, capacidade quando declarada,
+  par sem matching previo (**REJEITADA bloqueia re-sugestao**). Criterios atendidos congelados
+  em `criteriosSnapshot` (codigos `;`, sem PII). Dominio `MatchingCredoraOperacao` (V56: UNIQUE
+  parcial de par ativo, FKs sem CASCADE) com `SUGERIDA -> CONFIRMADA|REJEITADA` terminais.
+- Geracao por snapshot em lote: 6 consultas fixas (sem N+1), candidatas com `SELECT FOR UPDATE`
+  deterministico + `NOT EXISTS` (refreshes concorrentes serializam; pares decididos fora da
+  janela — sem starvation no limite de 200); decisao com `findByIdForUpdate` (replay/concorrente
+  = 409, 404 neutro sem UUID, motivo sanitizado <=255). Auditoria `CREDORA_MATCHING_SUGERIDA/
+  CONFIRMADA/REJEITADA` (V57) 1x por evento via listener AFTER_COMMIT.
+- Reviews: 1 por task (agente, formato completo) — hotfixes: requireNonNull no validador (30.1),
+  `NOT EXISTS` anti-starvation na janela (30.3), semantica OpenAPI do GET refresh (30.5); 30.2 e
+  30.4 zero findings acionaveis. `MatchingCredoraIT` E2E (6 cenarios, auth+step-up+Postgres
+  reais) cobre 401 real, refresh idempotente e confirmacao sem aporte. `check` final **verde:
+  1975 testes, 0 falhas** (69 novos). CI ficou vermelha entre os commits 9 e 10 por bomba de
+  data PRE-EXISTENTE (`CobrancaInadimplenciaControllerTest.proporRenegociacao_*`, hardcode
+  `2026-07-10` vs `@FutureOrPresent`, sem toque desde a Sprint 27) — desarmada com vencimento
+  dinamico no commit 10; commit 11 corrige 1 violacao de spotless do commit 9 (exit mascarado
+  por pipe na verificacao local — licao: sempre confirmar exit code). Docs: CREDORES.md (secao
+  Sprint 30), SPRINT-30-PR.md; collection nao retrofitada (gap herdado Sprint 14; contrato
+  vigente = springdoc). PRD-FASE-4 fica para o pos-merge.

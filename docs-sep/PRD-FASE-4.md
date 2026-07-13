@@ -177,8 +177,8 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 |--------|-------------|------|------|--------|
 | 27 | Follow-up / go-live | Step-up estrito server-side no aceite de contrato (enforcement, remove bypass) | [`027`](../specs/fase-4/027-sprint-27-step-up-server-side-aceite.md) | concluida (PR #89 develop / #90 main, 2026-07-08) |
 | 28 | Follow-up / refactor | Extracao de portas de persistencia do modulo `cobranca` (ADR 0007) | [`028`](../specs/fase-4/028-sprint-28-cobranca-portas-persistencia.md) | concluida (PR #91 develop / #92 main, 2026-07-08) |
-| 29 | Epic 15 | Aporte da credora + escrow (foundation, assistido) | [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md) | planejada (gate produto) |
-| 30 | Epic 15 | Matching credora <-> operacao (assistido) | [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md) | planejada (gate produto) |
+| 29 | Epic 15 | Aporte da credora + escrow (foundation, assistido) | [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md) | concluida (PR #93 develop, 2026-07-09 / #94 main, 2026-07-13) |
+| 30 | Epic 15 | Matching credora <-> operacao (assistido) | [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md) | concluida (PR #95 develop / #96 main, 2026-07-13) |
 | 31 | Epic 15 | Pix avancado — recorte inicial: gestao de chaves Pix (assistido) | [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md) | planejada |
 | 32 | Epic 15 / integracao | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar; Fake segue default) | [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) | planejada (ativacao real -> Fase 5) |
 

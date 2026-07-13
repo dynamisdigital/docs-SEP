@@ -10,26 +10,43 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-09._
+_Atualizado em: 2026-07-13._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md).
-- **Spec/step ativo**: Sprint 30 (backend), matching assistido credora-operacao —
-  spec [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md); steps just-in-time.
+- **Spec/step ativo**: proxima e a Sprint 31 (backend), Pix gestao de chaves — spec
+  [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md); steps just-in-time. Nenhuma task
+  em andamento.
 
 ## Onde estamos
 
-- **Sprint 29 (backend) MERGEADA em 2026-07-09** — aporte assistido da credora + escrow fake
-  (Epic 15). Em `origin/develop` via PR #93 (squash `3d10968`; 11 commits absorvidos); **NAO
-  promovida a `main`** (main segue `1f111e2`/#92). `POST/GET
+- **Sprint 30 (backend) MERGEADA em 2026-07-13** — matching assistido credora-operacao (Epic
+  15). Em `origin/develop` via PR #95 (squash `7bff870`; 11 commits absorvidos) e promovida a
+  `main` via PR #96 (`07f0347`); back-merge `main -> develop` (`a173e5c`); `develop` == `main`.
+  `check` verde: 1975 testes (inclui desarme de bomba de data pre-existente em cobranca que
+  derrubava a CI em qualquer branch desde 2026-07-11). `GET /api/v1/credores/matching/sugestoes`
+  (refresh-on-read idempotente, `FINANCEIRO`/`ADMIN`, sem step-up), `GET /{sugestaoId}` e
+  `POST /{sugestaoId}/decisao` (`@RequireStepUpEstrito`; `CONFIRMAR|REJEITAR`). Estados
+  `SUGERIDA -> CONFIRMADA|REJEITADA` (terminais; replay 409); elegibilidade explicita por
+  validador puro (credora ATIVA+ELEGIVEL, operacao ASSOCIADA, contrato ASSINADO, valor da
+  oportunidade, capacidade quando declarada, par sem matching previo — REJEITADA bloqueia
+  re-sugestao); geracao por snapshot em lote (6 consultas fixas, `FOR UPDATE` deterministico,
+  limite 200) sem N+1; V56 (UNIQUE parcial de par ativo) + V57; auditoria `CREDORA_MATCHING_*`
+  1x por evento. **Nada e confirmado automaticamente; confirmacao nao cria aporte/Pix/escrow**
+  (aporte segue Sprint 29). PR description em
+  [`repos/sep-api/SPRINT-30-PR.md`](../repos/sep-api/SPRINT-30-PR.md). **Desbloqueia F-Sprint 18
+  (web) e M-Sprint 16 (mobile) no recorte aporte+matching** (M-16 ainda depende da Sprint 31
+  para o recorte Pix).
+- **Sprint 29 (backend) MERGEADA em 2026-07-09 e promovida a `main`** — aporte assistido da
+  credora + escrow fake (Epic 15). Em `origin/develop` via PR #93 (squash `3d10968`) e em
+  `origin/main` via PR #94 (`d1f5f49`); `develop` == `main` na abertura da Sprint 30. `POST/GET
   /api/v1/credores/operacoes/{id}/aportes` (POST `FINANCEIRO`/`ADMIN` + `@RequireStepUpEstrito` +
   `Idempotency-Key`, 201/200 idempotente; GET owner-scoped sem step-up, 404 neutro), estados
   `PENDENTE -> EM_PROCESSAMENTO -> LIQUIDADO|FALHOU`, reconciliacao por use case interno (sem
   endpoint — escrow local; Fase 5 pluga webhook real), wallet creditada so na liquidacao,
   auditoria `CREDORA_APORTE_*` (V54/V55), concorrencia por `SELECT FOR UPDATE`. Nenhum dinheiro
-  real; `EscrowProvider`/Celcoin intocados. 1906 testes verdes (`check`). PR description em
-  [`repos/sep-api/SPRINT-29-PR.md`](../repos/sep-api/SPRINT-29-PR.md). Desbloqueia F-Sprint 18
+  real; `EscrowProvider`/Celcoin intocados. 1906 testes verdes (`check`). Desbloqueia F-Sprint 18
   (aporte web) e M-Sprint 16 (aporte mobile).
 - **Sprint 28 (backend) MERGEADA em 2026-07-08** — portas de persistencia do modulo `cobranca`
   (ADR 0007). Os 14 use cases dependem de portas em `application.port.out` (parcela, agenda,
@@ -57,11 +74,10 @@ _Atualizado em: 2026-07-09._
 
 ## Proximo passo
 
-1. **Sprint 30** (backend): matching assistido credora-operacao — spec
-   [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md); steps just-in-time.
-   Promocao da Sprint 29 a `main` fica a criterio da cadeia (hoje `develop` a frente de `main`).
-2. Seguir a ordem da Fase 4: backend 30-32; web F-16-19; mobile M-13-16. Ver dependencias em
-   [`specs/fase-4/README.md`](../specs/fase-4/README.md).
+1. **Sprint 31** (backend): Pix gestao de chaves — spec
+   [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md); steps just-in-time.
+2. Seguir a ordem da Fase 4: backend 31-32; web F-16-19 (F-18 liberada pelo backend 29-30);
+   mobile M-13-16. Ver dependencias em [`specs/fase-4/README.md`](../specs/fase-4/README.md).
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
 

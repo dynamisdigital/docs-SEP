@@ -303,12 +303,102 @@ idempotency key nem referencia de escrow. CHECK ampliado na V55.
 > Collection: gap herdado (congelada no Sprint 14) — nao retrofitada; contrato vigente =
 > springdoc runtime (`/v3/api-docs`).
 
+## Sprint 30 — Matching assistido credora-operacao (Epic 15, Fase 4)
+
+Evolui a associacao assistida da Sprint 17 para um recorte de **matching** entre a credora dona e
+uma operacao financiada da propria carteira pronta para receber aporte: o sistema **sugere** por
+regras explicitas de elegibilidade; a **decisao e sempre** de `FINANCEIRO`/`ADMIN` com step-up
+estrito. **Nenhum matching e confirmado automaticamente e a confirmacao nao dispara aporte, Pix,
+escrow ou chamada externa** — o aporte continua fluxo separado (Sprint 29).
+
+### Regras de elegibilidade (Task 30.1)
+
+`ValidadorElegibilidadeMatchingCredoraOperacao` (funcao pura; snapshot em lote via ports — sem
+N+1), na ordem: credora `ATIVA` -> credora `ELEGIVEL` -> operacao `ASSOCIADA` -> contrato
+`ASSINADO` (mesma fronteira do aporte) -> valor da operacao disponivel e positivo (vem da
+`OportunidadeInvestimento` da operacao; sem oportunidade = dados insuficientes, nao sugere) ->
+capacidade de aporte comporta o valor **quando declarada** (`capacidadeAporte` nula = criterio nao
+aplicado) -> par sem matching previo em **qualquer** status (**REJEITADA tambem bloqueia**
+re-sugestao — refresh nao re-sugere par ja decidido). Os criterios atendidos viram o
+`criteriosSnapshot` persistido (codigos separados por `;` — sem PII/score/payload).
+
+### Modelo e estados
+
+- `MatchingCredoraOperacao` (`matching_credora_operacao`, V56): `empresaCredoraId`, `operacaoId`,
+  `status`, `valorElegivel` (scale 2), `criteriosSnapshot`, `decididoPorUsuarioId`,
+  `motivoDecisaoSanitizado` (<=255, blank -> null), `dataDecisao`. Transicoes encapsuladas:
+  `SUGERIDA -> CONFIRMADA | REJEITADA` (terminais; replay falha sem alterar estado).
+- UNIQUE **parcial** `(empresa_credora_id, operacao_id) WHERE status IN ('SUGERIDA','CONFIRMADA')`
+  — duplicidade ativa bloqueada no banco; o bloqueio de re-sugestao pos-`REJEITADA` e regra de
+  geracao (aplicacao). FKs sem `ON DELETE CASCADE` (trilha CMN 4.656/LGPD).
+
+### Endpoints (`/api/v1/credores/matching`)
+
+- `GET /sugestoes` — `hasAnyRole('FINANCEIRO','ADMIN')`, **sem step-up**. **Refresh-on-read**: o
+  contrato aprovado nao tem endpoint de refresh, entao o GET gera sugestoes novas para pares
+  elegiveis (idempotente — par ja sugerido/decidido nao duplica; **nao e** read-only puro:
+  persiste sugestao + auditoria por par novo; evitar polling agressivo) e lista as `SUGERIDA`
+  (valor elegivel desc, criacao asc). Sem job automatico.
+- `GET /{sugestaoId}` — mesmas roles, sem step-up; qualquer status; `404` neutro sem UUID.
+- `POST /{sugestaoId}/decisao` — mesmas roles + `@RequireStepUpEstrito` (sem bypass de MFA). Body
+  `{acao: CONFIRMAR|REJEITAR, motivo?}`; `200` decisao registrada; `400` acao invalida/motivo
+  >255; `404` neutro; `409` decisao repetida/terminal. DTO publico minimo (`id`, `operacaoId`,
+  `empresaCredoraId`, `status`, `valorElegivel`, `criterios`, `criadaEm`, `decididaEm`) — nunca
+  motivo de decisao, decisor ou snapshot bruto.
+
+### Fluxo e use cases
+
+- `GerarSugestoesMatchingCredoraUseCase` — candidatas com `SELECT FOR UPDATE` deterministico
+  (refreshes concorrentes serializam; o segundo enxerga as sugestoes do primeiro, sem violar o
+  UNIQUE parcial) + `NOT EXISTS` tira da janela pares ja decididos (sem starvation no limite);
+  limite conservador de **200 candidatas por refresh** (mais antigas primeiro); 6 consultas em
+  lote fixas (candidatas, credoras, perfis, oportunidades, matchings existentes, contratos via
+  porta batch `consultarPorIds`). Trade-off local: o refresh compartilha o lock da operacao com o
+  registro de aporte (Sprint 29) — bloqueio breve, irrelevante no volume da fase.
+- `ListarSugestoesMatchingCredoraUseCase` — lista `SUGERIDA` (decididas so no `GET /{id}`).
+- `ConsultarMatchingCredoraOperacaoUseCase` — consulta individual, `404` neutro.
+- `DecidirMatchingCredoraOperacaoUseCase` — `findByIdForUpdate` (decisoes concorrentes
+  serializam; segunda recebe `409`), valida `SUGERIDA`, aplica `confirmar/rejeitar` no dominio
+  (ator + data + motivo sanitizado) e publica evento terminal. **Nao cria** `AporteCredora`, nao
+  chama escrow/provider — o use case nem depende dessas portas (garantia fixada por teste).
+
+### Auditoria (Sprint 30)
+
+`CREDORA_MATCHING_SUGERIDA` (1x por sugestao nova, ator = operador do refresh),
+`CREDORA_MATCHING_CONFIRMADA` / `CREDORA_MATCHING_REJEITADA` (terminais, 1x, ator = decisor;
+motivo sanitizado no payload apenas quando presente), via eventos + `CredoresAuditListener`
+(AFTER_COMMIT + REQUIRES_NEW). CHECK ampliado na V57.
+
+### Migrations (Sprint 30)
+
+- `V56__criar_matching_credora_operacao.sql` — tabela + UNIQUE parcial de par ativo + CHECKs +
+  indices (par, operacao, status+criacao).
+- `V57__ampliar_audit_seguranca_tipo_matching_credora.sql` — 3 tipos `CREDORA_MATCHING_*`.
+
+### Testes (Sprint 30)
+
+- Elegibilidade: `ValidadorElegibilidadeMatchingCredoraOperacaoTest` (13).
+- Dominio: `MatchingCredoraOperacaoDomainTest` (11 — transicoes, terminal sem mutacao, sem
+  vazamento em excecao/toString).
+- Use cases: `GerarSugestoesMatchingCredoraUseCaseTest` (11 — lote sem consulta por item,
+  duplicata/REJEITADA bloqueiam, auditoria so para novas), `ListarSugestoesMatchingCredoraUseCaseTest`
+  (2), `ConsultarMatchingCredoraOperacaoUseCaseTest` (3), `DecidirMatchingCredoraOperacaoUseCaseTest`
+  (8 — 404 neutro, 409 terminal, sem aporte/escrow).
+- Web (`@WebMvcTest` + aspect real): `MatchingCredoraControllerTest` (15 — roles, step-up estrito
+  so no POST, 400/403/404/409, campos proibidos).
+- E2E (`MatchingCredoraIT`, auth real + Postgres `sep_test`, 6 cenarios): refresh gera e nao
+  duplica, consulta, confirma/rejeita com step-up real, 401 sem token, 403 sem role/step-up,
+  409 replay, confirmacao **sem criar aporte**, par decidido fora do refresh seguinte.
+
+> Collection: gap herdado (congelada no Sprint 14) — nao retrofitada; contrato vigente =
+> springdoc runtime (`/v3/api-docs`).
+
 ## Pendencias / proximos passos
 
 - Divida tecnica de ports de persistencia (acima) — sprint de hardening.
 - N+1 na agregacao de cobranca da carteira (carteira pequena na foundation; avaliar
   `@EntityGraph` se escalar) e sync sem paginacao das propostas `APROVADA` (admin, volume
   controlado).
-- Aporte assistido entregue na Sprint 29 (fake/local). Matching (Sprint 30, assistido),
-  marketplace e movimentacao financeira real (Celcoin/BaaS) seguem pendentes — Fase 4/5 e
-  decisao de produto.
+- Aporte assistido entregue na Sprint 29 (fake/local); matching assistido entregue na Sprint 30
+  (sugestao + decisao com step-up, sem automacao financeira). Marketplace e movimentacao
+  financeira real (Celcoin/BaaS) seguem pendentes — Fase 4/5 e decisao de produto.
