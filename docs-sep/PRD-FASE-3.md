@@ -40,7 +40,7 @@ Este arquivo preserva o roadmap consolidado e detalha as frentes de expansao da 
 - persistir na auditoria o UUID do usuario autenticado em operacoes autenticadas
 
 ### Epic 4 - Tratamento de erros, documentacao e testes (escopo da Sprint 4)
-**Status: Concluida em 2026-05-06** (Sprint 4, branch `feature/sprint-4-erros-docs-testes` reimplementada apos incidente squash merge dos PRs #10/#11 que perderam o conteudo da sprint; mergeada em `main` via PR #16, commit `c5158de`; ver `CONTEXT.md` para o postmortem completo)
+**Status: Concluida em 2026-05-06** (Sprint 4, branch `feature/sprint-4-erros-docs-testes` reimplementada apos incidente squash merge dos PRs #10/#11 que perderam o conteudo da sprint; mergeada em `main` via PR #16, commit `c5158de`; ver `CONTEXT-PARTE-2.md` para o postmortem completo)
 - criar `ApiExceptionHandler` com `@RestControllerAdvice`
 - padronizar payload de erro via `ErrorResponseDto` (`timestamp`, `status`, `error`, `message`, `path`, `traceId`)
 - mapear validacao, conflito, autenticacao, autorizacao, excecoes de dominio e fallback generico
@@ -334,7 +334,7 @@ A orientacao operacional para os agentes de IA que assumem trabalho neste projet
 **Pre-requisito de leitura**: toda nova instancia de agente de IA, antes de qualquer acao no repositorio, deve ler:
 
 1. Este PRD (`docs-sep/PRD.md`)
-2. [`docs-sep/CONTEXT.md`](./CONTEXT.md) — historico de decisoes
+2. [`docs-sep/STATE.md`](./STATE.md) — estado atual, proximo passo e ponteiros de contexto
 3. [`AGENT.md`](../AGENT.md) — pelo menos a secao do agente em uso (Claude, Codex ou Copilot)
 4. O spec relevante em `specs/` quando ha task em andamento
 5. O step correspondente em `steps-fase-1/{backend,web,mobile}/` ou `steps-fase-2/{backend,web,mobile}/`, quando existir

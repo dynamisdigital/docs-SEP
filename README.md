@@ -5,7 +5,7 @@ Este diretório reúne toda a documentação funcional, técnica e de produto do
 ## Estrutura dos Arquivos
 
 - **PRD.md**: Índice do documento de requisitos do produto. O conteúdo detalhado fica dividido em `docs-sep/PRD-FASE-1.md` a `docs-sep/PRD-FASE-5.md`.
-- **CONTEXT.md**: Índice do contexto. O **estado atual** vive em `docs-sep/CONTEXT-ESTADO-ATUAL.md` (pequeno; leia sempre para saber onde estamos); a fundação em `docs-sep/CONTEXT-PARTE-1.md`; o histórico de execução por sprint em `docs-sep/CONTEXT-PARTE-2.md` (grande; sob demanda).
+- **STATE.md**: Fonte unica do estado atual, proximo passo, gates e ponteiro "Leia agora". A fundacao vive em `docs-sep/CONTEXT-PARTE-1.md`; o historico de execucao por sprint em `docs-sep/CONTEXT-PARTE-2.md` (grande; sob demanda).
 - **AI-ROADMAP.md**: Mapa operacional para agentes de IA encontrarem rapidamente os documentos certos para implementações, reviews e dúvidas.
 - **documentacao-cliente.html**: Apresentação executiva para o cliente, com visão de negócio, jornadas, funcionalidades, cronograma e roadmap visual.
 - **documentacao-dev.html**: Guia técnico para desenvolvedores, detalhando stack, arquitetura, pacotes, endpoints, segurança, sprints, épicos e convenções.
@@ -19,7 +19,7 @@ Este diretório reúne toda a documentação funcional, técnica e de produto do
 ## Como usar
 
 - Consulte o **PRD.md** para navegar pelo PRD por fase.
-- Consulte o **CONTEXT.md** para navegar pelo contexto: estado atual (`CONTEXT-ESTADO-ATUAL.md`), fundação (`CONTEXT-PARTE-1.md`) e histórico (`CONTEXT-PARTE-2.md`).
+- Consulte o **STATE.md** para saber onde estamos, o proximo passo e o "Leia agora"; use `CONTEXT-PARTE-1.md` para fundacao e `CONTEXT-PARTE-2.md` para historico.
 - Use o **AGENT.md** e o **AI-ROADMAP.md** para carregar o contexto minimo em novas sessoes com agentes.
 - Consulte o **AI-ROADMAP.md** para saber quais documentos ler por tipo de tarefa antes de implementar, revisar ou responder dúvidas.
 - Use a **documentacao-cliente.html** para apresentações e acompanhamento executivo.

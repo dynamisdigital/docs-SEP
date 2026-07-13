@@ -1,9 +1,8 @@
 # Contexto do Projeto SEP - Parte 2 - Historico de execucao
 
 > **Arquivo historico (log de execucao por sprint). Grande — leia so sob demanda, para detalhe
-> historico.** O **estado atual, o proximo passo e os gates pendentes** vivem em
-> [`CONTEXT-ESTADO-ATUAL.md`](./CONTEXT-ESTADO-ATUAL.md). A fundacao esta em
-> [`CONTEXT-PARTE-1.md`](./CONTEXT-PARTE-1.md).
+> historico.** O **estado atual, o proximo passo, os gates pendentes e o "Leia agora"** vivem em
+> [`STATE.md`](./STATE.md). A fundacao esta em [`CONTEXT-PARTE-1.md`](./CONTEXT-PARTE-1.md).
 
 ## Historico de execucao e decisoes
 
@@ -522,10 +521,10 @@ No estado atual:
 - **Sprint 15 hardening/bug-hunt concluida em 2026-05-27** no `sep-api` (PR #65 -> `develop`, commit remoto `baef3ef`, com merge posterior em `main` via PR #66). Fechou 27 findings triagiados, 11 P1/P2 corrigidos, baseline JaCoCo formal e cobertura de branches do modulo `escrow` de 50% para 100%. O step operacional vive em `steps-fase-2/backend/015-sprint-15-hardening-steps.md` como hardening pos-Fase-2, sem spec formal.
 - **Promocao manual `develop -> main` concluida em 2026-05-27** nos repos `sep-api`, `sep-app` e `sep-mobile`. A verificacao apos `git fetch --all --prune` mostrou diff vazio entre `origin/main` e `origin/develop` nos tres repos de codigo. Observacao operacional: o historico nao ficou necessariamente alinhado por ancestry em todos os repos, mas o conteudo entregue em `main` equivale ao conteudo de `develop`.
 
-## Proximo passo (historico — superado por CONTEXT-ESTADO-ATUAL.md)
+## Proximo passo (historico — superado por STATE.md)
 
 > Esta secao reflete o proximo passo de um momento passado (Fase 2/inicio da Fase 3) e **esta
-> superada**. O proximo passo vigente vive em [`CONTEXT-ESTADO-ATUAL.md`](./CONTEXT-ESTADO-ATUAL.md).
+> superada**. O proximo passo vigente vive em [`STATE.md`](./STATE.md).
 > Mantida como registro historico.
 
 Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend Sprints 5-14** (2026-05-11 a 2026-05-26), Sprint 15 hardening pos-Fase-2 (2026-05-27) + **M-Sprints 1-5 mobile** + **F-Sprints 1-6 web** (F-6 onboarding mergeada 2026-06-03, PR #33) + **Follow-ups 5F-FIX-01..06** concluidas, com fluxo GitHub `feature → develop → main` estavel, conteudo promovido para `main` nos tres repos de codigo e documentacao consolidada (`docs-sep/SEGURANCA.md` §16; `ONBOARDING.md`; `CREDITO.md`; `OPEN-FINANCE.md`; `CONTRATOS.md`; `CCB.md`; `COBRANCA.md`; `NOTIFICACOES.md`; `BACKOFFICE.md`), os proximos passos provaveis sao:

@@ -1,6 +1,6 @@
 # Contexto do Projeto SEP - Parte 1 - Base e decisoes iniciais
 
-> Extraido de `CONTEXT.md` para reduzir o tamanho do documento principal.
+> Extraido do antigo `CONTEXT.md` (hoje `STATE.md`) para reduzir o tamanho do documento principal.
 
 ## Objetivo deste arquivo
 

@@ -505,7 +505,7 @@ Se o filtro nao capturar todos os testes por padrao Gradle, usar explicitamente:
 ### Step 028.7.1 - Atualizar documentacao
 
 Atualizar:
-- `docs-sep/STATE.md` ou `docs-sep/CONTEXT-ESTADO-ATUAL.md` conforme estado real do repo no momento
+- `docs-sep/STATE.md`
   da execucao: Sprint 28 fechada -> proxima Sprint 29.
 - `docs-sep/CONTEXT-PARTE-2.md`: apendar historico curto da Sprint 28.
 - `docs-sep/PRD-FASE-4.md`: marcar Sprint 28 concluida apos merge.

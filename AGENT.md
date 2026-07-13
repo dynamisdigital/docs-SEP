@@ -6,13 +6,13 @@ Este arquivo e o guia operacional curto para qualquer agente de IA que trabalhe 
 
 Antes de implementar, revisar codigo ou responder duvidas, leia:
 
-1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - indice do PRD por fase. Conteudo detalhado em [`PRD-FASE-1.md`](docs-sep/PRD-FASE-1.md), [`PRD-FASE-2.md`](docs-sep/PRD-FASE-2.md) e [`PRD-FASE-3.md`](docs-sep/PRD-FASE-3.md).
-2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto. Para **estado atual, proximo passo e gates**, leia [`CONTEXT-ESTADO-ATUAL.md`](docs-sep/CONTEXT-ESTADO-ATUAL.md) (pequeno; sempre). Fundacao em [`CONTEXT-PARTE-1.md`](docs-sep/CONTEXT-PARTE-1.md); historico de execucao por sprint em [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md) (grande; so sob demanda).
-3. Este arquivo (`AGENT.md`) - regras operacionais para agentes.
-4. [`AI-ROADMAP.md`](AI-ROADMAP.md) - indice por tipo de tarefa.
-5. Spec relevante em `specs/`.
-6. Step correspondente em `steps-fase-1/` a `steps-fase-5/`, quando existir.
-7. Docs operacionais em `repos/<repo>/` e ADRs relevantes em `adr/`.
+1. [`docs-sep/STATE.md`](docs-sep/STATE.md) - fonte unica do estado atual, proximo passo, gates e ponteiro "Leia agora" para a fase/spec/step corrente. Fundacao em [`CONTEXT-PARTE-1.md`](docs-sep/CONTEXT-PARTE-1.md); historico de execucao por sprint em [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md) (grande; so sob demanda).
+2. Este arquivo (`AGENT.md`) - regras operacionais para agentes.
+3. [`AI-ROADMAP.md`](AI-ROADMAP.md) - condicional; leia quando a tarefa for de tipo/modulo nao coberto pelo "Leia agora" do `STATE.md` ou quando precisar navegar por documentos.
+4. Spec apontado pelo `STATE.md` ou spec relevante em `specs/`.
+5. Step correspondente em `steps-fase-1/` a `steps-fase-5/`, quando existir.
+6. Docs operacionais em `repos/<repo>/` e ADRs relevantes em `adr/`.
+7. [`docs-sep/PRD.md`](docs-sep/PRD.md) + arquivo `PRD-FASE-*` relevante quando precisar do quadro completo de produto/fase.
 
 Hierarquia em caso de conflito: PRD + ADRs prevalecem; depois specs; depois steps; depois docs operacionais em `repos/`; por fim `AI-ROADMAP.md` e este arquivo.
 
@@ -174,7 +174,7 @@ Atualize `AI-ROADMAP.md` no mesmo ciclo quando criar, mover, remover ou alterar 
 
 Docs globais de produto, contexto, seguranca transversal e operacao cross-repo ficam em `docs-SEP/docs-sep/`. ADRs ficam em `docs-SEP/adr/`. Specs ficam em `docs-SEP/specs/` (subpastas `fase-1/` a `fase-5/`). Steps ficam em `docs-SEP/steps-fase-1/` a `docs-SEP/steps-fase-5/` (subpastas `backend/`, `web/`, `mobile/`).
 
-Contexto (regra fixa para nao inchar o arquivo de estado): o **estado atual, o proximo passo e os gates** vivem em `docs-sep/CONTEXT-ESTADO-ATUAL.md` (pequeno; fonte unica; sempre lido). Ao **fechar uma sprint**, sobrescreva esse arquivo (estado + proximo passo) e apende uma entrada curta ao historico em `docs-sep/CONTEXT-PARTE-2.md` (log por sprint; grande; lido so sob demanda). Nao trate `CONTEXT-PARTE-2.md` como fonte de estado; `CONTEXT-PARTE-1.md` e a fundacao estavel.
+Contexto (regra fixa para nao inchar o arquivo de estado): o **estado atual, o proximo passo, os gates e o ponteiro "Leia agora"** vivem em `docs-sep/STATE.md` (pequeno; fonte unica; sempre lido). Ao **fechar uma sprint**, sobrescreva esse arquivo (estado + proximo passo + leia agora) e apende uma entrada curta ao historico em `docs-sep/CONTEXT-PARTE-2.md` (log por sprint; grande; lido so sob demanda). Nao trate `CONTEXT-PARTE-2.md` como fonte de estado; `CONTEXT-PARTE-1.md` e a fundacao estavel.
 
 ## Como trabalhar
 
@@ -215,7 +215,9 @@ Para sprints de hardening / bug-hunt:
 - [`docs-sep/PRD-FASE-1.md`](docs-sep/PRD-FASE-1.md)
 - [`docs-sep/PRD-FASE-2.md`](docs-sep/PRD-FASE-2.md)
 - [`docs-sep/PRD-FASE-3.md`](docs-sep/PRD-FASE-3.md)
-- [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md)
+- [`docs-sep/PRD-FASE-4.md`](docs-sep/PRD-FASE-4.md)
+- [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md)
+- [`docs-sep/STATE.md`](docs-sep/STATE.md)
 - [`docs-sep/CONTEXT-PARTE-1.md`](docs-sep/CONTEXT-PARTE-1.md)
 - [`docs-sep/CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md)
 - [`AI-ROADMAP.md`](AI-ROADMAP.md)

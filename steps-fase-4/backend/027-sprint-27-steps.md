@@ -365,7 +365,7 @@ Atualizar:
   fechado apos merge.
 - `docs-sep/PRD-FASE-5.md` (Frente D): remover step-up estrito da lista de gates pendentes de
   go-live.
-- `docs-sep/CONTEXT-ESTADO-ATUAL.md`: sobrescrever estado + proximo passo (Sprint 27 fechada ->
+- `docs-sep/STATE.md`: sobrescrever estado + proximo passo + leia agora (Sprint 27 fechada ->
   proxima sprint da Fase 4); apendar entrada curta ao historico em `docs-sep/CONTEXT-PARTE-2.md`.
 - `AI-ROADMAP.md`.
 

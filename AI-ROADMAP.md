@@ -30,10 +30,10 @@ O `AI-ROADMAP.md` deve estar sempre atualizado.
 
 Leitura base para qualquer agente:
 
-1. [`docs-sep/PRD.md`](docs-sep/PRD.md) - indice do PRD; leia o arquivo de fase relevante (`PRD-FASE-1.md`, `PRD-FASE-2.md`, `PRD-FASE-3.md`, `PRD-FASE-4.md` ou `PRD-FASE-5.md`).
-2. [`docs-sep/CONTEXT.md`](docs-sep/CONTEXT.md) - indice do contexto. Para **estado atual/proximo passo/gates**, leia [`CONTEXT-ESTADO-ATUAL.md`](docs-sep/CONTEXT-ESTADO-ATUAL.md) (pequeno; sempre). Fundacao em `CONTEXT-PARTE-1.md`; historico por sprint em `CONTEXT-PARTE-2.md` (grande; so sob demanda).
-3. [`AGENT.md`](AGENT.md)
-4. Este arquivo (`AI-ROADMAP.md`)
+1. [`docs-sep/STATE.md`](docs-sep/STATE.md) - estado atual, proximo passo, gates e ponteiro "Leia agora" para a fase/spec/step corrente.
+2. [`AGENT.md`](AGENT.md)
+3. Este arquivo (`AI-ROADMAP.md`) somente quando a tarefa for de tipo/modulo nao coberto pelo "Leia agora" do `STATE.md` ou quando precisar navegar por documentos.
+4. [`docs-sep/PRD.md`](docs-sep/PRD.md) + arquivo `PRD-FASE-*` relevante quando precisar do quadro completo de produto/fase.
 
 > **Fase 4 (em andamento)**: escopo em [`docs-sep/PRD-FASE-4.md`](docs-sep/PRD-FASE-4.md) — conclusao
 > das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
@@ -60,13 +60,13 @@ Leitura base para qualquer agente:
 | Code review | Base -> spec da sprint -> step da task -> doc operacional do modulo -> diff/codigo -> testes existentes |
 | Criar nova sprint/steps | Base -> PRD secao da sprint -> spec correspondente -> steps anteriores similares -> ADRs relevantes |
 | Atualizacao documental | Base -> documento alvo -> documentos que apontam para ele -> este roadmap |
-| Duvida de produto/regra | `docs-sep/PRD.md` + arquivo `PRD-FASE-*` relevante -> `docs-sep/CONTEXT.md` + parte relevante -> doc operacional do modulo -> spec da sprint |
+| Duvida de produto/regra | `docs-sep/STATE.md` -> `docs-sep/PRD.md` + arquivo `PRD-FASE-*` relevante -> doc operacional do modulo -> spec da sprint |
 | Integracao externa | Base -> ADR 0004 -> ADR 0008 quando houver WireMock -> doc operacional do modulo -> specs/steps da integracao |
 | Seguranca/auth/step-up/auditoria | Base -> `docs-sep/SEGURANCA.md` -> specs/steps da Sprint 5 -> docs do modulo afetado |
 | Metricas de implementacao | Base -> [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) -> step da sprint -> testes do repo |
-| Status de sprint | Base -> PRD/CONTEXT da fase -> spec/step da sprint -> doc operacional do modulo -> PR description temporaria quando aplicavel |
+| Status de sprint | Base -> PRD/STATE da fase -> spec/step da sprint -> doc operacional do modulo -> PR description temporaria quando aplicavel |
 | Fechamento de sprint | Step da sprint -> doc operacional do modulo -> PR description temporaria, se o PR real precisar -> PRD -> collections -> este roadmap |
-| Melhoria de fim de fase / bug hunt | Base -> PRD/CONTEXT da fase -> steps/specs da fase -> docs operacionais -> metricas/testes -> [`TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`](docs-sep/TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md) |
+| Melhoria de fim de fase / bug hunt | Base -> PRD/STATE da fase -> steps/specs da fase -> docs operacionais -> metricas/testes -> [`TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`](docs-sep/TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md) |
 
 ## Mapa por modulo
 
@@ -123,7 +123,7 @@ Leitura base para qualquer agente:
 | pipeline, CI, deploy | [`docs-sep/ci-pipelines/README.md`](docs-sep/ci-pipelines/README.md) |
 | logs, observabilidade, correlationId, traceId, CloudWatch, Actuator | [`docs-sep/OBSERVABILIDADE.md`](docs-sep/OBSERVABILIDADE.md) + [`022`](specs/fase-3/022-sprint-22-observabilidade-operacional.md) + [`step 022`](steps-fase-3/backend/022-sprint-22-steps.md) + ADR 0016 |
 | metricas, produtividade, progresso, DORA, SPACE, dashboard da sprint | [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |
-| acompanhamento, status de sprint, indicadores para stakeholders | PRD/CONTEXT da fase + step da sprint + doc operacional do modulo + [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |
+| acompanhamento, status de sprint, indicadores para stakeholders | PRD/STATE da fase + step da sprint + doc operacional do modulo + [`docs-sep/METRICAS-IMPLEMENTACAO.md`](docs-sep/METRICAS-IMPLEMENTACAO.md) |
 
 ## Checklists rapidos
 
@@ -147,7 +147,7 @@ Leitura base para qualquer agente:
 ### Antes de responder duvida
 
 - Identificar se a pergunta e sobre produto, arquitetura, codigo atual ou processo.
-- Para produto: PRD + CONTEXT.
+- Para produto: PRD + STATE.
 - Para arquitetura: ADRs + AGENT.
 - Para comportamento implementado: doc operacional + codigo atual.
 - Sinalizar quando houver divergencia entre documentacao e codigo.
@@ -159,7 +159,7 @@ Leitura base para qualquer agente:
 - Atualizar doc operacional do modulo em `repos/<repo>/`.
 - Criar PR description temporaria quando aplicavel; se materializada como `repos/<repo>/SPRINT-*-PR.md`, apagar esse arquivo ao iniciar a sprint seguinte.
 - Atualizar PRD quando a sprint for concluida.
-- **Atualizar o estado**: sobrescrever [`docs-sep/CONTEXT-ESTADO-ATUAL.md`](docs-sep/CONTEXT-ESTADO-ATUAL.md) (estado + proximo passo + gates) e apendar uma entrada curta ao historico em `docs-sep/CONTEXT-PARTE-2.md`. Nao inchar o log; nao duplicar detalhe do PRD.
+- **Atualizar o estado**: sobrescrever [`docs-sep/STATE.md`](docs-sep/STATE.md) (estado + proximo passo + gates + leia agora) e apendar uma entrada curta ao historico em `docs-sep/CONTEXT-PARTE-2.md`. Nao inchar o log; nao duplicar detalhe do PRD.
 - Atualizar collections Postman/Insomnia se endpoints mudaram.
 - Revisar este roadmap.
 

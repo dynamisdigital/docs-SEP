@@ -25,7 +25,7 @@ usuario aprovar explicitamente.
 ## Fontes obrigatorias
 
 - PRD da fase e secoes de status.
-- CONTEXT.md.
+- STATE.md.
 - Steps e specs da fase encerrada.
 - Docs operacionais em `repos/<repo>/`.
 - Metricas de implementacao quando aplicavel.
