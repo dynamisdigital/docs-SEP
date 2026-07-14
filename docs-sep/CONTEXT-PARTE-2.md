@@ -941,3 +941,33 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   serializacao com 2 transacoes reais); **P2** fake retinha o comando com valor em claro no mapa
   de idempotencia — trocado por fingerprint SHA-256; **P2** CPF/CNPJ aceitavam DV invalido e
   sequencias repetidas — validacao mod-11 completa (+11 testes de normalizacao).
+
+## Sprint 32 — Consolidacao dos adapters externos skeleton (2026-07-14)
+
+- Sexta e ultima sprint backend da Fase 4 (`sep-api`, branch
+  `feature/sprint-32-adapters-externos-skeleton`, 8 commits, base `develop` == `main`
+  `7231a52`). **Push/PR/merge manuais pendentes** na data deste registro (descricao pronta em
+  `repos/sep-api/SPRINT-32-PR.md`). Hardening cirurgico dos 6 skeletons existentes por matriz de
+  gaps comprovados (Task 32.1 — inventario antes de codigo); zero adapter novo, zero
+  dominio/REST/migration, fake default preservado, nenhuma rede/credencial real.
+- ADR 0017 (feature flags por ambiente): flags independentes com fake default e selecao
+  explicita; `ProviderFlagsValidator` (BeanFactoryPostProcessor) derruba o boot com mensagem
+  clara em flag desconhecida ANTES dos singletons; `assinatura=celcoin` rejeitado (ADR 0013);
+  fail-fast de base-url/credencial sem expor segredo (ctor de todos os adapters, incluindo os 3
+  de onboarding que nao validavam).
+- `ProviderRetryConfig` + marcador `ProviderHttpFault` (shared): retry somente em falha
+  transiente nas 6 instances — timeout/IO reentra (o wrap generico do RestClient nao reentrava em
+  NENHUMA capacidade), 5xx traduzido reentra, 4xx/parsing/malformed nao. Fecha os follow-ups de
+  retry-em-4xx do YAML (Sprints 11/19: clicksign, pix, escrow). Compliance: resposta malformada
+  de PLD virava "sem hits" (falso limpo) — agora falha claro; KYC sem `verification_id` virava
+  NPE. Sanitizacao assertada em todas as capacidades (sem CPF/CNPJ/nome/token/PDF/chave em erro).
+- Fixtures WireMock reutilizaveis por capacidade (sucesso/erro-negocio/timeout via `X-Simular`,
+  dados ficticios) + profile opt-in `local-wiremock` (localhost-only, credencial ficticia) +
+  guards permanentes (profile carregado de verdade; dev/test 100% fake; fixtures sem host/segredo
+  real; contexto test com exatamente 1 bean por port). Doc novo
+  `repos/sep-api/INTEGRACOES-PROVIDERS.md` com matriz e procedimento de ativacao gated da Fase 5
+  (credencial -> confronto com doc real -> smoke sandbox -> observabilidade -> promocao/rollback).
+- Reviews: 1 por task (agente, formato completo) — hotfixes: BFPP antes dos singletons (32.2),
+  guard de causa circular no predicate (32.3), guard de fixtures endurecido + trigger de timeout
+  uniformizado (32.6); 32.4/32.5 zero findings. ITs de adapter: 58 -> 77 testes; +29 testes novos
+  de wiring/guards/predicate. Suite final, `check` e `bootJar` verdes (ver checkpoint).

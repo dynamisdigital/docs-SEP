@@ -1,5 +1,8 @@
 # Politica de PLD — Onboarding SEP
 
+> Providers externos (flags por ambiente, retry, fixtures WireMock, smoke local e ativacao
+> gated da Fase 5): ver [`INTEGRACOES-PROVIDERS.md`](./INTEGRACOES-PROVIDERS.md) (Sprint 32, ADR 0017).
+
 Politica e cuidados tecnicos de **Prevencao a Lavagem de Dinheiro** aplicada no modulo
 `onboarding`. Implementacao consolidada na Sprint 7 (PF + PJ + representantes legais).
 

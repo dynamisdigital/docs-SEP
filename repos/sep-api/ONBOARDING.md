@@ -1,5 +1,8 @@
 # Onboarding KYC PF + KYB PJ + PLD
 
+> Providers externos (flags por ambiente, retry, fixtures WireMock, smoke local e ativacao
+> gated da Fase 5): ver [`INTEGRACOES-PROVIDERS.md`](./INTEGRACOES-PROVIDERS.md) (Sprint 32, ADR 0017).
+
 Modulo `onboarding` do `sep-api` — implementa verificacao de identidade KYC PF (Sprint 6),
 verificacao cadastral KYB PJ (Sprint 7) e consulta PLD pos-aprovacao (Sprint 7), conforme
 exigencia legal da Resolucao CMN 4.656/2018 Art. 8 + Lei 9.613/1998 (PLD).

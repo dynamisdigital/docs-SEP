@@ -15,12 +15,29 @@ _Atualizado em: 2026-07-14._
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md).
-- **Spec/step ativo**: proxima e a Sprint 32 (backend), adapters Celcoin skeleton — spec
-  [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md); steps just-in-time.
-  Nenhuma task em andamento.
+- **Spec/step ativo**: Sprint 32 (backend) **implementada** na branch
+  `feature/sprint-32-adapters-externos-skeleton` (8 commits) — spec
+  [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) + steps
+  [`032`](../steps-fase-4/backend/032-sprint-32-steps.md). **Push, PR e merge sao manuais e estao
+  pendentes.** Apos o merge, o recorte backend da Fase 4 fecha; seguem web F-16-19 e mobile
+  M-13-16.
 
 ## Onde estamos
 
+- **Sprint 32 (backend) IMPLEMENTADA em 2026-07-14** — consolidacao dos adapters externos
+  skeleton (Epic 15 / integracao; fecha o recorte backend da Fase 4). Na branch
+  `feature/sprint-32-adapters-externos-skeleton` (base `develop` == `main`, `7231a52`);
+  push/PR/merge manuais pendentes. Hardening cirurgico dos 6 skeletons existentes (KYC/KYB/PLD,
+  Clicksign — ADR 0013 preservado, Pix, escrow) **sem adapter novo, sem dominio/REST/migration e
+  sem ativar nada real** (fake segue default). ADR 0017 (flags por ambiente) +
+  `ProviderFlagsValidator` (fail-fast de flag antes dos singletons) + `ProviderRetryConfig`
+  (retry so em falha transiente nas 6 instances — **fecha os follow-ups de retry-em-4xx das
+  Sprints 11/19**) + correcoes de compliance (PLD malformado nao vira mais "sem hits") + fixtures
+  WireMock reutilizaveis + profile opt-in `local-wiremock` + guards permanentes (fake default,
+  fixtures sem host/segredo real, 1 bean por port). Doc operacional novo
+  [`INTEGRACOES-PROVIDERS.md`](../repos/sep-api/INTEGRACOES-PROVIDERS.md) com matriz e
+  **procedimento de ativacao gated da Fase 5**. PR description em
+  [`repos/sep-api/SPRINT-32-PR.md`](../repos/sep-api/SPRINT-32-PR.md).
 - **Sprint 31 (backend) MERGEADA em 2026-07-14** — gestao assistida de chaves Pix da conta
   operacional/escrow (Epic 15, recorte inicial de Pix avancado da Fase 4). Em `origin/develop`
   via PR #97 (squash `7231a52`; 11 commits absorvidos) e promovida a `main` via PR #98
@@ -92,9 +109,11 @@ _Atualizado em: 2026-07-14._
 
 ## Proximo passo
 
-1. **Sprint 32** (backend): adapters Celcoin skeleton — spec
-   [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md); steps just-in-time.
-   Fecha o recorte backend da Fase 4.
+1. **Manual (dev humano)**: push da branch `feature/sprint-32-adapters-externos-skeleton`, abrir
+   PR para `develop` (descricao em [`SPRINT-32-PR.md`](../repos/sep-api/SPRINT-32-PR.md)), merge
+   e promocao a `main`; commit manual das mudancas de `docs-SEP`; apos o merge, atualizar este
+   STATE ("IMPLEMENTADA" -> "MERGEADA") e o PRD-FASE-4 (Sprint 32 concluida — backend da Fase 4
+   fechado).
 2. Seguir a ordem da Fase 4: web F-16-19 (F-18 liberada pelo backend 29-30); mobile M-13-16
    (recortes aporte+matching+Pix liberados pelas Sprints 29-31). Ver dependencias em
    [`specs/fase-4/README.md`](../specs/fase-4/README.md).

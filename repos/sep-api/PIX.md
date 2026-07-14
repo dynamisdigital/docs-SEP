@@ -1,5 +1,8 @@
 # PIX — sep-api
 
+> Providers externos (flags por ambiente, retry, fixtures WireMock, smoke local e ativacao
+> gated da Fase 5): ver [`INTEGRACOES-PROVIDERS.md`](./INTEGRACOES-PROVIDERS.md) (Sprint 32, ADR 0017).
+
 Documento operacional da fundacao do modulo `pix` e do `EscrowProvider` (Sprint 19 — Epic 15 parte 1). Atualizado pos-implementacao.
 
 > Spec: [`specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md`](../../specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md). Steps: [`steps-fase-3/backend/019-sprint-19-steps.md`](../../steps-fase-3/backend/019-sprint-19-steps.md).
@@ -59,7 +62,7 @@ Adapters Celcoin (skeleton, ativados so com a property):
 - Erros HTTP traduzidos para `PixProvider(Http)Exception` / `EscrowProvider(Http)Exception` — nenhum tipo de framework/response cru vaza para application. Status desconhecido tambem vira excecao de provider.
 - DTOs Celcoin vivem so no adapter; o dominio nunca os ve.
 
-> Nota de retry: como o Resilience4j roteia retry por tipo de excecao via YAML (sem predicate), a `*ProviderHttpException` esta nos `retryExceptions` e, por consequencia, 4xx tambem reentra ate `maxAttempts`. Aceito para o skeleton (Idempotency-Key protege reenvios), mesmo tradeoff de `clicksign-assinatura`. Predicate Java (retry so em 5xx) e follow-up.
+> Nota de retry (atualizada na Sprint 32): o predicate Java compartilhado (`ProviderRetryConfig`) fechou o follow-up — retry reentra somente em 5xx traduzido (`ProviderHttpFault`) e timeout/IO; 4xx e parsing nao reentram. Detalhe em [`INTEGRACOES-PROVIDERS.md`](./INTEGRACOES-PROVIDERS.md).
 
 ### Properties
 
@@ -365,5 +368,5 @@ Follow-ups:
 - **Smoke E2E RestAssured full-chain** do desembolso (contrato ASSINADO + agenda + escrow + step-up token) — registrado como follow-up; logica coberta por testes de use case e HTTP/seguranca por `@WebMvcTest` (`PixDesembolsoControllerTest`, aspect real).
 - **Gap escrow `externalId`** para Celcoin real: `Wallet`/`ContaEscrow` locais (Sprint 12) tem `external_id` nulo; desembolso via Celcoin real depende dele. Use cases de provisionamento escrow via `EscrowProvider` + auditoria `ESCROW_*_PROVIDER_CRIADA`.
 - Conciliacao automatica de `PixRecebimento` com parcela de cobranca (Sprint 21).
-- Retry predicate Java (retry so em 5xx) para `celcoin-pix` / `celcoin-escrow`.
+- ~~Retry predicate Java (retry so em 5xx) para `celcoin-pix` / `celcoin-escrow`~~ — fechado na Sprint 32 (`ProviderRetryConfig`).
 - Contrato Celcoin real (endpoints/campos do skeleton sao suposicao validada por WireMock, nao pelo contrato fechado) — inclui `POST/DELETE /pix/keys` da Sprint 31 (gestao de chaves); validacao obrigatoria contra a documentacao/credenciais reais na Fase 5.

@@ -1,5 +1,8 @@
 # CONTRATOS - sep-api
 
+> Providers externos (flags por ambiente, retry, fixtures WireMock, smoke local e ativacao
+> gated da Fase 5): ver [`INTEGRACOES-PROVIDERS.md`](./INTEGRACOES-PROVIDERS.md) (Sprint 32, ADR 0017).
+
 Documento operacional do modulo `contratos` (Epic 7).
 Sprint 10 — parte 1 (geracao + aceite), executada 2026-05-20.
 Sprint 11 — parte 2 (assinatura digital + CCB), executada 2026-05-21.

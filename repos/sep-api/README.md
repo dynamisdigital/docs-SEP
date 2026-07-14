@@ -15,6 +15,9 @@ Documentacao especifica do backend/API SEP.
   endpoints REST e auditoria.
 - [CONTRATOS.md](CONTRATOS.md) - modulo `contratos` (Sprint 10): geracao textual,
   versionamento, hash, aceite com step-up, cancelamento pre-aceite e auditoria.
+- [INTEGRACOES-PROVIDERS.md](INTEGRACOES-PROVIDERS.md) - providers externos (Sprint 32):
+  inventario/matriz das 6 capacidades, feature flags por ambiente (ADR 0017), politica de
+  retry, fixtures WireMock, smoke `local-wiremock` e ativacao gated da Fase 5.
 
 ## Orientacao
 
