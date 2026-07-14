@@ -179,7 +179,7 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 | 28 | Follow-up / refactor | Extracao de portas de persistencia do modulo `cobranca` (ADR 0007) | [`028`](../specs/fase-4/028-sprint-28-cobranca-portas-persistencia.md) | concluida (PR #91 develop / #92 main, 2026-07-08) |
 | 29 | Epic 15 | Aporte da credora + escrow (foundation, assistido) | [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md) | concluida (PR #93 develop, 2026-07-09 / #94 main, 2026-07-13) |
 | 30 | Epic 15 | Matching credora <-> operacao (assistido) | [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md) | concluida (PR #95 develop / #96 main, 2026-07-13) |
-| 31 | Epic 15 | Pix avancado — recorte inicial: gestao de chaves Pix (assistido) | [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md) | planejada |
+| 31 | Epic 15 | Pix avancado — recorte inicial: gestao de chaves Pix (assistido) | [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md) | concluida (PR #97 develop / #98 main, 2026-07-14) |
 | 32 | Epic 15 / integracao | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar; Fake segue default) | [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) | planejada (ativacao real -> Fase 5) |
 
 ### Web (`sep-app`)
@@ -198,7 +198,7 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 | M-13 | Epic 14 | Empacotamento nativo Android (Capacitor 8) + ADR baseline Cap 8 | [`213`](../specs/fase-4/213-msprint-13-empacotamento-nativo-android.md) | planejada |
 | M-14 | Epic 14 | Empacotamento nativo iOS (Capacitor 8) | [`214`](../specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) | planejada |
 | M-15 | Epic 14 | Biometria nativa (substitui stub PWA) + hardening nativo | [`215`](../specs/fase-4/215-msprint-15-biometria-nativa.md) | planejada |
-| M-16 | Epic 14/15 | Aporte/matching e Pix avancado visiveis ao usuario (quando backend existir) | [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) | planejada (dep. backend 29-31) |
+| M-16 | Epic 14/15 | Aporte/matching e Pix avancado visiveis ao usuario (quando backend existir) | [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) | planejada (dep. backend 29-31 concluidas) |
 
 **Decisoes de planejamento**:
 

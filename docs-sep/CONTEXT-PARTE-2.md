@@ -906,8 +906,9 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
 ## Sprint 31 — Gestao assistida de chaves Pix (2026-07-14)
 
 - Quinta sprint da Fase 4 (`sep-api`, branch `feature/sprint-31-pix-gestao-chaves`, 11 commits,
-  base `develop` == `main` `a173e5c`). **Push/PR/merge manuais pendentes** na data deste registro
-  (descricao pronta em `repos/sep-api/SPRINT-31-PR.md`). Epic 15, recorte inicial de Pix
+  base `develop` == `main` `a173e5c`). Mergeada em `origin/develop` via PR #97 (squash `7231a52`)
+  e promovida a `main` via PR #98 (`76aa3b6`) em 2026-07-14; `develop` == `main`; `check` verde
+  com **2102 testes** (baseline 1975). Epic 15, recorte inicial de Pix
   avancado: `POST/GET/DELETE /api/v1/pix/chaves` — cadastro/listagem/remocao assistidas
   (`FINANCEIRO`/`ADMIN`; mutacoes `@RequireStepUpEstrito`; `Idempotency-Key` no cadastro; GET
   read-only local sem step-up). Nenhum dinheiro movido; Sprints 19-21 intocadas; fake default e
