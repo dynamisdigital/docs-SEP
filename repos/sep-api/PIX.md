@@ -246,6 +246,74 @@ intocados (ativacao real na Fase 5).
   (`AporteEscrowException`, mensagem fixa).
 - Wallet reusada: a mesma wallet por proposta da Sprint 12 (sem wallet nova por operacao).
 
+## Gestao de chaves da conta operacional (Sprint 31 — Epic 15)
+
+> Spec: [`specs/fase-4/031-sprint-31-pix-gestao-chaves.md`](../../specs/fase-4/031-sprint-31-pix-gestao-chaves.md). Steps: [`steps-fase-4/backend/031-sprint-31-steps.md`](../../steps-fase-4/backend/031-sprint-31-steps.md).
+
+Gestao **assistida** (financeiro/admin) de chaves Pix da conta operacional/escrow via Provider
+Pattern. **Nenhum dinheiro e movido**; desembolso/recebimento/conciliacao (Sprints 19-21) ficam
+intocados. Roda sobre fake default; o skeleton Celcoin e coberto por WireMock e **nao** e ativado
+(Fase 5).
+
+### Endpoints REST (`/api/v1/pix/chaves`)
+
+| Metodo | Rota | Roles | Seguranca |
+| ------ | ---- | ----- | --------- |
+| `POST` | `/api/v1/pix/chaves` | `FINANCEIRO`, `ADMIN` | **step-up estrito** (`@RequireStepUpEstrito`) + `Idempotency-Key` |
+| `GET` | `/api/v1/pix/chaves` | `FINANCEIRO`, `ADMIN` | autenticado — leitura local, **sem step-up**, nunca consulta o provider |
+| `DELETE` | `/api/v1/pix/chaves/{chaveId}` | `FINANCEIRO`, `ADMIN` | **step-up estrito** (`@RequireStepUpEstrito`) |
+
+- `POST` retorna **201** quando cria; **200** no replay idempotente (mesma key + mesmo tipo/valor).
+  Key reutilizada com payload diferente ou chave equivalente ja `ATIVA` -> **409**. Request:
+  `tipo` + `valor`. Response: `id`, `tipo`, `valorMascarado`, `status`, `criadaEm`, `removidaEm`
+  (sem `novo`; ele so decide o status HTTP).
+- `DELETE` retorna **204** para remocao nova **ou** replay de chave ja `INATIVA`; UUID inexistente
+  (ou fora do escopo da conta) -> **404 neutro** com mensagem que nao ecoa o UUID.
+- `GET` inclui `ATIVA` e `INATIVA` (historico), da mais recente para a mais antiga.
+
+### Tipos e normalizacao
+
+`TipoChavePix`: `CPF | CNPJ | EMAIL | TELEFONE | EVP`. `NormalizadorChavePix` canonicaliza uma
+unica vez antes de hash/mascara/provider: CPF 11 e CNPJ 14 digitos (remove pontuacao) **com
+digitos verificadores mod-11 validos e rejeicao de sequencias repetidas**; TELEFONE
+E.164 Brasil `+55DDDNUMERO` (10-11 digitos nacionais, DDD com ambos os digitos 1-9; sem DDI assume
+`+55`); EMAIL trim + lowercase (regex estrita, limite DICT 77); EVP UUID canonico lowercase. Valor
+invalido -> `400` **sem ecoar o valor**.
+
+### Dominio, persistencia e concorrencia
+
+- `ChavePix` (`chave_pix`, `V58`): estados `ATIVA -> INATIVA` (unica transicao; remocao e logica,
+  historico nunca apagado). Campos minimizados: `valor_hash` SHA-256 (64) + `valor_mascarado`
+  (<= 80) — **nao existe coluna de valor bruto**; `provider_key_id` e `idempotency_key` sao
+  internos e nunca aparecem em resposta/erro/auditoria.
+- Protecoes no banco: UNIQUE `(conta_escrow_id, idempotency_key)`; UNIQUE **parcial**
+  `(conta_escrow_id, tipo, valor_hash) WHERE status='ATIVA'` (chave equivalente pode ser
+  recadastrada apos inativacao, com key nova); CHECK de coerencia da remocao (INATIVA exige ator +
+  instante); FK sem CASCADE.
+- Conta operacional resolvida por porta dedicada (`ContaOperacionalEscrowQueryPort` ->
+  `ContaEscrow` titular `SEP-COBRANCA` `ATIVA`; `contaTecnicaId` = `external_id` quando existir).
+- Cadastro (`CadastrarChavePixUseCase`): serializado por **advisory lock transacional** em
+  (conta, tipo, hash) adquirido ANTES das verificacoes e da chamada externa — requisicoes
+  concorrentes com o mesmo valor e keys diferentes nao cadastram duas chaves no provider (o
+  perdedor re-checa sob o lock e leva 409 sem chamada externa; zero chave orfa). Provider e
+  chamado **antes** de persistir — falha externa nao cria chave `ATIVA` nem auditoria; o provider
+  honra idempotencia (mesma key), permitindo retry seguro; as UNIQUEs da V58 seguem como defesa
+  residual, convergidas para replay ou 409, nunca 500.
+- Remocao (`RemoverChavePixUseCase`): `SELECT FOR UPDATE` escopado na conta serializa remocoes
+  concorrentes (uma unica chamada de provider/auditoria); provider falha -> rollback, chave segue
+  `ATIVA` para retentativa.
+
+### Provider
+
+`PixProvider` ganhou `cadastrarChave(comando, idempotencyKey, correlationId)` (resposta = so
+`providerKeyId`) e `removerChave(providerKeyId, correlationId)` — mesmo mecanismo de selecao
+(`app.pix.provider`). `FakePixProvider` (default): idempotente por key (`computeIfAbsent`),
+thread-safe, falhas armaveis e `reset()`; retem apenas **fingerprint SHA-256** do comando — o
+valor em claro nao fica em memoria alem do request. `CelcoinPixProvider`: `POST/DELETE /pix/keys` — contrato
+**skeleton local da Fase 4** (validar contra a doc real na Fase 5); reusa OAuth2, retry/circuit
+breaker, `MDCBridge` e traducao sanitizada; `404` no DELETE e sucesso idempotente sem retry. A
+chave em claro so trafega no body HTTP em memoria; logs levam apenas `key_id`.
+
 ## Auditoria
 
 `PixWebhookAuditListener` (`@TransactionalEventListener` AFTER_COMMIT + `@Transactional` REQUIRES_NEW, padrao `CobrancaAuditListener`) grava em `audit_log_seguranca`:
@@ -268,6 +336,15 @@ Desembolso (Sprint 20) — `PixDesembolsoAuditListener` (AFTER_COMMIT + REQUIRES
 
 `usuario_id` aponta para o **tomador** (sujeito da operacao); o operador que disparou fica em `criado_por` da `pix_transferencia` (auditoria JPA). Detalhes JSON: apenas ids + valor + status/motivo — a **chave Pix nunca entra no audit log** (os eventos sequer a transportam).
 
+Gestao de chaves (Sprint 31) — `PixChaveAuditListener` (AFTER_COMMIT + REQUIRES_NEW), CHECK ampliado em `V59`:
+
+| Evento | Quando |
+| ------ | ------ |
+| `PIX_CHAVE_CADASTRADA` | chave cadastrada no provider e persistida `ATIVA` (so criacao nova; replay nao re-audita) |
+| `PIX_CHAVE_REMOVIDA` | transicao efetiva `ATIVA -> INATIVA` (replay de chave inativa nao re-audita) |
+
+`usuario_id` = **operador** (financeiro/admin) que executou a mutacao. Detalhes JSON: apenas `chaveId`, `contaEscrowId` (local), `tipo` e `status` — nunca valor, hash, mascara, `providerKeyId` ou idempotency key (os eventos sequer os transportam).
+
 ## Testes
 
 - Dominio: `PixDomainTest` (estados validos/invalidos, hash SHA-256, scale, blank).
@@ -275,10 +352,11 @@ Desembolso (Sprint 20) — `PixDesembolsoAuditListener` (AFTER_COMMIT + REQUIRES
 - Providers: `FakePixProviderTest`, `FakeEscrowProviderTest`, `CelcoinPixProviderIT`, `CelcoinEscrowProviderIT` (WireMock: OAuth Bearer, parsing, map de status, retry 5xx, traducao de erro, Idempotency-Key).
 - Webhook: `PixWebhookIT` (HMAC + alias, idempotencia, minimizacao, FALHOU, IGNORADO, correlationId, auditoria).
 - Recebimento (Sprint 21): `ProcessarWebhookPixRecebimentoTest` (correlacao txid/fallback, NAO_IDENTIFICADO, corrida idempotente, dispara conciliacao), `ConciliarRecebimentoPixUseCaseTest` (exato->PAGA, parcial/maior->DIVERGENTE, nao-ATIVA/sem-e2e nao baixa, replay, marcarFalha), `RecebimentoPixDivergenteListenerTest`, `PixRecebimentoObjetoOriginalAdapterTest`, `PixRecebimentoControllerTest` (`@WebMvcTest`, roles/403/404), `PixRecebimentoConciliacaoIT` (smoke E2E full-chain: referencia->webhook->CONCILIADO->parcela PAGA->Recebimento PIX + escrow->replay nao duplica).
+- Gestao de chaves (Sprint 31): `NormalizadorChavePixTest` (normalizacao/rejeicao por tipo sem eco), `ChavePixTest` (dominio, ATIVA->INATIVA idempotente), `ChavePixRepositoryTest` (schema sem valor bruto, UNIQUEs, CHECK de coerencia, lock serializa 2 transacoes reais), `FakePixProviderTest` (chaves: idempotencia, conflito sanitizado, falhas armadas, reset), `CelcoinPixProviderIT` (WireMock: POST/DELETE `/pix/keys`, Bearer + Idempotency-Key, 404 idempotente sem retry, 4xx/5xx sanitizados), `CadastrarChavePixUseCaseTest`/`ListarChavesPixUseCaseTest`/`RemoverChavePixUseCaseTest`, `PixChaveAuditListenerTest`, `PixChaveControllerTest` (`@WebMvcTest`: roles, step-up estrito, 400 sem eco, campos proibidos), `PixChaveIT` (E2E auth real + Postgres: POST->GET->DELETE->GET, replay, colisao normalizada, falha de provider sem estado orfao, minimizacao em tabela/JSON/audit, auditoria unica).
 
 ## Pendencias
 
-Entregue na Sprint 20: desembolso assistido. Entregue na Sprint 21: recebimento Pix de parcela (referencia `txid` + REST + webhook correlacionado + baixa via port de cobranca + escrow idempotente + backoffice de divergencias).
+Entregue na Sprint 20: desembolso assistido. Entregue na Sprint 21: recebimento Pix de parcela (referencia `txid` + REST + webhook correlacionado + baixa via port de cobranca + escrow idempotente + backoffice de divergencias). Entregue na Sprint 31: gestao assistida de chaves Pix da conta operacional (cadastro idempotente + listagem mascarada + remocao logica, fake default + skeleton Celcoin WireMock; nenhum dinheiro movido).
 
 Follow-ups:
 - **Self-service do tomador** (CLIENTE owner gera referencia da propria parcela) — fica para o front das jornadas (web/mobile).
@@ -288,4 +366,4 @@ Follow-ups:
 - **Gap escrow `externalId`** para Celcoin real: `Wallet`/`ContaEscrow` locais (Sprint 12) tem `external_id` nulo; desembolso via Celcoin real depende dele. Use cases de provisionamento escrow via `EscrowProvider` + auditoria `ESCROW_*_PROVIDER_CRIADA`.
 - Conciliacao automatica de `PixRecebimento` com parcela de cobranca (Sprint 21).
 - Retry predicate Java (retry so em 5xx) para `celcoin-pix` / `celcoin-escrow`.
-- Contrato Celcoin real (endpoints/campos do skeleton sao suposicao validada por WireMock, nao pelo contrato fechado).
+- Contrato Celcoin real (endpoints/campos do skeleton sao suposicao validada por WireMock, nao pelo contrato fechado) — inclui `POST/DELETE /pix/keys` da Sprint 31 (gestao de chaves); validacao obrigatoria contra a documentacao/credenciais reais na Fase 5.

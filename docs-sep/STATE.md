@@ -10,17 +10,33 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-13._
+_Atualizado em: 2026-07-14._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md).
-- **Spec/step ativo**: proxima e a Sprint 31 (backend), Pix gestao de chaves — spec
-  [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md); steps just-in-time. Nenhuma task
-  em andamento.
+- **Spec/step ativo**: Sprint 31 (backend) **implementada** na branch
+  `feature/sprint-31-pix-gestao-chaves` (11 commits) — spec
+  [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md) + steps
+  [`031`](../steps-fase-4/backend/031-sprint-31-steps.md). **Push, PR e merge sao manuais e estao
+  pendentes.** Apos o merge, proxima e a Sprint 32 (adapters Celcoin skeleton — spec
+  [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md)).
 
 ## Onde estamos
 
+- **Sprint 31 (backend) IMPLEMENTADA em 2026-07-14** — gestao assistida de chaves Pix da conta
+  operacional/escrow (Epic 15, recorte inicial de Pix avancado da Fase 4). Na branch
+  `feature/sprint-31-pix-gestao-chaves` (base `develop` == `main`, `a173e5c`); push/PR/merge
+  manuais pendentes. `POST/GET/DELETE /api/v1/pix/chaves` (`FINANCEIRO`/`ADMIN`; mutacoes com
+  `@RequireStepUpEstrito` + `Idempotency-Key` no cadastro; GET read-only local sem step-up).
+  Minimizacao total: persiste apenas hash SHA-256 + mascara (V58 — UNIQUEs de idempotencia e de
+  chave ativa por valor + CHECK de coerencia); valor bruto nunca em resposta/erro/evento/audit/log.
+  `PixProvider` evoluido (`cadastrarChave`/`removerChave`): fake default idempotente; skeleton
+  Celcoin `POST/DELETE /pix/keys` coberto por WireMock (contrato local; validar na Fase 5).
+  Cadastro serializado por advisory lock (corrida nao gera chave orfa no provider) e provider antes de persistir (falha externa nao cria estado); CPF/CNPJ com digito verificador; remocao logica
+  `ATIVA -> INATIVA` serializada por `FOR UPDATE`. Auditoria `PIX_CHAVE_CADASTRADA`/`REMOVIDA`
+  (V59) 1x por transicao, operador como sujeito. **Nenhum dinheiro movido; Sprints 19-21
+  intocadas.** PR description em [`repos/sep-api/SPRINT-31-PR.md`](../repos/sep-api/SPRINT-31-PR.md).
 - **Sprint 30 (backend) MERGEADA em 2026-07-13** — matching assistido credora-operacao (Epic
   15). Em `origin/develop` via PR #95 (squash `7bff870`; 11 commits absorvidos) e promovida a
   `main` via PR #96 (`07f0347`); back-merge `main -> develop` (`a173e5c`); `develop` == `main`.
@@ -74,10 +90,14 @@ _Atualizado em: 2026-07-13._
 
 ## Proximo passo
 
-1. **Sprint 31** (backend): Pix gestao de chaves — spec
-   [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md); steps just-in-time.
-2. Seguir a ordem da Fase 4: backend 31-32; web F-16-19 (F-18 liberada pelo backend 29-30);
-   mobile M-13-16. Ver dependencias em [`specs/fase-4/README.md`](../specs/fase-4/README.md).
+1. **Manual (dev humano)**: push da branch `feature/sprint-31-pix-gestao-chaves`, abrir PR para
+   `develop` (descricao em [`SPRINT-31-PR.md`](../repos/sep-api/SPRINT-31-PR.md)), merge e
+   promocao a `main`; commit manual das mudancas de `docs-SEP`.
+2. **Sprint 32** (backend): adapters Celcoin skeleton — spec
+   [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md); steps just-in-time.
+3. Seguir a ordem da Fase 4: web F-16-19 (F-18 liberada pelo backend 29-30); mobile M-13-16
+   (M-16 recorte Pix liberado pela 31 apos merge). Ver dependencias em
+   [`specs/fase-4/README.md`](../specs/fase-4/README.md).
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
 

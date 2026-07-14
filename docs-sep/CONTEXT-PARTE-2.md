@@ -902,3 +902,41 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   por pipe na verificacao local — licao: sempre confirmar exit code). Docs: CREDORES.md (secao
   Sprint 30), SPRINT-30-PR.md; collection nao retrofitada (gap herdado Sprint 14; contrato
   vigente = springdoc). PRD-FASE-4 fica para o pos-merge.
+
+## Sprint 31 — Gestao assistida de chaves Pix (2026-07-14)
+
+- Quinta sprint da Fase 4 (`sep-api`, branch `feature/sprint-31-pix-gestao-chaves`, 11 commits,
+  base `develop` == `main` `a173e5c`). **Push/PR/merge manuais pendentes** na data deste registro
+  (descricao pronta em `repos/sep-api/SPRINT-31-PR.md`). Epic 15, recorte inicial de Pix
+  avancado: `POST/GET/DELETE /api/v1/pix/chaves` — cadastro/listagem/remocao assistidas
+  (`FINANCEIRO`/`ADMIN`; mutacoes `@RequireStepUpEstrito`; `Idempotency-Key` no cadastro; GET
+  read-only local sem step-up). Nenhum dinheiro movido; Sprints 19-21 intocadas; fake default e
+  skeleton Celcoin `POST/DELETE /pix/keys` so por WireMock (contrato local — validar na Fase 5).
+- Minimizacao fim a fim: `chave_pix` (V58) sem coluna de valor bruto (hash SHA-256 + mascara);
+  UNIQUE `(conta, idempotency_key)` + UNIQUE parcial de chave ATIVA por valor + CHECK de
+  coerencia de remocao; normalizacao unica por tipo (`NormalizadorChavePix` — CPF/CNPJ digitos,
+  telefone E.164 +55 com DDD 1-9, email estrito <=77, EVP UUID canonico) antes de
+  hash/mascara/provider; valor bruto nunca em resposta/erro/evento/audit/log (provado por testes
+  em todas as camadas, inclusive E2E com tabela+audit).
+- Cadastro chama provider ANTES de persistir (falha externa nao cria chave ATIVA nem auditoria;
+  provider idempotente permite retry seguro; corrida converge pelas UNIQUEs sem 500 via
+  TransactionTemplate fora da tx abortada). Remocao logica `ATIVA -> INATIVA` com
+  `findByIdAndContaEscrowIdForUpdate` (lock escopado na conta serializa: 1 chamada de
+  provider/auditoria; replay INATIVA = no-op 204; 404 neutro sem UUID). Conta operacional por
+  porta nova `ContaOperacionalEscrowQueryPort` (titular `SEP-COBRANCA` ATIVA, Sprint 12).
+  Auditoria `PIX_CHAVE_CADASTRADA`/`PIX_CHAVE_REMOVIDA` (V59, base V57) AFTER_COMMIT +
+  REQUIRES_NEW, operador como `usuario_id`, detalhes minimos.
+- Reviews: 1 por task (agente, formato completo) — hotfixes: regex de email + DDD (31.1),
+  assert de constraint por causa raiz (31.2); 31.3/31.4/31.5/31.6 zero findings. Teste de
+  concorrencia real no repository (2 transacoes, latches). `PixChaveIT` E2E (8 cenarios,
+  auth+step-up+Postgres reais). Licao aplicada: exit codes sempre capturados explicitos (sem
+  pipe). Docs: PIX.md (secao Sprint 31 + auditoria + testes), AI-ROADMAP, SPRINT-31-PR.md;
+  collection nao retrofitada (gap herdado Sprint 14; contrato vigente = springdoc).
+  PRD-FASE-4/STATE definitivo ficam para o pos-merge.
+- Review manual pre-merge (2026-07-14) achou 3 findings, fechados no commit 11: **P1** corrida de
+  cadastro podia criar chave orfa no provider (dois cadastros externos, um sem referencia local)
+  — resolvido com `pg_advisory_xact_lock` por (conta, tipo, hash) ANTES da chamada externa
+  (perdedor re-checa sob o lock e leva 409 sem provider; UNIQUEs viram defesa residual; teste de
+  serializacao com 2 transacoes reais); **P2** fake retinha o comando com valor em claro no mapa
+  de idempotencia — trocado por fingerprint SHA-256; **P2** CPF/CNPJ aceitavam DV invalido e
+  sequencias repetidas — validacao mod-11 completa (+11 testes de normalizacao).
