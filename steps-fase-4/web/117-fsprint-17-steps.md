@@ -2,9 +2,19 @@
 
 **Spec de origem**: [`117-fsprint-17-financeiro-conciliacao-web.md`](../../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md)
 
-**Status**: planejada — escopo funcional condicionado ao gap analysis da Task F-17.1. A F-Sprint
-16 e seu follow-up estao mergeados; `sep-app/develop` e `sep-app/main` estavam em paridade de
-conteudo na criacao destes steps (2026-07-15).
+**Status**: concluida em 2026-07-15 — PR #92 para `develop` (squash `2dfa0fd`; 3 commits
+absorvidos) e PR #93 para `main` (`develop` == `main`). **Classificacoes finais do gap
+analysis (matriz aprovada pelo usuario na F-17.1)**: IMPLEMENTAR = divergencias Pix com recorte
+de status enviado ao backend (default ABERTO; "Todos" omite o param) + contagens via
+`PageResponse.totalElements` com aviso de pagina parcial (F-17.2, commit `cfcfa52`);
+JA_COBERTO = lista de recebimentos manuais (F-9), jornada de desembolso/recebimento Pix (F-13),
+navegacao de tratamento e reprocessos com step-up (F-10), dashboard (F-10) — F-17.4 encerrada sem
+codigo; CONTRATO_AUSENTE (follow-ups backend, nada simulado no front) = paginacao/filtros em
+`GET /cobranca/recebimentos`, recebimentos por parcela para perfil financeiro, listagem Pix por
+operacao/contrato, DTO consolidado server-side (F-17.3 encerrada sem codigo);
+FORA_DE_ESCOPO = chaves Pix (F-18), tomador/credora/BI/boleto/Pix automatico. F-17.5: fixture MSW
+de divergencia RESOLVIDA + specs de rede e recorte server-side (commit `80e1c29`). Gate final:
+lint, lint:scss, Vitest 491, build e Playwright 27/27 (novo smoke do filtro de status).
 
 **Objetivo geral**: fechar somente gaps comprovados da jornada interna de financeiro/conciliacao no
 `sep-app`, consumindo contratos ja existentes dos modulos `cobranca`, `pix` e `backoffice`. O

@@ -362,6 +362,8 @@ steps: [`113-fsprint-13-steps.md`](../../steps-fase-3/web/113-fsprint-13-steps.m
 - `/app/pix/recebimentos/referencias/:id` -> referencia (txid, copia-cola, vinculo de parcela).
 - `/app/pix/recebimentos/:id` -> recebimento conciliado/divergente, com vinculos quando houver.
 - `/app/pix/divergencias` -> painel que reusa a fila do backoffice filtrada pelos tipos Pix.
+  F-17.2: recorte por status enviado ao backend (default `ABERTO`; "Todos" omite o parametro) e
+  contagens sempre do `PageResponse.totalElements`, com aviso explicito de pagina parcial.
 
 ### Contratos consumidos
 
@@ -392,6 +394,11 @@ steps: [`113-fsprint-13-steps.md`](../../steps-fase-3/web/113-fsprint-13-steps.m
 
 - **Sem endpoint dedicado de divergencias Pix**: o painel reusa a fila do backoffice filtrada por
   tipo (`listarFila`). Follow-up: endpoint/contadores dedicados se o volume justificar.
+- **Contratos ausentes registrados no gap analysis da F-17** (follow-ups backend; nada simulado no
+  front): paginacao/filtros em `GET /cobranca/recebimentos` (Javadoc do proprio controller ja
+  prometia); recebimentos por parcela para o perfil financeiro (o da Sprint 23 e CLIENTE-only);
+  listagem Pix por operacao/contrato (hoje so consulta por id); DTO consolidado server-side de
+  recebimentos+desembolsos por operacao (consolidacao local por N+1/correlacao e proibida).
 - **Parcela para `BACKOFFICE`**: a rota de parcela na cobranca (`/app/cobranca/financeiro/parcelas/:id`)
   e `FINANCEIRO`/`ADMIN`; nos detalhes de referencia/recebimento o id da parcela aparece como texto
   para `BACKOFFICE` (sem link), que trata divergencias pelo proprio fluxo.
@@ -401,11 +408,14 @@ steps: [`113-fsprint-13-steps.md`](../../steps-fase-3/web/113-fsprint-13-steps.m
 - Vitest: suite verde (`npm run test`), incluindo `PixService` (URLs/headers/idempotencia/step-up),
   area/shell + sidenav (roles), desembolso (idempotencia, step-up, `403`/`409`/`422`, provider
   indisponivel), recebimentos (referencia nova/reaproveitada, conciliado, `NAO_IDENTIFICADO`),
-  divergencias (reuso do backoffice, sem acao perigosa) e o `stepUpInterceptor` (rotas Pix).
+  divergencias (reuso do backoffice, sem acao perigosa; filtro de status server-side, totais do
+  backend, pagina parcial sinalizada e rede sem resultado presumido — F-17) e o
+  `stepUpInterceptor` (rotas Pix).
 - `npm run lint`, `npm run lint:scss` e `npm run build` verdes.
 - Smoke Playwright offline `e2e/pix.spec.ts` (area, desembolso por role + status, referencia com
-  copia-cola, recebimento conciliado, divergencias -> backoffice). A solicitacao de desembolso exige
-  step-up (MFA) e fica para o smoke real com backend em `:8080`.
+  copia-cola, recebimento conciliado, divergencias -> backoffice, filtro de status das
+  divergencias). A solicitacao de desembolso exige step-up (MFA) e fica para o smoke real com
+  backend em `:8080`.
 
 ## Jornada da empresa credora (F-Sprint 11)
 

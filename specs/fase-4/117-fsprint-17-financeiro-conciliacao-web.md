@@ -4,7 +4,10 @@
 
 - **ID da Spec**: 117
 - **Titulo**: F-Sprint 17 - Conciliacao e visao financeira consolidada no web
-- **Status**: planejada (escopo confirmado por gap analysis no precheck)
+- **Status**: concluida (PR #92 `develop` squash `2dfa0fd` + PR #93 `main`, 2026-07-15;
+  `develop` == `main`; escopo IMPLEMENTAR aprovado no gap analysis = divergencias com filtro
+  de status server-side + totais do backend; Tasks 3 e 4 encerradas sem codigo —
+  CONTRATO_AUSENTE / JA_COBERTO)
 - **Fase do produto**: Fase 4 - Epic 13
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD-FASE-4 §35 (Epic 13 - gaps financeiro/conciliacao)

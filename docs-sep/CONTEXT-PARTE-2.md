@@ -1048,3 +1048,34 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   via PR #90; back-merge `main -> develop` (`9b8f02c`); `develop` == `main` (conferido por
   conteudo: persona tomador, TRATA_403_LOCALMENTE e aria-modal presentes nos blobs remotos).
   **F-Sprint 16 fechada.** Proxima sprint web: F-17 (spec 117; steps a criar).
+
+## F-Sprint 17 — Aprofundamento financeiro/conciliacao web (2026-07-15)
+
+- Segunda sprint web da Fase 4 (`sep-app`, branch `feature/fsprint-17-financeiro-conciliacao-web`,
+  3 commits + fechamento). **Push/PR/merge manuais pendentes** na data deste registro (descricao em
+  `repos/sep-app/SPRINT-F-17-PR.md`). Sprint dirigida por **gap analysis bloqueante** (F-17.1):
+  matriz de 13 capacidades classificadas (`IMPLEMENTAR | JA_COBERTO | CONTRATO_AUSENTE |
+  FORA_DE_ESCOPO`) e aprovada pelo usuario antes de qualquer codigo.
+- IMPLEMENTAR (F-17.2, `cfcfa52`): painel `/app/pix/divergencias` — recorte de status enviado ao
+  backend (default ABERTO; "Todos" omite o parametro; um status por request como o contrato da
+  fila aceita) e contagens via `PageResponse.totalElements` com aviso explicito de pagina parcial
+  (o painel exibia `.length` de pagina de 50 como se fosse total, e itens RESOLVIDO/IGNORADO
+  entravam no recorte "em aberto"). Labels/chips reusados do backoffice; select desabilitado em
+  voo; `takeUntilDestroyed`; zero mutacao nova (fila do backoffice segue dona das transicoes).
+- JA_COBERTO: recebimentos manuais (F-9), jornada Pix (F-13), reprocessos com step-up e dashboard
+  (F-10) — Task F-17.4 encerrada sem codigo. CONTRATO_AUSENTE (follow-ups backend registrados,
+  nada simulado): paginacao/filtros em `GET /cobranca/recebimentos`; recebimentos por parcela para
+  o perfil financeiro; listagem Pix por operacao/contrato; DTO consolidado server-side — Task
+  F-17.3 encerrada sem codigo. FORA_DE_ESCOPO: chaves Pix (F-18 avalia), tomador/credora/BI.
+- F-17.5 (`80e1c29`): fixture MSW `c...0007` (DESEMBOLSO_PIX_FALHOU RESOLVIDO) + specs de rede e
+  do recorte server-side. F-17.6: smoke Playwright do filtro (pix.spec 8 -> 9; suite e2e 27) e
+  docs. Gate final: lint, lint:scss, Vitest 491, build AOT e Playwright 27/27 verdes.
+- Reviews: 1 por task com codigo (cavecrew-reviewer) — F-17.2 e F-17.5 zero findings.
+
+### F-Sprint 17 — merge, sprint fechada (2026-07-15, mesmo dia)
+
+- Mergeada em `origin/develop` via PR #92 (squash `2dfa0fd`; commits `cfcfa52` + `80e1c29` +
+  `ea85438` absorvidos) e promovida a `main` via PR #93 (`8cae8f7`); `develop` == `main`
+  (conferido por conteudo: statusFiltro, fixture RESOLVIDA e smoke do filtro presentes nos blobs
+  remotos). Review manual do usuario: sem achados. **F-Sprint 17 fechada.** Proxima sprint web:
+  F-18 (aporte+matching credora, spec 118; steps a criar; backends 29-31 mergeados).

@@ -187,7 +187,7 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 | Sprint | Epic/frente | Tema | Spec | Status |
 |--------|-------------|------|------|--------|
 | F-16 | Epic 13 | Renegociacao do tomador no web (fecha gap F-9) | [`116`](../specs/fase-4/116-fsprint-16-renegociacao-tomador-web.md) | concluida (PR #87/#88 + follow-up #89/#90, 2026-07-15) |
-| F-17 | Epic 13 | Aprofundamento financeiro/conciliacao web (se houver gap) | [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) | planejada |
+| F-17 | Epic 13 | Aprofundamento financeiro/conciliacao web (se houver gap) | [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) | concluida (PR #92/#93, 2026-07-15; gap analysis: 2 gaps fechados nas divergencias Pix, 4 contratos ausentes registrados como follow-up backend) |
 | F-18 | Epic 15/10 | Aporte e matching da credora no web (quando backend existir) | [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) | planejada (dep. backend 29-30) |
 | F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | planejada |
 

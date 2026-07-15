@@ -42,10 +42,11 @@ Leitura base para qualquer agente:
 > [`specs/fase-4/`](specs/fase-4/README.md) (14 arquivos: backend `027`-`032`, web `116`-`119`,
 > mobile `213`-`216`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
 > Sprint 27+, web F-16+, mobile M-13+. A F-16 web esta **concluida** (PR #87/#88 +
-> follow-up #89/#90, 2026-07-15; steps [`116`](steps-fase-4/web/116-fsprint-16-steps.md));
-> a proxima sprint web e a F-17
-> (spec [`117`](specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md); steps
-> [`117`](steps-fase-4/web/117-fsprint-17-steps.md)).
+> follow-up #89/#90, 2026-07-15; steps [`116`](steps-fase-4/web/116-fsprint-16-steps.md)).
+> A F-17 web esta **concluida** (PR #92/#93, 2026-07-15; spec
+> [`117`](specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) + steps
+> [`117`](steps-fase-4/web/117-fsprint-17-steps.md)); a proxima sprint web e a F-18
+> (spec [`118`](specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md); steps a criar).
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em

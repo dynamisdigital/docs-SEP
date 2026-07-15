@@ -16,17 +16,27 @@ _Atualizado em: 2026-07-15._
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend da Fase 4 **fechado**
   (Sprints 27-32 mergeadas); web F-16 mergeada; seguem web F-17-19 e mobile M-13-16.
-- **Spec/step ativo**: F-Sprint 16 (web) **FECHADA** — feature mergeada via PR #87
-  `develop` (squash `908c353`) + PR #88 `main`; follow-up (smoke e2e + findings do review
-  manual) mergeado via PR #89 `develop` (squash `d9f9733`) + PR #90 `main` (back-merge
-  `9b8f02c`; `develop` == `main`). Spec
-  [`116`](../specs/fase-4/116-fsprint-16-renegociacao-tomador-web.md) + steps
-  [`116`](../steps-fase-4/web/116-fsprint-16-steps.md). Proxima sprint web: **F-17**
-  (spec [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) + steps
-  [`117`](../steps-fase-4/web/117-fsprint-17-steps.md)).
+- **Spec/step ativo**: F-Sprint 17 (web) **MERGEADA** (PR #92 `develop`, squash `2dfa0fd` +
+  PR #93 `main`, `8cae8f7`; `develop` == `main`) — spec
+  [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) + steps
+  [`117`](../steps-fase-4/web/117-fsprint-17-steps.md). Proxima sprint web: **F-18**
+  (spec [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md);
+  steps a criar; backends 29-31 ja mergeados).
 
 ## Onde estamos
 
+- **F-Sprint 17 (web) MERGEADA em 2026-07-15** — aprofundamento financeiro/conciliacao
+  (Epic 13). Em `origin/develop` via PR #92 (squash `2dfa0fd`; 3 commits absorvidos) e
+  promovida a `main` via PR #93 (`8cae8f7`); `develop` == `main` (conferido por conteudo).
+  Sprint dirigida por **gap analysis aprovado** (F-17.1):
+  IMPLEMENTAR = painel de divergencias Pix com recorte de status enviado ao backend (default
+  ABERTO) e contagens via `PageResponse.totalElements` com aviso de pagina parcial;
+  JA_COBERTO = recebimentos manuais (F-9), jornada Pix (F-13), reprocessos/dashboard (F-10) —
+  F-17.4 sem codigo; CONTRATO_AUSENTE (4 follow-ups backend registrados, nada simulado):
+  paginacao/filtros em `GET /cobranca/recebimentos`, recebimentos por parcela p/ financeiro,
+  listagem Pix por operacao/contrato, DTO consolidado server-side — F-17.3 sem codigo.
+  Vitest 491 + Playwright 27/27 (novo smoke do filtro). Detalhe em
+  [`SPRINT-F-17-PR.md`](../repos/sep-app/SPRINT-F-17-PR.md).
 - **F-Sprint 16 (web) MERGEADA em 2026-07-15** — decisao de renegociacao do tomador
   (Epic 13; fecha o gap adiado na F-Sprint 9). Em `origin/develop` via PR #87 (squash
   `908c353`; 7 commits absorvidos) e promovida a `main` via PR #88 (`66ce8a7`);
@@ -64,12 +74,11 @@ _Atualizado em: 2026-07-15._
 
 ## Proximo passo
 
-1. **Manual (dev humano)**: commit das mudancas de `docs-SEP` (fechamento da F-16).
-2. Seguir a ordem da Fase 4 web/mobile: F-17 (financeiro/conciliacao, spec
-   [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) + steps
-   [`117`](../steps-fase-4/web/117-fsprint-17-steps.md)),
-   F-18 (aporte+matching credora, liberada pelos backends 29-30), F-19; mobile M-13-16
-   (aporte+matching+Pix liberados pelas Sprints 29-31). Ver dependencias em
+1. **Manual (dev humano)**: commit das mudancas de `docs-SEP` (fechamento da F-17).
+2. Seguir a ordem da Fase 4 web/mobile: F-18 (aporte+matching credora, spec
+   [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md); steps a criar;
+   liberada pelos backends 29-30 e avalia visibilidade de chaves Pix da Sprint 31), F-19;
+   mobile M-13-16 (aporte+matching+Pix liberados pelas Sprints 29-31). Ver dependencias em
    [`specs/fase-4/README.md`](../specs/fase-4/README.md).
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
