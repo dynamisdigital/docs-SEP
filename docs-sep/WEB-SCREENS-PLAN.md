@@ -530,6 +530,8 @@ Modulo backend:
 Telas web previstas:
 - Minhas parcelas
 - Detalhe da parcela
+- Decisao de renegociacao do tomador (termos da proposta ativa + aceite com step-up ou
+  recusa; entregue na F-Sprint 16)
 - Status de pagamento
 - Painel de cobranca operacional
 - Inadimplencia

@@ -4,7 +4,9 @@
 
 - **ID da Spec**: 116
 - **Titulo**: F-Sprint 16 - Decisao de renegociacao do tomador no web
-- **Status**: planejada
+- **Status**: concluida (PR #87 `develop` squash `908c353` + PR #88 `main`; follow-up
+  smoke e2e + findings do review manual via PR #89 squash `d9f9733` + PR #90 —
+  2026-07-15; `develop` == `main`)
 - **Fase do produto**: Fase 4 - Epic 13 (fecha gap da F-Sprint 9)
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD-FASE-4 §35 (Epic 13 / follow-up 2); gap adiado na F-Sprint 9

@@ -971,3 +971,80 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   guard de causa circular no predicate (32.3), guard de fixtures endurecido + trigger de timeout
   uniformizado (32.6); 32.4/32.5 zero findings. ITs de adapter: 58 -> 77 testes; +29 testes novos
   de wiring/guards/predicate. Suite final, `check` e `bootJar` verdes (ver checkpoint).
+
+## F-Sprint 16 — Renegociacao do tomador no web (2026-07-15)
+
+- Primeira sprint web da Fase 4 (`sep-app`, branch `feature/fsprint-16-renegociacao-tomador-web`,
+  8 commits). **Push/PR/merge manuais pendentes** na data deste registro (descricao pronta em
+  `repos/sep-app/SPRINT-F-16-PR.md`). Fecha o gap adiado na F-Sprint 9: tomador consulta os
+  termos autoritativos da renegociacao ativa e decide (aceite/recusa) consumindo os backends
+  das Sprints 24 (GET owner-scoped) e 27 (step-up estrito). Antes da sprint: `develop` do
+  `sep-app` recebeu merge de `main` (bumps dependabot #79/#85; `npm ci` + `format:check`
+  replicando CI); Sprint 32 backend confirmada MERGEADA (PR #99 develop / #100 main).
+- Borda: `RenegociacaoTomadorResponse` (10 campos exatos; total do backend, sem derivacao) +
+  `consultarRenegociacaoAtiva` no `CobrancaService`. Specs do service passaram a rodar com o
+  `stepUpInterceptor` real na cadeia (prova que GET nao envia/consome token).
+- UI: rota lazy `/app/cobranca/parcelas/:parcelaId/renegociacao` + CTA no detalhe apenas em
+  `EM_NEGOCIACAO` (condicao de UX; autoridade e o GET). Tela com estados acessiveis (loading
+  `role=status`, erro com retry, indisponivel, acesso negado neutro) e DS SEP (tokens/mixins;
+  light/dark; sem paleta paralela). Sem IDs tecnicos no DOM (teste com regex de UUID).
+- Aceite (F-16.3): MFA pre-check com orientacao (`/app/profile/setup-totp`) sem tentar bypass;
+  reconsulta + confirmacao `role=alertdialog` com snapshot novo; sem token navega
+  `/app/step-up?next=<rota conhecida>`; retorno NUNCA aceita automaticamente; PATCH unico
+  (guard `decisaoEmVoo`); token consumido so pelo interceptor no PATCH de aceite.
+- Recusa (F-16.4): reconsulta + confirmacao, sem MFA/step-up; token eventual permanece no
+  store; estado unico de decisao bloqueia duplo submit e clique cruzado; hotfix do review
+  alinhou `[disabled]` dos CTAs ao guard (`confirmando() !== null`).
+- Falhas (F-16.5): rede/5xx com termos na tela viram visualizacao "desatualizada" (decisoes
+  bloqueadas ate nova leitura por retry explicito sem loading global); 404/409 de decisao
+  invalidam snapshot e reconsultam (GET 404 encerra como indisponivel); 403 do aceite
+  autenticado abre reverificacao apenas por gesto ("Verificar novamente"); 403 da recusa e
+  neutro; nenhum caminho presume sucesso.
+- MSW: handler GET renegociacao-ativa antes do GET generico; 403 uniforme (alheia OU
+  inexistente); deriva do estado mutavel (apos decisao -> 404 como o backend); parcelas
+  dedicadas por fluxo (`...0008` leitura, `...0009` aceite, `...000a` recusa) preservam
+  isolamento entre testes; parcela `EM_NEGOCIACAO` adicionada com fidelidade ao backend
+  (Sprint 13). Vitest 453 -> 484 (service 26, tela 22 com matriz de falhas via `server.use`,
+  interceptor 23, detalhe 4). Playwright `e2e/cobranca.spec.ts` 3 -> 6 cenarios (termos,
+  recusa sem step-up, aceite navegando ao step-up sem auto-aceite no retorno); comentario
+  obsoleto de endpoint ausente removido. Pendencia: aceite com TOTP real so no smoke real
+  com backend :8080 (desafio MFA sem handler offline), como nas demais jornadas sensiveis.
+- Reviews: 1 por task (cavecrew-reviewer, formato completo). Findings: F-16.2
+  `takeUntilDestroyed` no GET (hotfix); F-16.4 `[disabled]` dos CTAs (hotfix); F-16.1/16.3/16.5
+  zero findings. Gate final: lint, lint:scss, Vitest 484, build AOT e Playwright 26/26 verdes.
+
+### F-Sprint 16 — merge (2026-07-15, mesmo dia)
+
+- Mergeada em `origin/develop` via PR #87 (squash `908c353`; 7 commits absorvidos) e promovida a
+  `main` via PR #88 (`66ce8a7`); `develop` == `main`. Antes do merge da F-16, a Sprint 32 backend
+  foi confirmada mergeada (PR #99 develop / #100 main; `develop` == `main` no `sep-api`) —
+  **backend da Fase 4 fechado**.
+- Incidente de fechamento: o commit final da F-16.6 (extensao do smoke Playwright de cobranca,
+  3 -> 6 cenarios + remocao do comentario obsoleto) aguardava aprovacao de checkpoint quando o
+  PR #87 foi aberto e ficou fora do squash; o working tree local foi revertido no processo.
+  Reaplicado na branch `feature/fix-fsprint-16-e2e-smoke` (criada da `develop` pos-merge, apos
+  reset da `develop` local divergida para `origin/develop`); gate verde (lint, Vitest 484, build,
+  cobranca e2e 6/6). Push/PR/merge manuais pendentes; descricao na secao "Follow-up pos-merge"
+  de `repos/sep-app/SPRINT-F-16-PR.md`.
+
+### F-Sprint 16 — review manual pos-merge (2026-07-15, mesmo dia)
+
+- Review manual do usuario sobre o squash `908c353` + follow-up `57bcea6` achou 3 findings,
+  fechados em `c90640e` na branch `feature/fix-fsprint-16-e2e-smoke`: **P1** o
+  `errorInterceptor` global redirecionava todo 403 para `/access-denied`, impedindo o
+  tratamento local da matriz 116.5 (o usuario era ejetado antes do "Verificar novamente";
+  os specs nao pegavam porque registravam so o stepUpInterceptor) — novo `HttpContextToken`
+  `TRATA_403_LOCALMENTE` suprime o redirect apenas nos 3 endpoints da decisao do tomador e
+  os specs da tela passaram a integrar o errorInterceptor real; **P2** confirmacoes com
+  comportamento real de dialogo acessivel (aria-modal, foco no container ao abrir e
+  restaurado ao gatilho ao fechar, Escape cancela, trap de Tab, foco visivel DS); **P2**
+  smokes F-16 com a persona correta: `tomador@empresa.com` (CLIENTE, MFA ativo) no mock
+  de login, em vez de ADMIN. Vitest 484 -> 487; gate completo verde na branch.
+
+### F-Sprint 16 — follow-up mergeado, sprint fechada (2026-07-15, mesmo dia)
+
+- Follow-up mergeado em `origin/develop` via PR #89 (squash `d9f9733`; commits `57bcea6`
+  smoke e2e, `c90640e` findings do review manual, `5db67ad` comentario) e promovido a `main`
+  via PR #90; back-merge `main -> develop` (`9b8f02c`); `develop` == `main` (conferido por
+  conteudo: persona tomador, TRATA_403_LOCALMENTE e aria-modal presentes nos blobs remotos).
+  **F-Sprint 16 fechada.** Proxima sprint web: F-17 (spec 117; steps a criar).

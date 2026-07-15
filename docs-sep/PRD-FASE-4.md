@@ -180,13 +180,13 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 | 29 | Epic 15 | Aporte da credora + escrow (foundation, assistido) | [`029`](../specs/fase-4/029-sprint-29-credora-aporte-escrow.md) | concluida (PR #93 develop, 2026-07-09 / #94 main, 2026-07-13) |
 | 30 | Epic 15 | Matching credora <-> operacao (assistido) | [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md) | concluida (PR #95 develop / #96 main, 2026-07-13) |
 | 31 | Epic 15 | Pix avancado — recorte inicial: gestao de chaves Pix (assistido) | [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md) | concluida (PR #97 develop / #98 main, 2026-07-14) |
-| 32 | Epic 15 / integracao | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar; Fake segue default) | [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) | planejada (ativacao real -> Fase 5) |
+| 32 | Epic 15 / integracao | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar; Fake segue default) | [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) | concluida (PR #99 develop / #100 main, 2026-07-15; fecha o backend da Fase 4; ativacao real -> Fase 5) |
 
 ### Web (`sep-app`)
 
 | Sprint | Epic/frente | Tema | Spec | Status |
 |--------|-------------|------|------|--------|
-| F-16 | Epic 13 | Renegociacao do tomador no web (fecha gap F-9) | [`116`](../specs/fase-4/116-fsprint-16-renegociacao-tomador-web.md) | planejada |
+| F-16 | Epic 13 | Renegociacao do tomador no web (fecha gap F-9) | [`116`](../specs/fase-4/116-fsprint-16-renegociacao-tomador-web.md) | concluida (PR #87/#88 + follow-up #89/#90, 2026-07-15) |
 | F-17 | Epic 13 | Aprofundamento financeiro/conciliacao web (se houver gap) | [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) | planejada |
 | F-18 | Epic 15/10 | Aporte e matching da credora no web (quando backend existir) | [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) | planejada (dep. backend 29-30) |
 | F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | planejada |
