@@ -22,7 +22,8 @@ _Atualizado em: 2026-07-15._
   `9b8f02c`; `develop` == `main`). Spec
   [`116`](../specs/fase-4/116-fsprint-16-renegociacao-tomador-web.md) + steps
   [`116`](../steps-fase-4/web/116-fsprint-16-steps.md). Proxima sprint web: **F-17**
-  (spec [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md); steps a criar).
+  (spec [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) + steps
+  [`117`](../steps-fase-4/web/117-fsprint-17-steps.md)).
 
 ## Onde estamos
 
@@ -65,7 +66,8 @@ _Atualizado em: 2026-07-15._
 
 1. **Manual (dev humano)**: commit das mudancas de `docs-SEP` (fechamento da F-16).
 2. Seguir a ordem da Fase 4 web/mobile: F-17 (financeiro/conciliacao, spec
-   [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md); steps a criar),
+   [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) + steps
+   [`117`](../steps-fase-4/web/117-fsprint-17-steps.md)),
    F-18 (aporte+matching credora, liberada pelos backends 29-30), F-19; mobile M-13-16
    (aporte+matching+Pix liberados pelas Sprints 29-31). Ver dependencias em
    [`specs/fase-4/README.md`](../specs/fase-4/README.md).
