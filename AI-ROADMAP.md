@@ -49,8 +49,13 @@ Leitura base para qualquer agente:
 > **concluida** (PR #94/#95, 2026-07-16; spec
 > [`118`](specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) + steps
 > [`118`](steps-fase-4/web/118-fsprint-18-steps.md); chaves Pix fora — Gate F-18.0, destino web
-> dedicado pos-F-19); a proxima sprint web e a F-19 (spec
-> [`119`](specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md)).
+> dedicado pos-F-19). A F-19 web (hardening de tooling + contrato + collections) esta
+> **concluida** (2026-07-16; em `develop` por push direto fast-forward `bb825e7` — desvio
+> aceito — e `main` via PR #96; spec
+> [`119`](specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) + steps
+> [`119`](steps-fase-4/web/119-fsprint-19-steps.md); `contract:check` + snapshot OpenAPI no
+> `sep-app`, collections Postman/Insomnia renovadas, audit 9->0 e
+> [ADR 0018](adr/0018-avaliacao-angular-22-no-web.md) adiando Angular 22).
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
@@ -117,6 +122,7 @@ Leitura base para qualquer agente:
 | adapters externos, Celcoin/BaaS skeleton, Clicksign, feature flags, WireMock | [`repos/sep-api/INTEGRACOES-PROVIDERS.md`](repos/sep-api/INTEGRACOES-PROVIDERS.md) (matriz, flags, fixtures, ativacao gated) + [`032`](specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) + [`step 032`](steps-fase-4/backend/032-sprint-32-steps.md) (implementada na branch `feature/sprint-32-adapters-externos-skeleton`; push/PR manuais) + ADRs [`0004`](adr/0004-provider-pattern-para-integracoes-externas.md), [`0008`](adr/0008-wiremock-para-testes-integracao-celcoin.md), [`0013`](adr/0013-provedor-de-assinatura-digital.md) e [`0017`](adr/0017-feature-flags-de-providers-por-ambiente.md) |
 | Pix, gestao de chaves, desembolso, recebimento Pix, conciliacao Pix, leitura owner-scoped (backend) | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) + [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) + [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) + [`026`](specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md) (P1-P3 tomador/credora) + [`031`](specs/fase-4/031-sprint-31-pix-gestao-chaves.md) + [`step 031`](steps-fase-4/backend/031-sprint-31-steps.md) (gestao assistida de chaves, implementada — `PIX.md` §Gestao de chaves) |
 | Pix web, desembolso/recebimento/divergencia no app | [`repos/sep-app/README.md` §Pix](repos/sep-app/README.md) + [`113`](specs/fase-3/113-fsprint-13-pix-web.md) + [`step 113`](steps-fase-3/web/113-fsprint-13-steps.md) |
+| contrato front<->API, contract:check, snapshot OpenAPI, collections Postman/Insomnia, audit tooling web, Angular 22 | [`repos/sep-app/README.md` §F-Sprint 19](repos/sep-app/README.md) + `sep-app/contracts/README.md` + [`119`](specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md)/[`step 119`](steps-fase-4/web/119-fsprint-19-steps.md) + [ADR 0018](adr/0018-avaliacao-angular-22-no-web.md) |
 | Pix mobile, status de desembolso/pagamento da parcela/operacao credora, M-Sprint 11 | [`211`](specs/fase-3/211-msprint-11-pix-mobile.md) + [`step 211`](steps-fase-3/mobile/211-msprint-11-steps.md); Gates backend P1-P3 fechados pela Sprint 26 ([`026`](specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md), mergeada `develop` PR #87 + `main` PR #88); M-11 mobile mergeada em `develop` via PR #111 (squash `34f4f0f`; P1 contrato + P2 parcela + P3 carteira) e promovida a `main` via PR #112 (`ec74f5e`) |
 | KYC, KYB, documentos, Celcoin onboarding | [`repos/sep-api/ONBOARDING.md`](repos/sep-api/ONBOARDING.md) |
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |

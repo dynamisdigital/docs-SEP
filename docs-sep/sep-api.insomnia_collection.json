@@ -1,2137 +1,3283 @@
 {
-  "_type": "export",
-  "__export_format": 4,
-  "__export_date": "2026-05-15T00:00:00.000Z",
-  "__export_source": "manual",
-  "resources": [
-    {
-      "_id": "wrk_sep_api",
-      "_type": "workspace",
-      "parentId": null,
-      "name": "SEP API",
-      "description": "Coleção da API SEP (Java 21 + Spring Boot). Cobre auth, MFA TOTP, step-up, usuários, webhooks Celcoin (Pix, KYC, KYB, PLD), onboarding PF, actuator e OpenAPI. Mantém paridade com a collection Postman.",
-      "scope": "collection"
-    },
-    {
-      "_id": "env_base",
-      "_type": "environment",
-      "parentId": "wrk_sep_api",
-      "name": "Base Environment",
-      "data": {
-        "baseUrl": "http://localhost:8080",
-        "adminAccessToken": "",
-        "clienteAccessToken": "",
-        "adminRefreshToken": "",
-        "clienteRefreshToken": "",
-        "stepUpToken": "",
-        "stepUpChallengeId": "",
-        "mfaChallengeId": "",
-        "adminId": "",
-        "clienteId": "",
-        "onboardingSolicitacaoId": "",
-        "onboardingEmpresaId": "",
-        "celcoinKycSignature": "sha256=PLACEHOLDER",
-        "celcoinKybSignature": "sha256=PLACEHOLDER",
-        "celcoinPldSignature": "sha256=PLACEHOLDER",
-        "celcoinPixSignature": "sha256=PLACEHOLDER",
-        "idempotencyKey": "11111111-1111-1111-1111-111111111111",
-        "propostaCreditoId": "",
-        "parecerCreditoId": "",
-        "financeiroAccessToken": "",
-        "financeiroRefreshToken": "",
-        "financeiroId": "",
-        "contratoId": "",
-        "idEnvelopeExterno": "",
-        "clicksignWebhookSecret": "dev-clicksign-webhook-secret-change-me",
-        "clicksignSignature": "sha256=PLACEHOLDER",
-        "financeiroToken": "",
-        "parcelaId": "",
-        "recebimentoId": ""
-      },
-      "color": null,
-      "isPrivate": false,
-      "metaSortKey": 1
-    },
-    {
-      "_id": "env_local_dev",
-      "_type": "environment",
-      "parentId": "env_base",
-      "name": "local-dev",
-      "data": {
-        "baseUrl": "http://localhost:8080",
-        "propostaCreditoId": "",
-        "parecerCreditoId": "",
-        "financeiroAccessToken": "",
-        "financeiroRefreshToken": "",
-        "financeiroId": ""
-      },
-      "color": "#7d3cff",
-      "isPrivate": false,
-      "metaSortKey": 2
-    },
-    {
-      "_id": "fld_auth",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Auth",
-      "description": "Login, refresh, logout, /me",
-      "metaSortKey": -10
-    },
-    {
-      "_id": "fld_mfa",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "MFA TOTP (Sprint 5)",
-      "metaSortKey": -9
-    },
-    {
-      "_id": "fld_stepup",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Step-up (Sprint 5)",
-      "metaSortKey": -8
-    },
-    {
-      "_id": "fld_usuarios",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Usuários",
-      "metaSortKey": -7
-    },
-    {
-      "_id": "fld_webhooks_pix",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Webhooks Pix (Sprint 4)",
-      "metaSortKey": -6
-    },
-    {
-      "_id": "fld_onb_pf",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Onboarding KYC PF (Sprint 6)",
-      "metaSortKey": -5
-    },
-    {
-      "_id": "fld_onb_pj",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Onboarding KYB PJ (Sprint 7)",
-      "metaSortKey": -4.5
-    },
-    {
-      "_id": "fld_webhooks_kyb_pld",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Webhooks KYB/PLD (Sprint 7)",
-      "metaSortKey": -4
-    },
-    {
-      "_id": "fld_contratos",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Contratos (Sprints 10 + 11)",
-      "metaSortKey": -3.5
-    },
-    {
-      "_id": "fld_webhook_assinatura",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Webhook Assinatura Digital (Sprint 11)",
-      "metaSortKey": -3.4
-    },
-    {
-      "_id": "fld_cobranca",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Cobranca (Sprint 12)",
-      "metaSortKey": -3.2
-    },
-    {
-      "_id": "fld_backoffice",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Backoffice (Sprint 14)",
-      "metaSortKey": -3.1
-    },
-    {
-      "_id": "fld_actuator",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Actuator",
-      "metaSortKey": -3
-    },
-    {
-      "_id": "fld_openapi",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "OpenAPI / Swagger",
-      "metaSortKey": -2
-    },
-    {
-      "_id": "req_login_admin",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "POST /auth/login (admin)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/login",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_login_cliente",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "POST /auth/login (cliente)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/login",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_login_invalido",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "POST /auth/login (senha inválida) — 401",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/login",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"wrong-password\"\n}"
-      },
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_refresh_admin",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "POST /auth/refresh (admin)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/refresh",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"refreshToken\": \"{{ adminRefreshToken }}\"\n}"
-      },
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_refresh_cliente",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "POST /auth/refresh (cliente)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/refresh",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"refreshToken\": \"{{ clienteRefreshToken }}\"\n}"
-      },
-      "metaSortKey": 5
-    },
-    {
-      "_id": "req_logout",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "POST /auth/logout (admin) — 204",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/logout",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"refreshToken\": \"{{ adminRefreshToken }}\"\n}"
-      },
-      "metaSortKey": 6
-    },
-    {
-      "_id": "req_logout_all",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "POST /auth/logout-all (admin) — 204",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/logout-all",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "metaSortKey": 7
-    },
-    {
-      "_id": "req_me_admin",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "GET /auth/me (admin)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/auth/me",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "metaSortKey": 8
-    },
-    {
-      "_id": "req_me_cliente",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "GET /auth/me (cliente)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/auth/me",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 9
-    },
-    {
-      "_id": "req_me_sem_token",
-      "_type": "request",
-      "parentId": "fld_auth",
-      "name": "GET /auth/me (sem token) — 401",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/auth/me",
-      "headers": [],
-      "metaSortKey": 10
-    },
-    {
-      "_id": "req_totp_setup",
-      "_type": "request",
-      "parentId": "fld_mfa",
-      "name": "POST /auth/totp/setup (admin) — 200",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/totp/setup",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_totp_confirm",
-      "_type": "request",
-      "parentId": "fld_mfa",
-      "name": "POST /auth/totp/confirm (admin) — 204",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/totp/confirm",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"codigo\": \"123456\"\n}"
-      },
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_totp_verify",
-      "_type": "request",
-      "parentId": "fld_mfa",
-      "name": "POST /auth/totp/verify — 200",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/totp/verify",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"mfaChallengeId\": \"{{ mfaChallengeId }}\",\n  \"codigo\": \"123456\"\n}"
-      },
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_totp_disable",
-      "_type": "request",
-      "parentId": "fld_mfa",
-      "name": "POST /auth/totp/disable (admin) — 204",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/totp/disable",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"passwordAtual\": \"senha-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_stepup_init_admin",
-      "_type": "request",
-      "parentId": "fld_stepup",
-      "name": "POST /auth/step-up/initiate (admin)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/step-up/initiate",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_stepup_complete_admin",
-      "_type": "request",
-      "parentId": "fld_stepup",
-      "name": "POST /auth/step-up/complete (admin)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/step-up/complete",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"stepUpChallengeId\": \"{{ stepUpChallengeId }}\",\n  \"codigo\": \"123456\"\n}"
-      },
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_stepup_init_cliente",
-      "_type": "request",
-      "parentId": "fld_stepup",
-      "name": "POST /auth/step-up/initiate (cliente)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/step-up/initiate",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_stepup_complete_cliente",
-      "_type": "request",
-      "parentId": "fld_stepup",
-      "name": "POST /auth/step-up/complete (cliente)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/auth/step-up/complete",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"stepUpChallengeId\": \"{{ stepUpChallengeId }}\",\n  \"codigo\": \"123456\"\n}"
-      },
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_usr_create_publico",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "POST /usuarios (criar cliente público) — 201",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_usr_admin_create",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "POST /admin/usuarios (criar admin interno) — 201",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/admin/usuarios",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"admin2@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
-      },
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_usr_admin_create_cliente_403",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "POST /admin/usuarios (cliente tenta criar admin) — 403",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/admin/usuarios",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"admin-negado@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
-      },
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_usr_email_invalido_400",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "POST /usuarios (email inválido) — 400",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"nao-eh-email\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_usr_senha_fraca_400",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "POST /usuarios (senha fraca) — 400",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"fraca@empresa.com\",\n  \"password\": \"123456\"\n}"
-      },
-      "metaSortKey": 5
-    },
-    {
-      "_id": "req_usr_email_dup_409",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "POST /usuarios (email duplicado) — 409",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 6
-    },
-    {
-      "_id": "req_usr_get_admin_any",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "GET /usuarios/{id} (admin -> qualquer) — 200",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "metaSortKey": 7
-    },
-    {
-      "_id": "req_usr_get_cliente_self",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "GET /usuarios/{id} (cliente -> próprio) — 200",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 8
-    },
-    {
-      "_id": "req_usr_get_cliente_alheio_403",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "GET /usuarios/{id} (cliente -> alheio) — 403",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/usuarios/{{ adminId }}",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 9
-    },
-    {
-      "_id": "req_usr_get_inexistente_404",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "GET /usuarios/{id} (id inexistente) — 404",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/usuarios/00000000-0000-0000-0000-000000000000",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "metaSortKey": 10
-    },
-    {
-      "_id": "req_usr_list_admin",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "GET /usuarios (admin -> lista) — 200",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        }
-      ],
-      "metaSortKey": 11
-    },
-    {
-      "_id": "req_usr_list_cliente_403",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "GET /usuarios (cliente -> lista) — 403",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/usuarios",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 12
-    },
-    {
-      "_id": "req_usr_senha_self_204",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "PATCH /usuarios/{id}/senha (próprio cliente) — 204",
-      "method": "PATCH",
-      "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 13
-    },
-    {
-      "_id": "req_usr_senha_errada_400",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "PATCH /usuarios/{id}/senha (senha atual errada) — 400",
-      "method": "PATCH",
-      "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"passwordAtual\": \"senha-errada\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 14
-    },
-    {
-      "_id": "req_usr_senha_admin_403",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "PATCH /usuarios/{id}/senha (admin sobre cliente) — 403",
-      "method": "PATCH",
-      "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
-      },
-      "metaSortKey": 15
-    },
-    {
-      "_id": "req_wh_pix19_ok",
-      "_type": "request",
-      "parentId": "fld_webhooks_pix",
-      "name": "POST /webhooks/celcoin/pix (recebimento) — 202 (Sprint 19)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinPixSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"event_id\": \"evt-1\",\n  \"event_type\": \"pix.received\",\n  \"end_to_end_id\": \"E2E-1\",\n  \"amount\": 250.00\n}"
-      },
-      "description": "Endpoint dedicado da Sprint 19 (PixWebhookController). HMAC obrigatorio (secret app.webhooks.secrets.celcoin-pix); idempotencia por event_id do payload (sem Idempotency-Key). Cria PixWebhookEvent (so hash) + PixRecebimento inicial.",
-      "metaSortKey": 0
-    },
-    {
-      "_id": "req_wh_pix_ok",
-      "_type": "request",
-      "parentId": "fld_webhooks_pix",
-      "name": "POST /webhooks/celcoin/pix-recebimento — 202",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinPixSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"transactionId\": \"abc-123\",\n  \"valor\": 1500.50,\n  \"chavePix\": \"00000000000\",\n  \"status\": \"LIQUIDADO\"\n}"
-      },
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_wh_pix_dup",
-      "_type": "request",
-      "parentId": "fld_webhooks_pix",
-      "name": "POST /webhooks/celcoin/pix-recebimento (mesma idempotency) — 202",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinPixSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"transactionId\": \"abc-123\",\n  \"valor\": 1500.50,\n  \"chavePix\": \"00000000000\",\n  \"status\": \"LIQUIDADO\"\n}"
-      },
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_wh_pix_sem_idem_400",
-      "_type": "request",
-      "parentId": "fld_webhooks_pix",
-      "name": "POST /webhooks/celcoin/pix-recebimento (sem Idempotency-Key) — 400",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinPixSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"transactionId\": \"abc-123\"\n}"
-      },
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_wh_pix_sig_inv_401",
-      "_type": "request",
-      "parentId": "fld_webhooks_pix",
-      "name": "POST /webhooks/celcoin/pix-recebimento (assinatura inválida) — 401",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "sha256=INVALIDA"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"transactionId\": \"abc-123\"\n}"
-      },
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_onb_iniciar",
-      "_type": "request",
-      "parentId": "fld_onb_pf",
-      "name": "POST /onboarding/pessoa — 201",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/onboarding/pessoa",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"cpf\": \"52998224725\",\n  \"nomeCompleto\": \"Joao da Silva\",\n  \"dataNascimento\": \"1990-01-15\"\n}"
-      },
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_onb_doc_rg",
-      "_type": "request",
-      "parentId": "fld_onb_pf",
-      "name": "POST /onboarding/pessoa/{id}/documentos — RG (204)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/documentos",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "multipart/form-data",
-        "params": [
-          {
-            "name": "tipo",
-            "value": "RG"
-          },
-          {
-            "name": "arquivo",
-            "type": "file",
-            "fileName": ""
-          }
-        ]
-      },
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_onb_doc_selfie",
-      "_type": "request",
-      "parentId": "fld_onb_pf",
-      "name": "POST /onboarding/pessoa/{id}/documentos — SELFIE (204)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/documentos",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "multipart/form-data",
-        "params": [
-          {
-            "name": "tipo",
-            "value": "SELFIE"
-          },
-          {
-            "name": "arquivo",
-            "type": "file",
-            "fileName": ""
-          }
-        ]
-      },
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_onb_verificar",
-      "_type": "request",
-      "parentId": "fld_onb_pf",
-      "name": "POST /onboarding/pessoa/{id}/verificar — 202",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/verificar",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_onb_get",
-      "_type": "request",
-      "parentId": "fld_onb_pf",
-      "name": "GET /onboarding/pessoa/{id} — 200",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 5
-    },
-    {
-      "_id": "req_wh_kyc_approved",
-      "_type": "request",
-      "parentId": "fld_onb_pf",
-      "name": "POST /webhooks/celcoin/kyc — APPROVED (202)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyc",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinKycSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"verification_id\": \"fake-{{ onboardingSolicitacaoId }}\",\n  \"status\": \"APPROVED\",\n  \"reason\": null\n}"
-      },
-      "metaSortKey": 6
-    },
-    {
-      "_id": "req_wh_kyc_sig_inv",
-      "_type": "request",
-      "parentId": "fld_onb_pf",
-      "name": "POST /webhooks/celcoin/kyc (assinatura inválida) — 401",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyc",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "sha256=INVALIDA"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"verification_id\": \"fake-xyz\",\n  \"status\": \"APPROVED\"\n}"
-      },
-      "metaSortKey": 7
-    },
-    {
-      "_id": "req_onb_empresa_iniciar",
-      "_type": "request",
-      "parentId": "fld_onb_pj",
-      "name": "POST /onboarding/empresa — 201",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/onboarding/empresa",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"cnpj\": \"11222333000181\",\n  \"razaoSocial\": \"ACME LTDA\",\n  \"nomeFantasia\": \"Acme\",\n  \"tipoSocietario\": \"LTDA\",\n  \"porte\": \"ME\"\n}"
-      },
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_onb_empresa_doc_contrato",
-      "_type": "request",
-      "parentId": "fld_onb_pj",
-      "name": "POST /onboarding/empresa/{id}/documentos — CONTRATO_SOCIAL (204)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/documentos",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "multipart/form-data",
-        "params": [
-          {
-            "name": "tipo",
-            "value": "CONTRATO_SOCIAL"
-          },
-          {
-            "name": "arquivo",
-            "type": "file",
-            "fileName": ""
-          }
-        ]
-      },
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_onb_empresa_doc_endereco",
-      "_type": "request",
-      "parentId": "fld_onb_pj",
-      "name": "POST /onboarding/empresa/{id}/documentos — COMPROVANTE_ENDERECO (204)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/documentos",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "body": {
-        "mimeType": "multipart/form-data",
-        "params": [
-          {
-            "name": "tipo",
-            "value": "COMPROVANTE_ENDERECO"
-          },
-          {
-            "name": "arquivo",
-            "type": "file",
-            "fileName": ""
-          }
-        ]
-      },
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_onb_empresa_verificar",
-      "_type": "request",
-      "parentId": "fld_onb_pj",
-      "name": "POST /onboarding/empresa/{id}/verificar — 202",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/verificar",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_onb_empresa_get",
-      "_type": "request",
-      "parentId": "fld_onb_pj",
-      "name": "GET /onboarding/empresa/{id} — 200",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 5
-    },
-    {
-      "_id": "req_onb_empresa_representantes",
-      "_type": "request",
-      "parentId": "fld_onb_pj",
-      "name": "GET /onboarding/empresa/{id}/representantes — 200",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/representantes",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": 6
-    },
-    {
-      "_id": "req_wh_kyb_ativa",
-      "_type": "request",
-      "parentId": "fld_webhooks_kyb_pld",
-      "name": "POST /webhooks/celcoin/kyb — ATIVA (202)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinKybSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\",\n  \"tax_id\": \"11222333000181\",\n  \"company_name\": \"ACME LTDA\"\n}"
-      },
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_wh_kyb_inativa",
-      "_type": "request",
-      "parentId": "fld_webhooks_kyb_pld",
-      "name": "POST /webhooks/celcoin/kyb — INATIVA (REPROVADO)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinKybSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"INACTIVE\",\n  \"company_name\": \"Empresa Encerrada LTDA\"\n}"
-      },
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_wh_kyb_sem_idem",
-      "_type": "request",
-      "parentId": "fld_webhooks_kyb_pld",
-      "name": "POST /webhooks/celcoin/kyb (sem Idempotency-Key) — 400",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinKybSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\"\n}"
-      },
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_wh_kyb_sig_inv",
-      "_type": "request",
-      "parentId": "fld_webhooks_kyb_pld",
-      "name": "POST /webhooks/celcoin/kyb (assinatura inválida) — 401",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "sha256=INVALIDA"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\"\n}"
-      },
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_wh_pld_limpo",
-      "_type": "request",
-      "parentId": "fld_webhooks_kyb_pld",
-      "name": "POST /webhooks/celcoin/pld — todos limpos (APROVADO_FINAL)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinPldSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": [\n    {\n      \"target_type\": \"EMPRESA\",\n      \"document_number\": \"11222333000181\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": false },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
-      },
-      "metaSortKey": 5
-    },
-    {
-      "_id": "req_wh_pld_hit",
-      "_type": "request",
-      "parentId": "fld_webhooks_kyb_pld",
-      "name": "POST /webhooks/celcoin/pld — hit OFAC (REPROVADO_PLD)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinPldSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": [\n    {\n      \"target_type\": \"EMPRESA\",\n      \"document_number\": \"11222333000181\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": true, \"reason\": \"sancao\", \"severity\": \"ALTA\", \"inclusion_date\": \"2023-04-12\" },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
-      },
-      "metaSortKey": 6
-    },
-    {
-      "_id": "req_wh_pld_sem_idem",
-      "_type": "request",
-      "parentId": "fld_webhooks_kyb_pld",
-      "name": "POST /webhooks/celcoin/pld (sem Idempotency-Key) — 400",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ celcoinPldSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": []\n}"
-      },
-      "metaSortKey": 7
-    },
-    {
-      "_id": "req_wh_pld_sig_inv",
-      "_type": "request",
-      "parentId": "fld_webhooks_kyb_pld",
-      "name": "POST /webhooks/celcoin/pld (assinatura inválida) — 401",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ idempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "sha256=INVALIDA"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": []\n}"
-      },
-      "metaSortKey": 8
-    },
-    {
-      "_id": "req_act_health",
-      "_type": "request",
-      "parentId": "fld_actuator",
-      "name": "GET /actuator/health",
-      "method": "GET",
-      "url": "{{ baseUrl }}/actuator/health",
-      "headers": [],
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_act_info",
-      "_type": "request",
-      "parentId": "fld_actuator",
-      "name": "GET /actuator/info",
-      "method": "GET",
-      "url": "{{ baseUrl }}/actuator/info",
-      "headers": [],
-      "metaSortKey": 2
-    },
-    {
-      "_id": "req_act_metrics",
-      "_type": "request",
-      "parentId": "fld_actuator",
-      "name": "GET /actuator/metrics",
-      "method": "GET",
-      "url": "{{ baseUrl }}/actuator/metrics",
-      "headers": [],
-      "metaSortKey": 3
-    },
-    {
-      "_id": "req_act_prometheus",
-      "_type": "request",
-      "parentId": "fld_actuator",
-      "name": "GET /actuator/prometheus",
-      "method": "GET",
-      "url": "{{ baseUrl }}/actuator/prometheus",
-      "headers": [],
-      "metaSortKey": 4
-    },
-    {
-      "_id": "req_openapi_json",
-      "_type": "request",
-      "parentId": "fld_openapi",
-      "name": "GET /v3/api-docs",
-      "method": "GET",
-      "url": "{{ baseUrl }}/v3/api-docs",
-      "headers": [],
-      "metaSortKey": 1
-    },
-    {
-      "_id": "req_swagger_ui",
-      "_type": "request",
-      "parentId": "fld_openapi",
-      "name": "GET /swagger-ui/index.html (browser)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/swagger-ui/index.html",
-      "headers": [],
-      "metaSortKey": 2
-    },
-    {
-      "_id": "fld_credito",
-      "_type": "request_group",
-      "parentId": "wrk_sep_api",
-      "name": "Credito (Sprint 8)",
-      "description": "Modulo credito: propostas, motor de regras, parecer manual + promocao FINANCEIRO. Ver CREDITO.md em docs-SEP/repos/sep-api/.",
-      "metaSortKey": -1750000000000
-    },
-    {
-      "_id": "req_credito_post_proposta",
-      "_type": "request",
-      "parentId": "fld_credito",
-      "name": "POST /credito/propostas (cliente)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/credito/propostas",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "metaSortKey": -1750000000000,
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"solicitacaoOnboardingId\": \"{{ onboardingSolicitacaoId }}\",\n  \"tipoOperacao\": \"OUTROS\",\n  \"valorSolicitado\": 10000.00,\n  \"prazoMeses\": 12\n}"
-      }
-    },
-    {
-      "_id": "req_credito_get_proposta",
-      "_type": "request",
-      "parentId": "fld_credito",
-      "name": "GET /credito/propostas/{id}",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": -1749999000000
-    },
-    {
-      "_id": "req_credito_list",
-      "_type": "request",
-      "parentId": "fld_credito",
-      "name": "GET /credito/propostas (financeiro)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/credito/propostas?status=PRE_APROVADA&page=0&size=20",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ financeiroAccessToken }}"
-        }
-      ],
-      "metaSortKey": -1749998000000
-    },
-    {
-      "_id": "req_credito_parecer",
-      "_type": "request",
-      "parentId": "fld_credito",
-      "name": "POST /credito/propostas/{id}/parecer (FINANCEIRO + step-up)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/parecer",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ financeiroAccessToken }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        }
-      ],
-      "metaSortKey": -1749997000000,
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"decisao\": \"APROVAR\",\n  \"justificativa\": \"Cliente com bom historico interno e capacidade de pagamento adequada.\"\n}"
-      }
-    },
-    {
-      "_id": "req_credito_regras",
-      "_type": "request",
-      "parentId": "fld_credito",
-      "name": "GET /credito/propostas/{id}/regras (FINANCEIRO/ADMIN)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/regras",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ financeiroAccessToken }}"
-        }
-      ],
-      "metaSortKey": -1749996000000
-    },
-    {
-      "_id": "req_of_consentimento",
-      "_type": "request",
-      "parentId": "fld_credito",
-      "name": "POST /credito/propostas/{id}/open-finance/consentimento (Sprint 9 — CLIENTE dono)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/open-finance/consentimento",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"cpfCnpjTomador\": \"52998224725\",\n  \"redirectUri\": \"https://app.sep/auth/callback\"\n}"
-      },
-      "metaSortKey": -1749995900000
-    },
-    {
-      "_id": "req_of_status",
-      "_type": "request",
-      "parentId": "fld_credito",
-      "name": "GET /credito/propostas/{id}/open-finance (Sprint 9 — status + snapshot)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/open-finance",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ clienteAccessToken }}"
-        }
-      ],
-      "metaSortKey": -1749995800000
-    },
-    {
-      "_id": "req_of_webhook",
-      "_type": "request",
-      "parentId": "fld_webhooks",
-      "name": "POST /webhooks/celcoin/open-finance (Sprint 9 — consent.authorized)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/open-finance",
-      "headers": [
-        {
-          "name": "Idempotency-Key",
-          "value": "{{ openFinanceIdempotencyKey }}"
-        },
-        {
-          "name": "X-Webhook-Signature",
-          "value": "{{ openFinanceWebhookSignature }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"type\": \"consent.authorized\",\n  \"consent_id\": \"{{ openFinanceExternalId }}\"\n}"
-      },
-      "metaSortKey": -1749995700000
-    },
-    {
-      "_id": "req_usuarios_role",
-      "_type": "request",
-      "parentId": "fld_usuarios",
-      "name": "POST /usuarios/{id}/role (ADMIN + step-up promove FINANCEIRO)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/usuarios/{{ financeiroId }}/role",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ adminAccessToken }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        }
-      ],
-      "metaSortKey": -1749995000000,
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"role\": \"FINANCEIRO\"\n}"
-      }
-    },
-    {
-      "_id": "req_contrato_por_proposta",
-      "_type": "request",
-      "parentId": "fld_contratos",
-      "name": "GET /contratos/proposta/{propostaId} — consulta contrato vigente",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/contratos/proposta/{{ propostaCreditoId }}",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ accessToken }}"
-        }
-      ],
-      "metaSortKey": -1749994000000
-    },
-    {
-      "_id": "req_contrato_por_id",
-      "_type": "request",
-      "parentId": "fld_contratos",
-      "name": "GET /contratos/{id} — consulta por id",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ accessToken }}"
-        }
-      ],
-      "metaSortKey": -1749993000000
-    },
-    {
-      "_id": "req_contrato_versoes",
-      "_type": "request",
-      "parentId": "fld_contratos",
-      "name": "GET /contratos/{id}/versoes — lista versoes",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/versoes",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ accessToken }}"
-        }
-      ],
-      "metaSortKey": -1749992000000
-    },
-    {
-      "_id": "req_contrato_aceite",
-      "_type": "request",
-      "parentId": "fld_contratos",
-      "name": "PATCH /contratos/{id}/aceite — CLIENTE dono + step-up",
-      "method": "PATCH",
-      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/aceite",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ accessToken }}"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{}"
-      },
-      "metaSortKey": -1749991000000
-    },
-    {
-      "_id": "req_contrato_cancelar",
-      "_type": "request",
-      "parentId": "fld_contratos",
-      "name": "POST /contratos/{id}/cancelar — FINANCEIRO/ADMIN + step-up + justificativa",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/cancelar",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ financeiroAccessToken }}"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"justificativa\": \"Contrato cancelado por divergencia operacional antes do aceite.\"\n}"
-      },
-      "metaSortKey": -1749990000000
-    },
-    {
-      "_id": "req_contrato_assinar",
-      "_type": "request",
-      "parentId": "fld_contratos",
-      "name": "POST /contratos/{id}/assinar — FINANCEIRO/ADMIN + step-up (Sprint 11; idempotente)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/assinar",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ financeiroAccessToken }}"
-        },
-        {
-          "name": "X-Step-Up-Token",
-          "value": "{{ stepUpToken }}"
-        },
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{}"
-      },
-      "description": "Reprocessamento manual idempotente do envio para assinatura. Envelope ja existente eh devolvido sem chamar provider novamente. 202 + StatusAssinaturaResponse. Erros: 422 (CCB falha ou provider 4xx), 502 (provider erro generico), 503 (provider 5xx).",
-      "metaSortKey": -1749989000000
-    },
-    {
-      "_id": "req_contrato_assinatura_status",
-      "_type": "request",
-      "parentId": "fld_contratos",
-      "name": "GET /contratos/{id}/assinatura/status — ownership ou FINANCEIRO/ADMIN (Sprint 11)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/assinatura/status",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ accessToken }}"
-        }
-      ],
-      "description": "Snapshot do envelope (statusEnvelope + idEnvelopeExterno + dataAtualizacaoProvider) + status do contrato. Fonte: estado local; webhook eh fonte de verdade operacional.",
-      "metaSortKey": -1749988000000
-    },
-    {
-      "_id": "req_contrato_documento_assinado",
-      "_type": "request",
-      "parentId": "fld_contratos",
-      "name": "GET /contratos/{id}/documento-assinado — ownership ou FINANCEIRO/ADMIN (Sprint 11)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/documento-assinado",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ accessToken }}"
-        }
-      ],
-      "description": "Download do PDF assinado. Exige contrato ASSINADO; 409 se indisponivel. Retorna application/pdf + Content-Disposition + X-Document-Hash-Sha256 (integridade local). Cada download grava audit DOCUMENTO_ASSINADO_BAIXADO com ip + user-agent (LGPD).",
-      "metaSortKey": -1749987000000
-    },
-    {
-      "_id": "req_webhook_assinatura_sign",
-      "_type": "request",
-      "parentId": "fld_webhook_assinatura",
-      "name": "POST /webhooks/assinatura/clicksign — sign (202)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Content-Hmac",
-          "value": "{{ clicksignSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"event\": { \"name\": \"sign\", \"occurred_at\": \"2026-05-21T15:00:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
-      },
-      "description": "Callback ASSINADO. Substitua {{ clicksignSignature }} por sha256=<hex> calculado com HMAC-SHA256(clicksignWebhookSecret, body). Transiciona Contrato.ASSINADO + cria DocumentoAssinado + publica ContratoAssinadoEvent. Audit log: ASSINATURA_ASSINADA.",
-      "metaSortKey": -1749986000000
-    },
-    {
-      "_id": "req_webhook_assinatura_refuse",
-      "_type": "request",
-      "parentId": "fld_webhook_assinatura",
-      "name": "POST /webhooks/assinatura/clicksign — refuse (202)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Content-Hmac",
-          "value": "{{ clicksignSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"event\": { \"name\": \"refuse\", \"occurred_at\": \"2026-05-21T15:30:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
-      },
-      "description": "Callback RECUSADO. Transiciona Contrato.RECUSADO + publica ContratoRecusadoEvent. Audit log: ASSINATURA_RECUSADA.",
-      "metaSortKey": -1749985000000
-    },
-    {
-      "_id": "req_webhook_assinatura_view",
-      "_type": "request",
-      "parentId": "fld_webhook_assinatura",
-      "name": "POST /webhooks/assinatura/clicksign — view (202 informativo)",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Content-Hmac",
-          "value": "{{ clicksignSignature }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"event\": { \"name\": \"view\", \"occurred_at\": \"2026-05-21T14:45:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
-      },
-      "description": "Callback VISUALIZADO (informativo). Marca envelope VISUALIZADO; contrato preserva EM_ASSINATURA. Audit log: ASSINATURA_VISUALIZADA.",
-      "metaSortKey": -1749984000000
-    },
-    {
-      "_id": "req_webhook_assinatura_hmac_invalido",
-      "_type": "request",
-      "parentId": "fld_webhook_assinatura",
-      "name": "POST /webhooks/assinatura/clicksign (HMAC invalido) — 401",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Content-Hmac",
-          "value": "sha256=deadbeef0000000000000000000000000000000000000000000000000000dead"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"event\": { \"name\": \"sign\", \"occurred_at\": \"2026-05-21T15:00:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
-      },
-      "description": "HMAC hardcoded invalido. Esperado: 401 via BadCredentialsException. Contrato preserva EM_ASSINATURA — nada processado.",
-      "metaSortKey": -1749983000000
-    },
-    {
-      "_id": "req_cob_agenda",
-      "_type": "request",
-      "parentId": "fld_cobranca",
-      "name": "GET /cobranca/contratos/{contratoId}/agenda",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/cobranca/contratos/{{ contratoId }}/agenda",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ clienteToken }}"}],
-      "description": "Owner (CLIENTE) ou FINANCEIRO/ADMIN. Retorna AgendaPagamentoResponse com parcelas. 403 se cliente alheio; 404 se sem agenda.",
-      "metaSortKey": -1749982900000
-    },
-    {
-      "_id": "req_cob_parcela",
-      "_type": "request",
-      "parentId": "fld_cobranca",
-      "name": "GET /cobranca/parcelas/{id}",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ clienteToken }}"}],
-      "description": "Retorna ValorAtualizadoParcelaResponse com mora + multa pro-rata. Cliente alheio recebe 403 unificado mesmo se parcela inexistir (anti-enumeracao).",
-      "metaSortKey": -1749982800000
-    },
-    {
-      "_id": "req_cob_recebimento_post",
-      "_type": "request",
-      "parentId": "fld_cobranca",
-      "name": "POST /cobranca/parcelas/{id}/recebimentos",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/recebimentos",
-      "headers": [
-        {"name": "Content-Type", "value": "application/json"},
-        {"name": "Authorization", "value": "Bearer {{ financeiroToken }}"},
-        {"name": "Idempotency-Key", "value": "{{ idempotencyKey }}"}
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"valorRecebido\": 1000.00,\n  \"dataRecebimento\": \"2026-05-22T10:00:00-03:00\",\n  \"meioPagamento\": \"TRANSFERENCIA\",\n  \"identificadorExterno\": \"comp-2026-05-22-001\",\n  \"observacao\": \"Recebido via TED do tomador\"\n}"
-      },
-      "description": "FINANCEIRO/ADMIN + Idempotency-Key obrigatoria (pattern [A-Za-z0-9._-]{1,100}). Idempotente: mesma key retorna novo=false. Nova key em parcela PAGA -> 409. Header ausente -> 400.",
-      "metaSortKey": -1749982700000
-    },
-    {
-      "_id": "req_cob_recebimentos_list",
-      "_type": "request",
-      "parentId": "fld_cobranca",
-      "name": "GET /cobranca/recebimentos",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/cobranca/recebimentos",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ financeiroToken }}"}],
-      "description": "FINANCEIRO/ADMIN. Lista ordenada dataRecebimento DESC. Sem paginacao na Sprint 12.",
-      "metaSortKey": -1749982600000
-    },
-    {
-      "_id": "req_cob_recebimentos_tomador",
-      "_type": "request",
-      "parentId": "fld_cobranca",
-      "name": "GET /cobranca/parcelas/{id}/recebimentos (tomador)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/recebimentos",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ clienteToken }}"}],
-      "description": "Sprint 23: historico owner-scoped do tomador. Exclusivo ROLE_CLIENTE (FINANCEIRO/ADMIN -> 403). RecebimentoTomadorResponse[] (recebimentoId, valorRecebido, dataRecebimento, meioPagamento) DESC. Cenarios: 200 com itens; 200 []; 403 nao-owner (parcela inexistente/alheia, uniforme sem UUID).",
-      "metaSortKey": -1749982500000
-    },
-    {
-      "_id": "req_cob_renegociacao_ativa_tomador",
-      "_type": "request",
-      "parentId": "fld_cobranca",
-      "name": "GET /cobranca/parcelas/{id}/renegociacao-ativa (tomador)",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/renegociacao-ativa",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ clienteToken }}"}],
-      "description": "Sprint 24: termos da renegociacao ativa owner-scoped. Exclusivo ROLE_CLIENTE (FINANCEIRO/ADMIN -> 403). Read-only, sem step-up. RenegociacaoTomadorResponse (10 campos; valorTotalRenegociado calculado no backend; sem justificativa/operador/IDs de agenda/statusParcelaAnterior). Cenarios: 200 proposta ativa; 404 sem proposta ativa; 403 nao-owner (inexistente/alheia, uniforme sem UUID).",
-      "metaSortKey": -1749982499000
-    },
-    {
-      "_id": "req_bof_fila_list",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "GET /backoffice/fila",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/backoffice/fila?status=ABERTO&prioridade=ALTA&page=0&size=20",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}],
-      "description": "FINANCEIRO/BACKOFFICE/ADMIN. Filtros: tipo, prioridade, status, dataAberturaDe/Ate, atribuidoA. Paginacao Spring; clamp 100. Sort default prioridade DESC, dataAbertura ASC.",
-      "metaSortKey": -1749982500000
-    },
-    {
-      "_id": "req_bof_fila_get",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "GET /backoffice/fila/{id}",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}],
-      "description": "Detalhe + comentarios paginados + objeto original resolvido via Strategy (ResolvedorObjetoOriginalDispatcher) pelo tipoEntidade.",
-      "metaSortKey": -1749982400000
-    },
-    {
-      "_id": "req_bof_fila_assumir",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "POST /backoffice/fila/{id}/assumir",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/assumir",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}],
-      "description": "Lock pessimista. Transiciona ABERTO -> EM_TRATAMENTO. 409 se ja em estado final ou EM_TRATAMENTO.",
-      "metaSortKey": -1749982300000
-    },
-    {
-      "_id": "req_bof_fila_comentario",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "POST /backoffice/fila/{id}/comentarios",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/comentarios",
-      "headers": [
-        {"name": "Content-Type", "value": "application/json"},
-        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"conteudo\": \"Tomador contactado por telefone; aguardando comprovante por email ate amanha 18h.\"\n}"
-      },
-      "description": "Registra ComentarioInterno (ate 10000 chars). Sem step-up.",
-      "metaSortKey": -1749982200000
-    },
-    {
-      "_id": "req_bof_fila_resolver",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "PATCH /backoffice/fila/{id}/resolver",
-      "method": "PATCH",
-      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/resolver",
-      "headers": [
-        {"name": "Content-Type", "value": "application/json"},
-        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"},
-        {"name": "X-Step-Up-Token", "value": "{{ stepUpToken }}"}
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"justificativa\": \"Pendencia resolvida apos confirmacao manual com tomador.\"\n}"
-      },
-      "description": "Step-up obrigatorio. Justificativa >= 20 chars (400 BOF-400-001). Transiciona EM_TRATAMENTO -> RESOLVIDO. Justificativa registrada tambem como comentario interno.",
-      "metaSortKey": -1749982100000
-    },
-    {
-      "_id": "req_bof_fila_ignorar",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "PATCH /backoffice/fila/{id}/ignorar",
-      "method": "PATCH",
-      "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/ignorar",
-      "headers": [
-        {"name": "Content-Type", "value": "application/json"},
-        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"},
-        {"name": "X-Step-Up-Token", "value": "{{ stepUpToken }}"}
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"justificativa\": \"Falso positivo: tomador ja regularizou via outro canal manualmente.\"\n}"
-      },
-      "description": "Step-up obrigatorio. Justificativa >= 20 chars. Transiciona EM_TRATAMENTO -> IGNORADO.",
-      "metaSortKey": -1749982000000
-    },
-    {
-      "_id": "req_bof_reproc_webhook",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "POST /backoffice/reprocessos/webhook/{webhookEventId}",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/backoffice/reprocessos/webhook/{{ webhookEventId }}",
-      "headers": [
-        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"},
-        {"name": "X-Step-Up-Token", "value": "{{ stepUpToken }}"}
-      ],
-      "description": "Re-dispara webhook (forca WebhookEventLog.status = PROCESSADO). Anti-abuso 3/24h por identificadorExterno -> 429 BOF-429-001.",
-      "metaSortKey": -1749981900000
-    },
-    {
-      "_id": "req_bof_reproc_provider",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "POST /backoffice/reprocessos/provider/{tipoChamada}/{idEntidade}",
-      "method": "POST",
-      "url": "{{ baseUrl }}/api/v1/backoffice/reprocessos/provider/KYC/{{ entidadeId }}",
-      "headers": [
-        {"name": "Authorization", "value": "Bearer {{ backofficeToken }}"},
-        {"name": "X-Step-Up-Token", "value": "{{ stepUpToken }}"}
-      ],
-      "description": "tipoChamada in {KYC, KYB, PLD, OPEN_FINANCE, ASSINATURA_DIGITAL}. Tipo desconhecido -> 400 BOF-400-002. Anti-abuso 3/24h -> 429. Strategies stub.",
-      "metaSortKey": -1749981800000
-    },
-    {
-      "_id": "req_bof_dashboard",
-      "_type": "request",
-      "parentId": "fld_backoffice",
-      "name": "GET /backoffice/dashboard",
-      "method": "GET",
-      "url": "{{ baseUrl }}/api/v1/backoffice/dashboard",
-      "headers": [{"name": "Authorization", "value": "Bearer {{ backofficeToken }}"}],
-      "description": "Visao consolidada (Facade): contadores fila + tempo medio 30d + criticos > 48h + top 5 tipos + recebimentos do dia + inadimplencia + propostas por status. Cache-Control: no-store. Resiliente a falha parcial.",
-      "metaSortKey": -1749981700000
+ "_type": "export",
+ "__export_format": 4,
+ "__export_date": "2026-05-15T00:00:00.000Z",
+ "__export_source": "manual",
+ "resources": [
+  {
+   "_id": "wrk_sep_api",
+   "_type": "workspace",
+   "parentId": null,
+   "name": "SEP API",
+   "description": "Colecao da SEP API (Java 21 + Spring Boot 3.5), alinhada ao OpenAPI runtime de sep-api develop 7f40056 (F-Sprint 19, 2026-07-16).\n\n**Modulos cobertos:** Auth + MFA TOTP + step-up, Usuarios, Onboarding KYC PF / KYB PJ + PLD, Credito + Open Finance, Contratos + assinatura, Cobranca (recebimentos, inadimplencia, contato, renegociacao), Credores (oportunidades/interesse, carteira owner-scoped, matching e aporte assistidos), Pix (desembolso, recebimento/conciliacao, leituras owner-scoped, gestao de chaves), Governanca (roles cumulativas + parametros), Backoffice, Webhooks (HMAC + Idempotency-Key), Actuator e OpenAPI/Swagger.\n\n**Convencoes:**\n- Variaveis nunca contem credencial, token real, CPF/CNPJ ou chave Pix bruta; IDs sao capturados em runtime pelos test scripts.\n- Idempotency-Key e variavel POR INTENCAO (aporteIdempotencyKey, pixIdempotencyKey, chavePixIdempotencyKey); requests de replay reutilizam conscientemente a mesma variavel.\n- X-Step-Up-Token ({{stepUpToken}}) nos endpoints @RequireStepUp/@RequireStepUpEstrito.\n- Leituras owner-scoped respondem 404 neutro para recurso alheio/inexistente.\n- Default: http://localhost:8080 (nunca apontar comandos mutaveis para ambiente externo).\n\n**Ordem sugerida:** POST /usuarios -> POST /auth/login -> fluxos de MFA/step-up -> demais requests autenticados por persona (adminToken, financeiroToken, clienteToken, credoraToken).\n\n**Dados sinteticos e secrets (F-19):** as collections NUNCA versionam CPF/CNPJ, credencial, token ou chave Pix real. Preencha localmente: `cpfTeste`/`cnpjTeste` com valores sinteticos (gerador de dados de teste) e os secrets de webhook com os valores do seu `application-dev.yml` (envs `APP_WEBHOOK_SECRET_*`).",
+   "scope": "collection"
+  },
+  {
+   "_id": "env_base",
+   "_type": "environment",
+   "parentId": "wrk_sep_api",
+   "name": "Base Environment",
+   "data": {
+    "baseUrl": "http://localhost:8080",
+    "adminAccessToken": "",
+    "clienteAccessToken": "",
+    "adminRefreshToken": "",
+    "clienteRefreshToken": "",
+    "stepUpToken": "",
+    "stepUpChallengeId": "",
+    "mfaChallengeId": "",
+    "adminId": "",
+    "clienteId": "",
+    "onboardingSolicitacaoId": "",
+    "onboardingEmpresaId": "",
+    "celcoinKycSignature": "sha256=PLACEHOLDER",
+    "celcoinKybSignature": "sha256=PLACEHOLDER",
+    "celcoinPldSignature": "sha256=PLACEHOLDER",
+    "celcoinPixSignature": "sha256=PLACEHOLDER",
+    "idempotencyKey": "11111111-1111-1111-1111-111111111111",
+    "propostaCreditoId": "",
+    "parecerCreditoId": "",
+    "financeiroAccessToken": "",
+    "financeiroRefreshToken": "",
+    "financeiroId": "",
+    "contratoId": "",
+    "idEnvelopeExterno": "",
+    "clicksignWebhookSecret": "",
+    "clicksignSignature": "sha256=PLACEHOLDER",
+    "financeiroToken": "",
+    "parcelaId": "",
+    "recebimentoId": "",
+    "credoraToken": "",
+    "onboardingCredoraId": "",
+    "empresaCredoraId": "",
+    "oportunidadeId": "",
+    "operacaoCarteiraId": "",
+    "matchingSugestaoId": "",
+    "aporteId": "",
+    "aporteIdempotencyKey": "apt-2026-07-16-001",
+    "pixIdempotencyKey": "pix-2026-07-16-001",
+    "chavePixIdempotencyKey": "chv-2026-07-16-001",
+    "transferenciaId": "",
+    "referenciaRecebimentoId": "",
+    "pixRecebimentoId": "",
+    "chavePixId": "",
+    "parametroChave": "",
+    "renegociacaoId": "",
+    "cpfTeste": "",
+    "cnpjTeste": ""
+   },
+   "color": null,
+   "isPrivate": false,
+   "metaSortKey": 1
+  },
+  {
+   "_id": "env_local_dev",
+   "_type": "environment",
+   "parentId": "env_base",
+   "name": "local-dev",
+   "data": {
+    "baseUrl": "http://localhost:8080",
+    "propostaCreditoId": "",
+    "parecerCreditoId": "",
+    "financeiroAccessToken": "",
+    "financeiroRefreshToken": "",
+    "financeiroId": ""
+   },
+   "color": "#7d3cff",
+   "isPrivate": false,
+   "metaSortKey": 2
+  },
+  {
+   "_id": "fld_auth",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Auth",
+   "description": "Login, refresh, logout, /me",
+   "metaSortKey": -10
+  },
+  {
+   "_id": "fld_mfa",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "MFA TOTP (Sprint 5)",
+   "metaSortKey": -9
+  },
+  {
+   "_id": "fld_stepup",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Step-up (Sprint 5)",
+   "metaSortKey": -8
+  },
+  {
+   "_id": "fld_usuarios",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Usuários",
+   "metaSortKey": -7
+  },
+  {
+   "_id": "fld_webhooks_pix",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Webhooks Pix (Sprint 4)",
+   "metaSortKey": -6
+  },
+  {
+   "_id": "fld_onb_pf",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Onboarding KYC PF (Sprint 6)",
+   "metaSortKey": -5
+  },
+  {
+   "_id": "fld_onb_pj",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Onboarding KYB PJ (Sprint 7)",
+   "metaSortKey": -4.5
+  },
+  {
+   "_id": "fld_webhooks_kyb_pld",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Webhooks KYB/PLD (Sprint 7)",
+   "metaSortKey": -4
+  },
+  {
+   "_id": "fld_contratos",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Contratos (Sprints 10 + 11)",
+   "metaSortKey": -3.5
+  },
+  {
+   "_id": "fld_webhook_assinatura",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Webhook Assinatura Digital (Sprint 11)",
+   "metaSortKey": -3.4
+  },
+  {
+   "_id": "fld_cobranca",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Cobranca (Sprints 12-13 + 24)",
+   "metaSortKey": -3.2
+  },
+  {
+   "_id": "fld_backoffice",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Backoffice (Sprint 14)",
+   "metaSortKey": -3.1
+  },
+  {
+   "_id": "fld_actuator",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Actuator",
+   "metaSortKey": -3
+  },
+  {
+   "_id": "fld_openapi",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "OpenAPI / Swagger",
+   "metaSortKey": -2
+  },
+  {
+   "_id": "req_login_admin",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "POST /auth/login (admin)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/login",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
     }
-  ]
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_login_cliente",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "POST /auth/login (cliente)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/login",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_login_invalido",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "POST /auth/login (senha inválida) — 401",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/login",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"admin@empresa.com\",\n  \"password\": \"wrong-password\"\n}"
+   },
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_refresh_admin",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "POST /auth/refresh (admin)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/refresh",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"refreshToken\": \"{{ adminRefreshToken }}\"\n}"
+   },
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_refresh_cliente",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "POST /auth/refresh (cliente)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/refresh",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"refreshToken\": \"{{ clienteRefreshToken }}\"\n}"
+   },
+   "metaSortKey": 5
+  },
+  {
+   "_id": "req_logout",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "POST /auth/logout (admin) — 204",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/logout",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"refreshToken\": \"{{ adminRefreshToken }}\"\n}"
+   },
+   "metaSortKey": 6
+  },
+  {
+   "_id": "req_logout_all",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "POST /auth/logout-all (admin) — 204",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/logout-all",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "metaSortKey": 7
+  },
+  {
+   "_id": "req_me_admin",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "GET /auth/me (admin)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/auth/me",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "metaSortKey": 8
+  },
+  {
+   "_id": "req_me_cliente",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "GET /auth/me (cliente)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/auth/me",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 9
+  },
+  {
+   "_id": "req_me_sem_token",
+   "_type": "request",
+   "parentId": "fld_auth",
+   "name": "GET /auth/me (sem token) — 401",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/auth/me",
+   "headers": [],
+   "metaSortKey": 10
+  },
+  {
+   "_id": "req_totp_setup",
+   "_type": "request",
+   "parentId": "fld_mfa",
+   "name": "POST /auth/totp/setup (admin) — 200",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/totp/setup",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_totp_confirm",
+   "_type": "request",
+   "parentId": "fld_mfa",
+   "name": "POST /auth/totp/confirm (admin) — 204",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/totp/confirm",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"codigo\": \"123456\"\n}"
+   },
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_totp_verify",
+   "_type": "request",
+   "parentId": "fld_mfa",
+   "name": "POST /auth/totp/verify — 200",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/totp/verify",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"mfaChallengeId\": \"{{ mfaChallengeId }}\",\n  \"codigo\": \"123456\"\n}"
+   },
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_totp_disable",
+   "_type": "request",
+   "parentId": "fld_mfa",
+   "name": "POST /auth/totp/disable (admin) — 204",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/totp/disable",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"passwordAtual\": \"senha-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_stepup_init_admin",
+   "_type": "request",
+   "parentId": "fld_stepup",
+   "name": "POST /auth/step-up/initiate (admin)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/step-up/initiate",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_stepup_complete_admin",
+   "_type": "request",
+   "parentId": "fld_stepup",
+   "name": "POST /auth/step-up/complete (admin)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/step-up/complete",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"stepUpChallengeId\": \"{{ stepUpChallengeId }}\",\n  \"codigo\": \"123456\"\n}"
+   },
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_stepup_init_cliente",
+   "_type": "request",
+   "parentId": "fld_stepup",
+   "name": "POST /auth/step-up/initiate (cliente)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/step-up/initiate",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_stepup_complete_cliente",
+   "_type": "request",
+   "parentId": "fld_stepup",
+   "name": "POST /auth/step-up/complete (cliente)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/auth/step-up/complete",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"stepUpChallengeId\": \"{{ stepUpChallengeId }}\",\n  \"codigo\": \"123456\"\n}"
+   },
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_usr_create_publico",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "POST /usuarios (criar cliente público) — 201",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/usuarios",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_usr_admin_create",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "POST /admin/usuarios (criar admin interno) — 201",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/admin/usuarios",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"admin2@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
+   },
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_usr_admin_create_cliente_403",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "POST /admin/usuarios (cliente tenta criar admin) — 403",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/admin/usuarios",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"admin-negado@empresa.com\",\n  \"password\": \"senha-passphrase-segura\",\n  \"role\": \"ADMIN\"\n}"
+   },
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_usr_email_invalido_400",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "POST /usuarios (email inválido) — 400",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/usuarios",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"nao-eh-email\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_usr_senha_fraca_400",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "POST /usuarios (senha fraca) — 400",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/usuarios",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"fraca@empresa.com\",\n  \"password\": \"123456\"\n}"
+   },
+   "metaSortKey": 5
+  },
+  {
+   "_id": "req_usr_email_dup_409",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "POST /usuarios (email duplicado) — 409",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/usuarios",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"username\": \"cliente@empresa.com\",\n  \"password\": \"senha-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 6
+  },
+  {
+   "_id": "req_usr_get_admin_any",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "GET /usuarios/{id} (admin -> qualquer) — 200",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "metaSortKey": 7
+  },
+  {
+   "_id": "req_usr_get_cliente_self",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "GET /usuarios/{id} (cliente -> próprio) — 200",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 8
+  },
+  {
+   "_id": "req_usr_get_cliente_alheio_403",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "GET /usuarios/{id} (cliente -> alheio) — 403",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ adminId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 9
+  },
+  {
+   "_id": "req_usr_get_inexistente_404",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "GET /usuarios/{id} (id inexistente) — 404",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/usuarios/00000000-0000-0000-0000-000000000000",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "metaSortKey": 10
+  },
+  {
+   "_id": "req_usr_list_admin",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "GET /usuarios (admin -> lista) — 200",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/usuarios",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    }
+   ],
+   "metaSortKey": 11
+  },
+  {
+   "_id": "req_usr_list_cliente_403",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "GET /usuarios (cliente -> lista) — 403",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/usuarios",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 12
+  },
+  {
+   "_id": "req_usr_senha_self_204",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "PATCH /usuarios/{id}/senha (próprio cliente) — 204",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 13
+  },
+  {
+   "_id": "req_usr_senha_errada_400",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "PATCH /usuarios/{id}/senha (senha atual errada) — 400",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"passwordAtual\": \"senha-errada\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 14
+  },
+  {
+   "_id": "req_usr_senha_admin_403",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "PATCH /usuarios/{id}/senha (admin sobre cliente) — 403",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/senha",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"passwordAtual\": \"senha-passphrase-segura\",\n  \"novaSenha\": \"nova-passphrase-segura\"\n}"
+   },
+   "metaSortKey": 15
+  },
+  {
+   "_id": "req_wh_pix19_ok",
+   "_type": "request",
+   "parentId": "fld_webhooks_pix",
+   "name": "POST /webhooks/celcoin/pix (recebimento) — 202 (Sprint 19)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinPixSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"event_id\": \"evt-1\",\n  \"event_type\": \"pix.received\",\n  \"end_to_end_id\": \"E2E-1\",\n  \"amount\": 250.00\n}"
+   },
+   "description": "Endpoint dedicado da Sprint 19 (PixWebhookController). HMAC obrigatorio (secret app.webhooks.secrets.celcoin-pix); idempotencia por event_id do payload (sem Idempotency-Key). Cria PixWebhookEvent (so hash) + PixRecebimento inicial.",
+   "metaSortKey": 0
+  },
+  {
+   "_id": "req_wh_pix_ok",
+   "_type": "request",
+   "parentId": "fld_webhooks_pix",
+   "name": "POST /webhooks/celcoin/pix-recebimento — 202",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinPixSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"transactionId\": \"abc-123\",\n  \"valor\": 1500.50,\n  \"chavePix\": \"00000000000\",\n  \"status\": \"LIQUIDADO\"\n}"
+   },
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_wh_pix_dup",
+   "_type": "request",
+   "parentId": "fld_webhooks_pix",
+   "name": "POST /webhooks/celcoin/pix-recebimento (mesma idempotency) — 202",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinPixSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"transactionId\": \"abc-123\",\n  \"valor\": 1500.50,\n  \"chavePix\": \"00000000000\",\n  \"status\": \"LIQUIDADO\"\n}"
+   },
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_wh_pix_sem_idem_400",
+   "_type": "request",
+   "parentId": "fld_webhooks_pix",
+   "name": "POST /webhooks/celcoin/pix-recebimento (sem Idempotency-Key) — 400",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinPixSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"transactionId\": \"abc-123\"\n}"
+   },
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_wh_pix_sig_inv_401",
+   "_type": "request",
+   "parentId": "fld_webhooks_pix",
+   "name": "POST /webhooks/celcoin/pix-recebimento (assinatura inválida) — 401",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pix-recebimento",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "sha256=INVALIDA"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"transactionId\": \"abc-123\"\n}"
+   },
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_onb_iniciar",
+   "_type": "request",
+   "parentId": "fld_onb_pf",
+   "name": "POST /onboarding/pessoa — 201",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/onboarding/pessoa",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"cpf\": \"{{ cpfTeste }}\",\n  \"nomeCompleto\": \"Joao da Silva\",\n  \"dataNascimento\": \"1990-01-15\"\n}"
+   },
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_onb_doc_rg",
+   "_type": "request",
+   "parentId": "fld_onb_pf",
+   "name": "POST /onboarding/pessoa/{id}/documentos — RG (204)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/documentos",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "multipart/form-data",
+    "params": [
+     {
+      "name": "tipo",
+      "value": "RG"
+     },
+     {
+      "name": "arquivo",
+      "type": "file",
+      "fileName": ""
+     }
+    ]
+   },
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_onb_doc_selfie",
+   "_type": "request",
+   "parentId": "fld_onb_pf",
+   "name": "POST /onboarding/pessoa/{id}/documentos — SELFIE (204)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/documentos",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "multipart/form-data",
+    "params": [
+     {
+      "name": "tipo",
+      "value": "SELFIE"
+     },
+     {
+      "name": "arquivo",
+      "type": "file",
+      "fileName": ""
+     }
+    ]
+   },
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_onb_verificar",
+   "_type": "request",
+   "parentId": "fld_onb_pf",
+   "name": "POST /onboarding/pessoa/{id}/verificar — 202",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}/verificar",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_onb_get",
+   "_type": "request",
+   "parentId": "fld_onb_pf",
+   "name": "GET /onboarding/pessoa/{id} — 200",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/onboarding/pessoa/{{ onboardingSolicitacaoId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 5
+  },
+  {
+   "_id": "req_wh_kyc_approved",
+   "_type": "request",
+   "parentId": "fld_onb_pf",
+   "name": "POST /webhooks/celcoin/kyc — APPROVED (202)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyc",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinKycSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"verification_id\": \"fake-{{ onboardingSolicitacaoId }}\",\n  \"status\": \"APPROVED\",\n  \"reason\": null\n}"
+   },
+   "metaSortKey": 6
+  },
+  {
+   "_id": "req_wh_kyc_sig_inv",
+   "_type": "request",
+   "parentId": "fld_onb_pf",
+   "name": "POST /webhooks/celcoin/kyc (assinatura inválida) — 401",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyc",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "sha256=INVALIDA"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"verification_id\": \"fake-xyz\",\n  \"status\": \"APPROVED\"\n}"
+   },
+   "metaSortKey": 7
+  },
+  {
+   "_id": "req_onb_empresa_iniciar",
+   "_type": "request",
+   "parentId": "fld_onb_pj",
+   "name": "POST /onboarding/empresa — 201",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/onboarding/empresa",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"cnpj\": \"{{ cnpjTeste }}\",\n  \"razaoSocial\": \"ACME LTDA\",\n  \"nomeFantasia\": \"Acme\",\n  \"tipoSocietario\": \"LTDA\",\n  \"porte\": \"ME\"\n}"
+   },
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_onb_empresa_doc_contrato",
+   "_type": "request",
+   "parentId": "fld_onb_pj",
+   "name": "POST /onboarding/empresa/{id}/documentos — CONTRATO_SOCIAL (204)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/documentos",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "multipart/form-data",
+    "params": [
+     {
+      "name": "tipo",
+      "value": "CONTRATO_SOCIAL"
+     },
+     {
+      "name": "arquivo",
+      "type": "file",
+      "fileName": ""
+     }
+    ]
+   },
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_onb_empresa_doc_endereco",
+   "_type": "request",
+   "parentId": "fld_onb_pj",
+   "name": "POST /onboarding/empresa/{id}/documentos — COMPROVANTE_ENDERECO (204)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/documentos",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "multipart/form-data",
+    "params": [
+     {
+      "name": "tipo",
+      "value": "COMPROVANTE_ENDERECO"
+     },
+     {
+      "name": "arquivo",
+      "type": "file",
+      "fileName": ""
+     }
+    ]
+   },
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_onb_empresa_verificar",
+   "_type": "request",
+   "parentId": "fld_onb_pj",
+   "name": "POST /onboarding/empresa/{id}/verificar — 202",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/verificar",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_onb_empresa_get",
+   "_type": "request",
+   "parentId": "fld_onb_pj",
+   "name": "GET /onboarding/empresa/{id} — 200",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 5
+  },
+  {
+   "_id": "req_onb_empresa_representantes",
+   "_type": "request",
+   "parentId": "fld_onb_pj",
+   "name": "GET /onboarding/empresa/{id}/representantes — 200",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/onboarding/empresa/{{ onboardingEmpresaId }}/representantes",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": 6
+  },
+  {
+   "_id": "req_wh_kyb_ativa",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/kyb — ATIVA (202)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinKybSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\",\n  \"tax_id\": \"{{ cnpjTeste }}\",\n  \"company_name\": \"ACME LTDA\"\n}"
+   },
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_wh_kyb_inativa",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/kyb — INATIVA (REPROVADO)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinKybSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"INACTIVE\",\n  \"company_name\": \"Empresa Encerrada LTDA\"\n}"
+   },
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_wh_kyb_sem_idem",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/kyb (sem Idempotency-Key) — 400",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinKybSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\"\n}"
+   },
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_wh_kyb_sig_inv",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/kyb (assinatura inválida) — 401",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "sha256=INVALIDA"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\"\n}"
+   },
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_wh_pld_limpo",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/pld — todos limpos (APROVADO_FINAL)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinPldSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": [\n    {\n      \"target_type\": \"EMPRESA\",\n      \"document_number\": \"{{ cnpjTeste }}\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": false },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
+   },
+   "metaSortKey": 5
+  },
+  {
+   "_id": "req_wh_pld_hit",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/pld — hit OFAC (REPROVADO_PLD)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinPldSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": [\n    {\n      \"target_type\": \"EMPRESA\",\n      \"document_number\": \"{{ cnpjTeste }}\",\n      \"databases\": [\n        { \"database\": \"COAF\", \"hit\": false },\n        { \"database\": \"OFAC\", \"hit\": true, \"reason\": \"sancao\", \"severity\": \"ALTA\", \"inclusion_date\": \"2023-04-12\" },\n        { \"database\": \"INTERPOL\", \"hit\": false },\n        { \"database\": \"MTE\", \"hit\": false }\n      ]\n    }\n  ]\n}"
+   },
+   "metaSortKey": 6
+  },
+  {
+   "_id": "req_wh_pld_sem_idem",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/pld (sem Idempotency-Key) — 400",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinPldSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": []\n}"
+   },
+   "metaSortKey": 7
+  },
+  {
+   "_id": "req_wh_pld_sig_inv",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/pld (assinatura inválida) — 401",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/pld",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "sha256=INVALIDA"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"results\": []\n}"
+   },
+   "metaSortKey": 8
+  },
+  {
+   "_id": "req_act_health",
+   "_type": "request",
+   "parentId": "fld_actuator",
+   "name": "GET /actuator/health",
+   "method": "GET",
+   "url": "{{ baseUrl }}/actuator/health",
+   "headers": [],
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_act_info",
+   "_type": "request",
+   "parentId": "fld_actuator",
+   "name": "GET /actuator/info",
+   "method": "GET",
+   "url": "{{ baseUrl }}/actuator/info",
+   "headers": [],
+   "metaSortKey": 2
+  },
+  {
+   "_id": "req_act_metrics",
+   "_type": "request",
+   "parentId": "fld_actuator",
+   "name": "GET /actuator/metrics",
+   "method": "GET",
+   "url": "{{ baseUrl }}/actuator/metrics",
+   "headers": [],
+   "metaSortKey": 3
+  },
+  {
+   "_id": "req_act_prometheus",
+   "_type": "request",
+   "parentId": "fld_actuator",
+   "name": "GET /actuator/prometheus",
+   "method": "GET",
+   "url": "{{ baseUrl }}/actuator/prometheus",
+   "headers": [],
+   "metaSortKey": 4
+  },
+  {
+   "_id": "req_openapi_json",
+   "_type": "request",
+   "parentId": "fld_openapi",
+   "name": "GET /v3/api-docs",
+   "method": "GET",
+   "url": "{{ baseUrl }}/v3/api-docs",
+   "headers": [],
+   "metaSortKey": 1
+  },
+  {
+   "_id": "req_swagger_ui",
+   "_type": "request",
+   "parentId": "fld_openapi",
+   "name": "GET /swagger-ui/index.html (browser)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/swagger-ui/index.html",
+   "headers": [],
+   "metaSortKey": 2
+  },
+  {
+   "_id": "fld_credito",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Credito (Sprint 8)",
+   "description": "Modulo credito: propostas, motor de regras, parecer manual + promocao FINANCEIRO. Ver CREDITO.md em docs-SEP/repos/sep-api/.",
+   "metaSortKey": -1750000000000
+  },
+  {
+   "_id": "req_credito_post_proposta",
+   "_type": "request",
+   "parentId": "fld_credito",
+   "name": "POST /credito/propostas (cliente)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credito/propostas",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    },
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "metaSortKey": -1750000000000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"solicitacaoOnboardingId\": \"{{ onboardingSolicitacaoId }}\",\n  \"tipoOperacao\": \"OUTROS\",\n  \"valorSolicitado\": 10000.00,\n  \"prazoMeses\": 12\n}"
+   }
+  },
+  {
+   "_id": "req_credito_get_proposta",
+   "_type": "request",
+   "parentId": "fld_credito",
+   "name": "GET /credito/propostas/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": -1749999000000
+  },
+  {
+   "_id": "req_credito_list",
+   "_type": "request",
+   "parentId": "fld_credito",
+   "name": "GET /credito/propostas (financeiro)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credito/propostas?status=PRE_APROVADA&page=0&size=20",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroAccessToken }}"
+    }
+   ],
+   "metaSortKey": -1749998000000
+  },
+  {
+   "_id": "req_credito_parecer",
+   "_type": "request",
+   "parentId": "fld_credito",
+   "name": "POST /credito/propostas/{id}/parecer (FINANCEIRO + step-up)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/parecer",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroAccessToken }}"
+    },
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "metaSortKey": -1749997000000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"decisao\": \"APROVAR\",\n  \"justificativa\": \"Cliente com bom historico interno e capacidade de pagamento adequada.\"\n}"
+   }
+  },
+  {
+   "_id": "req_credito_regras",
+   "_type": "request",
+   "parentId": "fld_credito",
+   "name": "GET /credito/propostas/{id}/regras (FINANCEIRO/ADMIN)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/regras",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroAccessToken }}"
+    }
+   ],
+   "metaSortKey": -1749996000000
+  },
+  {
+   "_id": "req_of_consentimento",
+   "_type": "request",
+   "parentId": "fld_credito",
+   "name": "POST /credito/propostas/{id}/open-finance/consentimento (Sprint 9 — CLIENTE dono)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/open-finance/consentimento",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    },
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"cpfCnpjTomador\": \"{{ cpfTeste }}\",\n  \"redirectUri\": \"https://app.sep/auth/callback\"\n}"
+   },
+   "metaSortKey": -1749995900000
+  },
+  {
+   "_id": "req_of_status",
+   "_type": "request",
+   "parentId": "fld_credito",
+   "name": "GET /credito/propostas/{id}/open-finance (Sprint 9 — status + snapshot)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credito/propostas/{{ propostaCreditoId }}/open-finance",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "metaSortKey": -1749995800000
+  },
+  {
+   "_id": "req_of_webhook",
+   "_type": "request",
+   "parentId": "fld_webhooks",
+   "name": "POST /webhooks/celcoin/open-finance (Sprint 9 — consent.authorized)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/open-finance",
+   "headers": [
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ openFinanceIdempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ openFinanceWebhookSignature }}"
+    },
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"type\": \"consent.authorized\",\n  \"consent_id\": \"{{ openFinanceExternalId }}\"\n}"
+   },
+   "metaSortKey": -1749995700000
+  },
+  {
+   "_id": "req_usuarios_role",
+   "_type": "request",
+   "parentId": "fld_usuarios",
+   "name": "POST /usuarios/{id}/role (ADMIN + step-up promove FINANCEIRO)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ financeiroId }}/role",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminAccessToken }}"
+    },
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "metaSortKey": -1749995000000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"role\": \"FINANCEIRO\"\n}"
+   }
+  },
+  {
+   "_id": "req_contrato_por_proposta",
+   "_type": "request",
+   "parentId": "fld_contratos",
+   "name": "GET /contratos/proposta/{propostaId} — consulta contrato vigente",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/contratos/proposta/{{ propostaCreditoId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ accessToken }}"
+    }
+   ],
+   "metaSortKey": -1749994000000
+  },
+  {
+   "_id": "req_contrato_por_id",
+   "_type": "request",
+   "parentId": "fld_contratos",
+   "name": "GET /contratos/{id} — consulta por id",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ accessToken }}"
+    }
+   ],
+   "metaSortKey": -1749993000000
+  },
+  {
+   "_id": "req_contrato_versoes",
+   "_type": "request",
+   "parentId": "fld_contratos",
+   "name": "GET /contratos/{id}/versoes — lista versoes",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/versoes",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ accessToken }}"
+    }
+   ],
+   "metaSortKey": -1749992000000
+  },
+  {
+   "_id": "req_contrato_aceite",
+   "_type": "request",
+   "parentId": "fld_contratos",
+   "name": "PATCH /contratos/{id}/aceite — CLIENTE dono + step-up",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/aceite",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ accessToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{}"
+   },
+   "metaSortKey": -1749991000000
+  },
+  {
+   "_id": "req_contrato_cancelar",
+   "_type": "request",
+   "parentId": "fld_contratos",
+   "name": "POST /contratos/{id}/cancelar — FINANCEIRO/ADMIN + step-up + justificativa",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/cancelar",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroAccessToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"justificativa\": \"Contrato cancelado por divergencia operacional antes do aceite.\"\n}"
+   },
+   "metaSortKey": -1749990000000
+  },
+  {
+   "_id": "req_contrato_assinar",
+   "_type": "request",
+   "parentId": "fld_contratos",
+   "name": "POST /contratos/{id}/assinar — FINANCEIRO/ADMIN + step-up (Sprint 11; idempotente)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/assinar",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroAccessToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{}"
+   },
+   "description": "Reprocessamento manual idempotente do envio para assinatura. Envelope ja existente eh devolvido sem chamar provider novamente. 202 + StatusAssinaturaResponse. Erros: 422 (CCB falha ou provider 4xx), 502 (provider erro generico), 503 (provider 5xx).",
+   "metaSortKey": -1749989000000
+  },
+  {
+   "_id": "req_contrato_assinatura_status",
+   "_type": "request",
+   "parentId": "fld_contratos",
+   "name": "GET /contratos/{id}/assinatura/status — ownership ou FINANCEIRO/ADMIN (Sprint 11)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/assinatura/status",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ accessToken }}"
+    }
+   ],
+   "description": "Snapshot do envelope (statusEnvelope + idEnvelopeExterno + dataAtualizacaoProvider) + status do contrato. Fonte: estado local; webhook eh fonte de verdade operacional.",
+   "metaSortKey": -1749988000000
+  },
+  {
+   "_id": "req_contrato_documento_assinado",
+   "_type": "request",
+   "parentId": "fld_contratos",
+   "name": "GET /contratos/{id}/documento-assinado — ownership ou FINANCEIRO/ADMIN (Sprint 11)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/contratos/{{ contratoId }}/documento-assinado",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ accessToken }}"
+    }
+   ],
+   "description": "Download do PDF assinado. Exige contrato ASSINADO; 409 se indisponivel. Retorna application/pdf + Content-Disposition + X-Document-Hash-Sha256 (integridade local). Cada download grava audit DOCUMENTO_ASSINADO_BAIXADO com ip + user-agent (LGPD).",
+   "metaSortKey": -1749987000000
+  },
+  {
+   "_id": "req_webhook_assinatura_sign",
+   "_type": "request",
+   "parentId": "fld_webhook_assinatura",
+   "name": "POST /webhooks/assinatura/clicksign — sign (202)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Content-Hmac",
+     "value": "{{ clicksignSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"event\": { \"name\": \"sign\", \"occurred_at\": \"2026-05-21T15:00:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
+   },
+   "description": "Callback ASSINADO. Substitua {{ clicksignSignature }} por sha256=<hex> calculado com HMAC-SHA256(clicksignWebhookSecret, body). Transiciona Contrato.ASSINADO + cria DocumentoAssinado + publica ContratoAssinadoEvent. Audit log: ASSINATURA_ASSINADA.",
+   "metaSortKey": -1749986000000
+  },
+  {
+   "_id": "req_webhook_assinatura_refuse",
+   "_type": "request",
+   "parentId": "fld_webhook_assinatura",
+   "name": "POST /webhooks/assinatura/clicksign — refuse (202)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Content-Hmac",
+     "value": "{{ clicksignSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"event\": { \"name\": \"refuse\", \"occurred_at\": \"2026-05-21T15:30:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
+   },
+   "description": "Callback RECUSADO. Transiciona Contrato.RECUSADO + publica ContratoRecusadoEvent. Audit log: ASSINATURA_RECUSADA.",
+   "metaSortKey": -1749985000000
+  },
+  {
+   "_id": "req_webhook_assinatura_view",
+   "_type": "request",
+   "parentId": "fld_webhook_assinatura",
+   "name": "POST /webhooks/assinatura/clicksign — view (202 informativo)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Content-Hmac",
+     "value": "{{ clicksignSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"event\": { \"name\": \"view\", \"occurred_at\": \"2026-05-21T14:45:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
+   },
+   "description": "Callback VISUALIZADO (informativo). Marca envelope VISUALIZADO; contrato preserva EM_ASSINATURA. Audit log: ASSINATURA_VISUALIZADA.",
+   "metaSortKey": -1749984000000
+  },
+  {
+   "_id": "req_webhook_assinatura_hmac_invalido",
+   "_type": "request",
+   "parentId": "fld_webhook_assinatura",
+   "name": "POST /webhooks/assinatura/clicksign (HMAC invalido) — 401",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/assinatura/clicksign",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Content-Hmac",
+     "value": "sha256=deadbeef0000000000000000000000000000000000000000000000000000dead"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"event\": { \"name\": \"sign\", \"occurred_at\": \"2026-05-21T15:00:00Z\" },\n  \"document\": { \"key\": \"{{ idEnvelopeExterno }}\" }\n}"
+   },
+   "description": "HMAC hardcoded invalido. Esperado: 401 via BadCredentialsException. Contrato preserva EM_ASSINATURA — nada processado.",
+   "metaSortKey": -1749983000000
+  },
+  {
+   "_id": "req_cob_agenda",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "GET /cobranca/contratos/{contratoId}/agenda",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/cobranca/contratos/{{ contratoId }}/agenda",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    }
+   ],
+   "description": "Owner (CLIENTE) ou FINANCEIRO/ADMIN. Retorna AgendaPagamentoResponse com parcelas. 403 se cliente alheio; 404 se sem agenda.",
+   "metaSortKey": -1749982900000
+  },
+  {
+   "_id": "req_cob_parcela",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "GET /cobranca/parcelas/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    }
+   ],
+   "description": "Retorna ValorAtualizadoParcelaResponse com mora + multa pro-rata. Cliente alheio recebe 403 unificado mesmo se parcela inexistir (anti-enumeracao).",
+   "metaSortKey": -1749982800000
+  },
+  {
+   "_id": "req_cob_recebimento_post",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "POST /cobranca/parcelas/{id}/recebimentos",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/recebimentos",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"valorRecebido\": 1000.00,\n  \"dataRecebimento\": \"2026-05-22T10:00:00-03:00\",\n  \"meioPagamento\": \"TRANSFERENCIA\",\n  \"identificadorExterno\": \"comp-2026-05-22-001\",\n  \"observacao\": \"Recebido via TED do tomador\"\n}"
+   },
+   "description": "FINANCEIRO/ADMIN + Idempotency-Key obrigatoria (pattern [A-Za-z0-9._-]{1,100}). Idempotente: mesma key retorna novo=false. Nova key em parcela PAGA -> 409. Header ausente -> 400.",
+   "metaSortKey": -1749982700000
+  },
+  {
+   "_id": "req_cob_recebimentos_list",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "GET /cobranca/recebimentos",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/cobranca/recebimentos",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "FINANCEIRO/ADMIN. Lista ordenada dataRecebimento DESC. Sem paginacao na Sprint 12.",
+   "metaSortKey": -1749982600000
+  },
+  {
+   "_id": "req_cob_recebimentos_tomador",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "GET /cobranca/parcelas/{id}/recebimentos (tomador)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/recebimentos",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    }
+   ],
+   "description": "Sprint 23: historico owner-scoped do tomador. Exclusivo ROLE_CLIENTE (FINANCEIRO/ADMIN -> 403). RecebimentoTomadorResponse[] (recebimentoId, valorRecebido, dataRecebimento, meioPagamento) DESC. Cenarios: 200 com itens; 200 []; 403 nao-owner (parcela inexistente/alheia, uniforme sem UUID).",
+   "metaSortKey": -1749982500000
+  },
+  {
+   "_id": "req_cob_renegociacao_ativa_tomador",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "GET /cobranca/parcelas/{id}/renegociacao-ativa (tomador)",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/renegociacao-ativa",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    }
+   ],
+   "description": "Sprint 24: termos da renegociacao ativa owner-scoped. Exclusivo ROLE_CLIENTE (FINANCEIRO/ADMIN -> 403). Read-only, sem step-up. RenegociacaoTomadorResponse (10 campos; valorTotalRenegociado calculado no backend; sem justificativa/operador/IDs de agenda/statusParcelaAnterior). Cenarios: 200 proposta ativa; 404 sem proposta ativa; 403 nao-owner (inexistente/alheia, uniforme sem UUID).",
+   "metaSortKey": -1749982499000
+  },
+  {
+   "_id": "req_bof_fila_list",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "GET /backoffice/fila",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/backoffice/fila?status=ABERTO&prioridade=ALTA&page=0&size=20",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    }
+   ],
+   "description": "FINANCEIRO/BACKOFFICE/ADMIN. Filtros: tipo, prioridade, status, dataAberturaDe/Ate, atribuidoA. Paginacao Spring; clamp 100. Sort default prioridade DESC, dataAbertura ASC.",
+   "metaSortKey": -1749982500000
+  },
+  {
+   "_id": "req_bof_fila_get",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "GET /backoffice/fila/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    }
+   ],
+   "description": "Detalhe + comentarios paginados + objeto original resolvido via Strategy (ResolvedorObjetoOriginalDispatcher) pelo tipoEntidade.",
+   "metaSortKey": -1749982400000
+  },
+  {
+   "_id": "req_bof_fila_assumir",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "POST /backoffice/fila/{id}/assumir",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/assumir",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    }
+   ],
+   "description": "Lock pessimista. Transiciona ABERTO -> EM_TRATAMENTO. 409 se ja em estado final ou EM_TRATAMENTO.",
+   "metaSortKey": -1749982300000
+  },
+  {
+   "_id": "req_bof_fila_comentario",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "POST /backoffice/fila/{id}/comentarios",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/comentarios",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"conteudo\": \"Tomador contactado por telefone; aguardando comprovante por email ate amanha 18h.\"\n}"
+   },
+   "description": "Registra ComentarioInterno (ate 10000 chars). Sem step-up.",
+   "metaSortKey": -1749982200000
+  },
+  {
+   "_id": "req_bof_fila_resolver",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "PATCH /backoffice/fila/{id}/resolver",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/resolver",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"justificativa\": \"Pendencia resolvida apos confirmacao manual com tomador.\"\n}"
+   },
+   "description": "Step-up obrigatorio. Justificativa >= 20 chars (400 BOF-400-001). Transiciona EM_TRATAMENTO -> RESOLVIDO. Justificativa registrada tambem como comentario interno.",
+   "metaSortKey": -1749982100000
+  },
+  {
+   "_id": "req_bof_fila_ignorar",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "PATCH /backoffice/fila/{id}/ignorar",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/backoffice/fila/{{ itemFilaId }}/ignorar",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"justificativa\": \"Falso positivo: tomador ja regularizou via outro canal manualmente.\"\n}"
+   },
+   "description": "Step-up obrigatorio. Justificativa >= 20 chars. Transiciona EM_TRATAMENTO -> IGNORADO.",
+   "metaSortKey": -1749982000000
+  },
+  {
+   "_id": "req_bof_reproc_webhook",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "POST /backoffice/reprocessos/webhook/{webhookEventId}",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/backoffice/reprocessos/webhook/{{ webhookEventId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Re-dispara webhook (forca WebhookEventLog.status = PROCESSADO). Anti-abuso 3/24h por identificadorExterno -> 429 BOF-429-001.",
+   "metaSortKey": -1749981900000
+  },
+  {
+   "_id": "req_bof_reproc_provider",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "POST /backoffice/reprocessos/provider/{tipoChamada}/{idEntidade}",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/backoffice/reprocessos/provider/KYC/{{ entidadeId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "tipoChamada in {KYC, KYB, PLD, OPEN_FINANCE, ASSINATURA_DIGITAL}. Tipo desconhecido -> 400 BOF-400-002. Anti-abuso 3/24h -> 429. Strategies stub.",
+   "metaSortKey": -1749981800000
+  },
+  {
+   "_id": "req_bof_dashboard",
+   "_type": "request",
+   "parentId": "fld_backoffice",
+   "name": "GET /backoffice/dashboard",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/backoffice/dashboard",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ backofficeToken }}"
+    }
+   ],
+   "description": "Visao consolidada (Facade): contadores fila + tempo medio 30d + criticos > 48h + top 5 tipos + recebimentos do dia + inadimplencia + propostas por status. Cache-Control: no-store. Resiliente a falha parcial.",
+   "metaSortKey": -1749981700000
+  },
+  {
+   "_id": "fld_credores",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Credores (Sprints 16-17 + 29-30)",
+   "metaSortKey": -1750000000000,
+   "environment": {}
+  },
+  {
+   "_id": "fld_pix",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Pix (Sprints 19-21 + 26 + 31)",
+   "metaSortKey": -1749999999000,
+   "environment": {}
+  },
+  {
+   "_id": "fld_governanca",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Governanca (Sprint 18)",
+   "metaSortKey": -1749999998000,
+   "environment": {}
+  },
+  {
+   "_id": "req_f19_post_credores",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST /credores",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Cadastra a credora a partir de um onboarding PJ aprovado do proprio usuario (isAuthenticated). cnpj/razaoSocial derivam do KYB. 409 se ja existe credora para o usuario.",
+   "metaSortKey": -1749000000000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"onboardingId\": \"{{ onboardingCredoraId }}\",\n  \"tipoCredora\": \"EMPRESA\",\n  \"capacidadeAporte\": 50000.0\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_credores_me",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/me",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/me",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Dados da credora do usuario autenticado. 404 neutro se o usuario nao tem credora.",
+   "metaSortKey": -1748999999000
+  },
+  {
+   "_id": "req_f19_get_credores_me_elegibilidade",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/me/elegibilidade",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/me/elegibilidade",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Status cadastral + elegibilidade derivada do onboarding PJ. Sem recalculo no cliente.",
+   "metaSortKey": -1748999998000
+  },
+  {
+   "_id": "req_f19_get_credores_id",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/{{ empresaCredoraId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    }
+   ],
+   "description": "Visao ADMIN de uma credora especifica.",
+   "metaSortKey": -1748999997000
+  },
+  {
+   "_id": "req_f19_get_credores_oportunidades",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/oportunidades",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/oportunidades",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Lista oportunidades de investimento disponiveis. Nao expoe estado de interesse por item.",
+   "metaSortKey": -1748999996000
+  },
+  {
+   "_id": "req_f19_get_credores_oportunidades_id",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/oportunidades/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/oportunidades/{{ oportunidadeId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Detalhe de uma oportunidade.",
+   "metaSortKey": -1748999995000
+  },
+  {
+   "_id": "req_f19_post_credores_oportunidades_id_interesses",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST /credores/oportunidades/{id}/interesses",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores/oportunidades/{{ oportunidadeId }}/interesses",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Manifesta interesse na oportunidade. 409 interesse ativo duplicado; 422 credora inelegivel.",
+   "metaSortKey": -1748999994000
+  },
+  {
+   "_id": "req_f19_get_credores_oportunidades_id_interesses_me",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/oportunidades/{id}/interesses/me",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/oportunidades/{{ oportunidadeId }}/interesses/me",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Interesse ativo do usuario na oportunidade (autoritativo; Sprint 25). 404 se nao ha interesse ativo.",
+   "metaSortKey": -1748999993000
+  },
+  {
+   "_id": "req_f19_delete_credores_oportunidades_id_interesses_me",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "DELETE /credores/oportunidades/{id}/interesses/me",
+   "method": "DELETE",
+   "url": "{{ baseUrl }}/api/v1/credores/oportunidades/{{ oportunidadeId }}/interesses/me",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Cancela o interesse ativo do usuario na oportunidade.",
+   "metaSortKey": -1748999992000
+  },
+  {
+   "_id": "req_f19_post_credores_oportunidades_sync",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST /credores/oportunidades/sync",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores/oportunidades/sync",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    }
+   ],
+   "description": "Sincroniza oportunidades a partir de contratos elegiveis (ADMIN).",
+   "metaSortKey": -1748999991000
+  },
+  {
+   "_id": "req_f19_get_credores_carteira",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/carteira",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/carteira",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Carteira owner-scoped da credora do usuario. Lista vazia ou 404 neutro sem credora.",
+   "metaSortKey": -1748999990000
+  },
+  {
+   "_id": "req_f19_get_credores_carteira_id",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/carteira/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/carteira/{{ operacaoCarteiraId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Detalhe owner-scoped de operacao da carteira. 404 neutro para operacao alheia ou inexistente.",
+   "metaSortKey": -1748999989000
+  },
+  {
+   "_id": "req_f19_get_credores_carteira_id_pix",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/carteira/{id}/pix",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/carteira/{{ operacaoCarteiraId }}/pix",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Movimentacoes Pix owner-scoped da operacao (Sprint 26). 404 neutro para operacao alheia.",
+   "metaSortKey": -1748999988000
+  },
+  {
+   "_id": "req_f19_post_credores_carteira_operacoes",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST /credores/carteira/operacoes",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores/carteira/operacoes",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Associa contrato a carteira da credora (ADMIN + step-up). Justificativa ate 500 chars.",
+   "metaSortKey": -1748999987000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"empresaCredoraId\": \"{{ empresaCredoraId }}\",\n  \"contratoId\": \"{{ contratoId }}\",\n  \"oportunidadeId\": \"{{ oportunidadeId }}\",\n  \"justificativa\": \"Associacao de operacao financiada em ambiente local de teste\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_credores_matching_sugestoes",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/matching/sugestoes",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/matching/sugestoes",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Sugestoes de matching credora-operacao (FINANCEIRO/ADMIN; Sprint 30).",
+   "metaSortKey": -1748999986000
+  },
+  {
+   "_id": "req_f19_get_credores_matching_sugestaoid",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/matching/{sugestaoId}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/matching/{{ matchingSugestaoId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Detalhe de uma sugestao de matching.",
+   "metaSortKey": -1748999985000
+  },
+  {
+   "_id": "req_f19_post_credores_matching_sugestaoid_decisao",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST /credores/matching/{sugestaoId}/decisao",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores/matching/{{ matchingSugestaoId }}/decisao",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Decide a sugestao (CONFIRMAR/REJEITAR). FINANCEIRO/ADMIN + step-up ESTRITO (sem bypass de MFA). Decisao sobre status terminal -> 409. Confirmar apenas registra a decisao; nunca cria aporte.",
+   "metaSortKey": -1748999984000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"acao\": \"CONFIRMAR\",\n  \"motivo\": \"Elegibilidade validada em ambiente local\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_post_credores_operacoes_operacaoid_aportes",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST /credores/operacoes/{operacaoId}/aportes",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores/operacoes/{{ operacaoCarteiraId }}/aportes",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ aporteIdempotencyKey }}"
+    }
+   ],
+   "description": "Registra aporte assistido (FINANCEIRO/ADMIN + step-up ESTRITO + Idempotency-Key obrigatoria). 201 = registro novo; 200 = replay idempotente da mesma key.",
+   "metaSortKey": -1748999983000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"valor\": 10000.0\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_credores_operacoes_operacaoid_aportes",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET /credores/operacoes/{operacaoId}/aportes",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/operacoes/{{ operacaoCarteiraId }}/aportes",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Lista owner-scoped de aportes da operacao (somente leitura; F-18). 404 neutro para usuario sem credora, operacao alheia ou inexistente.",
+   "metaSortKey": -1748999982000
+  },
+  {
+   "_id": "req_f19_post_aportes_replay_idempotente_mesma_key",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST aportes — replay idempotente (mesma key)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores/operacoes/{{ operacaoCarteiraId }}/aportes",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ aporteIdempotencyKey }}"
+    }
+   ],
+   "description": "Replay consciente: reutiliza a MESMA {{aporteIdempotencyKey}} e o MESMO valor do aporte anterior. Esperado 200 com o mesmo aporte (nao duplica).",
+   "metaSortKey": -1748999981000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"valor\": 10000.0\n}"
+   }
+  },
+  {
+   "_id": "req_f19_post_aportes_400_valor_invalido",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST aportes — 400 valor invalido",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores/operacoes/{{ operacaoCarteiraId }}/aportes",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ aporteIdempotencyKey }}"
+    }
+   ],
+   "description": "Validacao: valor deve ser positivo com ate duas casas decimais.",
+   "metaSortKey": -1748999980000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"valor\": -1\n}"
+   }
+  },
+  {
+   "_id": "req_f19_post_matching_decisao_sem_step_up",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "POST matching decisao — sem step-up",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/credores/matching/{{ matchingSugestaoId }}/decisao",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Sem X-Step-Up-Token: step-up estrito nega a mutacao (401/403 STEP_UP_REQUIRED).",
+   "metaSortKey": -1748999979000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"acao\": \"CONFIRMAR\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_carteira_id_404_owner_scoped_neutro",
+   "_type": "request",
+   "parentId": "fld_credores",
+   "name": "GET carteira/{id} — 404 owner-scoped neutro",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/credores/carteira/00000000-0000-0000-0000-000000000000",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ credoraToken }}"
+    }
+   ],
+   "description": "Ownership: id inexistente/alheio responde 404 neutro, sem revelar existencia do recurso.",
+   "metaSortKey": -1748999978000
+  },
+  {
+   "_id": "req_f19_post_pix_desembolsos",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "POST /pix/desembolsos",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/pix/desembolsos",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ pixIdempotencyKey }}"
+    }
+   ],
+   "description": "Desembolso assistido (FINANCEIRO/ADMIN + step-up ESTRITO + Idempotency-Key). Chave em claro apenas no request; resposta so mascara. 201 novo; 200 replay idempotente (novo=false).",
+   "metaSortKey": -1748999977000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"contratoId\": \"{{ contratoId }}\",\n  \"valor\": 15000.0,\n  \"chavePixDestino\": \"exemplo.ficticio@chave-pix-de-teste.local\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_pix_desembolsos_id",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "GET /pix/desembolsos/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/pix/desembolsos/{{ transferenciaId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Status local da transferencia (FINANCEIRO/ADMIN/BACKOFFICE).",
+   "metaSortKey": -1748999976000
+  },
+  {
+   "_id": "req_f19_post_pix_desembolsos_id_status",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "POST /pix/desembolsos/{id}/status",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/pix/desembolsos/{{ transferenciaId }}/status",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Reconsulta status no provider (step-up). providerIndisponivel=true quando o provider falhou e o status local foi devolvido.",
+   "metaSortKey": -1748999975000
+  },
+  {
+   "_id": "req_f19_get_pix_contratos_contratoid_desembolso",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "GET /pix/contratos/{contratoId}/desembolso",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/pix/contratos/{{ contratoId }}/desembolso",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    }
+   ],
+   "description": "Leitura owner-scoped do tomador (CLIENTE; Sprint 26). 404 neutro para contrato alheio.",
+   "metaSortKey": -1748999974000
+  },
+  {
+   "_id": "req_f19_get_pix_parcelas_parcelaid_status",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "GET /pix/parcelas/{parcelaId}/status",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/pix/parcelas/{{ parcelaId }}/status",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    }
+   ],
+   "description": "Status Pix owner-scoped da parcela do tomador (CLIENTE; Sprint 26). 404 neutro.",
+   "metaSortKey": -1748999973000
+  },
+  {
+   "_id": "req_f19_post_pix_recebimentos_referencias",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "POST /pix/recebimentos/referencias",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/pix/recebimentos/referencias",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Gera/reaproveita referencia Pix de parcela (FINANCEIRO/ADMIN). 201 nova; 200 reaproveitada (novo=false).",
+   "metaSortKey": -1748999972000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"parcelaId\": \"{{ parcelaId }}\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_pix_recebimentos_referencias_id",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "GET /pix/recebimentos/referencias/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/pix/recebimentos/referencias/{{ referenciaRecebimentoId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Consulta referencia de recebimento (FINANCEIRO/ADMIN/BACKOFFICE).",
+   "metaSortKey": -1748999971000
+  },
+  {
+   "_id": "req_f19_get_pix_recebimentos_id",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "GET /pix/recebimentos/{id}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/pix/recebimentos/{{ pixRecebimentoId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Recebimento conciliado/divergente (FINANCEIRO/ADMIN/BACKOFFICE). Campos de vinculo nulos quando NAO_IDENTIFICADO. Nao ha endpoint de listagem: preencha {{pixRecebimentoId}} manualmente a partir do evento de conciliacao (webhook Pix processado) ou da fila de backoffice (RECEBIMENTO_PIX_DIVERGENTE).",
+   "metaSortKey": -1748999970000
+  },
+  {
+   "_id": "req_f19_post_pix_chaves",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "POST /pix/chaves",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/pix/chaves",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ chavePixIdempotencyKey }}"
+    }
+   ],
+   "description": "Cadastra chave Pix da conta operacional/escrow (FINANCEIRO/ADMIN + step-up ESTRITO + Idempotency-Key; Sprint 31). Valor NUNCA e persistido, logado ou reexibido em claro — resposta traz apenas mascara + hash. Exemplo usa EVP inequivocamente ficticio.",
+   "metaSortKey": -1748999969000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"tipo\": \"EVP\",\n  \"valor\": \"00000000-1111-2222-3333-444444444444\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_pix_chaves",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "GET /pix/chaves",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/pix/chaves",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Lista chaves cadastradas (FINANCEIRO/ADMIN). Respostas exibem somente mascara e hash/identificador.",
+   "metaSortKey": -1748999968000
+  },
+  {
+   "_id": "req_f19_delete_pix_chaves_chaveid",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "DELETE /pix/chaves/{chaveId}",
+   "method": "DELETE",
+   "url": "{{ baseUrl }}/api/v1/pix/chaves/{{ chavePixId }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Remove chave (FINANCEIRO/ADMIN + step-up ESTRITO). Advisory lock anti-chave-orfa no backend.",
+   "metaSortKey": -1748999967000
+  },
+  {
+   "_id": "req_f19_post_desembolsos_replay_idempotente_mesma_key",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "POST desembolsos — replay idempotente (mesma key)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/pix/desembolsos",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ pixIdempotencyKey }}"
+    }
+   ],
+   "description": "Replay consciente da MESMA {{pixIdempotencyKey}} com o mesmo payload: 200 com novo=false, sem nova transferencia.",
+   "metaSortKey": -1748999966000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"contratoId\": \"{{ contratoId }}\",\n  \"valor\": 15000.0,\n  \"chavePixDestino\": \"exemplo.ficticio@chave-pix-de-teste.local\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_parcelas_id_status_404_owner_scoped_neutro",
+   "_type": "request",
+   "parentId": "fld_pix",
+   "name": "GET parcelas/{id}/status — 404 owner-scoped neutro",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/pix/parcelas/00000000-0000-0000-0000-000000000000/status",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    }
+   ],
+   "description": "Ownership: parcela alheia/inexistente responde 404 neutro.",
+   "metaSortKey": -1748999965000
+  },
+  {
+   "_id": "req_f19_get_usuarios_id_roles",
+   "_type": "request",
+   "parentId": "fld_governanca",
+   "name": "GET /usuarios/{id}/roles",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/roles",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    }
+   ],
+   "description": "Conjunto cumulativo de roles + principal (ADMIN-only; Sprint 18).",
+   "metaSortKey": -1748999964000
+  },
+  {
+   "_id": "req_f19_put_usuarios_id_roles",
+   "_type": "request",
+   "parentId": "fld_governanca",
+   "name": "PUT /usuarios/{id}/roles",
+   "method": "PUT",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/roles",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Substitui o conjunto de roles (nao vazio). ADMIN + step-up.",
+   "metaSortKey": -1748999963000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"roles\": [\"CLIENTE\", \"FINANCEIRO\"]\n}"
+   }
+  },
+  {
+   "_id": "req_f19_post_usuarios_id_roles_role",
+   "_type": "request",
+   "parentId": "fld_governanca",
+   "name": "POST /usuarios/{id}/roles/{role}",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/roles/FINANCEIRO",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Adiciona uma role ao conjunto. ADMIN + step-up.",
+   "metaSortKey": -1748999962000
+  },
+  {
+   "_id": "req_f19_delete_usuarios_id_roles_role",
+   "_type": "request",
+   "parentId": "fld_governanca",
+   "name": "DELETE /usuarios/{id}/roles/{role}",
+   "method": "DELETE",
+   "url": "{{ baseUrl }}/api/v1/usuarios/{{ clienteId }}/roles/FINANCEIRO",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Remove uma role do conjunto (conjunto nao pode ficar vazio -> 400). ADMIN + step-up.",
+   "metaSortKey": -1748999961000
+  },
+  {
+   "_id": "req_f19_get_governanca_parametros",
+   "_type": "request",
+   "parentId": "fld_governanca",
+   "name": "GET /governanca/parametros",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/governanca/parametros",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    }
+   ],
+   "description": "Lista parametros operacionais (ADMIN-only).",
+   "metaSortKey": -1748999960000
+  },
+  {
+   "_id": "req_f19_get_governanca_parametros_chave",
+   "_type": "request",
+   "parentId": "fld_governanca",
+   "name": "GET /governanca/parametros/{chave}",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/governanca/parametros/{{ parametroChave }}",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    }
+   ],
+   "description": "Detalhe + historico de versoes (mais recente primeiro).",
+   "metaSortKey": -1748999959000
+  },
+  {
+   "_id": "req_f19_patch_governanca_parametros_chave",
+   "_type": "request",
+   "parentId": "fld_governanca",
+   "name": "PATCH /governanca/parametros/{chave}",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/governanca/parametros/{{ parametroChave }}",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ adminToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Altera valor com justificativa obrigatoria. ADMIN + step-up; versionado e auditado.",
+   "metaSortKey": -1748999958000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"novoValor\": \"100000\",\n  \"justificativa\": \"Ajuste de parametro em ambiente local de teste\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_get_cobranca_inadimplencia",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "GET /cobranca/inadimplencia",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/cobranca/inadimplencia",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Parcelas inadimplentes com filtros opcionais (FINANCEIRO/ADMIN; Sprint 13).",
+   "metaSortKey": -1748999957000,
+   "parameters": [
+    {
+     "name": "dias_atraso_min",
+     "value": "1"
+    },
+    {
+     "name": "status",
+     "value": "INADIMPLENTE"
+    }
+   ]
+  },
+  {
+   "_id": "req_f19_post_cobranca_parcelas_id_contato",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "POST /cobranca/parcelas/{id}/contato",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/contato",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    }
+   ],
+   "description": "Registra contato manual de cobranca (FINANCEIRO/ADMIN).",
+   "metaSortKey": -1748999956000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"descricao\": \"Contato telefonico com o tomador sobre parcela em atraso\",\n  \"diasAtraso\": 5\n}"
+   }
+  },
+  {
+   "_id": "req_f19_post_cobranca_parcelas_id_renegociacao",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "POST /cobranca/parcelas/{id}/renegociacao",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/cobranca/parcelas/{{ parcelaId }}/renegociacao",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ financeiroToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Propoe renegociacao da parcela (FINANCEIRO/ADMIN + step-up; Sprint 13).",
+   "metaSortKey": -1748999955000,
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"novoValorParcela\": 900.0,\n  \"novoVencimento\": \"2026-08-15\",\n  \"numeroParcelas\": 1,\n  \"desconto\": 50.0,\n  \"justificativa\": \"Renegociacao proposta apos contato com o tomador\"\n}"
+   }
+  },
+  {
+   "_id": "req_f19_patch_cobranca_renegociacoes_id_aceite",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "PATCH /cobranca/renegociacoes/{id}/aceite",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/cobranca/renegociacoes/{{ renegociacaoId }}/aceite",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    },
+    {
+     "name": "X-Step-Up-Token",
+     "value": "{{ stepUpToken }}"
+    }
+   ],
+   "description": "Tomador aceita a renegociacao (CLIENTE dono + step-up ESTRITO; Sprint 24). Decisao em status terminal -> 409.",
+   "metaSortKey": -1748999954000
+  },
+  {
+   "_id": "req_f19_patch_cobranca_renegociacoes_id_recusa",
+   "_type": "request",
+   "parentId": "fld_cobranca",
+   "name": "PATCH /cobranca/renegociacoes/{id}/recusa",
+   "method": "PATCH",
+   "url": "{{ baseUrl }}/api/v1/cobranca/renegociacoes/{{ renegociacaoId }}/recusa",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteToken }}"
+    }
+   ],
+   "description": "Tomador recusa a renegociacao (CLIENTE dono, sem step-up; Sprint 24). Terminal -> 409.",
+   "metaSortKey": -1748999953000
+  },
+  {
+   "_id": "req_wh_kyb_aprovado_tardio",
+   "_type": "request",
+   "parentId": "fld_webhooks_kyb_pld",
+   "name": "POST /webhooks/celcoin/kyb — APROVADO tardio (202)",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/webhooks/celcoin/kyb",
+   "headers": [
+    {
+     "name": "Content-Type",
+     "value": "application/json"
+    },
+    {
+     "name": "Idempotency-Key",
+     "value": "{{ idempotencyKey }}"
+    },
+    {
+     "name": "X-Webhook-Signature",
+     "value": "{{ celcoinKybSignature }}"
+    }
+   ],
+   "body": {
+    "mimeType": "application/json",
+    "text": "{\n  \"external_id\": \"{{ onboardingEmpresaId }}\",\n  \"registration_status\": \"ACTIVE\",\n  \"tax_id\": \"{{ cnpjTeste }}\",\n  \"company_name\": \"ACME LTDA\"\n}"
+   },
+   "description": "Callback Celcoin KYB tardio (correcao manual pos-sync). HMAC SHA-256 hex obrigatorio. Resposta 202 (idempotente).",
+   "metaSortKey": -1748999999000
+  }
+ ]
 }

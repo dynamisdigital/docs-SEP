@@ -15,17 +15,30 @@ _Atualizado em: 2026-07-16._
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend da Fase 4 **fechado**
-  (Sprints 27-32 mergeadas); web F-16-18 mergeadas; seguem web F-19 e mobile M-13-16.
-- **Spec/step ativo**: F-Sprint 18 (web) **MERGEADA** (PR #94 `develop`, squash `ee9d5b6` +
-  PR #95 `main`, `7c96b78`; `develop` == `main`) — spec
-  [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) + steps
-  [`118`](../steps-fase-4/web/118-fsprint-18-steps.md). Proxima sprint web: **F-19**
-  (hardening tooling/contrato, spec
-  [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md); steps a criar).
+  (Sprints 27-32 mergeadas); web F-16-19 mergeadas; seguem mobile M-13-16 e a sprint web
+  dedicada de chaves Pix (Gate F-18.0).
+- **Spec/step ativo**: F-Sprint 19 (web) **MERGEADA** (em `develop` por push direto
+  fast-forward, tip `bb825e7` — 6 commits, sem PR/squash, desvio aceito pelo dev; promovida a
+  `main` via PR #96, `01ccc52`; `develop` == `main` conferido por conteudo) — spec
+  [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) + steps
+  [`119`](../steps-fase-4/web/119-fsprint-19-steps.md); detalhe em
+  [`SPRINT-F-19-PR.md`](../repos/sep-app/SPRINT-F-19-PR.md).
   Mobile M-13-16 liberadas pelos backends 29-31.
 
 ## Onde estamos
 
+- **F-Sprint 19 (web) MERGEADA em 2026-07-16** — hardening de tooling, contrato e collections
+  (follow-up da Fase 3; sem tela/endpoint/regra nova). Em `origin/develop` por push direto
+  fast-forward (tip `bb825e7`; desvio de fluxo aceito) e promovida a `main` via PR #96
+  (`01ccc52`); `develop` == `main`. Entregas: `contract:check` deterministico no `sep-app`
+  (snapshot OpenAPI do sep-api `7f40056` versionado em `contracts/`; 82 contratos consumidos,
+  zero divergencia real; lacunas do OpenAPI em `knownGaps` como follow-up backend — header
+  step-up, Duration, enums, headers de resposta do documento assinado, required/nullable de
+  responses) + step no CI-APP; tooling endurecido dentro do Angular 20 (`npm audit` 9->0,
+  `npm ci` sem bypass); collections Postman/Insomnia renovadas (150/150 requests, credores/
+  Pix+chaves/governanca/cobranca, sem PII/secrets — vars vazias `cpfTeste`/`cnpjTeste`);
+  [ADR 0018](../adr/0018-avaliacao-angular-22-no-web.md) **ADIA Angular 22** (LTS do 20 ate
+  2026-11-28; revisao 2026-09-30 ou infra Fase 5). Vitest 586 + Playwright 31.
 - **F-Sprint 18 (web) MERGEADA em 2026-07-16** — aporte e matching assistidos da credora
   (Epic 15/10; consome backends Sprints 29-30). Em `origin/develop` via PR #94 (squash
   `ee9d5b6`; 10 commits absorvidos) e promovida a `main` via PR #95 (`7c96b78`);
@@ -40,8 +53,9 @@ _Atualizado em: 2026-07-16._
   em voo; P3 seed MSW sem credora inelegivel sugerida). **Gate F-18.0**: chaves Pix fora da
   F-18 — destino web dedicado pos-F-19; item do `v1.0-local` segue pendente (PRD-FASE-4
   §37). Vitest 562 + Playwright 31/31 (4 smokes novos; TOTP real e negacao de rota por URL
-  direta ficam pro smoke real `:8080`). Detalhe em
-  [`SPRINT-F-18-PR.md`](../repos/sep-app/SPRINT-F-18-PR.md).
+  direta ficam pro smoke real `:8080`). Detalhe no historico
+  ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md); a descricao de PR temporaria da F-18 foi
+  removida no ciclo padrao ao abrir a F-19).
 - **F-Sprint 17 (web) MERGEADA em 2026-07-15** — aprofundamento financeiro/conciliacao
   (Epic 13). PR #92 develop (squash `2dfa0fd`) + #93 main. Gap analysis: 2 gaps fechados
   nas divergencias Pix (recorte de status no backend + `totalElements`); 4 contratos
@@ -70,13 +84,12 @@ _Atualizado em: 2026-07-16._
 
 ## Proximo passo
 
-1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamento da F-18).
-2. Seguir a ordem da Fase 4 web/mobile: F-19 (hardening de tooling + validacao de contrato,
-   spec [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md); steps a
-   criar); mobile M-13-16 (empacotamento nativo, biometria, aporte/matching/Pix — liberados
-   pelas Sprints 29-31). Depois da F-19: sprint web dedicada de visibilidade de chaves Pix
-   (decisao do Gate F-18.0; pendencia do `v1.0-local` no PRD-FASE-4 §37). Ver dependencias
-   em [`specs/fase-4/README.md`](../specs/fase-4/README.md).
+1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamentos F-18 e
+   F-19: collections, ADR 0018, PRD/STATE/historico, docs).
+2. Seguir a ordem da Fase 4 web/mobile: mobile M-13-16 (empacotamento nativo, biometria,
+   aporte/matching/Pix — liberados pelas Sprints 29-31) e a sprint web dedicada de
+   visibilidade de chaves Pix (decisao do Gate F-18.0; pendencia do `v1.0-local` no
+   PRD-FASE-4 §37). Ver dependencias em [`specs/fase-4/README.md`](../specs/fase-4/README.md).
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
 

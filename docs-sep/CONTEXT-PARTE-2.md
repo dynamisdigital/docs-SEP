@@ -1112,3 +1112,39 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   `main` via PR #95 (`7c96b78`); `develop` == `main` == branch (conferido por conteudo). Pos-merge
   `npm ci --legacy-peer-deps` + `format:check` verdes. **F-Sprint 18 fechada.** Proxima sprint
   web: F-19 (hardening tooling/contrato, spec 119); mobile M-13-16 liberadas.
+
+## F-Sprint 19 — Hardening de tooling, contrato e collections (2026-07-16)
+
+- Sprint de tooling (spec 119; sem tela/endpoint/regra nova) que saldou a divida aceita no
+  fechamento da Fase 3: validacao automatizada de contrato front<->API, hardening dentro do
+  Angular 20, refresh das collections (congeladas desde a Sprint 14) e ADR 0018 para Angular 22.
+- Contrato: OpenAPI runtime do sep-api `develop` `7f40056` exportado (sha256 `e2b7a041...`;
+  3.1.0, 97 paths/105 ops/108 schemas) e versionado como snapshot em `sep-app/contracts/`;
+  `contract:check` (verificador Node zero-dependencia, 24 testes) valida os 82 contratos
+  consumidos — path/metodo, parametros (query/header/path, incl. required de request bodies),
+  headers sensiveis e de resposta, status de sucesso, campos/tipos/enums. **Zero divergencia
+  real**; lacunas do OpenAPI registradas em `knownGaps` sem mascarar (follow-ups backend:
+  X-Step-Up-Token nao documentado, Duration serializado como number vs doc string, enums de
+  contratos/assinatura, headers de resposta do documento assinado, required/nullable ausentes
+  nas responses). Step `contract:check` no CI-APP (offline, deterministico).
+- Tooling: Angular 20.3.26 + build/CLI 20.3.32; lockfile regenerado sem bypass de peers (npm 9
+  nao resolve grupo Angular incremental); `npm audit` 9 (5 high, todas dev) -> **0**; prettier
+  3.9/playwright 1.61/msw 2.15/happy-dom 20.10 in-range. README/Dependabot alinhados.
+- Collections Postman+Insomnia: 150/150 requests, cobertura metodo+path identica (115 ops), 
+  folders novos de credores (19 ops + negativos), Pix com chaves (11), governanca (7) e
+  +5 de cobranca; Idempotency-Key por intencao; 404 owner-scoped neutro; varredura de
+  seguranca do review manual removeu CPF/CNPJ e secrets versionados (vars vazias
+  `cpfTeste`/`cnpjTeste`; secrets preenchidos localmente via `application-dev.yml`).
+- ADR 0018: **ADIAR Angular 22** (exige Node 22+/TS 6 + majors da cadeia de teste; Angular 20
+  em LTS ate 2026-11-28; sem driver de seguranca com audit zerado). Revisao 2026-09-30 ou no
+  planejamento de infra/CI da Fase 5; advisory runtime sem fix na serie 20 reabre imediato.
+- Reviews: cavecrew por task (3 findings no verificador corrigidos em `e7d6d56`; demais sem
+  pendencia) + review manual do dev com 7 findings (required de request, headers de resposta,
+  path params, schema sem tipo, PII/secrets das collections, paridade/contagens, STATE)
+  fechados em `bb825e7` e no working tree do docs-SEP.
+- Integracao: os 6 commits entraram em `origin/develop` por **push direto fast-forward** (tip
+  `bb825e7`; sem PR/squash — desvio de fluxo aceito pelo dev) e promovidos a `main` via PR #96
+  (`01ccc52`); `develop` == `main` por conteudo. Pos-merge: `npm ci` (0 vulns) +
+  `format:check` + `contract:check` verdes. Gate final: Vitest 586/586, Playwright 31/31,
+  audit 0 total. **F-Sprint 19 fechada.** Proximo: mobile M-13-16 e sprint web dedicada de
+  visibilidade de chaves Pix (Gate F-18.0; pendencia do `v1.0-local`, PRD-FASE-4 §37).

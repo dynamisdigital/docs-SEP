@@ -189,7 +189,7 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 | F-16 | Epic 13 | Renegociacao do tomador no web (fecha gap F-9) | [`116`](../specs/fase-4/116-fsprint-16-renegociacao-tomador-web.md) | concluida (PR #87/#88 + follow-up #89/#90, 2026-07-15) |
 | F-17 | Epic 13 | Aprofundamento financeiro/conciliacao web (se houver gap) | [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) | concluida (PR #92/#93, 2026-07-15; gap analysis: 2 gaps fechados nas divergencias Pix, 4 contratos ausentes registrados como follow-up backend) |
 | F-18 | Epic 15/10 | Aporte e matching da credora no web (quando backend existir) | [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) | concluida (PR #94/#95, 2026-07-16; matching assistido + aporte idempotente com step-up estrito + leitura owner-scoped na carteira; Gate F-18.0: chaves Pix fora — destino web dedicado pos-F-19) |
-| F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | planejada |
+| F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | concluida (2026-07-16; em `develop` por push direto fast-forward — desvio aceito — e `main` via PR #96; `contract:check` + snapshot OpenAPI, audit 9->0 dentro do Angular 20, collections Postman/Insomnia renovadas sem PII/secrets, [ADR 0018](../adr/0018-avaliacao-angular-22-no-web.md) ADIA Angular 22 com revisao em 2026-09-30) |
 
 ### Mobile (`sep-mobile`)
 
@@ -236,7 +236,9 @@ Este e o corte que permite "implementar tudo menos AWS e Celcoin".
 - Epic 16 entregue como **documento de planejamento** (arquitetura AWS + CI/CD de deploy).
 - Follow-ups da Fase 3 saldados: step-up estrito server-side no aceite (**fechado na Sprint 27** —
   bloqueio de go-live que **nao** depende de acesso externo eliminado), renegociacao web, portas de
-  persistencia de `cobranca`, refresh da collection Postman + hardening de tooling.
+  persistencia de `cobranca`, refresh da collection Postman + hardening de tooling (**fechado na
+  F-19, 2026-07-16** — contract:check contra OpenAPI runtime, audit 0, collections alinhadas;
+  Angular 22 adiado por ADR 0018).
 - Suite verde nos tres repos (lint/scss/format, testes, build; smokes E2E/PWA); `main` e `develop`
   em paridade; audit de producao limpo.
 

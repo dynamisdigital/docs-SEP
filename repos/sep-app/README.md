@@ -578,3 +578,61 @@ Superficies operacionais de **matching assistido** (backend Sprint 30) e **aport
 - Gestao de chaves Pix ficou **fora da F-18** (decisao do Gate F-18.0, 2026-07-16): destino web
   posterior explicito em sprint dedicada, apos a F-19; o item de Pix avancado do `v1.0-local` nao
   foi marcado como concluido por esta sprint.
+
+## Hardening de tooling, contrato e collections (F-Sprint 19)
+
+Sprint de tooling (sem tela, endpoint ou regra nova) que saldou a divida aceita no fechamento da
+Fase 3. Spec [`119`](../../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md); steps
+[`119`](../../steps-fase-4/web/119-fsprint-19-steps.md); decisao de major registrada na
+[ADR 0018](../../adr/0018-avaliacao-angular-22-no-web.md).
+
+### Validacao de contrato (`contract:check`)
+
+- `contracts/openapi.snapshot.json`: export do OpenAPI runtime do `sep-api` (develop `7f40056`,
+  export bruto sha256 `e2b7a041...`), com chaves ordenadas; **gerado, nao editar** — fonte, hash e
+  comando de regeneracao em `contracts/openapi.snapshot.meta.json` e `contracts/README.md`.
+- `contracts/consumed-contracts.json`: os 82 contratos que o frontend consome (espelha
+  `api.models.ts` + services), incluindo headers sensiveis, status de sucesso e enums.
+- `scripts/contract-check.mjs` (`npm run contract:check`): verificador zero-dependencia; falha
+  (exit != 0) em divergencia de path/metodo/parametro/header/status/campo/tipo/enum; le o snapshot
+  por default ou `SEP_OPENAPI_SCHEMA=<path|url>` para validar contra um runtime exportado.
+  Lacunas conhecidas do OpenAPI ficam em `knownGaps` (reportadas sem falhar): `X-Step-Up-Token`
+  nao documentado nas operacoes sensiveis, `DashboardResponse.tempoMedioResolucao30d` documentado
+  como `string` (runtime = number), enums nao publicados de contratos/assinatura e headers de
+  resposta do documento assinado (`X-Document-Hash-Sha256`/`Content-Disposition`) — todos
+  follow-ups backend. springdoc nao publica `required`/`nullable` nas responses (limitacao
+  registrada); `required` de request bodies E validado (campo obrigatorio novo no backend que o
+  frontend nao envia falha o check), assim como parametros de path e tipos ausentes/quebrados.
+- Resultado da F-19: **zero divergencia real** — nenhum tipo de borda precisou mudar.
+- CI (`CI-APP`): step `contract:check` entre `format:check` e `lint`, offline e deterministico.
+
+### Tooling (Angular 20 endurecido)
+
+- Angular `20.3.26` + build/CLI `20.3.32`; lockfile regenerado sem bypass de peers
+  (`npm ci` limpo). `npm audit`: 9 ocorrencias (5 high, todas dev tooling) -> **0 total**;
+  `--omit=dev` sempre zero.
+- Transitivos corrigidos: piscina, vite, esbuild, ws, sigstore, brace-expansion, @babel/core.
+  In-range acompanharam: prettier 3.9, playwright 1.61, msw 2.15, happy-dom 20.10, eslint 9.39.5.
+- **Angular 22 ADIADO** (ADR 0018): exige Node 22+ + TypeScript 6 + majors de toda a cadeia de
+  teste; Angular 20 em LTS ate 2026-11-28; revisao programada 2026-09-30 ou no planejamento de
+  infra/CI da Fase 5.
+
+### Collections Postman/Insomnia
+
+- `docs-sep/sep-api.postman_collection.json` e `sep-api.insomnia_collection.json` alinhadas ao
+  mesmo OpenAPI (150 requests cada; cobertura metodo+path identica — 115 operacoes unicas;
+  rotulos de requests pre-Sprint 14 divergem em estilo entre as duas, mesmas operacoes):
+  folders novos de Credores (19 ops + negativos de replay/validacao/step-up/ownership), Pix
+  (11 ops incl. chaves) e Governanca (7 ops); Cobranca ganhou
+  inadimplencia/contato/renegociacao/aceite/recusa.
+- Convencoes: `Idempotency-Key` por intencao; exemplos de chave Pix inequivocamente ficticios
+  (resposta so mascara+hash); leituras owner-scoped com exemplo de `404` neutro; **zero
+  segredo/PII versionado** — CPF/CNPJ sinteticos e secrets de webhook viraram variaveis vazias
+  (`cpfTeste`/`cnpjTeste`/secrets), preenchidas localmente a partir do `application-dev.yml`.
+- Exclusoes justificadas de paridade com o OpenAPI: `roles/{role}` e `provider/{tipoChamada}`
+  cobertos por exemplares literais; webhooks genericos cobertos pelas variantes concretas.
+
+### Testes
+
+- Baseline pos-sprint: Vitest **580** (85 arquivos; +18 do verificador de contrato),
+  Playwright **31**, lint/format/scss/build verdes em instalacao limpa.
