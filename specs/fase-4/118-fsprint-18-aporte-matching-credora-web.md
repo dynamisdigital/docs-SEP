@@ -4,7 +4,8 @@
 
 - **ID da Spec**: 118
 - **Titulo**: F-Sprint 18 - Aporte e matching assistidos da credora no web
-- **Status**: planejada (dep. backend 29-30)
+- **Status**: concluida (PR #94 `develop` squash `ee9d5b6` + PR #95 `main`, 2026-07-16;
+  chaves Pix fora por decisao do Gate F-18.0 — destino web dedicado pos-F-19)
 - **Fase do produto**: Fase 4 - Epic 15 / Epic 10
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD-FASE-4 §35 (Epic 15 - aporte/matching); Sprints backend 29-30

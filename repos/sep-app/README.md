@@ -495,3 +495,86 @@ steps: [`111-fsprint-11-steps.md`](../../steps-fase-3/web/111-fsprint-11-steps.m
 - Smoke manual dev-offline com `credora@empresa.com` / `123456` (credora elegivel),
   `credora-inelegivel@empresa.com` (inelegivel) e `credora-novo@empresa.com` (sem credora -> cadastro).
   O smoke real com backend em `:8080` fica como follow-up.
+
+## Aporte e matching da credora (F-Sprint 18)
+
+Superficies operacionais de **matching assistido** (backend Sprint 30) e **aporte assistido**
+(backend Sprint 29) no modulo `credora` do web, consumindo os contratos reais do `sep-api`. Spec
+[`118`](../../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md); steps
+[`118`](../../steps-fase-4/web/118-fsprint-18-steps.md).
+
+### Personas e acesso
+
+- **Duas personas no mesmo modulo `credores`**: as rotas operacionais de matching/aporte sao de
+  `FINANCEIRO`/`ADMIN` (`roleGuard`, sem `credoraPresenceGuard` — operador nao possui credora); as
+  rotas da persona `CLIENTE` (cadastro/perfil/oportunidades/carteira) permanecem intactas.
+- Item de navegacao `Matching de credoras` (grupo Operacao) somente para `FINANCEIRO`/`ADMIN`;
+  `CLIENTE` e `BACKOFFICE` nao o veem. O menu `Credora` da persona `CLIENTE` continua separado.
+
+### Rotas
+
+- `/app/credora/matching` -> fila de sugestoes pendentes (refresh-on-read por gesto explicito).
+- `/app/credora/matching/:sugestaoId` -> detalhe autoritativo + decisao assistida (step-up estrito).
+- `/app/credora/matching/:sugestaoId/aporte` -> aporte assistido da operacao do matching confirmado.
+- `/app/credora/carteira/:id` -> detalhe da operacao ganhou a lista owner-scoped de aportes
+  (somente leitura, sem CTA de mutacao).
+
+### Contratos consumidos
+
+- Matching: `GET /credores/matching/sugestoes` (**refresh-on-read**: pode persistir e auditar
+  sugestoes novas antes de listar as `SUGERIDA`; sem polling), `GET /credores/matching/{id}`
+  (`404` neutro) e `POST /credores/matching/{id}/decisao` (step-up estrito; body
+  `{ acao: CONFIRMAR|REJEITAR, motivo? <=255 }`; `409` decisao terminal/repetida; confirmar apenas
+  registra a decisao — **nunca cria aporte nem chama escrow/Pix/provider**).
+- Aporte: `POST /credores/operacoes/{operacaoId}/aportes` (step-up estrito + `Idempotency-Key`
+  obrigatoria; `201` novo, `200` replay idempotente, `409` key conflitante/inelegivel, `404`
+  neutro) e `GET` da mesma URL (autenticado, sem step-up; financeiro/admin qualquer operacao,
+  credora dona somente a propria; `404` neutro indistinguivel).
+
+### Decisoes
+
+- **Decisao sempre sobre o estado atual**: cada gesto reconsulta o detalhe antes de abrir o dialogo
+  de confirmacao (que so abre em `SUGERIDA`); falha na reconsulta nunca chama o POST. `409`/`404`
+  reconsultam sem sucesso presumido; rede/`5xx` marca o snapshot como desatualizado e bloqueia
+  decisoes ate nova leitura.
+- **MFA + step-up estrito nas duas mutacoes**: MFA inativo bloqueia com orientacao (o backend
+  estrito rejeita bypass e a UI nao tenta); sem token a tela navega a `/app/step-up?next=<rota>` e,
+  no retorno, exige novo clique — **retornar do step-up nunca confirma, rejeita ou registra**. O
+  `403` dos POSTs e tratado localmente (`TRATA_403_LOCALMENTE`) com reverificacao por gesto
+  explicito; GETs e guard de role seguem no fluxo global de acesso negado.
+- **Idempotencia por intencao**: uma intencao de aporte = um valor confirmado + uma
+  `Idempotency-Key` (`crypto.randomUUID()`) somente em memoria. Retry de rede/`5xx` com o mesmo
+  valor reusa a key (replay idempotente no backend); mudar o valor cria nova intencao/key; reload
+  perde o rascunho. A key nunca aparece na UI nem persiste em `localStorage`/`sessionStorage`.
+- **Nenhuma regra financeira no frontend**: valor inicial do aporte = `valorElegivel` do backend
+  (revisao livre; validacao local apenas de formato — obrigatorio, positivo, ate 2 casas); CTA de
+  aporte em `CONFIRMADA` e regra de UX, a autoridade de elegibilidade e o POST. `201` e `200` sao
+  ambos sucesso real; erro de rede nunca vira sucesso presumido.
+- Status de aporte (`PENDENTE -> EM_PROCESSAMENTO -> LIQUIDADO | FALHOU`) vem apenas do backend;
+  atualizacao por botao `Atualizar status` (sem polling; **nao existe endpoint de reconciliacao na
+  Fase 4**). Mensagens por estado deixam claro o provider fake/local — nenhum dinheiro real.
+- Erros nunca ecoam UUID, key, escrow, provider ou motivo tecnico; IDs aparecem como sufixo curto.
+- Dialogos acessiveis no padrao da F-16 (`alertdialog`, `aria-modal`, foco inicial, trap de Tab,
+  `Escape`, restauracao de foco; rejeitar = acao destrutiva distinta).
+
+### Testes
+
+- Vitest: suite verde (`npm run test`, 556), incluindo contratos HTTP do `CredoraService`
+  (5 operacoes novas + `Idempotency-Key`), `stepUpInterceptor` (2 POSTs novos, GETs protegidos,
+  paths parecidos), sugestoes (1 chamada inicial, refresh por gesto, sem polling), detalhe/decisao
+  (reconsulta, MFA, step-up sem auto-decisao, matriz `400/403/404/409/rede`, duplo submit, foco),
+  aporte (prefill, formato, key por intencao/retry, replay `200`, matriz) e carteira owner-scoped
+  (read-only, erro localizado sem apagar o detalhe).
+- Playwright dev-offline: `e2e/credora-matching.spec.ts` (4 smokes — decisao ate o step-up sem
+  auto-decisao no retorno, CTA separado de aporte com prefill, carteira owner somente leitura,
+  menu oculto para roles indevidas). Decisao/aporte com TOTP real e a negacao de rota por role via
+  URL direta ficam para o smoke real com backend `:8080` (o full reload do modo offline reinicia a
+  sessao mock).
+
+### Limitacoes da fase
+
+- Provider fake/local (Sprint 29): nenhum dinheiro real; sem endpoint REST de reconciliacao — a UI
+  apenas reconsulta o `GET` de aportes.
+- Gestao de chaves Pix ficou **fora da F-18** (decisao do Gate F-18.0, 2026-07-16): destino web
+  posterior explicito em sprint dedicada, apos a F-19; o item de Pix avancado do `v1.0-local` nao
+  foi marcado como concluido por esta sprint.

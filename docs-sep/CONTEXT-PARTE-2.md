@@ -1079,3 +1079,36 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   (conferido por conteudo: statusFiltro, fixture RESOLVIDA e smoke do filtro presentes nos blobs
   remotos). Review manual do usuario: sem achados. **F-Sprint 17 fechada.** Proxima sprint web:
   F-18 (aporte+matching credora, spec 118; steps a criar; backends 29-31 mergeados).
+
+### F-Sprint 18 — aporte e matching da credora no web (2026-07-16)
+
+- Superficies operacionais de matching assistido (Sprint 30) e aporte assistido (Sprint 29) para
+  `FINANCEIRO`/`ADMIN` + leitura owner-scoped de aportes na carteira da credora dona. Duas
+  personas no modulo `credores`: rotas `/app/credora/matching[/:id[/aporte]]` com `roleGuard`,
+  sem `credoraPresenceGuard`; jornada CLIENTE intacta. Gate F-18.0 decidiu formalmente: chaves
+  Pix (Sprint 31) FORA da F-18 — destino web dedicado pos-F-19; item do `v1.0-local` segue
+  pendente no PRD-FASE-4 §37.
+- Padroes: decisao sempre sobre estado atual (reconsulta antes do dialogo; falha nunca chama o
+  POST); MFA precheck + step-up estrito nas duas mutacoes com `next` da propria rota (retorno
+  nunca decide/registra); `TRATA_403_LOCALMENTE` somente nos POSTs (403 de leitura segue global);
+  refresh-on-read e status de aporte apenas por gesto explicito (sem polling; sem endpoint de
+  reconciliacao na fase); matriz 400/403/404/409/rede sem sucesso presumido; erros sem UUID/key/
+  escrow/provider; dialogos acessiveis (padrao F-16) com motivo <=255 e acao destrutiva distinta.
+- Idempotencia por intencao: {operacao, valor, Idempotency-Key `crypto.randomUUID()`} no
+  `AporteIntencaoStore` (singleton de root, somente memoria — nunca storage): retry de rede/5xx
+  com o mesmo valor reusa a MESMA key mesmo apos a navegacao ao step-up destruir o componente
+  (anti-duplicacao); mudar o valor troca a key; sucesso/400/404/409 encerram a intencao.
+- Review por task (cavecrew-reviewer): 3 hotfixes (guard de reentrada no detalhe; spy de
+  navegacao antes do render; regex de rota do smoke). Review manual do usuario: 3 achados
+  fechados em `5e03226` — P1 intencao movida do componente para o store (risco de aporte
+  duplicado), P2 lista de aportes substitui consulta em voo em vez de descartar o refresh
+  pos-POST, P3 seed MSW sem credora inelegivel sugerida.
+- MSW stateful (decisao muda estado; replay por key; ownership 404 neutro identico; aportes nos 4
+  estados; reset deterministico) + smoke `e2e/credora-matching.spec.ts` (4 cenarios; TOTP real e
+  negacao de rota por URL direta ficam pro smoke real `:8080` — full reload do modo offline
+  reinicia a sessao mock). Gate final: lint, lint:scss, Vitest 562, build AOT, Playwright 31/31 e
+  `npm audit --omit=dev` 0 vulnerabilidades.
+- Mergeada em `origin/develop` via PR #94 (squash `ee9d5b6`; 10 commits absorvidos) e promovida a
+  `main` via PR #95 (`7c96b78`); `develop` == `main` == branch (conferido por conteudo). Pos-merge
+  `npm ci --legacy-peer-deps` + `format:check` verdes. **F-Sprint 18 fechada.** Proxima sprint
+  web: F-19 (hardening tooling/contrato, spec 119); mobile M-13-16 liberadas.

@@ -635,6 +635,13 @@ Observacoes:
   autenticacao + presenca de credora, sem role `CREDORA`. Detalhe operacional em
   [`repos/sep-app/README.md` §credora](../repos/sep-app/README.md). O onboarding KYB da credora e a
   operacao admin (sincronizar oportunidades, associar carteira) ficam fora desta jornada.
+- **Implementado na F-Sprint 18** (web, mergeada via PR #94 `develop` + #95 `main`, 2026-07-16):
+  matching assistido (fila de sugestoes refresh-on-read + detalhe + decisao com step-up estrito) e
+  aporte assistido (registro idempotente com step-up + status) para `FINANCEIRO`/`ADMIN`, e lista
+  owner-scoped de aportes no detalhe da carteira da credora dona (somente leitura). Consome os
+  backends das Sprints 29-30; provider fake/local. Detalhe em
+  [`repos/sep-app/README.md` §F-Sprint 18](../repos/sep-app/README.md). Gestao de chaves Pix ficou
+  fora (decisao do Gate F-18.0; destino web posterior dedicado).
 
 ### 6.8 Administracao e Governanca
 
