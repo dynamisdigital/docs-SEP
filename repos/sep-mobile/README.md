@@ -473,3 +473,38 @@ Spec e steps:
 - [`specs/fase-3/211-msprint-11-pix-mobile.md`](../../specs/fase-3/211-msprint-11-pix-mobile.md)
 - [`steps-fase-3/mobile/211-msprint-11-steps.md`](../../steps-fase-3/mobile/211-msprint-11-steps.md)
 - backend Gates P1-P3: [`026`](../../steps-fase-3/backend/026-sprint-26-steps.md) (Sprint 26, mergeada PR #87/#88).
+
+## Empacotamento nativo Android (M-Sprint 13)
+
+Empacota o PWA como app **nativo Android** via Capacitor 8.4 ([ADR 0019](../../adr/0019-baseline-capacitor-8-mobile.md)
+formaliza a baseline e supersede o ADR 0003 no recorte do Capacitor e o ADR 0015). Sem jornada,
+endpoint ou contrato novo; PWA permanece intacto (fallback web explicito em todo runtime nativo).
+
+**Status**: implementada em `feature/msprint-13-android-capacitor` (branch da sprint; ver
+`SPRINT-M-13-PR.md` enquanto o PR nao e aberto).
+
+Entregas principais:
+
+- `android/` versionado (minSdk 24, compile/target SDK 36, Gradle 8.14.3, AGP 8.13.0); manifest
+  endurecido (`allowBackup=false`, somente INTERNET, deep link por scheme `com.dynamis.sep.mobile://`
+  — App Links https na Fase 5); `values/colors.xml` com tokens do DS.
+- Icone adaptativo + splash claro/escuro gerados de `resources/logo.svg` (fonte versionada;
+  **placeholder do DS** — arte oficial da marca e follow-up).
+- Runtime nativo em `src/app/core/native/`: `PlatformService` (deteccao unica de plataforma) e
+  `NativeRuntimeService` (status bar segue o tema; back button com saida previsivel nas raizes e
+  `Location.back()` fora delas; deep links por allowlist com rejeicao de dot segments, navegando
+  pelo Router e portanto pelos guards; falha de plugin isolada; no-op no web).
+- `redirectAuthenticatedGuard` em `/welcome`, `/login` e `/register` (achado do smoke: pop do
+  historico do WebView devolvia usuario logado a tela publica).
+- Sessao: sem mudanca de storage (`Preferences` para tokens; step-up so em memoria); storage
+  endurecido fica para a M-Sprint 15 (regra do ADR 0019).
+- CI `CI-MOBILE` ganhou o job `Build Android (debug)` (Node 22 + JDK 21; `gradlew test lint
+  assembleDebug`; artifact `mobile-android-apk-debug`; sem keystore).
+- Smoke em emulador API 36 (build `dev-offline` com MSW; backend real e validacao manual): login ->
+  home -> tabs, back button (raiz sai; intermediario volta), deep link valido/invalido, kill/reopen
+  com sessao, logout, landscape, Logcat sem segredo/PII.
+
+Spec e steps:
+- [`specs/fase-4/213-msprint-13-empacotamento-nativo-android.md`](../../specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
+- [`steps-fase-4/mobile/213-msprint-13-steps.md`](../../steps-fase-4/mobile/213-msprint-13-steps.md)
+- [`adr/0019-baseline-capacitor-8-mobile.md`](../../adr/0019-baseline-capacitor-8-mobile.md)

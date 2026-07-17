@@ -1148,3 +1148,57 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   `format:check` + `contract:check` verdes. Gate final: Vitest 586/586, Playwright 31/31,
   audit 0 total. **F-Sprint 19 fechada.** Proximo: mobile M-13-16 e sprint web dedicada de
   visibilidade de chaves Pix (Gate F-18.0; pendencia do `v1.0-local`, PRD-FASE-4 §37).
+
+## M-Sprint 13 — Empacotamento nativo Android (Capacitor 8) (2026-07-17)
+
+- Empacota o `sep-mobile` como app **nativo Android** via Capacitor 8.4 (Epic 14, spec 213 /
+  PRD-FASE-4 §35), sem trocar a stack (Angular 20.x + Ionic 8.4+), sem jornada/endpoint/regra/
+  contrato novo e sem regressao do PWA. Desbloqueia M-14 (iOS) e M-15 (biometria nativa).
+- **ADR 0019** formaliza a baseline Capacitor 8 (supersede o ADR 0003 nominal Cap 6 e o
+  ADR 0015 Proposto no recorte do Capacitor). Node >= 22 obrigatorio no CLI (fatal com Node 20).
+- Projeto `android/` versionado (minSdk 24, compile/target 36, Gradle 8.14.3, AGP 8.13.0),
+  gerado por `npx cap add android` com 5 plugins oficiais major 8. `capacitor.config.ts`
+  inalterado (`com.dynamis.sep.mobile` / `SEP` / `www`; sem `server.url`).
+- Runtime nativo isolado em `core/native/`: `PlatformService` (deteccao de runtime) +
+  `NativeRuntimeService` (status bar por tema, back button por prioridade -1, deep links por
+  allowlist de prefixos via `router.navigateByUrl` — guards executam), com fallback web no-op;
+  `BiometricService` refatorado (sem uso nativo ainda — M-15). Falha de plugin isolada em
+  try/catch (nunca derruba sessao/navegacao).
+- Seguranca: deep links descartam URL desconhecida/malformada em silencio (nunca logada — pode
+  ter token/PII) e derrubam qualquer `..` (literal, `%2e`, path opaco `scheme:app/../..`);
+  manifest endurecido (`allowBackup="false"` porque tokens ficam em SharedPreferences; so
+  permissao INTERNET no app, VIBRATE entra pelo merge do plugin haptics; scheme proprio
+  `com.dynamis.sep.mobile://` sem dominio inventado, App Links https = Fase 5;
+  `MainActivity` exported so com launcher/VIEW, FileProvider nao exportado). Sessao inalterada
+  (`Preferences` segue para token — endurecimento na M-15, regra do ADR 0019); step-up token so
+  em memoria. Logcat pos-smoke: 0 segredos/valores (21 hits = so o *nome* da chave em log V do
+  debug).
+- **Guard novo `redirectAuthenticatedGuard`** (welcome/login/register): achado do smoke — o back
+  fisico faz pop do historico do WebView e, sem o guard, devolvia usuario **logado** a `/login`;
+  destino identico ao splash (`/app/inicio`); vale tambem para o PWA. Back button: raizes
+  encerram o app; fora delas `Location.back()`; historico vazio (cold start via deep link) volta
+  a `/`.
+- Reviews (cavecrew-reviewer por task, 7 commits): hotfixes `colors.xml` (styles referenciava
+  cor inexistente, build quebrava), deep links dot-segment em path opaco, `replace(/%2e/g)` no
+  lugar de `replaceAll` (quebrava build AOT — lib < es2021, Vitest JIT nao acusa; validado com
+  exit code explicito sem pipe, ver [[feedback_exit_code_pipe]]), back com historico vazio.
+- Artefatos e smoke: APK debug 5,2 MB / AAB debug 4,1 MB; smoke em emulador (AVD `sep-pixel`,
+  Pixel 5, API 36, KVM, build `dev-offline` com MSW) — login MSW -> `/app/inicio`, jornada
+  basica, voltar/deep link valido/invalido, encerrar-reabrir, logout, rotacao, Logcat limpo,
+  todos OK. Smoke contra backend real `:8080` (login+MFA TOTP reais) segue validacao manual
+  pendente (mesmo criterio do golden-path historico). Icone/splash placeholder do DS gerados de
+  `resources/logo.svg` via `@capacitor/assets` (arte oficial nao existe — follow-up).
+- Verificacao: Vitest **487** (68 arquivos; +23: platform 3, native-runtime 16, guard 4),
+  lint/lint:scss/format:check verdes, build AOT prod verde, `./gradlew test lint assembleDebug
+  bundleDebug` verdes; e2e Playwright PWA 24/25 (vermelho `golden-path-mobile` **preexistente** —
+  seletor `/cadastr/i` + backend real; ver M-9-12). Job CI novo `Build Android (debug)` (Node 22
+  + JDK 21 + cache Gradle; artifact `mobile-android-apk-debug`; sem keystore).
+- Follow-ups: (1) arte oficial da marca (icone/splash); (2) `minifyEnabled false` + proguard no
+  release da Fase 5; (3) dupla `loadCurrentUser` (splash + guard) idempotente — dedup no
+  `AuthService` se incomodar; (4) smoke backend real `:8080`; (5) `golden-path-mobile` e2e
+  vermelho preexistente; (6) splash nativo Android 12+ via androidx SplashScreen.
+- Integracao: **MERGEADA develop+main via PR #123** (`develop` == `main` conferido pelo dev).
+  docs-SEP (git manual do dev): ADR 0019, steps 213, `SPRINT-M-13-PR.md` (criado), AI-ROADMAP
+  (M-13 mergeada), README do sep-mobile §Android, STATE + este historico; ADR 0015 anotado como
+  supersedido no recorte; `SPRINT-M-11-PR.md` removido (ciclo). **M-Sprint 13 fechada.** Proximo:
+  mobile M-14 (iOS), M-15 (biometria), M-16 (aporte/matching/Pix) e sprint web de chaves Pix.

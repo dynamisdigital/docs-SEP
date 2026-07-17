@@ -2,9 +2,11 @@
 
 ## Status
 
-**Proposto** (2026-05-27). Sprint 15 — Hardening + Bug-Hunt (Task 15.6).
+**Supersedido por [ADR 0019](./0019-baseline-capacitor-8-mobile.md)** (2026-07-17, M-Sprint 13).
 
-Sera promovido a **Aceito** quando a Sprint Mobile reabrir e a stack for re-validada com Ionic 8.4+ e plugins nativos (biometria, secure storage, push notifications) plugados.
+Historico: **Proposto** (2026-05-27). Sprint 15 — Hardening + Bug-Hunt (Task 15.6). A promocao a
+Aceito prevista aqui foi concretizada pelo ADR 0019 na reabertura da trilha nativa (baseline
+re-validada em Capacitor 8.4.x com toolchain Android real).
 
 ## Contexto
 

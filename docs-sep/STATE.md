@@ -10,23 +10,43 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-16._
+_Atualizado em: 2026-07-17._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend da Fase 4 **fechado**
-  (Sprints 27-32 mergeadas); web F-16-19 mergeadas; seguem mobile M-13-16 e a sprint web
-  dedicada de chaves Pix (Gate F-18.0).
-- **Spec/step ativo**: F-Sprint 19 (web) **MERGEADA** (em `develop` por push direto
-  fast-forward, tip `bb825e7` — 6 commits, sem PR/squash, desvio aceito pelo dev; promovida a
-  `main` via PR #96, `01ccc52`; `develop` == `main` conferido por conteudo) — spec
-  [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) + steps
-  [`119`](../steps-fase-4/web/119-fsprint-19-steps.md); detalhe em
-  [`SPRINT-F-19-PR.md`](../repos/sep-app/SPRINT-F-19-PR.md).
-  Mobile M-13-16 liberadas pelos backends 29-31.
+  (Sprints 27-32 mergeadas); web F-16-19 mergeadas; mobile **M-13 mergeada**; seguem mobile
+  M-14-16 e a sprint web dedicada de chaves Pix (Gate F-18.0).
+- **Spec/step ativo**: M-Sprint 13 (mobile) **MERGEADA** develop+main via PR #123
+  (`develop` == `main` conferido pelo dev) — empacotamento nativo Android (Capacitor 8), sem
+  jornada/endpoint/contrato novo e sem regressao PWA — spec
+  [`213`](../specs/fase-4/213-msprint-13-empacotamento-nativo-android.md) + steps
+  [`213`](../steps-fase-4/mobile/213-msprint-13-steps.md) +
+  [ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md); detalhe em
+  [`SPRINT-M-13-PR.md`](../repos/sep-mobile/SPRINT-M-13-PR.md).
+  Proximo: mobile M-14 (iOS), M-15 (biometria nativa), M-16 (aporte/matching/Pix — liberados
+  pelas Sprints 29-31) e a sprint web de chaves Pix.
 
 ## Onde estamos
 
+- **M-Sprint 13 (mobile) MERGEADA em 2026-07-17** — empacotamento nativo Android via
+  Capacitor 8 (Epic 14; sem jornada/endpoint/contrato novo, sem regressao PWA). Em
+  `origin/develop` + `origin/main` via PR #123 (`develop` == `main` conferido pelo dev).
+  [ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md) formaliza a baseline Capacitor 8
+  (supersede ADR 0003 e ADR 0015 no recorte do Capacitor; Node >= 22 obrigatorio no CLI).
+  Projeto `android/` versionado (minSdk 24, compile/target 36, Gradle 8.14.3, AGP 8.13.0;
+  5 plugins oficiais major 8); runtime nativo isolado em `core/native/` (`PlatformService` +
+  `NativeRuntimeService`: status bar por tema, back button, deep links por allowlist via
+  guards) com fallback web (no-op); guard novo `redirectAuthenticatedGuard` (achado do smoke —
+  back fisico devolvia usuario logado a tela publica). Manifest endurecido
+  (`allowBackup="false"`, so INTERNET, deep link por scheme proprio
+  `com.dynamis.sep.mobile://`; App Links https ficam pra Fase 5). APK debug 5,2 MB / AAB debug
+  4,1 MB; smoke em emulador (AVD Pixel 5, API 36, build offline com MSW) OK; job CI
+  `Build Android (debug)` novo. Vitest 487 + `gradlew test lint assembleDebug bundleDebug`
+  verdes; e2e PWA 24/25 (vermelho `golden-path-mobile` preexistente). Follow-ups: arte oficial
+  da marca (icone/splash = placeholder DS), `minifyEnabled`/proguard no release da Fase 5,
+  dedup de `loadCurrentUser`, smoke contra backend real `:8080`. Desbloqueia M-14 (iOS) e M-15
+  (biometria). Detalhe em [`SPRINT-M-13-PR.md`](../repos/sep-mobile/SPRINT-M-13-PR.md).
 - **F-Sprint 19 (web) MERGEADA em 2026-07-16** — hardening de tooling, contrato e collections
   (follow-up da Fase 3; sem tela/endpoint/regra nova). Em `origin/develop` por push direto
   fast-forward (tip `bb825e7`; desvio de fluxo aceito) e promovida a `main` via PR #96
@@ -84,10 +104,10 @@ _Atualizado em: 2026-07-16._
 
 ## Proximo passo
 
-1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamentos F-18 e
-   F-19: collections, ADR 0018, PRD/STATE/historico, docs).
-2. Seguir a ordem da Fase 4 web/mobile: mobile M-13-16 (empacotamento nativo, biometria,
-   aporte/matching/Pix — liberados pelas Sprints 29-31) e a sprint web dedicada de
+1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamento M-13:
+   ADR 0019, steps 213, `SPRINT-M-13-PR.md`, AI-ROADMAP, README do sep-mobile, STATE/historico).
+2. Seguir a ordem da Fase 4 mobile/web: mobile **M-14** (iOS), **M-15** (biometria nativa) e
+   **M-16** (aporte/matching/Pix — liberados pelas Sprints 29-31) e a sprint web dedicada de
    visibilidade de chaves Pix (decisao do Gate F-18.0; pendencia do `v1.0-local` no
    PRD-FASE-4 §37). Ver dependencias em [`specs/fase-4/README.md`](../specs/fase-4/README.md).
 
