@@ -10,13 +10,14 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-17._
+_Atualizado em: 2026-07-20._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend da Fase 4 **fechado**
-  (Sprints 27-32 mergeadas); web F-16-19 mergeadas; mobile **M-13 mergeada**; seguem mobile
-  M-14-16 e a sprint web dedicada de chaves Pix (Gate F-18.0).
+  (Sprints 27-32 mergeadas); web F-16-19 mergeadas; mobile **M-13 mergeada**; **M-14 (iOS)
+  bloqueada por gate externo de hardware macOS** (ver §Gates externos); seguem mobile M-15/M-16
+  sobre PWA/Android e a sprint web dedicada de chaves Pix (Gate F-18.0).
 - **Spec/step ativo**: M-Sprint 13 (mobile) **MERGEADA** develop+main via PR #123
   (`develop` == `main` conferido pelo dev) — empacotamento nativo Android (Capacitor 8), sem
   jornada/endpoint/contrato novo e sem regressao PWA — spec
@@ -24,8 +25,9 @@ _Atualizado em: 2026-07-17._
   [`213`](../steps-fase-4/mobile/213-msprint-13-steps.md) +
   [ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md); detalhe em
   [`SPRINT-M-13-PR.md`](../repos/sep-mobile/SPRINT-M-13-PR.md).
-  Proximo: mobile M-14 (iOS), M-15 (biometria nativa), M-16 (aporte/matching/Pix — liberados
-  pelas Sprints 29-31) e a sprint web de chaves Pix.
+  Proximo: mobile **M-16** (aporte/matching/Pix — liberados pelas Sprints 29-31, executavel em
+  PWA/Android sem depender de iOS) e a sprint web de chaves Pix. **M-14 (iOS) e M-15 (biometria
+  nativa iOS) ficam aguardando** o gate externo de hardware macOS 13+ (ver §Gates externos).
 
 ## Onde estamos
 
@@ -105,19 +107,33 @@ _Atualizado em: 2026-07-17._
 ## Proximo passo
 
 1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamento M-13:
-   ADR 0019, steps 213, `SPRINT-M-13-PR.md`, AI-ROADMAP, README do sep-mobile, STATE/historico).
-2. Seguir a ordem da Fase 4 mobile/web: mobile **M-14** (iOS), **M-15** (biometria nativa) e
-   **M-16** (aporte/matching/Pix — liberados pelas Sprints 29-31) e a sprint web dedicada de
-   visibilidade de chaves Pix (decisao do Gate F-18.0; pendencia do `v1.0-local` no
-   PRD-FASE-4 §37). Ver dependencias em [`specs/fase-4/README.md`](../specs/fase-4/README.md).
+   ADR 0019, steps 213, `SPRINT-M-13-PR.md`, AI-ROADMAP, README do sep-mobile, STATE/historico
+   + gate externo M-14 iOS registrado neste STATE).
+2. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+   §Gates externos). Nao bloqueiam a Fase 4 sobre fake nem as trilhas PWA/Android/web.
+3. Seguir a ordem da Fase 4 sem depender de iOS: mobile **M-16** (aporte/matching/Pix — liberados
+   pelas Sprints 29-31; roda em PWA/Android) e a sprint web dedicada de visibilidade de chaves
+   Pix (decisao do Gate F-18.0; pendencia do `v1.0-local` no PRD-FASE-4 §37). Ver dependencias
+   em [`specs/fase-4/README.md`](../specs/fase-4/README.md).
+4. Enquanto o gate M-14 nao abre, avaliar fallback via runner CI macOS (spec 214.3.4) para
+   validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
+   spec e permanece pendente do gate.
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
 
 - **Credenciais Celcoin/BaaS** (sandbox e producao) — ativacao de adapters reais; escopo Fase 5.
 - **Conta/ambiente AWS** — provisionamento e deploy remoto; escopo Fase 5.
 - **Contas de loja** (Google Play, Apple Developer) — publicacao mobile; escopo Fase 5.
+- **Host macOS compativel com Xcode 15+ (macOS 13+ Ventura)** — pre-requisito da **M-Sprint 14**
+  (empacotamento nativo iOS via Capacitor 8). Host atual do dev e macOS 12.7.6 Monterey em hardware
+  sem upgrade possivel; Xcode.app, CocoaPods e simulador iOS ausentes. Enquanto o acesso nao
+  existir (Mac com macOS 13+, cloud Mac tipo MacinCloud/MacStadium/AWS mac1, ou runner CI macOS
+  15), a M-Sprint 14 permanece bloqueada. **Nao bloqueia** M-15/M-16 sobre PWA/Android nem o
+  restante da Fase 4; impacta apenas o fechamento do Epic 14 iOS no marco `v1.0-local`
+  (PRD-FASE-4 §37).
 
-Ate os acessos existirem: banco PostgreSQL local via Docker Compose; providers em Fake + WireMock.
+Ate os acessos existirem: banco PostgreSQL local via Docker Compose; providers em Fake + WireMock;
+empacotamento iOS adiado ate hardware/cloud Mac disponivel.
 
 ## Decisoes ativas ainda vigentes
 
