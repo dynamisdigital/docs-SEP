@@ -111,7 +111,7 @@ Ate os acessos existirem: banco PostgreSQL local via Docker Compose; providers e
 - [ ] **Step 2: Apagar os 2 arquivos antigos**
 
 ```bash
-cd /c/workspace-sep/docs-SEP
+cd docs-SEP
 rm docs-sep/CONTEXT.md docs-sep/CONTEXT-ESTADO-ATUAL.md
 ```
 
@@ -511,7 +511,7 @@ Esperado: nenhum resultado.
 - [ ] **Step 1: Grep total no repo por referências soltas**
 
 ```bash
-cd /c/workspace-sep/docs-SEP
+cd docs-SEP
 grep -rln "CONTEXT-ESTADO-ATUAL\|CONTEXT\.md" --include="*.md" . \
   | grep -v -E "^\./(adr|specs/fase-1|specs/fase-2|steps-fase-1|steps-fase-2|steps-fase-3)/" \
   | grep -v "^\./docs-sep/CONTEXT-PARTE-2.md"

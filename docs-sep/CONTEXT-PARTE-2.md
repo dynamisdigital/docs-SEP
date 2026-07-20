@@ -54,7 +54,7 @@ No estado atual:
   - **1B**: Sprint 5 abre a Fase 2 (gate de hardening obrigatorio antes de qualquer integracao real com Celcoin)
   - **2B**: granularidade de 2 sprints por Epic 5-8 (parte 1 + parte 2), Epic 9 em sprint unica → 9 sprints novas (006-014)
   - **3C**: apenas backend nesta etapa; F-Sprints 5+ e M-Sprints 5+ NAO sao planejadas agora (decisao motivada por evitar planejar UI sobre contratos que ainda evoluem nas Epics 5-9)
-  - **4D**: entregaveis = plano executivo (`/home/mauricio/.claude/plans/precisamos-agora-planejar-as-polished-pumpkin.md`) + atualizacao do PRD (§22 com Sprints 5-14, §25 com sprints alocadas por Epic, nova §29 com tabela executiva Epics × Sprints) + 9 specs novas em `docs-SEP/specs/fase-2/006` ate `docs-SEP/specs/fase-2/014`
+  - **4D**: entregaveis = plano executivo versionado em `docs-SEP/docs-sep/PRD-FASE-2.md` (§22 com Sprints 5-14, §25 com sprints alocadas por Epic, §29 com tabela executiva Epics × Sprints) + 9 specs novas em `docs-SEP/specs/fase-2/006` ate `docs-SEP/specs/fase-2/014`
 - mapa Sprint → Epic da Fase 2 (referencia rapida):
   - Sprint 5 → Epic 4 estendida (Endurecimento de Seguranca — gate)
   - Sprints 6, 7 → Epic 5 (Onboarding KYC PF, Onboarding KYB PJ + PLD)
