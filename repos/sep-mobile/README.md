@@ -389,8 +389,9 @@ Telas/componentes (`src/app/features/credora/`):
 - `shared/` — `credora-status`/`oportunidade-status`/`operacao-status` (pills semanticas) e
   `credora-format` (moeda/taxa/data; taxa como fracao via `Intl percent`, igual ao consumidor web).
 
-Borda (`src/app/core/credores/`): `credora-mobile.service` (9 endpoints permitidos; sem
-cadastro/sync/associacao admin; `POST` interesses sem corpo; `DELETE` 204 sem DTO; propaga 404/409/422)
+Borda (`src/app/core/credores/`): `credora-mobile.service` (9 endpoints permitidos aqui; a M-Sprint 16
+acrescenta `listarAportes` como decimo — ver secao propria; sem cadastro/sync/associacao admin;
+`POST` interesses sem corpo; `DELETE` 204 sem DTO; propaga 404/409/422)
 e `credora-context.store` — presenca **efemera em memoria** (sem storage), deduplica chamadas
 concorrentes, distingue 404 de rede/5xx, escopa presenca/credora ao usuario autenticado (troca de
 usuario/logout invalidam) e descarta resposta de usuario trocado durante a requisicao.
@@ -473,6 +474,62 @@ Spec e steps:
 - [`specs/fase-3/211-msprint-11-pix-mobile.md`](../../specs/fase-3/211-msprint-11-pix-mobile.md)
 - [`steps-fase-3/mobile/211-msprint-11-steps.md`](../../steps-fase-3/mobile/211-msprint-11-steps.md)
 - backend Gates P1-P3: [`026`](../../steps-fase-3/backend/026-sprint-26-steps.md) (Sprint 26, mergeada PR #87/#88).
+
+## Aportes owner-scoped da credora (M-Sprint 16)
+
+Exibe a empresa credora dona os **aportes da propria operacao**, em somente leitura, dentro do
+detalhe da carteira ja existente. Consome um unico contrato da **Sprint 29**:
+
+```http
+GET /api/v1/credores/operacoes/{operacaoId}/aportes
+```
+
+Autenticado (`isAuthenticated()`), **sem step-up e sem `Idempotency-Key`**: ownership, ordem, valores
+e estados sao resolvidos no backend, que devolve `404` neutro para operacao alheia ou inexistente.
+
+**Escopo reduzido pelo Gate M-16.0.** O recorte original da spec 216 previa tambem matching
+assistido, registro de aporte e visibilidade de chaves Pix. Os cinco outros endpoints exigem
+`FINANCEIRO`/`ADMIN`, e o `sep-mobile` so conhece `UsuarioRole = 'ADMIN' | 'CLIENTE'`
+(`src/app/core/api/api.models.ts`) — a credora autentica como `CLIENTE` e receberia `403`. Esse
+escopo foi **adiado**, nao implementado silenciosamente; a decisao e a tabela de alcance por endpoint
+estao na spec 216. O item de Pix avancado do `v1.0-local` (PRD-FASE-4 §37) **nao** e fechado por esta
+sprint.
+
+Borda: `AporteCredoraResponse` + `StatusAporteCredora`
+(`PENDENTE | EM_PROCESSAMENTO | LIQUIDADO | FALHOU`) em `core/api/api.models.ts`, e
+`listarAportes(operacaoId)` em `core/credores/credora-mobile.service` (decimo endpoint permitido).
+O `stepUpInterceptor` **nao** foi alterado: o token e de uso unico e consumi-lo num GET inutilizaria
+a proxima mutacao legitima do usuario — ha teste travando isso.
+
+Tela (`features/credora/carteira/portfolio-detail.component`): secao "Aportes da operacao" espelhando
+o padrao ja usado pelo card de status Pix — leitura secundaria que **nao bloqueia** o detalhe
+principal, com token de geracao descartando resposta obsoleta e retry proprio. Quatro superficies
+mutuamente exclusivas: carregando, lista, **vazia** (`200 []`), **indisponivel** (`404` neutro) e erro
+tecnico (rede/5xx). Um `404` seguido de retry com 5xx mostra o erro tecnico, nao a ausencia neutra.
+Falha da lista nunca derruba o detalhe da carteira ja carregado. Sem polling e sem refresh invisivel:
+atualizacao so por gesto, com guarda de request em voo que impede duas leituras concorrentes no duplo
+toque (o `[disabled]` do `ion-button` so vale a partir do proximo ciclo de change detection).
+
+`shared/aporte-status.component` — badge dos quatro estados com **rotulo textual** (a cor nunca e a
+unica informacao) e switch exaustivo sobre o union: novo status sem tom quebra a compilacao.
+
+Limites: **nenhum CTA de mutacao** para a persona credora (registrar/decidir/matching); ordem vem do
+backend e o app nao reordena nem agrega; nada de escrow, provider, `Idempotency-Key`, motivo tecnico
+de falha ou ID interno no DOM; nada persistido em storage.
+
+Testes: Vitest cobre o service (URL/metodo, ordem preservada, lista vazia, `404`, ausencia de
+step-up/`Idempotency-Key`, ausencia de metodos de mutacao) e a tela (quatro estados com rotulo e tom,
+vazio ≠ `404` ≠ erro tecnico, retry `404`→5xx, duplo toque com request unica, ausencia de CTA de
+mutacao, ausencia de escrow/provider/IDs). Smoke Playwright em `e2e/credora-mobile.spec.ts`: credora
+ve os quatro aportes em somente leitura com um unico botao no card, e operacao sem aportes mostra o
+estado vazio. Handlers MSW em `credoresHandlers`, reseedaveis por `mock.credora` (`aportes:
+'LISTA' | 'VAZIA'`), sem endpoint de mutacao mockado.
+
+Spec e steps:
+- [`specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md`](../../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md)
+- [`steps-fase-4/mobile/216-msprint-16-steps.md`](../../steps-fase-4/mobile/216-msprint-16-steps.md)
+- backend: Sprint 29 (aporte, PR #93/#94). Sprints 30 (matching) e 31 (chaves Pix) ficaram sem
+  consumo mobile pelo Gate M-16.0.
 
 ## Empacotamento nativo Android (M-Sprint 13)
 

@@ -9,7 +9,20 @@ preservando PWA e empacotamento nativo Android (M-13). Regras, estados, totais, 
 ownership, idempotencia, auditoria, movimentacao de escrow e mascaramento continuam autoritativos no
 backend.
 
-**Esforco total estimado**: 4-6 dias de Dev Pleno Mobile.
+> **ESCOPO REDUZIDO PELO GATE M-16.0 (2026-07-20).** O precheck constatou que o `sep-mobile` so
+> conhece `UsuarioRole = 'ADMIN' | 'CLIENTE'` (`src/app/core/api/api.models.ts:1`) e que 5 dos 6
+> endpoints previstos exigem `FINANCEIRO`/`ADMIN` no backend — persona que esta spec/step exclui do
+> mobile. Decisao registrada (opcao A): **a M-16 entrega somente a leitura owner-scoped de aportes**
+> (`GET /api/v1/credores/operacoes/{operacaoId}/aportes`, o unico contrato que a credora `CLIENTE`
+> alcanca). As Tasks **M-16.2, M-16.3 e M-16.5** e os Steps **216.4.1-216.4.3** ficam **ADIADOS** e
+> permanecem abaixo apenas como registro para quando a persona operacional existir no mobile.
+> Detalhe da decisao e da tabela de alcance por endpoint na spec 216.
+>
+> Ordem executavel real: `Gate M-16.0` -> `M-16.1` (reduzida) -> `M-16.4` (somente Step 216.4.4) ->
+> `M-16.6` (reduzida).
+
+**Esforco total estimado**: 4-6 dias de Dev Pleno Mobile no escopo original; **1-1,5 dia** no
+escopo reduzido pelo Gate M-16.0.
 
 **Repos de destino**:
 
@@ -69,13 +82,20 @@ prechecks (Git + toolchain + baseline PWA/Android + contratos S29-31)
 
 ## Contratos backend consumidos
 
-### Matching operacional (Sprint 30)
+> **Conferencia de contrato (Gate M-16.0, 2026-07-20)**: os 6 endpoints existem em
+> `sep-api/origin/develop` nos paths previstos. Correcoes factuais aplicadas abaixo: `TipoChavePix`
+> usa `EVP` (nao `ALEATORIA`); `ChavePixResponse` tem campo extra `removidaEm`; `POST /aportes`
+> tambem pode retornar `422`; `POST /matching/{id}/decisao` responde `200` (nao `201`).
+
+### Matching operacional (Sprint 30) - ADIADO pelo Gate M-16.0
 
 ```http
 GET  /api/v1/credores/matching/sugestoes
 GET  /api/v1/credores/matching/{sugestaoId}
 POST /api/v1/credores/matching/{sugestaoId}/decisao
 ```
+
+**Nao consumido nesta sprint**: exige `FINANCEIRO`/`ADMIN`; a credora autentica como `CLIENTE`.
 
 - Todos exigem `FINANCEIRO` ou `ADMIN`; somente o `POST` exige step-up estrito.
 - `GET /sugestoes` e **refresh-on-read**: pode persistir e auditar sugestoes novas antes de listar
@@ -93,24 +113,28 @@ POST /api/v1/credores/operacoes/{operacaoId}/aportes
 GET  /api/v1/credores/operacoes/{operacaoId}/aportes
 ```
 
-- `POST`: `FINANCEIRO`/`ADMIN`, step-up estrito, header `Idempotency-Key` obrigatorio e body
-  `{ valor }`; retorna `201` em novo registro ou `200` em replay idempotente.
-- `GET`: autenticado, sem step-up; permite visao operacional e empresa credora dona. Usuario sem
-  credora, operacao alheia e operacao inexistente recebem `404` neutro.
-- DTO publico: `id`, `operacaoId`, `status`, `valor`, `dataCriacao`, `dataAtualizacao`.
+- `POST` — **ADIADO pelo Gate M-16.0**: `FINANCEIRO`/`ADMIN`, step-up estrito, header
+  `Idempotency-Key` obrigatorio e body `{ valor }`; retorna `201` em novo registro, `200` em replay
+  idempotente, e ainda `400`/`403`/`404`/`409`/`422`. Nao consumido nesta sprint.
+- `GET` — **unico contrato consumido pela M-16**: autenticado (`isAuthenticated()`), sem step-up;
+  atende visao operacional e empresa credora dona. Usuario sem credora, operacao alheia e operacao
+  inexistente recebem `404` neutro. Lista vem ordenada por data de criacao desc.
+- DTO publico: `id`, `operacaoId`, `status`, `valor`, `dataCriacao`, `dataAtualizacao` (todos
+  non-null).
 - Estados: `PENDENTE -> EM_PROCESSAMENTO -> LIQUIDADO | FALHOU`.
 - Nao existe endpoint REST de reconciliacao na Fase 4. Reconsulta e permitida por gesto, sem
   polling e sem simular webhook.
 
-### Chaves Pix (Sprint 31) - leitura mascarada apenas
+### Chaves Pix (Sprint 31) - ADIADO pelo Gate M-16.0
 
 ```http
 GET /api/v1/pix/chaves
 ```
 
 - `FINANCEIRO`/`ADMIN`; sem step-up (step-up so nas mutacoes `POST`/`DELETE`, fora de escopo desta
-  sprint mobile).
-- DTO publico: `id`, `tipo`, `valorMascarado`, `status` (`ATIVA` | `INATIVA`), `criadaEm`.
+  sprint mobile). **Nao consumido nesta sprint**: a credora `CLIENTE` receberia `403`.
+- DTO publico: `id`, `tipo`, `valorMascarado`, `status` (`ATIVA` | `INATIVA`), `criadaEm`,
+  `removidaEm` (nullable, preenchido so em `INATIVA`).
 - Valor bruto da chave nunca aparece no payload, log ou erro. Mobile so exibe `valorMascarado` e
   `tipo`.
 - Sem cadastro/remocao no mobile; `POST` e `DELETE` sao do web (F-Sprint dedicada de chaves Pix +
@@ -183,15 +207,23 @@ escopo em qualquer caso.
 
 ## Rastreabilidade spec 216 -> steps
 
-| Task da spec 216 | Steps |
-|------------------|-------|
-| 1. Service/modelos aporte, matching e chaves Pix | M-16.1 |
-| 2. Aporte assistido (iniciar + step-up) + status | M-16.4 |
-| 3. Decisao matching assistida (confirmar/rejeitar, step-up) | M-16.2 + M-16.3 |
-| 4. Visao mascarada de chaves Pix | M-16.5 |
-| 5. MSW + Vitest + smoke Playwright PWA | M-16.1-M-16.6 (Vitest por task; MSW/Playwright em M-16.6) |
-| 6. Docs (`README §Credora`, roadmap, PR temp) | M-16.6 |
-| Gates de cadeia, contrato, baseline e escopo Pix | M-16.0 |
+Apos o Gate M-16.0 a spec 216 foi reescrita para tres tasks. Rastreabilidade vigente:
+
+| Task da spec 216 (revisada) | Steps |
+|-----------------------------|-------|
+| 1. Modelos de borda + `listarAportes` no service | M-16.1 (reduzida) |
+| 2. Lista owner-scoped no detalhe da carteira | M-16.4, Steps 216.4.4-216.4.5 |
+| 3. MSW + Vitest + smoke + docs + fechamento | M-16.6 (reduzida) |
+| Gates de cadeia, contrato, baseline e escopo | M-16.0 |
+
+Rastreabilidade do escopo **adiado**, preservada para reativacao futura:
+
+| Escopo adiado | Steps preservados | Bloqueio |
+|---------------|-------------------|----------|
+| Sugestoes de matching | M-16.2 | persona `FINANCEIRO` ausente no mobile |
+| Decisao de matching com step-up | M-16.3 | persona `FINANCEIRO` + `TRATA_403_LOCALMENTE` inexistente |
+| Aporte assistido (POST, idempotencia, step-up) | Steps 216.4.1-216.4.3 | persona `FINANCEIRO` |
+| Chaves Pix mascaradas | M-16.5 | `GET /pix/chaves` exige `FINANCEIRO`/`ADMIN` |
 
 ---
 
@@ -288,7 +320,7 @@ Registrar a decisao no bloco de fechamento (M-16.6) e no `SPRINT-M-16-PR.md`.
 
 ```bash
 cd <sep-mobile-root>
-npm ci
+npm ci --legacy-peer-deps
 npm run lint
 npm run lint:scss
 npm run format:check
@@ -300,8 +332,18 @@ cd android
 ./gradlew test lint assembleDebug
 ```
 
+- `npm ci` puro **falha** neste repo (`ERESOLVE`: `zone.js@0.16.2` x peer `~0.15.0` do
+  `@angular/core@20.3.26`). O CI usa `npm ci --legacy-peer-deps` (`.github/workflows/ci.yml:52,91,135`)
+  e este step segue o CI.
+- Node: jobs web do CI usam Node 20; o job Android usa Node 22 (ADR 0019 exige >= 22 para o CLI do
+  Capacitor).
 - Registrar falhas preexistentes (ex.: `golden-path-mobile` conforme M-13).
 - Nao corrigir regressao alheia a M-16 sem aprovacao.
+
+**Baseline medida em 2026-07-20** (branch `feature/msprint-16-aporte-pix-avancado-mobile` recem
+criada de `origin/develop`, Node 22): `npm ci --legacy-peer-deps`, lint, lint:scss, format:check,
+build e Vitest **487/487 (68 arquivos)** verdes; Playwright **24 passed / 1 failed**, sendo a falha
+o `golden-path-mobile` ja registrado como preexistente no fechamento da M-13.
 
 ### Definicao de pronto do Gate M-16.0
 
@@ -313,109 +355,86 @@ cd android
 
 ---
 
-## Task M-16.1 - DTOs, services e step-up routing
+## Task M-16.1 - DTOs e leitura owner-scoped de aportes no service (REDUZIDA)
 
-**Objetivo**: criar a borda tipada e segura antes das telas.
+**Objetivo**: criar a borda tipada do unico contrato que a credora alcanca, antes da tela.
 
 **Pre-requisito**: Gate M-16.0 concluido.
 
-**Esforco**: 0,5-1 dia.
+**Esforco**: 0,25 dia no escopo reduzido.
 
-**Arquivos esperados**:
+**Arquivos esperados** (nomes reais conferidos no Gate M-16.0):
 
 - `src/app/core/api/api.models.ts`.
-- `src/app/core/credora/credora.service.ts` e spec.
-- `src/app/core/pix/pix-chaves.service.ts` e spec (novo modulo).
-- `src/app/core/interceptors/step-up.interceptor.ts` e spec.
+- `src/app/core/credores/credora-mobile.service.ts` e spec.
+
+Nao ha `src/app/core/credora/credora.service.ts` nem modulo `src/app/core/pix/` no `sep-mobile`; os
+caminhos originais deste step estavam extrapolados do `sep-app`.
 
 ### Step 216.1.1 - Adicionar modelos de borda
 
-Adicionar tipos exatos:
+Adicionar apenas os tipos do contrato consumido:
 
 ```text
-StatusMatchingCredoraOperacao = SUGERIDA | CONFIRMADA | REJEITADA
-AcaoDecisaoMatching = CONFIRMAR | REJEITAR
 StatusAporteCredora = PENDENTE | EM_PROCESSAMENTO | LIQUIDADO | FALHOU
-StatusChavePix = ATIVA | INATIVA
-TipoChavePix (espelhar enum backend: CPF | CNPJ | EMAIL | TELEFONE | ALEATORIA)
-MatchingSugestaoResponse
-DecidirMatchingRequest
-RegistrarAporteRequest
-AporteCredoraResponse
-ChavePixResponse (id, tipo, valorMascarado, status, criadaEm)
+AporteCredoraResponse (id, operacaoId, status, valor, dataCriacao, dataAtualizacao)
 ```
 
-Datas permanecem `string` ISO e valores monetarios `number` apenas para entrada/exibicao. Nao
-adicionar campos internos, valor bruto de chave, nem helpers que calculem elegibilidade, total ou
-desmascarem chave.
+Datas permanecem `string` ISO e valores monetarios `number` apenas para exibicao. Nao adicionar
+campos internos nem helpers que calculem total, elegibilidade ou estado.
 
-### Step 216.1.2 - Estender `CredoraService`
+Tipos de matching e de chave Pix **nao** entram: seus contratos estao adiados e modelo sem consumo
+vira codigo morto.
 
-Metodos esperados, com nomes equivalentes aceitos se revelarem melhor a intencao:
+### Step 216.1.2 - Estender o service da credora
+
+Adicionar um unico metodo a `CredoraMobileService`, seguindo a convencao vigente do service
+(`firstValueFrom`, retorno `Promise`, sem `Observable` exposto):
 
 ```text
-listarSugestoesMatching()
-consultarMatching(sugestaoId)
-decidirMatching(sugestaoId, request)
-registrarAporte(operacaoId, request, idempotencyKey)
-listarAportes(operacaoId)
+listarAportes(operacaoId) -> Promise<AporteCredoraResponse[]>
 ```
 
-- O service transporta DTOs e headers; nao gera key, nao decide retry e nao interpreta estado.
-- `registrarAporte` deve permitir observar `201` x `200` somente se a UI realmente usar essa
-  distincao; nao ampliar `observe: 'response'` sem necessidade.
+- O service transporta o DTO; nao interpreta estado, nao ordena e nao agrega.
+- Sem cache persistente; leitura por chamada, refresh por gesto.
 
-### Step 216.1.3 - Criar `PixChavesService` (leitura apenas)
+### Step 216.1.3 - Testar contrato HTTP
 
-Novo modulo `src/app/core/pix/`:
-
-```text
-listarChaves()  -> Observable<ChavePixResponse[]>
-```
-
-- Nao expor `cadastrar` nem `remover` (fora de escopo mobile).
-- Nao adicionar cache local persistente; leitura por chamada, refresh explicito.
-
-### Step 216.1.4 - Incluir os POSTs no `stepUpInterceptor`
-
-Anexar e consumir token somente em:
-
-```text
-POST /credores/matching/{id}/decisao
-POST /credores/operacoes/{id}/aportes
-```
-
-GETs (incluindo `/pix/chaves`) nunca consomem token. Cobrir match positivo, metodo errado e paths
-parecidos para impedir consumo acidental.
-
-### Step 216.1.5 - Testar contrato HTTP
-
-Cobrir URLs/metodos/body, `Idempotency-Key`, DTOs, ausencia de step-up nos GETs, presenca de token
-somente nos dois POSTs sensiveis e ausencia de qualquer chamada de mutacao a `/pix/chaves`.
+Cobrir URL, metodo, DTO, lista vazia e `404` neutro. Confirmar que a chamada **nao** anexa
+`X-Step-Up-Token` (o `stepUpInterceptor` nao deve ganhar nenhuma entrada nesta sprint).
 
 ```bash
-npm run test -- --run src/app/core/credora/credora.service.spec.ts
-npm run test -- --run src/app/core/pix/pix-chaves.service.spec.ts
-npm run test -- --run src/app/core/interceptors/step-up.interceptor.spec.ts
+npm run test -- --run src/app/core/credores/credora-mobile.service.spec.ts
 npm run lint
 ```
 
 ### Definicao de pronto da Task M-16.1
 
-- [ ] DTOs publicos fieis e minimos; sem valor bruto de chave.
-- [ ] Cinco operacoes HTTP centralizadas no `CredoraService` + `listarChaves` no `PixChavesService`.
-- [ ] Step-up anexado somente aos POSTs corretos.
-- [ ] Nenhuma regra financeira, ownership ou mascaramento no cliente.
+- [ ] `StatusAporteCredora` e `AporteCredoraResponse` fieis ao DTO backend.
+- [ ] `listarAportes` centralizado no service da credora.
+- [ ] `stepUpInterceptor` inalterado; GET nao consome token.
+- [ ] Nenhuma regra financeira ou de ownership no cliente.
 
 ### Commit sugerido
 
 ```text
-feat(mobile): adicionar contratos de aporte, matching e chaves Pix
+feat(mobile): adicionar contrato de aportes owner-scoped da credora
 ```
 
 ---
 
-## Task M-16.2 - Rotas, navegacao e sugestoes de matching
+### Steps 216.1.4-216.1.5 (original) - **ADIADOS (Gate M-16.0)**
+
+> `PixChavesService`, novos DTOs de matching e as entradas de step-up para
+> `POST /credores/matching/{id}/decisao` e `POST /credores/operacoes/{id}/aportes` dependem da
+> persona `FINANCEIRO`. Registro preservado na spec 216.
+
+---
+
+## Task M-16.2 - Rotas, navegacao e sugestoes de matching - **ADIADA (Gate M-16.0)**
+
+> Nao implementar nesta sprint. Depende da persona `FINANCEIRO`, inexistente no `sep-mobile`.
+> Conteudo preservado como registro.
 
 **Objetivo**: oferecer a `FINANCEIRO`/`ADMIN` uma fila explicita de sugestoes pendentes no app, sem
 polling nem decisao automatica.
@@ -488,7 +507,12 @@ feat(mobile): listar sugestoes de matching da credora
 
 ---
 
-## Task M-16.3 - Detalhe e decisao assistida com step-up
+## Task M-16.3 - Detalhe e decisao assistida com step-up - **ADIADA (Gate M-16.0)**
+
+> Nao implementar nesta sprint. Depende da persona `FINANCEIRO`, inexistente no `sep-mobile`.
+> Observacao factual: `TRATA_403_LOCALMENTE` citado abaixo **nao existe no `sep-mobile`** (conceito
+> criado no `sep-app` na F-16); se esta task for reativada, o mecanismo precisa ser criado antes.
+> Conteudo preservado como registro.
 
 **Objetivo**: confirmar ou rejeitar uma sugestao somente apos reconsulta, confirmacao acessivel e
 step-up valido.
@@ -558,16 +582,20 @@ feat(mobile): permitir decisao assistida de matching
 
 ---
 
-## Task M-16.4 - Aporte assistido, status e leitura owner-scoped
+## Task M-16.4 - Leitura owner-scoped de aportes na carteira (REDUZIDA)
 
-**Objetivo**: iniciar um aporte separado a partir de matching confirmado e apresentar o ciclo de
-status tanto ao operador quanto a empresa credora dona no mobile.
+**Objetivo**: apresentar o ciclo de status dos aportes a empresa credora dona, em somente leitura,
+no detalhe da operacao da carteira.
 
-**Pre-requisito**: Task M-16.3 concluida.
+**Pre-requisito**: Task M-16.1 concluida. (A M-16.3 esta adiada e nao bloqueia.)
 
-**Esforco**: 1 dia.
+**Esforco**: 0,5 dia no escopo reduzido.
 
-### Step 216.4.1 - Criar rota/pagina operacional de aporte
+**Recorte executavel**: apenas o **Step 216.4.4**. Os Steps 216.4.1-216.4.3 (rota operacional de
+aporte, idempotencia, step-up, POST) estao **ADIADOS** pelo Gate M-16.0 e ficam abaixo como
+registro.
+
+### Step 216.4.1 - Criar rota/pagina operacional de aporte - **ADIADO (Gate M-16.0)**
 
 Na rota `/credora/matching/:sugestaoId/aporte`:
 
@@ -579,7 +607,7 @@ Na rota `/credora/matching/:sugestaoId/aporte`:
 
 O backend continua validando operacao ativa, contrato assinado e valor.
 
-### Step 216.4.2 - Confirmar e registrar com idempotencia
+### Step 216.4.2 - Confirmar e registrar com idempotencia - **ADIADO (Gate M-16.0)**
 
 Antes do POST:
 
@@ -594,7 +622,7 @@ porque o token anterior e de uso unico. Mudanca do valor invalida a intencao e g
 na proxima confirmacao. Nunca mostrar, logar nem persistir a key em `Preferences`, `localStorage`
 ou `sessionStorage`.
 
-### Step 216.4.3 - Apresentar resposta e historico operacional
+### Step 216.4.3 - Apresentar resposta e historico operacional - **ADIADO (Gate M-16.0)**
 
 Depois de `201` ou `200`, renderizar o DTO retornado e reconsultar `GET /aportes`. Exibir lista em
 ordem recebida, valor, status e datas. Atualizacao posterior ocorre apenas por botao `Atualizar
@@ -606,47 +634,62 @@ Mensagens por estado:
 - `LIQUIDADO`: status confirmado pelo backend;
 - `FALHOU`: falha generica; o contrato publico nao traz motivo tecnico.
 
-### Step 216.4.4 - Expor leitura owner-scoped na carteira
+### Step 216.4.4 - Expor leitura owner-scoped na carteira (EXECUTAVEL)
 
-Estender a rota existente da carteira/operacao da persona credora `CLIENTE` (equivalente mobile de
-`/app/credora/carteira/:id`) para chamar `listarAportes(operacaoId)` e mostrar a mesma
-representacao somente leitura. Nao exibir registrar, retry, matching ou qualquer mutacao para a
-persona credora `CLIENTE`.
+Estender a rota existente `/app/credora/carteira/:operacaoId`
+(`src/app/features/credora/carteira/portfolio-detail.component.*`, guard `credoraPresenceGuard`,
+`authenticated.routes.ts:216`) para chamar `listarAportes(operacaoId)` e mostrar os aportes em
+somente leitura. Nao exibir registrar, retry de mutacao, matching ou qualquer CTA de escrita.
 
-- `[]` = nenhum aporte registrado.
-- `404` = operacao indisponivel/neutra, coerente com o detalhe atual.
-- Falha da lista de aportes nao apaga um detalhe de carteira ja carregado; apresentar erro
-  localizado com retry.
+- `[]` = nenhum aporte registrado (mensagem neutra).
+- `404` = operacao indisponivel/neutra, coerente com o detalhe atual; sem ecoar ID.
+- Falha da lista de aportes **nao** apaga um detalhe de carteira ja carregado; apresentar erro
+  localizado com retry por gesto.
+- Sem polling e sem refresh invisivel ao retomar foreground; atualizacao apenas pelo gesto ja
+  existente na pagina (pull-to-refresh manual/botao), sem disparar duas requests simultaneas.
 
-### Step 216.4.5 - Testar os dois recortes
+Rotulos por estado, sem inventar semantica alem do contrato:
 
-Cobrir prefill autoritativo, edicao sem calculo, key por intencao/retry, `201`/`200`, estados,
-refresh explicito, ausencia de polling, ausencia de persistencia da key e owner sem CTA de mutacao.
+- `PENDENTE`/`EM_PROCESSAMENTO`: processamento em andamento, sem garantia de liquidacao;
+- `LIQUIDADO`: confirmado pelo backend;
+- `FALHOU`: falha generica (o contrato publico nao traz motivo tecnico).
+
+Aplicar o New Design System vigente: badge textual (nao so cor), `safe-area`, light/dark e estados
+loading/vazio/erro coerentes com `portfolio-detail`/`portfolio-list`.
+
+### Step 216.4.5 - Testar o recorte owner-scoped
+
+Cobrir renderizacao fiel do DTO, os quatro estados, lista vazia, `404` neutro, erro + retry sem
+perder o detalhe ja carregado, ausencia de polling e ausencia de qualquer CTA de mutacao.
 
 ```bash
 npm run test -- --run src/app/features/credora
-npm run test -- --run src/app/core/credora
+npm run test -- --run src/app/core/credores
 npm run lint
 npm run lint:scss
 ```
 
 ### Definicao de pronto da Task M-16.4
 
-- [ ] Aporte continua passo separado do matching.
-- [ ] Step-up e idempotencia corretos, sem persistencia sensivel (memoria apenas).
-- [ ] Status vem somente do POST/GET backend.
-- [ ] Operador e owner veem o recorte permitido; owner nao ve mutacao.
+- [ ] Credora dona ve os aportes da propria operacao em somente leitura.
+- [ ] Status, valor e datas vem exclusivamente do `GET` backend.
+- [ ] Nenhum CTA de mutacao, step-up ou idempotencia na superficie do owner.
+- [ ] Erro na lista nao derruba o detalhe da carteira.
 - [ ] UI deixa explicito que a Fase 4 usa provider fake/local.
 
 ### Commit sugerido
 
 ```text
-feat(mobile): adicionar aporte assistido e status da credora
+feat(mobile): exibir aportes owner-scoped no detalhe da carteira
 ```
 
 ---
 
-## Task M-16.5 - Visao mascarada de chaves Pix
+## Task M-16.5 - Visao mascarada de chaves Pix - **ADIADA (Gate M-16.0)**
+
+> Nao implementar nesta sprint. `GET /api/v1/pix/chaves` exige `FINANCEIRO`/`ADMIN`. A visibilidade
+> de chaves Pix segue pela sprint web dedicada (Gate F-18.0); o item de Pix avancado do
+> `v1.0-local` (PRD-FASE-4 §37) **nao** e fechado pela M-16. Conteudo preservado como registro.
 
 **Objetivo**: exibir a lista de chaves Pix da conta operacional/escrow para `FINANCEIRO`/`ADMIN` no
 mobile, em leitura mascarada, sem qualquer mutacao e sem vazar valor bruto.
@@ -719,63 +762,56 @@ feat(mobile): exibir chaves Pix mascaradas da credora
 **Objetivo**: fechar a matriz negativa, validar as jornadas integradas em PWA, atualizar
 documentacao e preparar o PR.
 
-**Pre-requisito**: Task M-16.5 concluida.
+**Pre-requisito**: Task M-16.4 concluida. (As Tasks M-16.3 e M-16.5 estao adiadas.)
 
-**Esforco**: 0,5-1 dia.
+**Esforco**: 0,5 dia no escopo reduzido.
 
-### Step 216.6.1 - Fixar matriz de resposta
+### Step 216.6.1 - Fixar matriz de resposta (reduzida)
 
-| Resposta | Matching | Aporte | Chaves Pix (GET) |
-|----------|----------|--------|------------------|
-| `400` | acao/motivo invalido; manter formulario | valor/key invalido; manter formulario | n/a |
-| `403` GET | acesso negado global | acesso negado conforme persona/rota | acesso negado global |
-| `403` POST | limpar estado efemero e oferecer novo step-up | idem, preservando a intencao sem reenviar | n/a |
-| `404` | recurso indisponivel neutro | operacao indisponivel neutra; sem enumeracao | n/a (lista pode vir vazia) |
-| `409` | reconsultar estado terminal | elegibilidade/key conflitante; reconsultar lista, sem sucesso presumido | n/a |
-| rede/`5xx` | estado desconhecido; reconsultar antes de repetir | reusar key da mesma intencao e reconsultar | oferecer retry por gesto |
+Unico contrato consumido: `GET /api/v1/credores/operacoes/{operacaoId}/aportes`.
 
-Mensagens nao ecoam UUID, header, payload bruto, valor bruto de chave ou detalhe de provider.
+| Resposta | Comportamento esperado |
+|----------|------------------------|
+| `200` `[]` | lista vazia; mensagem neutra, sem fabricar fixture |
+| `200` com itens | render fiel do DTO, na ordem recebida |
+| `403` | acesso negado pelo fluxo global (`error.interceptor` -> `/access-denied`) |
+| `404` | operacao indisponivel/neutra; sem ecoar ID e sem enumerar |
+| rede/`5xx` | erro localizado + retry por gesto; nao apaga o detalhe ja carregado |
 
-### Step 216.6.2 - Cobrir concorrencia e duplo submit
+Mensagens nao ecoam UUID, header, payload bruto ou detalhe de provider.
 
-- uma request por comando;
-- CTAs bloqueados durante GET de reverificacao e POST;
-- dialogs nao sobrepostos;
-- resposta tardia de request anterior nao sobrescreve recurso mais novo;
-- `409` sempre converge por nova leitura;
-- pull-to-refresh e botao `Atualizar` nao disparam duas requests simultaneas.
+As linhas de `400`/`409`/step-up da matriz original pertencem aos POSTs adiados e nao se aplicam.
 
-### Step 216.6.3 - Completar MSW stateful
+### Step 216.6.2 - Cobrir concorrencia
 
-Fixtures/handlers devem representar:
+- uma request por gesto;
+- pull-to-refresh e botao `Atualizar` nao disparam duas requests simultaneas;
+- resposta tardia de request anterior nao sobrescreve leitura mais nova;
+- sem polling e sem refresh invisivel ao retomar foreground.
 
-- sugestao `SUGERIDA`, decisao `CONFIRMADA` e `REJEITADA`;
-- refresh-on-read idempotente, sem duplicar sugestao;
-- decisao `409` em terminal e `404` neutro;
-- aporte novo `201`, replay da mesma key/valor `200`, conflito `409`;
-- lista vazia e aportes nos quatro estados;
-- owner credora com operacao propria e `404` para alheia;
-- chaves Pix: lista com `ATIVA`/`INATIVA` e vazia; `403` para role indevida; nunca retornar valor
-  bruto;
-- reset deterministico entre specs.
+### Step 216.6.3 - Completar MSW stateful (reduzido)
 
-O mock valida `X-Step-Up-Token` e `Idempotency-Key`; nao altera o comportamento de producao para
-facilitar o teste. Nao inventar endpoint de mutacao de chave.
+Fixtures/handlers devem representar, para `GET /credores/operacoes/{operacaoId}/aportes`:
 
-### Step 216.6.4 - Criar smoke Playwright PWA
+- aportes nos quatro estados (`PENDENTE`, `EM_PROCESSAMENTO`, `LIQUIDADO`, `FALHOU`);
+- lista vazia;
+- operacao propria da credora dona e `404` neutro para operacao alheia/inexistente;
+- reset deterministico entre specs, seguindo o padrao ja usado em `mock.credora`.
+
+Nao inventar handler de mutacao (POST de aporte, decisao de matching, cadastro/remocao de chave):
+esses contratos estao adiados e um mock sem tela vira ruido.
+
+### Step 216.6.4 - Criar smoke Playwright PWA (reduzido)
 
 Cobrir ao menos:
 
-1. `FINANCEIRO`/`ADMIN`: sugestoes -> detalhe -> confirmacao -> step-up -> gesto explicito ->
-   decisao -> CTA separado de aporte;
-2. aporte -> confirmacao -> step-up -> gesto explicito -> `201/200` -> status/lista;
-3. empresa credora `CLIENTE`: carteira -> detalhe -> status de aportes somente leitura;
-4. `FINANCEIRO`/`ADMIN`: rota `/credora/pix/chaves` renderiza lista mascarada, sem CTA de mutacao;
-5. role indevida nao ve menu e nao acessa rota operacional.
+1. empresa credora `CLIENTE`: carteira -> detalhe da operacao -> lista de aportes somente leitura,
+   com estado visivel;
+2. ausencia de qualquer CTA de mutacao (registrar/decidir/retry de escrita) nessa superficie;
+3. operacao sem aportes renderiza o estado vazio.
 
-Se o MSW nao conseguir concluir TOTP de forma fiel, o smoke offline deve ao menos provar o
-redirecionamento e a ausencia de auto-submit; a decisao/aporte com token real vira smoke local com
-backend `:8080`, registrado como gate, nao como sucesso simulado.
+Reusar o padrao de bootstrap dos smokes existentes (`e2e/credora-mobile.spec.ts`: MSW via
+`localStorage.NG_APP_USE_MSW` + login `cliente@empresa.com`).
 
 Manter o smoke `golden-path-mobile` no estado vigente (falha preexistente da M-13 nao regride nem
 "cura" nesta sprint sem ADR).
@@ -850,18 +886,16 @@ test(mobile): validar jornada de aporte, matching e chaves Pix
 
 ---
 
-## Gate final da M-Sprint 16
+## Gate final da M-Sprint 16 (escopo reduzido pelo Gate M-16.0)
 
-- [ ] `FINANCEIRO`/`ADMIN` lista sugestoes sem polling e entende o efeito de refresh-on-read.
-- [ ] Decisao de matching e sempre explicita, reverificada e protegida por step-up estrito.
-- [ ] Confirmar matching nao cria nem promete aporte.
-- [ ] Aporte e separado, confirmado, idempotente e protegido por step-up estrito.
-- [ ] Operador acompanha status e empresa credora dona recebe leitura owner-scoped sem mutacao.
-- [ ] Chaves Pix aparecem mascaradas, sem valor bruto, PII ou dado tecnico; sem CTA de mutacao.
-- [ ] Valores, criterios, estados e mascaramento refletem o backend; nenhuma regra recalculada.
-- [ ] `400/403/404/409/rede`, concorrencia e duplo submit possuem cobertura proporcional.
-- [ ] Nenhum dado interno, UUID em erro, key, PII, escrow, provider ou valor bruto de chave vaza na
-      UI, log ou telemetria.
+- [ ] Empresa credora dona ve os aportes da propria operacao em somente leitura, sem CTA de mutacao.
+- [ ] Valores, estados e datas refletem o backend; nenhuma regra recalculada no app.
+- [ ] `403`/`404`/vazio/rede e concorrencia de refresh possuem cobertura proporcional.
+- [ ] Erro na lista de aportes nao derruba o detalhe da carteira ja carregado.
+- [ ] Sem polling, sem refresh invisivel, sem endpoint ficticio de reconciliacao.
+- [ ] Nenhum dado interno, UUID em erro, PII, escrow ou provider vaza na UI, log ou telemetria.
+- [ ] Escopo adiado (matching, aporte POST, chaves Pix) permanece **nao implementado** e registrado
+      na spec 216, sem marcar item de `v1.0-local` como concluido.
 - [ ] New Design System SEP, acessibilidade, safe-area, teclado virtual, responsividade e
       light/dark verificados.
 - [ ] MSW, Vitest, lint, SCSS lint, build, Playwright PWA e `gradlew assembleDebug` verdes ou
