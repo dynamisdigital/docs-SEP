@@ -227,6 +227,14 @@ Este e o corte que permite "implementar tudo menos AWS e Celcoin".
 - Epic 13 web completo: renegociacao do tomador entregue; gaps de jornada financeira/conciliacao
   fechados.
 - Epic 14 mobile empacotado nativo (Android/iOS) com biometria nativa; ADR Capacitor 8 aceito.
+  **Pendencia rastreada (gate externo, 2026-07-20)**: **Android** entregue e nativo pela
+  M-Sprint 13 (mergeada develop+main via PR #123); [ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md)
+  aceito. **iOS (M-Sprint 14) e biometria nativa iOS (M-Sprint 15)** ficam pendentes de gate
+  externo de hardware **macOS 13+ Ventura** (host de desenvolvimento atual e macOS 12.7.6
+  Monterey sem upgrade possivel; Capacitor 8 iOS exige Xcode 15+). Enquanto o gate nao abre
+  (Mac com macOS 13+, cloud Mac ou runner CI macOS 15), o Epic 14 iOS/biometria iOS **NAO**
+  esta concluido; PWA e Android permanecem funcionais e nao sao afetados. Ver
+  [`STATE.md`](./STATE.md) §Gates externos.
 - Epic 15 completo **sobre provider fake**: aporte da credora + escrow, matching e recorte de Pix
   avancado implementados, testados e visiveis no web e no mobile; skeleton dos adapters reais
   Celcoin/BaaS escrito e coberto por WireMock, com Fake como default. **Pendencia rastreada
@@ -248,10 +256,16 @@ Este e o corte que permite "implementar tudo menos AWS e Celcoin".
    financeira real (KYC/PLD/assinatura/Pix/escrow/aporte) nao e validada fim-a-fim.
 2. **Conta/ambiente AWS** — sem ela, nao ha provisionamento nem deploy remoto; a aplicacao roda so
    local.
+3. **Host macOS compativel com Xcode 15+ (macOS 13+ Ventura)** (registrado em 2026-07-20) —
+   sem ele, a M-Sprint 14 (empacotamento nativo iOS) e a M-Sprint 15 (biometria nativa iOS) da
+   baseline Capacitor 8 nao rodam. Nao bloqueia a Fase 4 sobre fake nem as trilhas
+   PWA/Android/web; bloqueia apenas o recorte iOS do Epic 14 no marco `v1.0-local`. Ver
+   [`STATE.md`](./STATE.md) §Gates externos.
 
-Ambos os gates, mais a publicacao em lojas e a validacao de producao, sao o escopo da **Fase 5**
-([`PRD-FASE-5.md`](./PRD-FASE-5.md)). A v1.0-local esta "pronta para go-live pendente apenas destes
-acessos".
+Os tres gates, mais a publicacao em lojas e a validacao de producao, sao o escopo da **Fase 5**
+([`PRD-FASE-5.md`](./PRD-FASE-5.md)) — com excecao do gate de hardware macOS, cujo desbloqueio
+pode ocorrer a qualquer momento por hardware novo, cloud Mac (MacinCloud/MacStadium/AWS mac1) ou
+runner CI macOS 15. A v1.0-local esta "pronta para go-live pendente apenas destes acessos".
 
 ## 38. Gates e pre-requisitos
 
@@ -259,6 +273,10 @@ acessos".
   de adapters, na Fase 5); ate la, Fake + WireMock permanecem o padrao.
 - **Conta/ambiente AWS aprovado** — pre-requisito para materializar o Epic 16; sem ele, apenas
   planejamento.
+- **Host macOS compativel com Xcode 15+ (macOS 13+ Ventura)** — pre-requisito para empacotamento
+  nativo iOS (M-Sprint 14) e biometria nativa iOS (M-Sprint 15) na baseline Capacitor 8
+  ([ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md)). Registrado como gate externo em
+  2026-07-20; ver [`STATE.md`](./STATE.md) §Gates externos.
 - **Decisao de produto** — recorte de aporte real, matching e de Pix avancado (split/chaves/
   automatico) antes das Sprints 29-31.
 - **ADRs candidatos** (criados just-in-time na sprint que os exige):

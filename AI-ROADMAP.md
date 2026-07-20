@@ -56,6 +56,19 @@ Leitura base para qualquer agente:
 > [`119`](steps-fase-4/web/119-fsprint-19-steps.md); `contract:check` + snapshot OpenAPI no
 > `sep-app`, collections Postman/Insomnia renovadas, audit 9->0 e
 > [ADR 0018](adr/0018-avaliacao-angular-22-no-web.md) adiando Angular 22).
+> Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
+> via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
+> + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
+> 0019](adr/0019-baseline-capacitor-8-mobile.md)). **M-Sprint 14** (empacotamento nativo iOS via
+> Capacitor 8; spec [`214`](specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) + steps
+> [`214`](steps-fase-4/mobile/214-msprint-14-steps.md)) **BLOQUEADA por gate externo de hardware
+> macOS** (2026-07-20): host de desenvolvimento em macOS 12.7.6 Monterey sem upgrade possivel;
+> Cap 8 iOS exige Xcode 15+ (macOS 13+ Ventura). Ver `docs-sep/STATE.md` §Gates externos. **M-15
+> (biometria nativa iOS)** aguarda o mesmo gate. Rota alternativa em execucao: **M-Sprint 16**
+> (aporte/matching/Pix credora mobile em PWA/Android, spec
+> [`216`](specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md); steps just-in-time por
+> criar) e **sprint web dedicada de chaves Pix** (Gate F-18.0, pendencia `v1.0-local`
+> PRD-FASE-4 §37; spec/numeracao ainda por criar).
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
@@ -134,7 +147,7 @@ Leitura base para qualquer agente:
 | Aplicacao do design system web, F-Sprint 15, login/registro/dashboard/shell, tiles/chips/gradiente | [`115`](specs/fase-3/115-fsprint-15-aplicacao-design-system-web.md) (mergeada, PR #55 -> develop) + [`step 115`](steps-fase-3/web/115-fsprint-15-steps.md) + [`repos/sep-app/DESIGN-SYSTEM.md`](repos/sep-app/DESIGN-SYSTEM.md) |
 | mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) quando envolver UI/design; baseline Capacitor 8: [ADR 0019](adr/0019-baseline-capacitor-8-mobile.md) |
 | Android nativo, empacotamento, APK/AAB, deep link, back button, M-Sprint 13 (mergeada develop+main, PR #123) | [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md) + [`step 213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR 0019](adr/0019-baseline-capacitor-8-mobile.md) + [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) §Empacotamento nativo Android |
-| iOS nativo, Xcode, simulador, IPA, safe area, teclado, Keychain, M-Sprint 14 | [`214`](specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) + [`step 214`](steps-fase-4/mobile/214-msprint-14-steps.md) + [ADR 0019](adr/0019-baseline-capacitor-8-mobile.md) |
+| iOS nativo, Xcode, simulador, IPA, safe area, teclado, Keychain, M-Sprint 14 (BLOQUEADA — gate externo de hardware macOS 13+, ver STATE.md §Gates externos) | [`214`](specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) + [`step 214`](steps-fase-4/mobile/214-msprint-14-steps.md) + [ADR 0019](adr/0019-baseline-capacitor-8-mobile.md) + [`docs-sep/STATE.md`](docs-sep/STATE.md) §Gates externos |
 | Aplicacao do design system mobile, M-Sprint 12 (implementada), splash/login/homes/shell/tabs, dark mode | [`212`](specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`step 212`](steps-fase-3/mobile/212-msprint-12-steps.md) + [`115`](specs/fase-3/115-fsprint-15-aplicacao-design-system-web.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) + [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) §Implementacao |
 | credito mobile, propostas mobile, Open Finance mobile, M-Sprint 7 | [`207`](specs/fase-3/207-msprint-7-credito-mobile.md) + [`step 207`](steps-fase-3/mobile/207-msprint-7-steps.md) + [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) + [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) + [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) |
 | formalizacao mobile, contrato mobile, aceite mobile, CCB mobile, M-Sprint 8 | [`208`](specs/fase-3/208-msprint-8-formalizacao-mobile.md) + [`step 208`](steps-fase-3/mobile/208-msprint-8-steps.md) + [`repos/sep-api/CONTRATOS.md`](repos/sep-api/CONTRATOS.md) + [`repos/sep-api/CCB.md`](repos/sep-api/CCB.md) + [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) (mergeada em `develop` pela PR #105 e promovida a `main` pela PR #106) |
