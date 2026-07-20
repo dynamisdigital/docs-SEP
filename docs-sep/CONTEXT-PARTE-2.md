@@ -1202,3 +1202,44 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   (M-13 mergeada), README do sep-mobile §Android, STATE + este historico; ADR 0015 anotado como
   supersedido no recorte; `SPRINT-M-11-PR.md` removido (ciclo). **M-Sprint 13 fechada.** Proximo:
   mobile M-14 (iOS), M-15 (biometria), M-16 (aporte/matching/Pix) e sprint web de chaves Pix.
+
+## M-Sprint 14 — Empacotamento nativo iOS: BLOQUEADA por gate externo de hardware macOS (2026-07-20)
+
+- Tentativa de abrir a M-Sprint 14 (spec 214 / steps 214, Epic 14). Nao se chegou a criar branch
+  nem tocar em codigo: o Precheck 214.P.3 (validar toolchain iOS) reprovou o host antes do
+  Precheck 214.P.2 (branch), conforme instrucao da propria spec ("se a cadeia estiver incompleta,
+  parar antes da branch").
+- Diagnostico do host de desenvolvimento: macOS **12.7.6 Monterey** em hardware que **nao aceita
+  upgrade** (limite fisico do modelo, sem caminho de update para macOS 13+ Ventura/Sonoma/
+  Sequoia). Ausencias confirmadas: `Xcode.app` (`xcodebuild` reclama `tool 'xcodebuild' requires
+  Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line
+  tools instance`), CocoaPods (`pod: command not found`), simulador iOS. Node 24.15.0/npm 11.12.1
+  OK; brew 6.0.10 presente.
+- Incompatibilidade central: a **baseline Capacitor 8** (ADR 0019) exige Xcode 15+, que por sua
+  vez exige macOS 13+. Em Monterey a versao maxima instalavel de Xcode e 14.2 (SDK iOS 16.2), o
+  que quebraria o contrato do ADR 0019 e o pre-req §11 dos steps 214 ("host macOS com Xcode e
+  Command Line Tools compativeis com Capacitor 8").
+- Decisao: registrar a M-Sprint 14 como **novo gate externo** (categoria Celcoin/AWS/lojas),
+  documentado em `STATE.md` §Gates externos (entrada "Host macOS compativel com Xcode 15+
+  (macOS 13+ Ventura)"). O gate **nao bloqueia** a Fase 4 sobre fake nem as trilhas PWA/Android/
+  web; bloqueia apenas o fechamento do Epic 14 iOS no marco `v1.0-local` (PRD-FASE-4 §37, DoD
+  Epic 14). PRD-FASE-4 §37 pode ganhar nota "iOS pendente gate hardware"; ADR novo (gate
+  hardware + eventual runner CI macOS) fica em aberto para decisao do dev.
+- Plano combinado enquanto o gate nao abre: (4) seguir para **M-Sprint 16** (aporte/matching/Pix
+  credora mobile — spec 216 existe; steps just-in-time por criar; roda em PWA/Android sem
+  dependencia iOS); (5) especificar e executar a **sprint web dedicada de chaves Pix**
+  (Gate F-18.0 / v1.0-local §37 — spec/numeracao ainda por criar em `specs/fase-4/`); (2) avaliar
+  **runner CI macOS 14+** (spec 214.3.4 fallback) para validar `xcodebuild` de simulador sem
+  smoke local — o smoke local segue obrigatorio pela spec e permanece pendente do gate.
+- Caminhos alternativos considerados e descartados nesta janela: instalar Xcode 14.2 em Monterey
+  (contradiz ADR 0019 e risca falhas em plugin/Swift), locacao imediata de cloud Mac
+  (MacinCloud/MacStadium/AWS mac1 — custo/burocracia sem urgencia funcional), compra/emprestimo
+  de hardware novo (decisao de investimento do dev). Todos ficam disponiveis para desbloqueio
+  futuro.
+- Artefatos atualizados no working tree do `docs-SEP` (git manual do dev): `STATE.md` (data
+  2026-07-20; §Leia agora, §Proximo passo e §Gates externos refletindo o bloqueio e a rota
+  M-16/web-Pix; passo novo de fallback via runner CI macOS); este historico. Nao se abriu branch
+  em `sep-mobile` e nao ha commits pendentes de aprovacao. **M-Sprint 14 em espera de gate
+  externo.** Proximo: mobile **M-Sprint 16** (dependencias backend 29-31 e M-10 satisfeitas) e a
+  sprint web dedicada de chaves Pix (Gate F-18.0); M-Sprint 15 (biometria nativa iOS) tambem
+  aguarda o mesmo gate hardware.
