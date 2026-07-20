@@ -4,7 +4,7 @@
 
 - **ID da Spec**: 213
 - **Titulo**: M-Sprint 13 - Build nativo Android via Capacitor 8
-- **Status**: planejada
+- **Status**: concluida (mergeada em `develop` e `main` via PR #123, 2026-07-17; `develop` == `main` conferido pelo dev)
 - **Fase do produto**: Fase 4 - Epic 14 (empacotamento nativo)
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD-FASE-4 §35 (Epic 14 - nativo); pendencia documental de baseline Capacitor 8
