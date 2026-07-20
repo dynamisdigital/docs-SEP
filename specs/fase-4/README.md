@@ -44,7 +44,7 @@ As tabelas usam a ordem recomendada de execucao.
 | M-13 | [`213-msprint-13-empacotamento-nativo-android.md`](./213-msprint-13-empacotamento-nativo-android.md) | Empacotamento nativo Android (Capacitor 8) + ADR baseline | 5 |
 | M-14 | [`214-msprint-14-empacotamento-nativo-ios.md`](./214-msprint-14-empacotamento-nativo-ios.md) | Empacotamento nativo iOS (Capacitor 8) | 4 |
 | M-15 | [`215-msprint-15-biometria-nativa.md`](./215-msprint-15-biometria-nativa.md) | Biometria nativa (substitui stub PWA) + hardening | 6 |
-| M-16 | [`216-msprint-16-aporte-pix-avancado-mobile.md`](./216-msprint-16-aporte-pix-avancado-mobile.md) | Aporte/matching e chaves Pix na credora mobile | 6 |
+| M-16 | [`216-msprint-16-aporte-pix-avancado-mobile.md`](./216-msprint-16-aporte-pix-avancado-mobile.md) | Aporte/matching e chaves Pix na credora mobile — **concluida com escopo reduzido** (Gate M-16.0: so aportes owner-scoped; matching/aporte POST/chaves Pix adiados por exigirem `FINANCEIRO`) | 6 -> 3 |
 
 ## Dependencias gerais
 
@@ -54,6 +54,10 @@ As tabelas usam a ordem recomendada de execucao.
   precheck); F-18 depende das Sprints backend 29-30; F-19 depende do OpenAPI vigente.
 - Mobile M-13 -> M-14 (nativo); M-15 depende da base nativa (M-13/M-14) e da Sprint 27; M-16 depende
   das Sprints backend 29-31 e da M-Sprint 10.
+- **Dependencia de persona (Gate M-16.0, 2026-07-20)**: contratos backend que exigem
+  `FINANCEIRO`/`ADMIN` sao inalcancaveis pelo `sep-mobile`, que so conhece
+  `UsuarioRole = 'ADMIN' | 'CLIENTE'`. Antes de planejar sprint mobile sobre contrato novo,
+  conferir a role exigida no backend — foi o que reduziu a M-16 a um unico endpoint.
 - Gates externos (credenciais Celcoin, conta AWS, contas de loja) nao bloqueiam a implementacao
   destas sprints sobre fake; a ativacao real e a publicacao sao escopo da Fase 5
   ([`../../docs-sep/PRD-FASE-5.md`](../../docs-sep/PRD-FASE-5.md)).

@@ -1243,3 +1243,55 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   externo.** Proximo: mobile **M-Sprint 16** (dependencias backend 29-31 e M-10 satisfeitas) e a
   sprint web dedicada de chaves Pix (Gate F-18.0); M-Sprint 15 (biometria nativa iOS) tambem
   aguarda o mesmo gate hardware.
+
+## M-Sprint 16 — Aportes owner-scoped da credora mobile, com escopo cortado pelo Gate M-16.0 (2026-07-20)
+
+- **Mergeada** em `origin/develop` via PR #124 (squash `77ea01a`) e promovida a `origin/main` via
+  PR #125 (`a694f2d`); `develop` == `main` conferido por conteudo remoto (nao por titulo de PR).
+  Branch `feature/msprint-16-aporte-pix-avancado-mobile`, 6 commits.
+- **Gate M-16.0 — achado que reescreveu a sprint.** O precheck mediu os seis contratos das Sprints
+  29-31 contra a base real do `sep-mobile` e encontrou uma contradicao de persona: o app so conhece
+  `UsuarioRole = 'ADMIN' | 'CLIENTE'` (`src/app/core/api/api.models.ts`) e o `roleGuard` tipa
+  `route.data['roles']` como `UsuarioRole[]`, entao declarar `'FINANCEIRO'` nem compila. Cinco dos
+  seis endpoints exigem `FINANCEIRO`/`ADMIN` e a credora autentica como `CLIENTE` — receberia `403`.
+  A propria spec 216 e o step 216 ja restringiam o mobile a tomador e credora, excluindo operacao
+  interna de financeiro/backoffice: a spec se contradizia. Decisao registrada (opcao A): entregar
+  apenas o unico contrato alcancavel, `GET /api/v1/credores/operacoes/{operacaoId}/aportes`.
+- **Escopo adiado, nao descartado**: matching (3 endpoints), `POST` de aporte e
+  `GET /api/v1/pix/chaves`. Steps preservados no arquivo 216 marcados `ADIADO`, com a rastreabilidade
+  do que bloqueia cada um. Reativar exige ADR + revisao da spec 216 (expor persona operacional no
+  mobile) **ou** sprint backend que admita a credora dona nesses contratos.
+- **Divergencias de contrato corrigidas na documentacao** durante o precheck: `TipoChavePix` usa
+  `EVP` (nao `ALEATORIA`); `ChavePixResponse` tem campo extra `removidaEm`; `POST /aportes` tambem
+  retorna `422`; `TRATA_403_LOCALMENTE` **nao existe no `sep-mobile`** (foi criado no `sep-app` na
+  F-16); rotas reais sao `/app/credora/...`; service real e `core/credores/credora-mobile.service.ts`;
+  baseline exige `npm ci --legacy-peer-deps` (o `npm ci` puro falha com `ERESOLVE` em `zone.js`).
+- **Entrega**: `StatusAporteCredora` + `AporteCredoraResponse` na borda; `listarAportes` no service;
+  secao somente leitura "Aportes da operacao" no detalhe da carteira, espelhando o padrao do card de
+  status Pix (M-11.4) — leitura secundaria que nao bloqueia o detalhe, token de geracao descartando
+  resposta obsoleta, retry proprio. Quatro superficies distintas (lista, vazia `200 []`,
+  indisponivel `404` neutro, erro tecnico), e um `404` seguido de 5xx mostra o erro, nao a ausencia.
+  Badge `aporte-status` com rotulo textual (cor nunca e a unica informacao) e switch exaustivo.
+  Nenhum CTA de mutacao. `stepUpInterceptor` **inalterado**, com teste travando que o GET nao consome
+  o token de uso unico.
+- **Achados dos code reviews, com fixes**: (1) fixture de aporte tipada com `StatusAporteCredora`;
+  (2) **race condition P2** — duas chamadas concorrentes capturavam a mesma geracao e a ultima a
+  responder vencia, podendo reexibir estado mais velho; corrigido com guarda de request em voo, e o
+  teste foi validado por negacao (sem a guarda, falha com `found 2 requests`); (3) assercao negativa
+  do smoke da M-10 (`not.toContain('aporte de')`) ficou semanticamente obsoleta — guardava "credora
+  nao ve aporte", invariante que esta sprint mudou de proposito; passou a asserir o invariante
+  vigente (a credora ve aportes, nunca a superficie de mutacao).
+- **Verificacoes**: Vitest **503/503** (era 487); Playwright **26 passed / 1 failed** — o vermelho e
+  o `golden-path-mobile` preexistente da M-13; lint/scss/format/build verdes; `npm audit --omit=dev`
+  0; `npx cap sync android` OK. `./gradlew assembleDebug` **nao roda na maquina de dev** (sem Android
+  SDK; `local.properties` e gitignored) — coberto pelo job CI `Build Android (debug)`, que roda em
+  push de qualquer branch e valida `gradlew test lint` + `assembleDebug` + existencia do APK.
+- **Follow-up herdado**: `consultarStatusPix` (mesmo arquivo, M-11.4, ja em `main`) tem a mesma race
+  condition de duplo toque corrigida aqui; nao tocado por estar fora de escopo.
+- **Impacto no marco**: o item de Pix avancado do `v1.0-local` (PRD-FASE-4 §37) **nao** foi fechado
+  — segue sem superficie de chaves Pix no web e no mobile. A exigencia "visiveis no web e no mobile"
+  do Epic 15 fica parcialmente atendida.
+- **Artefatos**: `SPRINT-M-16-PR.md` criado e `SPRINT-M-13-PR.md` removido (ciclo padrao);
+  `README.md` do `sep-mobile` com secao nova; `AI-ROADMAP.md`, `PRD-FASE-4.md` §37, `STATE.md` e este
+  historico atualizados. Proximo: **sprint web dedicada de chaves Pix** (unica frente executavel;
+  spec/numeracao por criar). M-14 (iOS) e M-15 (biometria) seguem no gate de hardware macOS.

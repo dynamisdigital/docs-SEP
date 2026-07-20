@@ -9,6 +9,11 @@ preservando PWA e empacotamento nativo Android (M-13). Regras, estados, totais, 
 ownership, idempotencia, auditoria, movimentacao de escrow e mascaramento continuam autoritativos no
 backend.
 
+> **Status: CONCLUIDA** — mergeada em `develop` via PR #124 (squash `77ea01a`) e em `main` via
+> PR #125 (`a694f2d`), 2026-07-20; `develop` == `main` conferido por conteudo remoto. Vitest
+> 503/503; Playwright 26 passed / 1 failed (`golden-path-mobile`, preexistente da M-13). Detalhe em
+> [`repos/sep-mobile/SPRINT-M-16-PR.md`](../../repos/sep-mobile/SPRINT-M-16-PR.md).
+>
 > **ESCOPO REDUZIDO PELO GATE M-16.0 (2026-07-20).** O precheck constatou que o `sep-mobile` so
 > conhece `UsuarioRole = 'ADMIN' | 'CLIENTE'` (`src/app/core/api/api.models.ts:1`) e que 5 dos 6
 > endpoints previstos exigem `FINANCEIRO`/`ADMIN` no backend — persona que esta spec/step exclui do

@@ -4,7 +4,8 @@
 
 - **ID da Spec**: 216
 - **Titulo**: M-Sprint 16 - Aporte/matching assistidos e visibilidade de chaves Pix (credora mobile)
-- **Status**: em execucao com **escopo reduzido** (ver "Decisao de escopo - Gate M-16.0")
+- **Status**: **CONCLUIDA** com escopo reduzido (ver "Decisao de escopo - Gate M-16.0") — mergeada
+  em `develop` via PR #124 (`77ea01a`) e em `main` via PR #125 (`a694f2d`), 2026-07-20
 - **Fase do produto**: Fase 4 - Epic 14 / Epic 15
 - **Trilha**: Mobile (`sep-mobile`)
 - **Origem**: PRD-FASE-4 §35 (Epic 14/15); Sprints backend 29-31

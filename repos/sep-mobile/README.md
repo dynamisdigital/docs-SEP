@@ -537,8 +537,9 @@ Empacota o PWA como app **nativo Android** via Capacitor 8.4 ([ADR 0019](../../a
 formaliza a baseline e supersede o ADR 0003 no recorte do Capacitor e o ADR 0015). Sem jornada,
 endpoint ou contrato novo; PWA permanece intacto (fallback web explicito em todo runtime nativo).
 
-**Status**: implementada em `feature/msprint-13-android-capacitor` (branch da sprint; ver
-`SPRINT-M-13-PR.md` enquanto o PR nao e aberto).
+**Status**: **mergeada** em `develop` e `main` via PR #123 (2026-07-17). A descricao temporaria
+`SPRINT-M-13-PR.md` foi removida no ciclo padrao ao abrir a M-16; historico em
+[`docs-sep/CONTEXT-PARTE-2.md`](../../docs-sep/CONTEXT-PARTE-2.md).
 
 Entregas principais:
 

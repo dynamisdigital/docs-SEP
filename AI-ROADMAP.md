@@ -64,10 +64,11 @@ Leitura base para qualquer agente:
 > [`214`](steps-fase-4/mobile/214-msprint-14-steps.md)) **BLOQUEADA por gate externo de hardware
 > macOS** (2026-07-20): host de desenvolvimento em macOS 12.7.6 Monterey sem upgrade possivel;
 > Cap 8 iOS exige Xcode 15+ (macOS 13+ Ventura). Ver `docs-sep/STATE.md` §Gates externos. **M-15
-> (biometria nativa iOS)** aguarda o mesmo gate. Rota alternativa em execucao: **M-Sprint 16**
-> (spec [`216`](specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) + steps
-> [`216`](steps-fase-4/mobile/216-msprint-16-steps.md)), **com escopo reduzido pelo Gate M-16.0**
-> (2026-07-20): entrega apenas a **leitura owner-scoped de aportes** da credora, unico dos seis
+> (biometria nativa iOS)** aguarda o mesmo gate. **M-Sprint 16 MERGEADA** develop+main via
+> PR #124/#125 (2026-07-20; spec
+> [`216`](specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) + steps
+> [`216`](steps-fase-4/mobile/216-msprint-16-steps.md)), **com escopo reduzido pelo Gate M-16.0**:
+> entregou apenas a **leitura owner-scoped de aportes** da credora, unico dos seis
 > contratos das Sprints 29-31 que a persona `CLIENTE` alcanca. Matching, registro de aporte e
 > chaves Pix exigem `FINANCEIRO`/`ADMIN`, role inexistente no `sep-mobile`
 > (`UsuarioRole = 'ADMIN' | 'CLIENTE'`), e ficaram **adiados** — reativa-los exige ADR + revisao da

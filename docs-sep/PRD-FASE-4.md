@@ -241,6 +241,14 @@ Este e o corte que permite "implementar tudo menos AWS e Celcoin".
   (Gate F-18.0, 2026-07-16)**: aporte+matching visiveis no web desde a F-18; a visibilidade web do
   recorte de chaves Pix (Sprint 31) ficou fora da F-18 por decisao formal e exige sprint web
   dedicada pos-F-19 — este item NAO esta concluido.
+  **Recorte mobile (Gate M-16.0, 2026-07-20)**: a M-Sprint 16 entregou apenas a **leitura
+  owner-scoped de aportes** da credora (mergeada develop+main, PR #124/#125). Matching, registro de
+  aporte e chaves Pix **nao** foram levados ao mobile: os cinco contratos exigem `FINANCEIRO`/`ADMIN`
+  e o `sep-mobile` so conhece `UsuarioRole = 'ADMIN' | 'CLIENTE'` — a credora autentica como
+  `CLIENTE` e receberia `403`. Levar esse recorte ao app exigiria expor a persona operacional no
+  mobile (ADR + revisao da spec 216) ou backend que admita a credora dona nesses contratos.
+  Consequencia: a exigencia "visiveis no web **e no mobile**" segue **parcialmente atendida** e o
+  item de Pix avancado do marco **NAO** esta concluido nem pelo web nem pelo mobile.
 - Epic 16 entregue como **documento de planejamento** (arquitetura AWS + CI/CD de deploy).
 - Follow-ups da Fase 3 saldados: step-up estrito server-side no aceite (**fechado na Sprint 27** —
   bloqueio de go-live que **nao** depende de acesso externo eliminado), renegociacao web, portas de

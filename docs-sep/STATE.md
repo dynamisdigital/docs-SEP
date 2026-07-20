@@ -15,21 +15,44 @@ _Atualizado em: 2026-07-20._
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend da Fase 4 **fechado**
-  (Sprints 27-32 mergeadas); web F-16-19 mergeadas; mobile **M-13 mergeada**; **M-14 (iOS)
-  bloqueada por gate externo de hardware macOS** (ver §Gates externos); seguem mobile M-15/M-16
-  sobre PWA/Android e a sprint web dedicada de chaves Pix (Gate F-18.0).
-- **Spec/step ativo**: M-Sprint 13 (mobile) **MERGEADA** develop+main via PR #123
-  (`develop` == `main` conferido pelo dev) — empacotamento nativo Android (Capacitor 8), sem
-  jornada/endpoint/contrato novo e sem regressao PWA — spec
-  [`213`](../specs/fase-4/213-msprint-13-empacotamento-nativo-android.md) + steps
-  [`213`](../steps-fase-4/mobile/213-msprint-13-steps.md) +
-  [ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md); detalhe em
-  [`SPRINT-M-13-PR.md`](../repos/sep-mobile/SPRINT-M-13-PR.md).
-  Proximo: mobile **M-16** (aporte/matching/Pix — liberados pelas Sprints 29-31, executavel em
-  PWA/Android sem depender de iOS) e a sprint web de chaves Pix. **M-14 (iOS) e M-15 (biometria
-  nativa iOS) ficam aguardando** o gate externo de hardware macOS 13+ (ver §Gates externos).
+  (Sprints 27-32 mergeadas); web F-16-19 mergeadas; mobile **M-13 e M-16 mergeadas**;
+  **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate externo de hardware macOS**
+  (ver §Gates externos). Resta executavel apenas a **sprint web dedicada de chaves Pix**
+  (Gate F-18.0).
+- **Spec/step ativo**: M-Sprint 16 (mobile) **MERGEADA** develop+main via PR #124 (squash
+  `77ea01a`) + PR #125 (`a694f2d`); `develop` == `main` conferido por conteudo remoto — spec
+  [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) + steps
+  [`216`](../steps-fase-4/mobile/216-msprint-16-steps.md); detalhe em
+  [`SPRINT-M-16-PR.md`](../repos/sep-mobile/SPRINT-M-16-PR.md).
+  **Escopo reduzido pelo Gate M-16.0**: entregou apenas a leitura owner-scoped de aportes da
+  credora; matching, registro de aporte e chaves Pix ficaram fora por exigirem a persona
+  `FINANCEIRO`, inexistente no `sep-mobile`.
+  Proximo: **sprint web dedicada de chaves Pix** — unica frente executavel; spec/numeracao ainda
+  por criar em `specs/fase-4/`. **M-14 e M-15 seguem aguardando** o gate de hardware macOS 13+.
 
 ## Onde estamos
+
+- **M-Sprint 16 (mobile) MERGEADA em 2026-07-20** — aportes owner-scoped da credora (Epic 14/15).
+  Em `origin/develop` via PR #124 (squash `77ea01a`) e promovida a `main` via PR #125
+  (`a694f2d`); `develop` == `main` conferido por conteudo. **O Gate M-16.0 cortou o escopo**: o
+  precheck mediu os seis contratos das Sprints 29-31 contra a base do app e constatou que cinco
+  exigem `FINANCEIRO`/`ADMIN` — role que o `sep-mobile` nao possui
+  (`UsuarioRole = 'ADMIN' | 'CLIENTE'`; o `roleGuard` tipa `route.data['roles']` como
+  `UsuarioRole[]`, entao `'FINANCEIRO'` nem compila) e a credora autentica como `CLIENTE`.
+  Entregue somente `GET /api/v1/credores/operacoes/{operacaoId}/aportes`: `StatusAporteCredora`
+  + `AporteCredoraResponse` na borda, `listarAportes` no `credora-mobile.service` e secao
+  somente leitura "Aportes da operacao" no detalhe da carteira, com quatro superficies distintas
+  (lista, vazia `200 []`, indisponivel `404` neutro, erro tecnico), retry por gesto, sem polling
+  e **sem nenhum CTA de mutacao**. `stepUpInterceptor` inalterado (GET nao consome o token de uso
+  unico; ha teste travando). Badge `aporte-status` com rotulo textual e switch exaustivo sobre o
+  union. Vitest **503** (era 487), Playwright 26 passed / 1 failed (`golden-path-mobile`,
+  preexistente da M-13), audit 0, build e `cap sync android` OK; `gradlew assembleDebug` roda no
+  job CI `Build Android (debug)` (a maquina de dev nao tem Android SDK). Escopo adiado
+  (matching, aporte POST, chaves Pix) **preservado como registro** na spec 216 e nos steps 216;
+  reativar exige ADR + revisao da spec ou backend que admita a credora dona. Follow-up:
+  `consultarStatusPix` (M-11.4, ja em `main`) tem a mesma race condition de duplo toque corrigida
+  aqui nos aportes. Detalhe em
+  [`SPRINT-M-16-PR.md`](../repos/sep-mobile/SPRINT-M-16-PR.md).
 
 - **M-Sprint 13 (mobile) MERGEADA em 2026-07-17** — empacotamento nativo Android via
   Capacitor 8 (Epic 14; sem jornada/endpoint/contrato novo, sem regressao PWA). Em
@@ -48,7 +71,8 @@ _Atualizado em: 2026-07-20._
   verdes; e2e PWA 24/25 (vermelho `golden-path-mobile` preexistente). Follow-ups: arte oficial
   da marca (icone/splash = placeholder DS), `minifyEnabled`/proguard no release da Fase 5,
   dedup de `loadCurrentUser`, smoke contra backend real `:8080`. Desbloqueia M-14 (iOS) e M-15
-  (biometria). Detalhe em [`SPRINT-M-13-PR.md`](../repos/sep-mobile/SPRINT-M-13-PR.md).
+  (biometria). A descricao temporaria `SPRINT-M-13-PR.md` foi removida no ciclo padrao ao abrir a
+  M-16; historico completo em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md).
 - **F-Sprint 19 (web) MERGEADA em 2026-07-16** — hardening de tooling, contrato e collections
   (follow-up da Fase 3; sem tela/endpoint/regra nova). Em `origin/develop` por push direto
   fast-forward (tip `bb825e7`; desvio de fluxo aceito) e promovida a `main` via PR #96
@@ -106,15 +130,19 @@ _Atualizado em: 2026-07-20._
 
 ## Proximo passo
 
-1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamento M-13:
-   ADR 0019, steps 213, `SPRINT-M-13-PR.md`, AI-ROADMAP, README do sep-mobile, STATE/historico
-   + gate externo M-14 iOS registrado neste STATE).
-2. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamento M-16:
+   spec/steps 216 com a decisao do Gate M-16.0, README do sep-mobile, AI-ROADMAP, PRD-FASE-4 §37,
+   STATE/historico; `SPRINT-M-16-PR.md` criado e `SPRINT-M-13-PR.md` removido no ciclo padrao).
+2. **Especificar e executar a sprint web dedicada de chaves Pix** — unica frente executavel da
+   Fase 4. Fecha a pendencia do `v1.0-local` no PRD-FASE-4 §37 (decisao do Gate F-18.0). Spec e
+   numeracao ainda **por criar** em [`specs/fase-4/`](../specs/fase-4/README.md); consome o
+   `GET /api/v1/pix/chaves` da Sprint backend 31 (`FINANCEIRO`/`ADMIN`, DTO mascarado).
+3. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos). Nao bloqueiam a Fase 4 sobre fake nem as trilhas PWA/Android/web.
-3. Seguir a ordem da Fase 4 sem depender de iOS: mobile **M-16** (aporte/matching/Pix — liberados
-   pelas Sprints 29-31; roda em PWA/Android) e a sprint web dedicada de visibilidade de chaves
-   Pix (decisao do Gate F-18.0; pendencia do `v1.0-local` no PRD-FASE-4 §37). Ver dependencias
-   em [`specs/fase-4/README.md`](../specs/fase-4/README.md).
+4. **Follow-ups tecnicos abertos** (nao bloqueiam): race condition de duplo toque em
+   `consultarStatusPix` no `sep-mobile` (M-11.4, ja em `main`; mesma correcao aplicada aos aportes
+   na M-16); smoke `golden-path-mobile` vermelho desde a M-13; escopo mobile adiado pelo Gate
+   M-16.0 (matching, aporte POST, chaves Pix) registrado na spec 216.
 4. Enquanto o gate M-14 nao abre, avaliar fallback via runner CI macOS (spec 214.3.4) para
    validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
    spec e permanece pendente do gate.
