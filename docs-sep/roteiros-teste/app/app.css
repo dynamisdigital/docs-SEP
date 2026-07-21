@@ -55,6 +55,13 @@
   --rail-w: 288px;
   --lateral-w: 320px;
   --topbar-h: 56px;
+
+  /* Preset "signal-flow" do ARQUITETURA-SEP: glow de fundo cyan+violet e chrome
+     translucido. Alpha baixo de proposito — clima, nao ruido sobre a leitura. */
+  --glow: radial-gradient(circle at 18% -8%, hsl(192 91% 50% / 10%), transparent 34rem),
+    radial-gradient(circle at 92% 6%, hsl(262 83% 58% / 7%), transparent 30rem);
+  --topbar-bg: hsl(0 0% 100% / 82%);
+  --acento-glow: 0 0 0 transparent;
 }
 
 .dark {
@@ -81,6 +88,12 @@
 
   --shadow-sm: 0 2px 8px -2px hsl(229deg 84% 2% / 60%);
   --shadow-lg: 0 8px 32px -8px hsl(229deg 84% 2% / 70%);
+
+  /* No escuro o glow do signal-flow e mais forte (o fundo aguenta). */
+  --glow: radial-gradient(circle at 18% -8%, hsl(188 86% 53% / 13%), transparent 34rem),
+    radial-gradient(circle at 92% 6%, hsl(255 92% 76% / 11%), transparent 30rem);
+  --topbar-bg: hsl(222 47% 11% / 80%);
+  --acento-glow: 0 0 18px -4px hsl(188 86% 53% / 45%);
 }
 
 * {
@@ -106,6 +119,10 @@ body {
   line-height: 1.5;
   color: hsl(var(--foreground));
   background: hsl(var(--background));
+  /* Glow do signal-flow: fixo, atras de todo o conteudo. Os cards sao opacos,
+     entao o glow so aparece nas margens — nunca reduz o contraste do texto. */
+  background-image: var(--glow);
+  background-attachment: fixed;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -164,7 +181,12 @@ kbd {
   height: var(--topbar-h);
   padding: 0 16px;
   border-bottom: 1px solid hsl(var(--border));
+  /* Chrome translucido da archify: o glow do fundo vaza por tras da barra.
+     Fallback opaco (hsl(var(--card))) para navegador sem backdrop-filter. */
   background: hsl(var(--card));
+  background: var(--topbar-bg);
+  backdrop-filter: saturate(1.4) blur(12px);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
 }
 
 .topbar-marca {
@@ -252,6 +274,7 @@ kbd {
 .btn-primario {
   color: hsl(var(--primary-foreground));
   background: hsl(var(--primary));
+  box-shadow: var(--acento-glow);
 }
 
 .btn-primario:hover {
@@ -434,6 +457,7 @@ textarea {
 
 .ponto.completo {
   background: hsl(var(--success));
+  box-shadow: 0 0 8px -1px hsl(var(--success) / 70%);
 }
 
 .ponto.parcial {

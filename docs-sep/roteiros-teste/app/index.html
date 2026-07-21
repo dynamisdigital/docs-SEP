@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SEP · Roteiros de teste manual</title>
 
-    <!-- Anti-FOUC: aplica o tema antes do CSS, senao pisca branco a cada reload. -->
+    <!-- Anti-FOUC: aplica o tema antes do CSS, senao pisca a cada reload.
+         Default: dark (estilo signal-flow do ARQUITETURA-SEP). O botao de tema
+         ainda troca para claro; a escolha fica salva em SEP_THEME. -->
     <script>
       (function () {
-        var t = "light";
+        var t = "dark";
         try {
           t = localStorage.getItem("SEP_THEME") || t;
         } catch (e) {}
