@@ -56,10 +56,11 @@ Leitura base para qualquer agente:
 > [`119`](steps-fase-4/web/119-fsprint-19-steps.md); `contract:check` + snapshot OpenAPI no
 > `sep-app`, collections Postman/Insomnia renovadas, audit 9->0 e
 > [ADR 0018](adr/0018-avaliacao-angular-22-no-web.md) adiando Angular 22). A F-20 web (gestao de
-> chaves Pix da conta operacional) esta **implementada** na branch
-> `feature/fsprint-20-chaves-pix-web` (push/PR manuais; spec
+> chaves Pix da conta operacional) esta **MERGEADA** develop+main via PR #107 (squash `66b5f04`) +
+> PR #108 (`c00d8ae`), 2026-07-21 (spec
 > [`120`](specs/fase-4/120-fsprint-20-chaves-pix-web.md) + steps
-> [`120`](steps-fase-4/web/120-fsprint-20-steps.md)), fechando a pendencia do Gate F-18.0.
+> [`120`](steps-fase-4/web/120-fsprint-20-steps.md)): fecha o **Gate F-18.0** e **conclui o recorte
+> web do marco `v1.0-local`**. Com ela, **backend e web da Fase 4 estao fechados**.
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
@@ -76,9 +77,10 @@ Leitura base para qualquer agente:
 > contratos das Sprints 29-31 que a persona `CLIENTE` alcanca. Matching, registro de aporte e
 > chaves Pix exigem `FINANCEIRO`/`ADMIN`, role inexistente no `sep-mobile`
 > (`UsuarioRole = 'ADMIN' | 'CLIENTE'`), e ficaram **adiados** — reativa-los exige ADR + revisao da
-> spec 216, ou backend admitindo a credora dona nesses contratos. Segue tambem a **sprint web
-> dedicada de chaves Pix** (Gate F-18.0, pendencia `v1.0-local` PRD-FASE-4 §37; spec/numeracao
-> ainda por criar); o item de Pix avancado **nao** e fechado pela M-16.
+> spec 216, ou backend admitindo a credora dona nesses contratos; o item de Pix avancado **nao** e
+> fechado pela M-16 no mobile. A pendencia web equivalente **foi fechada pela F-Sprint 20**
+> (Gate F-18.0). **Nao ha frente executavel restante na Fase 4**: so M-14 e M-15, ambas presas ao
+> gate de hardware macOS.
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
@@ -142,7 +144,7 @@ Leitura base para qualquer agente:
 | empresa credora, cadastro credora, elegibilidade credora | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + [`016`](specs/fase-3/016-sprint-16-credora-foundation.md) (backend implementado) + web [`111`](specs/fase-3/111-fsprint-11-credora-web.md) + [`step 111`](steps-fase-3/web/111-fsprint-11-steps.md) + [`repos/sep-app/README.md` §credora](repos/sep-app/README.md) (jornada web implementada — branch local `feature/fsprint-11-credora-web`; cadastro/perfil/oportunidades/interesse/carteira) |
 | oportunidades, carteira, interesse, operacao financiada da credora | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + [`017`](specs/fase-3/017-sprint-17-credora-oportunidades-carteira.md) + web [`111`](specs/fase-3/111-fsprint-11-credora-web.md) + [`repos/sep-app/README.md` §credora](repos/sep-app/README.md) |
 | aporte credora, matching credora, sugestoes, decisao assistida, status de aporte web | [`repos/sep-api/CREDORES.md`](repos/sep-api/CREDORES.md) + backend [`029`](specs/fase-4/029-sprint-29-credora-aporte-escrow.md)/[`step 029`](steps-fase-4/backend/029-sprint-29-steps.md) + [`030`](specs/fase-4/030-sprint-30-credora-matching-operacao.md)/[`step 030`](steps-fase-4/backend/030-sprint-30-steps.md) + web [`118`](specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md)/[`step 118`](steps-fase-4/web/118-fsprint-18-steps.md) |
-| adapters externos, Celcoin/BaaS skeleton, Clicksign, feature flags, WireMock | [`repos/sep-api/INTEGRACOES-PROVIDERS.md`](repos/sep-api/INTEGRACOES-PROVIDERS.md) (matriz, flags, fixtures, ativacao gated) + [`032`](specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) + [`step 032`](steps-fase-4/backend/032-sprint-32-steps.md) (implementada na branch `feature/sprint-32-adapters-externos-skeleton`; push/PR manuais) + ADRs [`0004`](adr/0004-provider-pattern-para-integracoes-externas.md), [`0008`](adr/0008-wiremock-para-testes-integracao-celcoin.md), [`0013`](adr/0013-provedor-de-assinatura-digital.md) e [`0017`](adr/0017-feature-flags-de-providers-por-ambiente.md) |
+| adapters externos, Celcoin/BaaS skeleton, Clicksign, feature flags, WireMock | [`repos/sep-api/INTEGRACOES-PROVIDERS.md`](repos/sep-api/INTEGRACOES-PROVIDERS.md) (matriz, flags, fixtures, ativacao gated) + [`032`](specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) + [`step 032`](steps-fase-4/backend/032-sprint-32-steps.md) (mergeada develop+main via PR #99/#100, 2026-07-15) + ADRs [`0004`](adr/0004-provider-pattern-para-integracoes-externas.md), [`0008`](adr/0008-wiremock-para-testes-integracao-celcoin.md), [`0013`](adr/0013-provedor-de-assinatura-digital.md) e [`0017`](adr/0017-feature-flags-de-providers-por-ambiente.md) |
 | Pix, gestao de chaves, desembolso, recebimento Pix, conciliacao Pix, leitura owner-scoped (backend) | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) + [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) + [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) + [`026`](specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md) (P1-P3 tomador/credora) + [`031`](specs/fase-4/031-sprint-31-pix-gestao-chaves.md) + [`step 031`](steps-fase-4/backend/031-sprint-31-steps.md) (gestao assistida de chaves, implementada — `PIX.md` §Gestao de chaves) |
 | Pix web, desembolso/recebimento/divergencia no app | [`repos/sep-app/README.md` §Pix](repos/sep-app/README.md) + [`113`](specs/fase-3/113-fsprint-13-pix-web.md) + [`step 113`](steps-fase-3/web/113-fsprint-13-steps.md) |
 | chaves Pix no web, cadastro/remocao assistida de chave, `/app/pix/chaves` | [`repos/sep-app/README.md` §F-Sprint 20](repos/sep-app/README.md) + [`120`](specs/fase-4/120-fsprint-20-chaves-pix-web.md) + [`step 120`](steps-fase-4/web/120-fsprint-20-steps.md); consome o backend [`031`](specs/fase-4/031-sprint-31-pix-gestao-chaves.md) |

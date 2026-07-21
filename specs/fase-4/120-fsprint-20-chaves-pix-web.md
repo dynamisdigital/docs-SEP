@@ -4,7 +4,8 @@
 
 - **ID da Spec**: 120
 - **Titulo**: F-Sprint 20 - Gestao assistida de chaves Pix da conta operacional no web
-- **Status**: planejada (fecha a pendencia de visibilidade web de chaves Pix do Gate F-18.0)
+- **Status**: concluida (PR #107 develop / #108 main, 2026-07-21; fecha a pendencia de visibilidade
+  web de chaves Pix do Gate F-18.0)
 - **Fase do produto**: Fase 4 - Epic 15
 - **Trilha**: Web (`sep-app`)
 - **Origem**: PRD-FASE-4 §37 (pendencia do marco `v1.0-local`, Gate F-18.0); Sprint backend 31

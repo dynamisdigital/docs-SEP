@@ -2,7 +2,8 @@
 
 **Spec de origem**: [`120-fsprint-20-chaves-pix-web.md`](../../specs/fase-4/120-fsprint-20-chaves-pix-web.md)
 
-**Status**: planejada. Steps just-in-time criados para execucao; nenhuma Task iniciada. Consome o
+**Status**: concluida (2026-07-21). Todas as Tasks executadas e mergeadas em `develop` (PR #107,
+squash `66b5f04`) e `main` (PR #108, `c00d8ae`); `develop` == `main` por conteudo. Consome o
 contrato da Sprint backend 31 ([`031`](../../specs/fase-4/031-sprint-31-pix-gestao-chaves.md)), ja
 integrado em `develop`.
 

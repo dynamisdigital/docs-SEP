@@ -36,7 +36,7 @@ As tabelas usam a ordem recomendada de execucao.
 | F-17 | [`117-fsprint-17-financeiro-conciliacao-web.md`](./117-fsprint-17-financeiro-conciliacao-web.md) | Aprofundamento financeiro/conciliacao web | 6 |
 | F-18 | [`118-fsprint-18-aporte-matching-credora-web.md`](./118-fsprint-18-aporte-matching-credora-web.md) | Aporte e matching da credora no web | 6 |
 | F-19 | [`119-fsprint-19-hardening-tooling-contrato-web.md`](./119-fsprint-19-hardening-tooling-contrato-web.md) | Hardening de tooling + refresh contrato/collection | 5 |
-| F-20 | [`120-fsprint-20-chaves-pix-web.md`](./120-fsprint-20-chaves-pix-web.md) | Gestao de chaves Pix no web (fecha pendencia Gate F-18.0 / `v1.0-local`) | 7 |
+| F-20 | [`120-fsprint-20-chaves-pix-web.md`](./120-fsprint-20-chaves-pix-web.md) | Gestao de chaves Pix no web — **concluida** (PR #107/#108, 2026-07-21; fecha a pendencia do Gate F-18.0 e o recorte web do `v1.0-local`) | 7 |
 
 ## Mobile (`sep-mobile`)
 

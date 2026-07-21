@@ -1295,3 +1295,69 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   `README.md` do `sep-mobile` com secao nova; `AI-ROADMAP.md`, `PRD-FASE-4.md` §37, `STATE.md` e este
   historico atualizados. Proximo: **sprint web dedicada de chaves Pix** (unica frente executavel;
   spec/numeracao por criar). M-14 (iOS) e M-15 (biometria) seguem no gate de hardware macOS.
+
+## F-Sprint 20 — Gestao de chaves Pix da conta operacional no web (2026-07-21)
+
+- Superficie web para **gestao assistida das chaves Pix da conta operacional/escrow** (spec 120 /
+  steps 120), consumindo o contrato da Sprint backend 31. **Fecha o Gate F-18.0** — a pendencia de
+  visibilidade web registrada no PRD-FASE-4 §37 — e **conclui o recorte web do marco `v1.0-local`**.
+  Nao altera endpoint, DTO, migration nem regra no `sep-api`.
+- **Contrato consumido**: `GET /pix/chaves` (sem step-up, `200` array possivelmente vazio, **nunca
+  `404`**); `POST /pix/chaves` (step-up **estrito** + `Idempotency-Key` obrigatoria; `201` novo /
+  `200` replay); `DELETE /pix/chaves/{chaveId}` (step-up estrito, idempotente, `204`, `404` neutro).
+  `ChavePixResponse` = `id`, `tipo`, `valorMascarado`, `status`, `criadaEm`, `removidaEm` — **o valor
+  bruto da chave nunca e retornado**. Tipo, DV, unicidade, idempotencia, advisory lock e auditoria
+  permanecem autoritativos no backend.
+- **Decisoes**: (1) **guard proprio mais restrito que o pai** — `/app/pix` admite `BACKOFFICE`, mas a
+  sub-rota `chaves` declara `roles: ['FINANCEIRO','ADMIN']`; `BACKOFFICE` nao ve o item de menu nem
+  acessa a rota. (2) **Valor em claro so na request de cadastro** — nunca em leitura, erro, sucesso,
+  log ou storage; a mensagem de sucesso usa o `valorMascarado` devolvido pelo backend, nao o que foi
+  digitado. (3) **Idempotencia por intencao** (`ChavePixIntencaoStore`, root e so memoria)
+  preservando `{ tipo, valor, Idempotency-Key }` atraves do round-trip de step-up: retry apos
+  rede/`5xx` reusa a **mesma** key e o rascunho e reconstituido no retorno — sem isso, corrigir um
+  erro de digitacao no reenvio geraria key nova e reabriria o risco de duplicar a chave; mudar
+  `tipo`/`valor` gera key nova de proposito. (4) **Retornar do step-up nunca muta**: o token e de uso
+  unico (consumido pelo interceptor ao anexar), entao cada cadastro e cada remocao exigem gesto novo.
+  (5) `DELETE` **sem** `Idempotency-Key` — idempotente por contrato, nao ha intencao a preservar.
+  (6) **Sem polling**; refresh so por gesto, com consulta em voo substituida (resposta tardia da
+  anterior nao sobrescreve a lista mais nova). (7) **Mock nao reimplementa regra do backend** (DV,
+  formato por tipo): reconhece valores sentinela para produzir `400`/`422`, evitando uma segunda
+  fonte de verdade que envelheceria calada.
+- **Achados dos code reviews, com fixes**: (1) **alta** — a equivalencia de chave comparava mascaras
+  de 3 caracteres, entao dois valores distintos com o mesmo prefixo colidiam num `409` falso;
+  corrigido por `impressaoChavePix(tipo, valor)`, com a identidade fora do DTO (`fcb9e9c`);
+  (2) o mapa de idempotencia do mock guardava `JSON.stringify(body)`, **com o valor em claro** —
+  passou a usar a mesma impressao nao reversivel (`fcb9e9c`); (3) `id` de heading criado sem
+  `aria-labelledby` e heading dentro da div de acoes — a regiao da lista virou `<section>` nomeada
+  (`6a53634`); (4) comentarios afirmavam que o `clip-path` preservava a semantica de tabela nos
+  cartoes, o que e **falso** (`display: flex` sobre `tr`/`td` desfaz os papeis `row`/`cell`) —
+  `thead` para `display: none` e comentarios corrigidos (`6a53634`); (5) mensagens diziam "A lista
+  foi atualizada" com a reconsulta ainda em voo, viraram "Atualizando a lista" (`ae3bde3`);
+  (6) testes de duplo clique alegavam provar a guarda do metodo — renomeados, com a barreira efetiva
+  (token de uso unico) documentada (`ae3bde3`).
+- **Verificacao por mutacao** foi usada ao longo da sprint: cada teste novo de guarda/invariante foi
+  validado quebrando a producao correspondente e confirmando a falha. **Tres testes que passavam sem
+  provar nada** foram identificados e corrigidos por esse metodo.
+- **Verificacoes**: Vitest **664/664** (87 arquivos; era 586); Playwright **36** (+5 desta sprint);
+  `lint` 0, `lint:scss` 0, `build` OK, `contract:check` OK (so `knownGaps`), `npm audit --omit=dev`
+  0. `X-Step-Up-Token` segue fora do OpenAPI (`knownGaps[0]`, follow-up backend): o front o registra
+  manualmente em `consumed-contracts.json` para `POST` e `DELETE`, como nas F-16/17/18.
+- **Limitacoes registradas como gate, nao como sucesso simulado**: cadastro e remocao com **TOTP
+  real** exigem o desafio MFA (sem handler offline) e ficam para o smoke local com backend `:8080` —
+  o smoke offline prova o redirecionamento ao step-up e a **ausencia de auto-submit** no retorno; a
+  negacao da **rota** para role indevida nao e demonstravel offline (um `page.goto` reinicia o MSW e
+  a sessao volta ao usuario default), ficando coberta nos testes de `roleGuard` no Vitest, enquanto o
+  smoke cobre a ausencia do item de menu; o layout de cartoes abaixo de 768px nao e verificavel em
+  jsdom (media queries nao se aplicam) e precisa de conferencia visual. Provider **fake/local**:
+  nenhuma chave real e criada ou removida no DICT.
+- **Integracao**: 11 commits em `origin/develop` via PR #107 (squash `66b5f04`) e promovidos a `main`
+  via PR #108 (`c00d8ae`); `develop` == `main` conferido por diff de conteudo (vazio).
+- **Impacto no marco**: com a F-20, **backend e web da Fase 4 estao fechados** e o recorte web do
+  `v1.0-local` esta concluido. Resta apenas o recorte **mobile** do Epic 15 (adiado por decisao
+  formal no Gate M-16.0, por falta da persona `FINANCEIRO` no app) e o **iOS** do Epic 14
+  (M-14/M-15), preso ao gate externo de hardware macOS 13+. **Nao ha frente executavel restante na
+  Fase 4.**
+- **Artefatos**: `README.md` do `sep-app` com secao nova (§F-Sprint 20); `SPRINT-F-20-PR.md` criado
+  (removido no ciclo padrao ao abrir a proxima sprint); spec 120, steps 120,
+  `specs/fase-4/README.md`, `AI-ROADMAP.md`, `PRD-FASE-4.md` §36/§37, `STATE.md` e este historico
+  atualizados.

@@ -10,28 +10,44 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-20._
+_Atualizado em: 2026-07-21._
 
 ## Leia agora
 
-- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend da Fase 4 **fechado**
-  (Sprints 27-32 mergeadas); web F-16-19 mergeadas; mobile **M-13 e M-16 mergeadas**;
+- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). **Backend e web da Fase 4 fechados**
+  (Sprints 27-32; F-16 a F-20 mergeadas); mobile **M-13 e M-16 mergeadas**;
   **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate externo de hardware macOS**
-  (ver §Gates externos). Resta executavel apenas a **sprint web dedicada de chaves Pix**
-  (Gate F-18.0).
-- **Spec/step ativo**: M-Sprint 16 (mobile) **MERGEADA** develop+main via PR #124 (squash
-  `77ea01a`) + PR #125 (`a694f2d`); `develop` == `main` conferido por conteudo remoto — spec
-  [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) + steps
-  [`216`](../steps-fase-4/mobile/216-msprint-16-steps.md); detalhe em
-  [`SPRINT-M-16-PR.md`](../repos/sep-mobile/SPRINT-M-16-PR.md).
-  **Escopo reduzido pelo Gate M-16.0**: entregou apenas a leitura owner-scoped de aportes da
-  credora; matching, registro de aporte e chaves Pix ficaram fora por exigirem a persona
-  `FINANCEIRO`, inexistente no `sep-mobile`.
-  Proximo: **sprint web dedicada de chaves Pix** — unica frente executavel; spec/numeracao ainda
-  por criar em `specs/fase-4/`. **M-14 e M-15 seguem aguardando** o gate de hardware macOS 13+.
+  (ver §Gates externos). **Nao ha frente executavel restante na Fase 4** — a decisao pendente e
+  de rumo: fechar a fase com as dividas registradas (§41 do PRD-FASE-4, ainda em branco) ou
+  abrir a Fase 5 nas frentes que nao dependem dos gates externos.
+- **Spec/step ativo**: F-Sprint 20 (web) **MERGEADA** develop+main via PR #107 (squash `66b5f04`)
+  + PR #108 (`c00d8ae`); `develop` == `main` conferido por diff de conteudo — spec
+  [`120`](../specs/fase-4/120-fsprint-20-chaves-pix-web.md) + steps
+  [`120`](../steps-fase-4/web/120-fsprint-20-steps.md); detalhe em
+  [`SPRINT-F-20-PR.md`](../repos/sep-app/SPRINT-F-20-PR.md).
+  **Fecha o Gate F-18.0** e conclui o recorte web do marco `v1.0-local`.
 
 ## Onde estamos
 
+- **F-Sprint 20 (web) MERGEADA em 2026-07-21** — gestao assistida das chaves Pix da conta
+  operacional/escrow (Epic 15; consome o backend da Sprint 31). Em `origin/develop` via PR #107
+  (squash `66b5f04`, 11 commits absorvidos) e promovida a `main` via PR #108 (`c00d8ae`);
+  `develop` == `main` por conteudo. `FINANCEIRO`/`ADMIN` listam (sempre mascarado, com historico),
+  cadastram e removem chaves, com **step-up estrito** nas mutacoes; **guard proprio mais restrito
+  que o pai** (`/app/pix` admite `BACKOFFICE`, mas a sub-rota `chaves` exige `FINANCEIRO`/`ADMIN`,
+  que tambem some do menu). **O valor bruto da chave so existe na request de cadastro** — nunca em
+  leitura, erro, sucesso, log ou storage; a confirmacao usa o `valorMascarado` do backend, nao o
+  que foi digitado. `ChavePixIntencaoStore` (root, so memoria) preserva
+  `{ tipo, valor, Idempotency-Key }` atraves do round-trip de step-up: retry pos-`5xx` reusa a
+  **mesma** key e o rascunho e reconstituido, entao corrigir uma digitacao no reenvio nao duplica a
+  chave. Retorno do step-up **nunca muta** (token de uso unico); `DELETE` idempotente, sem
+  `Idempotency-Key`; sem polling, consulta em voo substituida. Reviews acharam um `409` falso por
+  colisao de mascara de 3 chars (corrigido por impressao nao reversivel, que tambem tirou o valor
+  em claro do mapa de idempotencia do mock), a semantica de tabela quebrada nos cartoes e mensagens
+  que alegavam reconsulta ja concluida. Vitest **664** (era 586), Playwright **36** (+5),
+  `contract:check`/`lint`/`build`/audit verdes. Limitacoes registradas como gate, nao simuladas:
+  TOTP real, negacao de rota por URL direta e layout <768px exigem smoke local/conferencia visual.
+  Nada mudou no `sep-api`. Detalhe em [`SPRINT-F-20-PR.md`](../repos/sep-app/SPRINT-F-20-PR.md).
 - **M-Sprint 16 (mobile) MERGEADA em 2026-07-20** — aportes owner-scoped da credora (Epic 14/15).
   Em `origin/develop` via PR #124 (squash `77ea01a`) e promovida a `main` via PR #125
   (`a694f2d`); `develop` == `main` conferido por conteudo. **O Gate M-16.0 cortou o escopo**: o
@@ -96,9 +112,9 @@ _Atualizado em: 2026-07-20._
   nas mutacoes, refresh-on-read por gesto (sem polling) e `AporteIntencaoStore` (root, so
   memoria) preservando {operacao, valor, Idempotency-Key} entre instancias — retry pos-5xx
   reusa a MESMA key e nao duplica aporte (P1 do review manual; P2 lista substitui consulta
-  em voo; P3 seed MSW sem credora inelegivel sugerida). **Gate F-18.0**: chaves Pix fora da
-  F-18 — destino web dedicado pos-F-19; item do `v1.0-local` segue pendente (PRD-FASE-4
-  §37). Vitest 562 + Playwright 31/31 (4 smokes novos; TOTP real e negacao de rota por URL
+  em voo; P3 seed MSW sem credora inelegivel sugerida). **Gate F-18.0**: chaves Pix ficaram
+  fora da F-18 — destino web dedicado pos-F-19, **entregue pela F-20 em 2026-07-21**; o item
+  do `v1.0-local` no web esta fechado (PRD-FASE-4 §37). Vitest 562 + Playwright 31/31 (4 smokes novos; TOTP real e negacao de rota por URL
   direta ficam pro smoke real `:8080`). Detalhe no historico
   ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md); a descricao de PR temporaria da F-18 foi
   removida no ciclo padrao ao abrir a F-19).
@@ -130,22 +146,25 @@ _Atualizado em: 2026-07-20._
 
 ## Proximo passo
 
-1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamento M-16:
-   spec/steps 216 com a decisao do Gate M-16.0, README do sep-mobile, AI-ROADMAP, PRD-FASE-4 §37,
-   STATE/historico; `SPRINT-M-16-PR.md` criado e `SPRINT-M-13-PR.md` removido no ciclo padrao).
-2. **Especificar e executar a sprint web dedicada de chaves Pix** — unica frente executavel da
-   Fase 4. Fecha a pendencia do `v1.0-local` no PRD-FASE-4 §37 (decisao do Gate F-18.0). Spec e
-   numeracao ainda **por criar** em [`specs/fase-4/`](../specs/fase-4/README.md); consome o
-   `GET /api/v1/pix/chaves` da Sprint backend 31 (`FINANCEIRO`/`ADMIN`, DTO mascarado).
+1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamento F-20: spec/steps
+   120 marcados como concluidos, `specs/fase-4/README.md`, README do `sep-app`, AI-ROADMAP,
+   PRD-FASE-4 §36/§37, STATE/historico). `SPRINT-F-20-PR.md` **permanece** ate a proxima sprint
+   abrir (ciclo padrao: a descricao anterior e removida ao abrir a seguinte).
+2. **Decisao de rumo (nao ha frente executavel na Fase 4)**. Duas opcoes, ambas legitimas:
+   - **fechar a Fase 4** preenchendo o §41 do PRD-FASE-4 (hoje em branco) com status, PRs,
+     back-merges e as dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do
+     Epic 14 (M-14/M-15) entram como adiados, nao como pendencias em aberto; ou
+   - **abrir a Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)) nas frentes que nao dependem de
+     credencial Celcoin, conta AWS ou conta de loja.
 3. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
-   §Gates externos). Nao bloqueiam a Fase 4 sobre fake nem as trilhas PWA/Android/web.
+   §Gates externos). Enquanto ele nao abre, avaliar o fallback por runner CI macOS (spec 214.3.4)
+   para validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
+   spec e permanece preso ao gate.
 4. **Follow-ups tecnicos abertos** (nao bloqueiam): race condition de duplo toque em
-   `consultarStatusPix` no `sep-mobile` (M-11.4, ja em `main`; mesma correcao aplicada aos aportes
-   na M-16); smoke `golden-path-mobile` vermelho desde a M-13; escopo mobile adiado pelo Gate
-   M-16.0 (matching, aporte POST, chaves Pix) registrado na spec 216.
-4. Enquanto o gate M-14 nao abre, avaliar fallback via runner CI macOS (spec 214.3.4) para
-   validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
-   spec e permanece pendente do gate.
+   `consultarStatusPix` no `sep-mobile` (M-11.4, ja em `main`; mesma correcao ja aplicada aos
+   aportes na M-16); smoke `golden-path-mobile` vermelho desde a M-13; `X-Step-Up-Token` fora do
+   OpenAPI (`knownGaps[0]` do `contract:check` — follow-up backend); escopo mobile adiado pelo
+   Gate M-16.0 (matching, aporte POST, chaves Pix) registrado na spec 216.
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
 

@@ -165,11 +165,12 @@ AWS.
 
 ## 36. Mapeamento Fase 4: Projetos x Sprints
 
-Planejamento de alto nivel. Todas as sprints estao **planejadas** (nada implementado). Cada sprint
-mantem no maximo 7 tasks de implementacao; precheck, E2E/smoke, documentacao e collections nao entram
-na contagem. As **specs ja existem** em [`specs/fase-4/`](../specs/fase-4/README.md) (14 arquivos); os
-**steps** continuam **just-in-time** em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada
-execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-15, mobile ate M-12).
+Mapa da fase com o status corrente de cada sprint (atualizado em 2026-07-21: backend e web
+**concluidos**; no mobile restam M-14/M-15, bloqueadas por gate externo de hardware macOS). Cada
+sprint mantem no maximo 7 tasks de implementacao; precheck, E2E/smoke, documentacao e collections nao
+entram na contagem. As **specs ja existem** em [`specs/fase-4/`](../specs/fase-4/README.md)
+(15 arquivos, incluindo a `120` criada para o Gate F-18.0); os **steps** continuam **just-in-time**
+em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-15, mobile ate M-12).
 
 ### Backend (`sep-api`)
 
@@ -188,17 +189,18 @@ execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-
 |--------|-------------|------|------|--------|
 | F-16 | Epic 13 | Renegociacao do tomador no web (fecha gap F-9) | [`116`](../specs/fase-4/116-fsprint-16-renegociacao-tomador-web.md) | concluida (PR #87/#88 + follow-up #89/#90, 2026-07-15) |
 | F-17 | Epic 13 | Aprofundamento financeiro/conciliacao web (se houver gap) | [`117`](../specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) | concluida (PR #92/#93, 2026-07-15; gap analysis: 2 gaps fechados nas divergencias Pix, 4 contratos ausentes registrados como follow-up backend) |
-| F-18 | Epic 15/10 | Aporte e matching da credora no web (quando backend existir) | [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) | concluida (PR #94/#95, 2026-07-16; matching assistido + aporte idempotente com step-up estrito + leitura owner-scoped na carteira; Gate F-18.0: chaves Pix fora — destino web dedicado pos-F-19) |
+| F-18 | Epic 15/10 | Aporte e matching da credora no web (quando backend existir) | [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) | concluida (PR #94/#95, 2026-07-16; matching assistido + aporte idempotente com step-up estrito + leitura owner-scoped na carteira; Gate F-18.0: chaves Pix fora — destino web dedicado pos-F-19, **cumprido pela F-20**) |
 | F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | concluida (2026-07-16; em `develop` por push direto fast-forward — desvio aceito — e `main` via PR #96; `contract:check` + snapshot OpenAPI, audit 9->0 dentro do Angular 20, collections Postman/Insomnia renovadas sem PII/secrets, [ADR 0018](../adr/0018-avaliacao-angular-22-no-web.md) ADIA Angular 22 com revisao em 2026-09-30) |
+| F-20 | Epic 15 | Gestao de chaves Pix da conta operacional no web (fecha o Gate F-18.0) | [`120`](../specs/fase-4/120-fsprint-20-chaves-pix-web.md) | concluida (PR #107 develop / #108 main, 2026-07-21; lista mascarada + cadastro e remocao assistidos com step-up estrito, `roleGuard` proprio `FINANCEIRO`/`ADMIN` mais restrito que `/app/pix`, idempotencia por intencao preservada no round-trip de step-up; valor bruto nunca lido nem persistido; Vitest 664, Playwright 36, `contract:check`/audit verdes. **Fecha o recorte web do `v1.0-local`**) |
 
 ### Mobile (`sep-mobile`)
 
 | Sprint | Epic/frente | Tema | Spec | Status |
 |--------|-------------|------|------|--------|
-| M-13 | Epic 14 | Empacotamento nativo Android (Capacitor 8) + ADR baseline Cap 8 | [`213`](../specs/fase-4/213-msprint-13-empacotamento-nativo-android.md) | planejada |
-| M-14 | Epic 14 | Empacotamento nativo iOS (Capacitor 8) | [`214`](../specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) | planejada |
-| M-15 | Epic 14 | Biometria nativa (substitui stub PWA) + hardening nativo | [`215`](../specs/fase-4/215-msprint-15-biometria-nativa.md) | planejada |
-| M-16 | Epic 14/15 | Aporte/matching e Pix avancado visiveis ao usuario (quando backend existir) | [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) | planejada (dep. backend 29-31 concluidas) |
+| M-13 | Epic 14 | Empacotamento nativo Android (Capacitor 8) + ADR baseline Cap 8 | [`213`](../specs/fase-4/213-msprint-13-empacotamento-nativo-android.md) | concluida (PR #123 develop+main, 2026-07-17; projeto `android/` versionado, runtime nativo isolado em `core/native/`, [ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md) aceito) |
+| M-14 | Epic 14 | Empacotamento nativo iOS (Capacitor 8) | [`214`](../specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) | **bloqueada por gate externo** (2026-07-20): exige host macOS 13+ Ventura para Xcode 15+; ver §38 e [`STATE.md`](./STATE.md) §Gates externos |
+| M-15 | Epic 14 | Biometria nativa (substitui stub PWA) + hardening nativo | [`215`](../specs/fase-4/215-msprint-15-biometria-nativa.md) | **bloqueada pelo mesmo gate macOS** (depende da base nativa iOS da M-14) |
+| M-16 | Epic 14/15 | Aporte/matching e Pix avancado visiveis ao usuario (quando backend existir) | [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) | concluida com **escopo reduzido** (PR #124/#125, 2026-07-20; Gate M-16.0: so a leitura owner-scoped de aportes — matching, aporte POST e chaves Pix exigem `FINANCEIRO`/`ADMIN`, role inexistente no `sep-mobile`) |
 
 **Decisoes de planejamento**:
 
@@ -237,18 +239,22 @@ Este e o corte que permite "implementar tudo menos AWS e Celcoin".
   [`STATE.md`](./STATE.md) §Gates externos.
 - Epic 15 completo **sobre provider fake**: aporte da credora + escrow, matching e recorte de Pix
   avancado implementados, testados e visiveis no web e no mobile; skeleton dos adapters reais
-  Celcoin/BaaS escrito e coberto por WireMock, com Fake como default. **Pendencia rastreada
-  (Gate F-18.0, 2026-07-16)**: aporte+matching visiveis no web desde a F-18; a visibilidade web do
-  recorte de chaves Pix (Sprint 31) ficou fora da F-18 por decisao formal e exige sprint web
-  dedicada pos-F-19 — este item NAO esta concluido.
+  Celcoin/BaaS escrito e coberto por WireMock, com Fake como default. **Recorte web: CONCLUIDO
+  (2026-07-21)** — aporte+matching visiveis desde a F-18 e a gestao de chaves Pix da Sprint 31
+  entregue pela **F-Sprint 20** (PR #107/#108), fechando o **Gate F-18.0**, que exigia sprint web
+  dedicada pos-F-19.
   **Recorte mobile (Gate M-16.0, 2026-07-20)**: a M-Sprint 16 entregou apenas a **leitura
   owner-scoped de aportes** da credora (mergeada develop+main, PR #124/#125). Matching, registro de
   aporte e chaves Pix **nao** foram levados ao mobile: os cinco contratos exigem `FINANCEIRO`/`ADMIN`
   e o `sep-mobile` so conhece `UsuarioRole = 'ADMIN' | 'CLIENTE'` — a credora autentica como
   `CLIENTE` e receberia `403`. Levar esse recorte ao app exigiria expor a persona operacional no
   mobile (ADR + revisao da spec 216) ou backend que admita a credora dona nesses contratos.
-  Consequencia: a exigencia "visiveis no web **e no mobile**" segue **parcialmente atendida** e o
-  item de Pix avancado do marco **NAO** esta concluido nem pelo web nem pelo mobile.
+  Consequencia: com a F-20 fechada, a exigencia "visiveis no web **e no mobile**" fica **atendida no
+  web e pendente no mobile**. O recorte que falta (matching, aporte POST e chaves Pix no app) nao e
+  deficit de implementacao, e sim de **persona**: enquanto o `sep-mobile` nao conhecer
+  `FINANCEIRO`, ele e inalcancavel — reabri-lo exige ADR + revisao da spec 216, ou backend que
+  admita a credora dona nesses contratos. Ate essa decisao, o recorte mobile do Epic 15 permanece
+  **adiado por decisao formal**, nao em aberto.
 - Epic 16 entregue como **documento de planejamento** (arquitetura AWS + CI/CD de deploy).
 - Follow-ups da Fase 3 saldados: step-up estrito server-side no aceite (**fechado na Sprint 27** —
   bloqueio de go-live que **nao** depende de acesso externo eliminado), renegociacao web, portas de
