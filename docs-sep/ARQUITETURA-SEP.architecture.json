@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "SEP - Arquitetura Completa",
+    "subtitle": "Monolito modular DDD + Hexagonal | 4 repos | Provider Pattern | CMN 4.656/2018",
+    "output": "ARQUITETURA-SEP.html",
+    "quality_profile": "standard",
+    "views": [
+      {
+        "id": "entrada-autenticada",
+        "label": "Entrada autenticada",
+        "focus": ["web", "mobile", "security", "api", "identity"],
+        "note": "Como web e mobile atravessam o perimetro de seguranca ate a API REST."
+      },
+      {
+        "id": "jornada-tomador",
+        "label": "Jornada do tomador",
+        "focus": ["api", "onboarding", "credito", "contratos", "cobranca"],
+        "note": "Onboarding KYC, analise de credito, formalizacao da CCB e cobranca das parcelas."
+      },
+      {
+        "id": "credora-pix",
+        "label": "Credora, Pix e escrow",
+        "focus": ["credores", "pix", "escrow", "integration"],
+        "note": "Aporte da credora, movimentacao Pix e segregacao patrimonial em escrow."
+      },
+      {
+        "id": "integracoes",
+        "label": "Integracoes externas",
+        "focus": ["integration", "celcoin", "clicksign", "notificacoes", "hibp"],
+        "note": "Provider Pattern: toda saida externa passa por port.out com fake como default."
+      },
+      {
+        "id": "operacao-dados",
+        "label": "Operacao e dados",
+        "focus": ["jobs", "backoffice", "persistence", "postgres", "observabilidade"],
+        "note": "Jobs agendados, fila operacional, persistencia unica e observabilidade."
+      }
+    ]
+  },
+  "components": [
+    { "id": "web", "type": "frontend", "label": "sep-app", "sublabel": "Angular 20 - SCSS puro", "tag": "web console", "pos": [40, 600], "size": [150, 62] },
+    { "id": "mobile", "type": "frontend", "label": "sep-mobile", "sublabel": "Ionic 8 - Capacitor 8", "tag": "Android", "pos": [40, 700], "size": [150, 62] },
+
+    { "id": "security", "type": "security", "label": "Security Filter Chain", "sublabel": "RateLimit - JWT - PwdReset", "tag": "stateless", "pos": [240, 640], "size": [160, 66] },
+
+    { "id": "api", "type": "backend", "label": "REST API /api/v1", "sublabel": "32 controllers", "tag": "inbound", "pos": [450, 400], "size": [160, 62] },
+    { "id": "webhooks", "type": "security", "label": "Webhook Receiver", "sublabel": "HMAC-SHA256 - outbox", "tag": "idempotente", "pos": [450, 640], "size": [160, 62] },
+    { "id": "jobs", "type": "backend", "label": "Scheduled Jobs", "sublabel": "5 jobs - advisory lock PG", "tag": "batch", "pos": [450, 880], "size": [160, 62] },
+    { "id": "events", "type": "messagebus", "label": "Domain Events", "sublabel": "28 listeners AFTER_COMMIT", "tag": "in-process", "pos": [450, 1120], "size": [160, 62] },
+
+    { "id": "identity", "type": "backend", "label": "identity", "sublabel": "JWT - MFA TOTP - step-up", "tag": "11 use cases", "pos": [670, 80], "size": [150, 62] },
+    { "id": "usuarios", "type": "backend", "label": "usuarios", "sublabel": "cadastro - roles - perfil", "tag": "6 use cases", "pos": [670, 180], "size": [150, 62] },
+    { "id": "governanca", "type": "backend", "label": "governanca", "sublabel": "parametros versionados", "tag": "3 use cases", "pos": [670, 280], "size": [150, 62] },
+    { "id": "onboarding", "type": "backend", "label": "onboarding", "sublabel": "KYC PF - KYB PJ - PLD", "tag": "13 use cases", "pos": [670, 380], "size": [150, 62] },
+    { "id": "credito", "type": "backend", "label": "credito", "sublabel": "proposta - motor de regras", "tag": "12 use cases", "pos": [670, 480], "size": [150, 62] },
+    { "id": "contratos", "type": "backend", "label": "contratos", "sublabel": "CCB - aceite - assinatura", "tag": "9 use cases", "pos": [670, 580], "size": [150, 62] },
+    { "id": "cobranca", "type": "backend", "label": "cobranca", "sublabel": "parcelas - atraso - renegoc.", "tag": "14 use cases", "pos": [670, 680], "size": [150, 62] },
+    { "id": "credores", "type": "backend", "label": "credores", "sublabel": "oportunidades - aporte", "tag": "20 use cases", "pos": [670, 780], "size": [150, 62] },
+    { "id": "pix", "type": "backend", "label": "pix", "sublabel": "chaves - desembolso", "tag": "13 use cases", "pos": [670, 880], "size": [150, 62] },
+    { "id": "escrow", "type": "backend", "label": "escrow", "sublabel": "conta - wallet - movimento", "tag": "sem REST - CMN 4.656", "pos": [670, 980], "size": [150, 62] },
+    { "id": "backoffice", "type": "backend", "label": "backoffice", "sublabel": "fila - pendencias - reproc.", "tag": "9 use cases", "pos": [670, 1080], "size": [150, 62] },
+    { "id": "financeiro", "type": "backend", "label": "financeiro", "sublabel": "conciliacao (previsto)", "tag": "stub: so package-info", "pos": [670, 1180], "size": [150, 62] },
+
+    { "id": "integration", "type": "cloud", "label": "Provider Pattern", "sublabel": "port.out + RestClient + Resilience4j + OAuth2", "tag": "fake por default", "pos": [940, 380], "size": [180, 100] },
+    { "id": "persistence", "type": "cloud", "label": "JPA / Flyway", "sublabel": "54 repositories - 59 migrations", "tag": "schema unico", "pos": [940, 700], "size": [180, 80] },
+    { "id": "observabilidade", "type": "cloud", "label": "Observabilidade", "sublabel": "Micrometer - logs JSON - correlationId", "tag": "actuator protegido", "pos": [940, 1000], "size": [180, 80] },
+
+    { "id": "celcoin", "type": "external", "label": "Celcoin (BaaS)", "sublabel": "KYC - KYB - PLD - OpenFinance - Pix - Escrow", "tag": "6 APIs", "pos": [1200, 110], "size": [180, 90] },
+    { "id": "clicksign", "type": "external", "label": "Clicksign", "sublabel": "assinatura digital da CCB", "tag": "ADR 0013", "pos": [1200, 280], "size": [180, 62] },
+    { "id": "notificacoes", "type": "external", "label": "Notificacoes", "sublabel": "Zenvia SMS - SMTP email", "tag": "ADR 0014", "pos": [1200, 420], "size": [180, 62] },
+    { "id": "hibp", "type": "external", "label": "Have I Been Pwned", "sublabel": "checagem de senha vazada", "tag": "identity", "pos": [1200, 560], "size": [180, 62] },
+
+    { "id": "postgres", "type": "database", "label": "PostgreSQL 16", "sublabel": "banco unico - UUID v6 - JSONB", "tag": "Docker Compose local", "pos": [1200, 705], "size": [180, 70] },
+    { "id": "prometheus", "type": "external", "label": "Prometheus / CloudWatch", "sublabel": "metricas e logs (AWS na Fase 5)", "tag": "planejado", "pos": [1200, 1005], "size": [180, 70] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "sep-api - monolito modular (Java 21 - Spring Boot 3.5)", "wraps": ["security", "api", "webhooks", "jobs", "events", "identity", "usuarios", "governanca", "onboarding", "credito", "contratos", "cobranca", "credores", "pix", "escrow", "backoffice", "financeiro", "integration", "persistence", "observabilidade"] },
+    { "kind": "security-group", "label": "provedores externos - ativacao por feature flag de ambiente", "wraps": ["celcoin", "clicksign", "notificacoes", "hibp"] }
+  ],
+  "connections": [
+    { "id": "web-security", "from": "web", "to": "security", "label": "HTTPS + Bearer JWT", "variant": "emphasis", "labelAt": [215, 588] },
+    { "id": "mobile-security", "from": "mobile", "to": "security", "variant": "emphasis" },
+    { "id": "security-api", "from": "security", "to": "api", "label": "RBAC + step-up", "variant": "emphasis" },
+
+    { "id": "api-identity", "from": "api", "to": "identity" },
+    { "id": "api-usuarios", "from": "api", "to": "usuarios" },
+    { "id": "api-governanca", "from": "api", "to": "governanca" },
+    { "id": "api-onboarding", "from": "api", "to": "onboarding" },
+    { "id": "api-credito", "from": "api", "to": "credito", "variant": "emphasis" },
+    { "id": "api-contratos", "from": "api", "to": "contratos" },
+    { "id": "api-cobranca", "from": "api", "to": "cobranca" },
+    { "id": "api-credores", "from": "api", "to": "credores" },
+    { "id": "api-pix", "from": "api", "to": "pix" },
+    { "id": "api-backoffice", "from": "api", "to": "backoffice" },
+
+    { "id": "wh-onboarding", "from": "webhooks", "to": "onboarding", "variant": "security" },
+    { "id": "wh-credito", "from": "webhooks", "to": "credito", "variant": "security" },
+    { "id": "wh-contratos", "from": "webhooks", "to": "contratos", "variant": "security" },
+    { "id": "wh-pix", "from": "webhooks", "to": "pix", "variant": "security" },
+
+    { "id": "jobs-cobranca", "from": "jobs", "to": "cobranca", "variant": "dashed" },
+    { "id": "jobs-backoffice", "from": "jobs", "to": "backoffice", "variant": "dashed" },
+
+    { "id": "credito-events", "from": "credito", "to": "events", "label": "eventos de dominio", "variant": "dashed", "labelAt": [640, 768] },
+    { "id": "events-backoffice", "from": "events", "to": "backoffice", "variant": "dashed" },
+
+    { "id": "identity-integration", "from": "identity", "to": "integration" },
+    { "id": "onboarding-integration", "from": "onboarding", "to": "integration", "label": "port.out" },
+    { "id": "credito-integration", "from": "credito", "to": "integration", "variant": "emphasis" },
+    { "id": "contratos-integration", "from": "contratos", "to": "integration" },
+    { "id": "cobranca-integration", "from": "cobranca", "to": "integration" },
+    { "id": "pix-integration", "from": "pix", "to": "integration" },
+    { "id": "escrow-integration", "from": "escrow", "to": "integration" },
+
+    { "id": "integration-celcoin", "from": "integration", "to": "celcoin", "label": "OAuth2 client-credentials", "variant": "emphasis", "labelAt": [1160, 258] },
+    { "id": "integration-clicksign", "from": "integration", "to": "clicksign" },
+    { "id": "integration-notificacoes", "from": "integration", "to": "notificacoes" },
+    { "id": "integration-hibp", "from": "integration", "to": "hibp" },
+
+    { "id": "celcoin-webhooks", "from": "celcoin", "to": "webhooks", "label": "callbacks HMAC", "variant": "security", "fromSide": "top", "toSide": "top", "via": [[1290, 30], [420, 30], [420, 610], [530, 610]] },
+
+    { "id": "identity-persistence", "from": "identity", "to": "persistence" },
+    { "id": "usuarios-persistence", "from": "usuarios", "to": "persistence" },
+    { "id": "governanca-persistence", "from": "governanca", "to": "persistence" },
+    { "id": "onboarding-persistence", "from": "onboarding", "to": "persistence" },
+    { "id": "credito-persistence", "from": "credito", "to": "persistence" },
+    { "id": "contratos-persistence", "from": "contratos", "to": "persistence" },
+    { "id": "cobranca-persistence", "from": "cobranca", "to": "persistence" },
+    { "id": "credores-persistence", "from": "credores", "to": "persistence" },
+    { "id": "pix-persistence", "from": "pix", "to": "persistence" },
+    { "id": "escrow-persistence", "from": "escrow", "to": "persistence" },
+    { "id": "backoffice-persistence", "from": "backoffice", "to": "persistence" },
+
+    { "id": "persistence-postgres", "from": "persistence", "to": "postgres", "label": "JDBC", "variant": "emphasis", "route": "straight" },
+    { "id": "observabilidade-prometheus", "from": "observabilidade", "to": "prometheus", "variant": "dashed", "route": "straight" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Stack verificada",
+      "items": [
+        "Java 21 - Spring Boot 3.5.5 - Gradle - PostgreSQL 16",
+        "Angular 20.3 web e mobile - Ionic 8.8 - Capacitor 8.4",
+        "Sem cache e sem broker: eventos Spring in-process",
+        "Flyway V1..V59 - 54 repositories Spring Data"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Conformidade CMN 4.656 e LGPD",
+      "items": [
+        "Segregacao patrimonial via modulo escrow (ContaEscrow, Wallet)",
+        "PLD obrigatorio em COAF, OFAC, INTERPOL e MTE",
+        "Auditoria com ~88 tipos de evento de seguranca",
+        "Sanitizer LGPD fail-closed no Open Finance - PII mascarada"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Seguranca transversal",
+      "items": [
+        "JWT 15min + refresh rotativo 30d com deteccao de reuso",
+        "MFA TOTP - lockout - rate limiting",
+        "@RequireStepUp e @RequireStepUpEstrito via aspect",
+        "Roles cumulativas: ADMIN, FINANCEIRO, BACKOFFICE, CLIENTE"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Lacunas entre PRD e codigo",
+      "items": [
+        "modulo financeiro e stub: apenas package-info nas 4 camadas",
+        "Nenhum adapter Finansystech existe - assinatura e Clicksign",
+        "Todos os providers externos default fake/log em application.yml",
+        "Ambos os frontends apontam prod para localhost:8080"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Alvo AWS (Epic 16, Fase 5)",
+      "items": [
+        "EC2 + RDS PostgreSQL em sa-east-1 - VPC e IAM",
+        "CloudWatch + SNS para logs e alarmes",
+        "GitHub Actions para deploy remoto",
+        "Escada: local -> aws-develop -> homologacao -> producao"
+      ]
+    }
+  ]
+}
