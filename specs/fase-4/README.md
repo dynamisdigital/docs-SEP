@@ -36,6 +36,7 @@ As tabelas usam a ordem recomendada de execucao.
 | F-17 | [`117-fsprint-17-financeiro-conciliacao-web.md`](./117-fsprint-17-financeiro-conciliacao-web.md) | Aprofundamento financeiro/conciliacao web | 6 |
 | F-18 | [`118-fsprint-18-aporte-matching-credora-web.md`](./118-fsprint-18-aporte-matching-credora-web.md) | Aporte e matching da credora no web | 6 |
 | F-19 | [`119-fsprint-19-hardening-tooling-contrato-web.md`](./119-fsprint-19-hardening-tooling-contrato-web.md) | Hardening de tooling + refresh contrato/collection | 5 |
+| F-20 | [`120-fsprint-20-chaves-pix-web.md`](./120-fsprint-20-chaves-pix-web.md) | Gestao de chaves Pix no web (fecha pendencia Gate F-18.0 / `v1.0-local`) | 7 |
 
 ## Mobile (`sep-mobile`)
 
@@ -51,7 +52,8 @@ As tabelas usam a ordem recomendada de execucao.
 - Backend 27 (gate go-live) e 28 (refactor) sao independentes; 29 -> 30 -> 31 sao a sequencia do
   Epic 15 (assistido, sobre fake); 32 (skeleton) e independente e sua ativacao real e Fase 5.
 - Web F-16 depende da Sprint backend 24 (ja mergeada); F-17 e gap-closing (escopo confirmado no
-  precheck); F-18 depende das Sprints backend 29-30; F-19 depende do OpenAPI vigente.
+  precheck); F-18 depende das Sprints backend 29-30; F-19 depende do OpenAPI vigente; F-20 depende da Sprint
+  backend 31 (chaves Pix) e fecha a pendencia de visibilidade web do Gate F-18.0.
 - Mobile M-13 -> M-14 (nativo); M-15 depende da base nativa (M-13/M-14) e da Sprint 27; M-16 depende
   das Sprints backend 29-31 e da M-Sprint 10.
 - **Dependencia de persona (Gate M-16.0, 2026-07-20)**: contratos backend que exigem
