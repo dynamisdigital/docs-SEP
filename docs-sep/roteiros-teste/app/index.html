@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SEP · Roteiros de teste manual</title>
+
+    <!-- Anti-FOUC: aplica o tema antes do CSS, senao pisca branco a cada reload. -->
+    <script>
+      (function () {
+        var t = "light";
+        try {
+          t = localStorage.getItem("SEP_THEME") || t;
+        } catch (e) {}
+        if (t === "dark") document.documentElement.classList.add("dark");
+      })();
+    </script>
+
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="aviso-storage" class="aviso-storage" hidden></div>
+
+    <header class="topbar">
+      <div class="topbar-marca">
+        <span class="marca-ponto"></span>
+        <strong>SEP</strong><span class="marca-sub">Roteiros</span>
+      </div>
+
+      <label class="campo-rodada">
+        <span class="sr">Rodada</span>
+        <select id="sel-rodada" title="Rodada de execução"></select>
+      </label>
+      <button id="btn-nova-rodada" class="btn btn-ghost btn-icone" title="Nova rodada">+</button>
+
+      <div class="progresso-global">
+        <div class="barra"><i id="barra-global"></i></div>
+        <span id="txt-global" class="mono">0/0</span>
+      </div>
+
+      <div class="topbar-acoes">
+        <input id="busca" type="search" class="input busca" placeholder="Buscar…  /" />
+        <button id="btn-exportar" class="btn btn-ghost" title="Exportar JSON da rodada">Exportar</button>
+        <button id="btn-importar" class="btn btn-ghost" title="Importar JSON">Importar</button>
+        <input id="file-importar" type="file" accept="application/json,.json" hidden />
+        <button id="btn-glossario" class="btn btn-ghost" title="Glossário (g)">Glossário</button>
+        <button id="btn-tema" class="btn btn-ghost btn-icone" title="Alternar tema (t)">◐</button>
+        <button id="btn-ajuda" class="btn btn-ghost btn-icone" title="Atalhos (?)">?</button>
+      </div>
+    </header>
+
+    <div id="filtros" class="filtros"></div>
+
+    <main class="layout">
+      <nav id="rail" class="rail" aria-label="Roteiros"></nav>
+      <section id="palco" class="palco" tabindex="-1"></section>
+      <aside id="lateral" class="lateral" aria-label="Registro da execução"></aside>
+    </main>
+
+    <footer class="rodape">
+      <span id="rodape-info" class="mono"></span>
+      <span id="rodape-avisos"></span>
+    </footer>
+
+    <dialog id="dlg-ajuda" class="dlg">
+      <h2>Atalhos</h2>
+      <table class="tab-atalhos">
+        <tr><td><kbd>j</kbd> <kbd>k</kbd></td><td>passo seguinte / anterior</td></tr>
+        <tr><td><kbd>espaço</kbd> <kbd>x</kbd></td><td>marcar o passo em foco</td></tr>
+        <tr><td><kbd>enter</kbd></td><td>abrir ocorrência do passo em foco</td></tr>
+        <tr><td><kbd>n</kbd> <kbd>p</kbd></td><td>escopo seguinte / anterior</td></tr>
+        <tr><td><kbd>/</kbd></td><td>buscar</td></tr>
+        <tr><td><kbd>f</kbd></td><td>alternar filtro "pendentes"</td></tr>
+        <tr><td><kbd>t</kbd></td><td>alternar tema</td></tr>
+        <tr><td><kbd>g</kbd></td><td>abrir o glossário</td></tr>
+        <tr><td><kbd>esc</kbd></td><td>fechar / limpar</td></tr>
+      </table>
+      <p class="nota">
+        Não existe caixa de "falhou": deixe o passo desmarcado e registre uma
+        <strong>ocorrência</strong>. É a regra definida no §2 do hub.
+      </p>
+      <form method="dialog"><button class="btn btn-primario">Fechar</button></form>
+    </dialog>
+
+    <dialog id="dlg-glossario" class="dlg dlg-glossario">
+      <h2>Glossário</h2>
+      <input
+        id="glossario-filtro"
+        type="search"
+        class="input glossario-filtro"
+        placeholder="Filtrar termo…"
+      />
+      <dl id="glossario-lista" class="glossario-lista"></dl>
+      <form method="dialog"><button class="btn btn-primario">Fechar</button></form>
+    </dialog>
+
+    <script src="dados.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
