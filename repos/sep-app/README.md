@@ -636,3 +636,93 @@ Fase 3. Spec [`119`](../../specs/fase-4/119-fsprint-19-hardening-tooling-contrat
 
 - Baseline pos-sprint: Vitest **580** (85 arquivos; +18 do verificador de contrato),
   Playwright **31**, lint/format/scss/build verdes em instalacao limpa.
+
+## Gestao de chaves Pix da conta operacional (F-Sprint 20)
+
+Superficie web para **gestao assistida das chaves Pix da conta operacional/escrow** (backend
+Sprint 31), fechando a pendencia de visibilidade web registrada no Gate F-18.0. Spec
+[`120`](../../specs/fase-4/120-fsprint-20-chaves-pix-web.md); steps
+[`120`](../../steps-fase-4/web/120-fsprint-20-steps.md).
+
+### Personas e acesso
+
+- As tres operacoes sao de `FINANCEIRO`/`ADMIN` no backend. A sub-rota `chaves` tem `roleGuard`
+  **proprio, mais restrito que o pai** `/app/pix` (que inclui `BACKOFFICE`): `BACKOFFICE` entra no
+  Pix operacional mas nao ve o item de menu nem acessa a rota.
+- Item de navegacao `Chaves Pix` (grupo Operacao) somente para `FINANCEIRO`/`ADMIN`.
+
+### Rotas
+
+- `/app/pix/chaves` -> listagem mascarada (com historico `INATIVA`), cadastro assistido e remocao
+  assistida, na mesma tela.
+
+### Contratos consumidos
+
+- `GET /pix/chaves` — sem step-up. `200` com array (pode ser vazio), mais recentes primeiro,
+  incluindo `INATIVA`. **Nunca `404`**: sem conta operacional devolve `[]`. Por isso a listagem tem
+  tres superficies (lista / vazia / erro tecnico) e o `404` neutro pertence a remocao.
+- `POST /pix/chaves` — step-up estrito + `Idempotency-Key` obrigatoria; body `{ tipo, valor }`.
+  `201` novo, `200` replay idempotente, `400` (key ausente/invalida, tipo nulo, valor invalido),
+  `409` (key reusada com payload diferente ou chave equivalente ja ativa), `422` (conta
+  operacional indisponivel).
+- `DELETE /pix/chaves/{chaveId}` — step-up estrito. Inativacao logica `ATIVA -> INATIVA`,
+  **idempotente** (`204` mesmo se ja `INATIVA`); `404` **neutro** (nao distingue inexistente, fora
+  do escopo da conta operacional ou conta ausente).
+- `ChavePixResponse`: `id`, `tipo`, `valorMascarado`, `status`, `criadaEm`, `removidaEm` (nulo
+  enquanto `ATIVA`). **O valor bruto da chave nunca e retornado.**
+- Nota de contrato: o header `X-Step-Up-Token` nao e documentado no OpenAPI (`knownGaps[0]`); o
+  frontend o registra manualmente em `consumed-contracts.json` para `POST` e `DELETE`.
+
+### Decisoes
+
+- **Valor em claro so na request de cadastro.** Nunca aparece em leitura, mensagem de erro,
+  mensagem de sucesso, log ou storage. A confirmacao de sucesso usa o `valorMascarado` devolvido
+  pelo backend, nao o que foi digitado.
+- **Validacao apenas de formato minimo** no browser (campo preenchido, inclusive para `EVP`).
+  Tipo, digito verificador, unicidade e idempotencia sao autoritativos no backend — o frontend
+  nunca os reinterpreta.
+- **Idempotencia por intencao** (`ChavePixIntencaoStore`, root e so memoria): preserva
+  `{ tipo, valor, Idempotency-Key }` atraves da navegacao ao step-up. Retry apos rede/`5xx` reusa a
+  **mesma** key; mudar `tipo`/`valor` cria intencao e key novas. O rascunho e reconstituido no
+  retorno — sem isso, um erro de digitacao no reenvio geraria key nova e reabriria o risco de
+  duplicar a chave. Reload perde o rascunho; nada e persistido em `localStorage`/`sessionStorage`.
+- **Retornar do step-up nunca muta**: cadastro e remocao exigem novo clique. O token e de uso unico
+  (o interceptor o consome ao anexar), entao cada tentativa exige verificacao nova.
+- **`TRATA_403_LOCALMENTE` so nas mutacoes**; a leitura sem role segue no fluxo global de acesso
+  negado.
+- **Refresh so por gesto**, sem polling e sem recarga ao recuperar foco. Consulta em voo e
+  substituida: resposta tardia da anterior nao sobrescreve a lista mais nova.
+- **Cadastro e remocao se bloqueiam mutuamente** — os dois dialogos nunca se sobrepoem.
+- Remocao **sem `Idempotency-Key`**: o `DELETE` e idempotente por contrato, entao nao ha intencao a
+  preservar.
+
+### Estados e acessibilidade
+
+- Tres superficies da listagem (lista / vazia `200 []` / erro tecnico com retry), badge de status
+  **textual** (a cor nao e o unico portador), `caption` na tabela e regiao nomeada por
+  `aria-labelledby`.
+- Dialogos com `aria-modal`, foco de entrada e retorno ao gatilho, `Escape` e trap de `Tab`.
+- Abaixo de 768px a tabela vira cartoes empilhados: o `display: flex` sobre `tr`/`td` desfaz os
+  papeis nativos `row`/`cell`, entao o `thead` sai da arvore de acessibilidade (`display: none`) e
+  o rotulo de cada coluna passa a vir do `data-label`. **Nenhuma coluna, estado ou acao e ocultada.**
+
+### Testes
+
+- Vitest **664** (87 arquivos), Playwright **36** (+5 desta sprint), lint/scss/build e
+  `contract:check` verdes.
+- MSW stateful (`chavesPixHandlers`, `seedChavesPix`, `resetChavesPixState`) cobre lista com
+  `ATIVA`+`INATIVA`, `201`/`200`/`400`/`409`/`422` no cadastro e `204`/`404` na remocao, validando
+  step-up e `Idempotency-Key`. O mock **nao reimplementa a regra do backend** (DV, formato por
+  tipo): reconhece valores sentinela para produzir `400` e `422`.
+
+### Limitacoes da fase
+
+- Provider **fake/local**: nenhuma chave real e criada ou removida no DICT.
+- Cadastro e remocao concluidos com token TOTP real exigem o desafio MFA (sem handler offline) e
+  ficam para o smoke local com backend `:8080`. O smoke offline prova o redirecionamento ao step-up
+  e a **ausencia de auto-submit** no retorno.
+- A superficie de lista vazia so seria alcancavel offline removendo as duas chaves do seed, o que
+  depende do step-up acima; e coberta no Vitest da pagina.
+- A negacao da **rota** para role indevida nao e demonstravel no smoke offline (um `page.goto`
+  reinicia o MSW e a sessao volta ao usuario default); e coberta nos testes de `roleGuard` e da
+  configuracao de rotas no Vitest. O smoke cobre a ausencia do item de menu.

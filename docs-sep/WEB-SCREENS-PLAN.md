@@ -642,6 +642,12 @@ Observacoes:
   backends das Sprints 29-30; provider fake/local. Detalhe em
   [`repos/sep-app/README.md` §F-Sprint 18](../repos/sep-app/README.md). Gestao de chaves Pix ficou
   fora (decisao do Gate F-18.0; destino web posterior dedicado).
+- **Implementado na F-Sprint 20** (web): gestao assistida das **chaves Pix da conta
+  operacional/escrow** em `/app/pix/chaves`, fechando a pendencia do Gate F-18.0. Listagem sempre
+  mascarada com historico `INATIVA`, cadastro idempotente e remocao logica, ambos com step-up
+  estrito; sub-rota com `roleGuard` proprio (`FINANCEIRO`/`ADMIN`, sem `BACKOFFICE`). Consome o
+  backend da Sprint 31; provider fake/local. Detalhe em
+  [`repos/sep-app/README.md` §F-Sprint 20](../repos/sep-app/README.md).
 
 ### 6.8 Administracao e Governanca
 
