@@ -61,6 +61,24 @@ Leitura base para qualquer agente:
 > [`120`](specs/fase-4/120-fsprint-20-chaves-pix-web.md) + steps
 > [`120`](steps-fase-4/web/120-fsprint-20-steps.md)): fecha o **Gate F-18.0** e **conclui o recorte
 > web do marco `v1.0-local`**. Com ela, **backend e web da Fase 4 estao fechados**.
+> **Par corretivo aberto em 2026-07-29** — a jornada de conta bloqueada nao chega em
+> `/account-locked`. Duas sprints, dois lados do mesmo defeito, **independentes para implementar**;
+> so o smoke real contra `:8080` exige as duas: **Sprint backend 33** (spec
+> [`033`](specs/fase-4/033-sprint-33-lockout-conformidade.md) + steps
+> [`033`](steps-fase-4/backend/033-sprint-33-steps.md); branch
+> `feature/sprint-33-lockout-conformidade`) alinha a politica de lockout a regra documentada
+> (5 falhas em 15 min -> 30 min de bloqueio, antes implementada como contagem em 30 min) e eleva o
+> rate limit acima do limiar, porque com ambos em 5 o `429` mascara o `423` — **MERGEADA develop+main
+> em 2026-07-29 via PR #101 (squash `a613c6c`) + PR #102 (`15f7833`); `develop` == `main` conferido
+> por conteudo. Verificacoes verdes (2173 testes, `clean build`/`spotlessCheck`)**; detalhe em
+> [`SPRINT-33-PR.md`](repos/sep-api/SPRINT-33-PR.md). A IT revelou que nenhuma falha chegava a
+> `login_attempt` (registro desfeito pelo rollback do `BadCredentialsException`): o account lockout
+> nunca bloqueou de fato desde a Sprint 5, corrigido com `REQUIRES_NEW`. Ainda **pendente** a
+> **F-Sprint 21 web** (planejada para 2026-07-30)
+> (spec [`121`](specs/fase-4/121-fsprint-21-lockout-login-web.md) + steps
+> [`121`](steps-fase-4/web/121-fsprint-21-steps.md); branch `feature/fsprint-21-lockout-login-web`)
+> faz o login diferenciar status de erro e o mock MSW produzir `423`. Nenhuma das duas entrega escopo
+> novo — corrigem um requisito ja entregue pela Sprint 5 (Fase 2).
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
@@ -86,8 +104,10 @@ Leitura base para qualquer agente:
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
 > lojas e go-live de producao (conformidade CMN 4.656/LGPD). Cada frente e **gated** pelo acesso
 > correspondente (credenciais Celcoin, conta AWS, contas de loja). Specs e steps just-in-time em
-> `specs/fase-5/` e `steps-fase-5/`. Numeracao: backend Sprint 33+, infra I-Sprint 1+, mobile M-17+,
-> go-live G-1+.
+> `specs/fase-5/` e `steps-fase-5/`. Numeracao: backend Sprint **34+** (a 33 foi consumida pela
+> correcao de lockout na Fase 4, spec [`033`](specs/fase-4/033-sprint-33-lockout-conformidade.md)),
+> infra I-Sprint 1+, mobile M-17+, go-live G-1+. Web na Fase 5 segue F-Sprint **22+** (a 21 foi
+> consumida pela mesma correcao).
 
 ## Pacotes de leitura por tarefa
 
@@ -155,6 +175,7 @@ Leitura base para qualquer agente:
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |
 | jornada de usuario, teste manual, roteiro de teste, smoke local, checklist de QA, validacao fim-a-fim | repo **`sep-test-app`** (irmao): [`CENARIOS-TESTE-JORNADAS-USUARIO.md`](../sep-test-app/CENARIOS-TESTE-JORNADAS-USUARIO.md) (hub); preparo de ambiente e bootstrap do primeiro ADMIN em [`ROTEIRO-00`](../sep-test-app/ROTEIRO-00-AMBIENTE-E-MASSA.md); execucao pelo app via `npm start` (autosave em `data/db.json`; `dados.js` gerado por `npm run gerar`) |
 | MFA, TOTP, refresh, step-up, auditoria de seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) |
+| conta bloqueada, lockout, `/account-locked`, rate limit no login, mensagens de erro do login web | [`docs-sep/SEGURANCA.md` §5](docs-sep/SEGURANCA.md) (politica autoritativa) + backend [`005`](specs/fase-2/005-sprint-5-endurecimento-seguranca.md) Task 5.4/5.8 + **par corretivo 2026-07-29**: backend [`033`](specs/fase-4/033-sprint-33-lockout-conformidade.md)/[`step 033`](steps-fase-4/backend/033-sprint-33-steps.md) (janela 15/30 min + `423` alcancavel) e web [`121`](specs/fase-4/121-fsprint-21-lockout-login-web.md)/[`step 121`](steps-fase-4/web/121-fsprint-21-steps.md) (mensagens por status + mock `423`) |
 | multi-role, roles cumulativas, FINANCEIRO+BACKOFFICE, parametros operacionais, governanca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) §multi-role + [`018`](specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) |
 | governanca web, roles na UI, parametros operacionais web, /app/admin | [`112`](specs/fase-3/112-fsprint-12-governanca-web.md) (mergeada PR #51 -> develop) + [`step 112`](steps-fase-3/web/112-fsprint-12-steps.md) + [`repos/sep-app/README.md`](repos/sep-app/README.md) §Administracao e governanca |
 | tela web, Angular, design Apple/Notion | [`docs-sep/WEB-SCREENS-PLAN.md`](docs-sep/WEB-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) quando envolver UI/design atual |

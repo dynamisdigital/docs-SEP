@@ -10,25 +10,48 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-21._
+_Atualizado em: 2026-07-29._
 
 ## Leia agora
 
-- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). **Backend e web da Fase 4 fechados**
-  (Sprints 27-32; F-16 a F-20 mergeadas); mobile **M-13 e M-16 mergeadas**;
-  **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate externo de hardware macOS**
-  (ver §Gates externos). **Nao ha frente executavel restante na Fase 4** — a decisao pendente e
-  de rumo: fechar a fase com as dividas registradas (§41 do PRD-FASE-4, ainda em branco) ou
-  abrir a Fase 5 nas frentes que nao dependem dos gates externos.
-- **Spec/step ativo**: F-Sprint 20 (web) **MERGEADA** develop+main via PR #107 (squash `66b5f04`)
-  + PR #108 (`c00d8ae`); `develop` == `main` conferido por diff de conteudo — spec
-  [`120`](../specs/fase-4/120-fsprint-20-chaves-pix-web.md) + steps
-  [`120`](../steps-fase-4/web/120-fsprint-20-steps.md); detalhe em
-  [`SPRINT-F-20-PR.md`](../repos/sep-app/SPRINT-F-20-PR.md).
-  **Fecha o Gate F-18.0** e conclui o recorte web do marco `v1.0-local`.
+- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend (Sprints 27-32) e web (F-16 a F-20)
+  fechados; mobile **M-13 e M-16 mergeadas**; **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate
+  externo de hardware macOS** (ver §Gates externos). **Par corretivo de lockout** aberto em
+  2026-07-29 (a jornada de conta bloqueada nunca funcionou de fato): **Sprint 33 backend MERGEADA
+  develop+main** e **F-Sprint 21 web pendente** (planejada para 2026-07-30). Fora esse par e os
+  gates externos, a decisao restante e de rumo: fechar a Fase 4 com as dividas registradas (§41 do
+  PRD-FASE-4, ainda em branco) ou abrir a Fase 5.
+- **Spec/step ativo**: Sprint 33 (backend) **MERGEADA** develop+main em 2026-07-29 via PR #101
+  (squash `a613c6c`) + PR #102 (`15f7833`); `develop` == `main` conferido por diff de conteudo
+  (vazio) — conformidade da politica de lockout. Spec
+  [`033`](../specs/fase-4/033-sprint-33-lockout-conformidade.md) + steps
+  [`033`](../steps-fase-4/backend/033-sprint-33-steps.md); detalhe em
+  [`SPRINT-33-PR.md`](../repos/sep-api/SPRINT-33-PR.md). Sem migration, sem estado novo, sem ADR. O
+  lado web e a **F-Sprint 21** ([`121`](../specs/fase-4/121-fsprint-21-lockout-login-web.md)), ainda
+  nao iniciada (planejada para 2026-07-30).
 
 ## Onde estamos
 
+- **Sprint 33 (backend) MERGEADA develop+main em 2026-07-29** — conformidade da politica de account
+  lockout (Fase 4, par corretivo; sem escopo novo). Em `origin/develop` via PR #101 (squash
+  `a613c6c`) e promovida a `main` via PR #102 (`15f7833`); `develop` == `main` conferido por diff de
+  conteudo (vazio). `estaBloqueada` deixa de aproximar por contagem na janela de 30 min e passa a exigir que
+  as 5 falhas mais recentes caibam em 15 min; o bloqueio de 30 min conta **do evento**, nao do
+  envelhecimento das falhas. A decisao virou o value object puro `PoliticaLockout` (testavel sem
+  banco/relogio); o `LoginAttemptRepository` so entrega instantes de falha. Audit `LOCKOUT` + email
+  passam a ser emitidos **na transicao** (nao por `== maxAttempts`, que perdia o bloqueio no salto de
+  contador 4->6); `CONTA_BLOQUEADA` sai da contagem (evita bloqueio auto-perpetuante). Rate limit de
+  login/TOTP de 5 para **10** com a invariante `rate-limit > max-attempts` comentada — com ambos em 5
+  o `429` mascarava o `423`. **A IT nova (`LockoutLoginIT`) revelou que nenhuma falha chegava a
+  `login_attempt`**: o registro entrava na transacao do `AutenticarUsuarioUseCase` e era desfeito
+  pelo `BadCredentialsException` — o account lockout **nunca bloqueou de fato desde a Sprint 5**;
+  corrigido com `REQUIRES_NEW` no registro e na avaliacao. OpenAPI de login e TOTP verify passam a
+  declarar `423`/`429`. **2173 testes, 0 falhas** (+22 `@Test`); `clean build`/`spotlessCheck`
+  verdes. Sem migration, sem estado novo, sem ADR. Risco residual aceito (decidido pelo usuario):
+  seguir a doc torna o sistema 2x mais permissivo contra brute force lento (384/dia/conta vs 192);
+  controle compensatorio fica como follow-up. Detalhe em
+  [`SPRINT-33-PR.md`](../repos/sep-api/SPRINT-33-PR.md). O lado web e a **F-Sprint 21**, ainda
+  pendente. Nada mudou em `sep-app`/`sep-mobile`.
 - **F-Sprint 20 (web) MERGEADA em 2026-07-21** — gestao assistida das chaves Pix da conta
   operacional/escrow (Epic 15; consome o backend da Sprint 31). Em `origin/develop` via PR #107
   (squash `66b5f04`, 11 commits absorvidos) e promovida a `main` via PR #108 (`c00d8ae`);
@@ -146,25 +169,33 @@ _Atualizado em: 2026-07-21._
 
 ## Proximo passo
 
-1. **Manual (dev humano)**: revisar e commitar as mudancas de `docs-SEP` (fechamento F-20: spec/steps
-   120 marcados como concluidos, `specs/fase-4/README.md`, README do `sep-app`, AI-ROADMAP,
-   PRD-FASE-4 §36/§37, STATE/historico). `SPRINT-F-20-PR.md` **permanece** ate a proxima sprint
-   abrir (ciclo padrao: a descricao anterior e removida ao abrir a seguinte).
-2. **Decisao de rumo (nao ha frente executavel na Fase 4)**. Duas opcoes, ambas legitimas:
+1. **F-Sprint 21 (web) — lado web do par corretivo** (planejada para 2026-07-30; **proxima frente**):
+   spec [`121`](../specs/fase-4/121-fsprint-21-lockout-login-web.md) + steps
+   [`121`](../steps-fase-4/web/121-fsprint-21-steps.md): login diferencia status de erro e o mock
+   MSW produz `423`. Independente da 33 para implementar; so o smoke real contra `:8080` exige as
+   duas. **Ao abrir**: remover `SPRINT-33-PR.md` (ciclo padrao) e criar `SPRINT-F-21-PR.md` no fecho.
+2. **Manual (dev humano) — commitar `docs-SEP`**: fechamento da Sprint 33 (SEGURANCA.md §5/§10,
+   AI-ROADMAP, STATE/historico, `SPRINT-33-PR.md`; `SPRINT-32-PR.md` ja removido). O `sep-api` ja
+   esta mergeado develop+main (PR #101/#102). **Apos o merge web da F-21** (ou antes, se preferir):
+   renovar o snapshot OpenAPI no `sep-app` e remover a entrada de `knownGaps` do `423`/`429`.
+3. **Decisao de rumo** (apos o par corretivo; fora dele so restam os gates externos). Duas opcoes,
+   ambas legitimas:
    - **fechar a Fase 4** preenchendo o §41 do PRD-FASE-4 (hoje em branco) com status, PRs,
      back-merges e as dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do
      Epic 14 (M-14/M-15) entram como adiados, nao como pendencias em aberto; ou
    - **abrir a Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)) nas frentes que nao dependem de
      credencial Celcoin, conta AWS ou conta de loja.
-3. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+4. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos). Enquanto ele nao abre, avaliar o fallback por runner CI macOS (spec 214.3.4)
    para validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
    spec e permanece preso ao gate.
-4. **Follow-ups tecnicos abertos** (nao bloqueiam): race condition de duplo toque em
-   `consultarStatusPix` no `sep-mobile` (M-11.4, ja em `main`; mesma correcao ja aplicada aos
-   aportes na M-16); smoke `golden-path-mobile` vermelho desde a M-13; `X-Step-Up-Token` fora do
-   OpenAPI (`knownGaps[0]` do `contract:check` — follow-up backend); escopo mobile adiado pelo
-   Gate M-16.0 (matching, aporte POST, chaves Pix) registrado na spec 216.
+5. **Follow-ups tecnicos abertos** (nao bloqueiam): da Sprint 33 — registrar tentativas
+   `CONTA_BLOQUEADA`, `ContaBloqueadaException` com tempo restante, evicção do `RateLimiterRegistry`,
+   validador de startup da invariante `rate-limit > max-attempts`, assert do audit `LOCKOUT` na
+   `LockoutLoginIT`, controle compensatorio contra brute force lento; race condition de duplo toque
+   em `consultarStatusPix` no `sep-mobile` (M-11.4, ja em `main`); smoke `golden-path-mobile`
+   vermelho desde a M-13; `X-Step-Up-Token` fora do OpenAPI (`knownGaps[0]` do `contract:check`);
+   escopo mobile adiado pelo Gate M-16.0 (matching, aporte POST, chaves Pix) registrado na spec 216.
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
 

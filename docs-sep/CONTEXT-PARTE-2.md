@@ -1361,3 +1361,62 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   (removido no ciclo padrao ao abrir a proxima sprint); spec 120, steps 120,
   `specs/fase-4/README.md`, `AI-ROADMAP.md`, `PRD-FASE-4.md` §36/§37, `STATE.md` e este historico
   atualizados.
+
+## Sprint 33 — Conformidade da politica de account lockout (backend, 2026-07-29)
+
+- **Contexto**: par corretivo (lado backend) de um defeito ja entregue pela Sprint 5 (Fase 2) — a
+  jornada de conta bloqueada nunca chegava ao cliente. O `sep-api` documentava "5 falhas em 15 min ->
+  bloqueio de 30 min" mas implementava uma aproximacao e o `423` era mascarado pelo rate limit.
+  **Sem escopo novo, sem migration, sem estado persistido novo, sem ADR.** Branch
+  `feature/sprint-33-lockout-conformidade` (de `develop` em `7f40056`). O lado web e a **F-Sprint 21**
+  (spec 121), independente para implementar; so o smoke real contra `:8080` exige as duas.
+- **Task 33.1 — regra exata**: `estaBloqueada` deixa de contar na janela de 30 min e passa a exigir
+  que as `maxAttempts` (5) falhas mais recentes caibam na janela de 15 min; o bloqueio de 30 min
+  conta **do evento** (a falha que fechou a janela), nao do envelhecimento das falhas. A decisao foi
+  extraida para o value object puro `PoliticaLockout` (`eventoDeBloqueio(instantes, agora)`), testavel
+  sem banco e sem relogio real; o `LoginAttemptRepository` ganhou `buscarInstantesDeFalha` (ordem
+  decrescente, filtro por status de falha, limite defensivo via `Pageable`) e **so entrega dados**.
+  Code review 33.1: `PoliticaLockout` rejeita janela/duracao negativas (evita fail-open silencioso via
+  env var); assert do `Pageable` como limite (nao paginacao) impede que `PageRequest.of(1, ...)`
+  desligue o lockout com a suite verde; assercao exata da janela de leitura (antes tolerava 60s de
+  erro de relogio).
+- **Task 33.2 — transicao + saneamento**: `avaliarPosFalha` emite audit `LOCKOUT` + email **na
+  transicao** (quando a falha recem-registrada e a que trancou a conta), nao mais por
+  `falhasJanela == maxAttempts` — corrige o salto de contador 4->6 que deixava o bloqueio sem registro.
+  `CONTA_BLOQUEADA` sai de `STATUSES_FALHA` (nenhum caminho de producao o escreve; se escrevesse, cada
+  tentativa barrada renovaria o bloqueio — auto-perpetuante). Enum, constraint e o teste do mapeamento
+  permanecem.
+- **Task 33.3 — `423` alcancavel + bug de transacao**: `login-per-minute-per-ip` e
+  `totp-verify-per-minute-per-ip` de 5 para **10**, com a invariante `rate-limit > max-attempts`
+  comentada no `application.yml` (com ambos em 5 o `429` mascarava o `423`). A IT nova `LockoutLoginIT`
+  dirige 5 logins falhos reais e prova `401` x5 -> `423` na 6a (corpo `ErrorResponseDto`,
+  `error: "Locked"`), sem sobrescrever o rate limit default. **A IT revelou que nenhuma falha chegava
+  a `login_attempt`**: `RegistrarTentativaLoginUseCase.registrar` corria na transacao do
+  `AutenticarUsuarioUseCase` e era desfeito pelo `BadCredentialsException` lancado em seguida — **o
+  account lockout nunca bloqueou de fato desde a Sprint 5**. Correcao: `registrar` e `avaliarPosFalha`
+  passam a `@Transactional(REQUIRES_NEW)`.
+- **Task 33.4 — contrato + docs**: `@ApiResponse` `423` e `429` (ambos `ErrorResponseDto`) em
+  `POST /api/v1/auth/login` e `POST /api/v1/auth/totp/verify`; `SEGURANCA.md` §5 reescrito com a regra
+  exata, o desbloqueio so por expiracao (sem desbloqueio manual) e o risco residual, e §10 com os
+  novos defaults. Fecha o `knownGaps` do `423`/`429` que a F-Sprint 21 registra no `sep-app` (renovar
+  o snapshot OpenAPI pos-merge).
+- **Risco residual aceito (decisao do usuario, 2026-07-29)**: cumprir a regra documentada torna o
+  sistema 2x mais permissivo contra brute force lento — para nunca bloquear, o atacante passa de 4
+  falhas/30 min (192/dia/conta) para 4 falhas/15 min (384/dia/conta); o rate limit por IP nao
+  restringe ataque distribuido por conta. Nao e defeito de implementacao; controle compensatorio
+  (backoff exponencial ou rate limit por conta) fica como follow-up.
+- **Verificacoes**: `./gradlew clean build`, `./gradlew test` e `./gradlew spotlessCheck` verdes;
+  **2173 testes, 0 falhas** (branch adiciona +22 `@Test`). Sem migration; `git diff` da branch nao
+  toca `db/migration`.
+- **Follow-ups registrados**: registrar tentativas `CONTA_BLOQUEADA`; `ContaBloqueadaException` com
+  tempo restante; evicção do `RateLimiterRegistry`; renovar snapshot OpenAPI no `sep-app`; validador de
+  startup da invariante `rate-limit > max-attempts` (hoje so os defaults sao cobertos); assert do audit
+  `LOCKOUT` na `LockoutLoginIT`; controle compensatorio contra brute force lento.
+- **Estado**: **MERGEADA develop+main em 2026-07-29** — em `origin/develop` via PR #101 (squash
+  `a613c6c`) e promovida a `main` via PR #102 (`15f7833`); `develop` == `main` conferido por diff de
+  conteudo (vazio). Nada mudou em `sep-app`/`sep-mobile`.
+- **Artefatos**: no `sep-api` — `PoliticaLockout` (novo), `LockoutService`, `LoginAttemptRepository`,
+  `RegistrarTentativaLoginUseCase`, `AuthController`/`MfaController` (OpenAPI), `application.yml`,
+  testes (`PoliticaLockoutTest` novo, `LockoutServiceTest`, `LoginAttemptRepositoryTest`,
+  `LockoutLoginIT` novo). No `docs-SEP` — `SEGURANCA.md` §5/§10, `AI-ROADMAP.md`, `STATE.md`, este
+  historico e `SPRINT-33-PR.md` (criado; `SPRINT-32-PR.md` removido no ciclo padrao).

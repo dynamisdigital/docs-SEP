@@ -140,8 +140,13 @@ recebam dois pares validos.
 
 ### Rate limit (`RateLimitFilter`)
 
-- Em `POST /api/v1/auth/login`: 5 requests por minuto por IP.
-- Em `POST /api/v1/auth/totp/verify`: 5 requests por minuto por IP.
+- Em `POST /api/v1/auth/login`: 10 requests por minuto por IP (Sprint 33; era 5).
+- Em `POST /api/v1/auth/totp/verify`: 10 requests por minuto por IP (Sprint 33; era 5).
+- **Invariante (Sprint 33)**: os limites por IP devem ser estritamente
+  **maiores** que `lockout.max-attempts`. O filtro roda antes do controller;
+  com os dois valores em 5, a 6a tentativa — a unica capaz de responder `423`
+  — era barrada com `429` e o cliente nunca via o bloqueio. O rate limit
+  protege o servico; quem protege a conta e o lockout.
 - Backend: Resilience4j `RateLimiterRegistry` com chave dinamica `login:<ip>` /
   `totp-verify:<ip>`.
 - Excedido: `429 Too Many Requests` com `ErrorResponseDto` JSON e header
@@ -149,12 +154,31 @@ recebam dois pares validos.
 
 ### Account lockout (`LockoutService`)
 
-- Janela de detecao: 15 minutos. Apos 5 tentativas falhas (senha invalida ou
-  TOTP invalido), a conta entra em lockout por 30 minutos.
+- Regra exata (conformidade na Sprint 33): a conta bloqueia quando as 5
+  tentativas falhas mais recentes (senha invalida ou TOTP invalido) cabem numa
+  janela de 15 minutos. O bloqueio dura 30 minutos **contados da falha que
+  fechou a janela** (o evento de bloqueio), nao do envelhecimento das falhas.
+  Ate a Sprint 33 a implementacao aproximava por contagem na janela de 30 min
+  — bloqueava 5 falhas espalhadas por 25 min e estendia o bloqueio conforme
+  falhas antigas saiam da janela.
+- Desbloqueio **somente por expiracao** dos 30 minutos. Nao existe desbloqueio
+  manual (administrativo ou self-service); senha correta durante o bloqueio
+  tambem recebe `423` (o lockout e verificado antes da credencial).
+- Sem estado persistido: o bloqueio e derivado de `login_attempt` na leitura.
+  `CONTA_BLOQUEADA` nao conta como falha (nenhum caminho de producao o
+  escreve; se contasse, cada tentativa barrada renovaria o proprio bloqueio).
 - HTTP 423 Locked (`ContaBloqueadaException`, codigo `AUTH-423-001`).
-- Cada lockout grava `LOCKOUT` em `audit_log_seguranca` e dispara email via
-  `EmailService` (dev-local: `LogEmailService` apenas registra; em ambientes
-  reais, integrar SES/SMTP).
+- Audit `LOCKOUT` + email sao emitidos **na transicao** (quando a falha
+  recem-registrada e a que trancou a conta), uma vez por evento de bloqueio,
+  em transacao propria (`REQUIRES_NEW`) — o registro da tentativa e o audit
+  sobrevivem ao rollback do `BadCredentialsException` do chamador (dev-local:
+  `LogEmailService` apenas registra; em ambientes reais, integrar SES/SMTP).
+- **Risco residual aceito (Sprint 33)**: cumprir a regra documentada torna o
+  sistema 2x mais permissivo contra brute force lento — para nunca bloquear,
+  o atacante passa de 4 falhas/30 min (192/dia/conta) para 4 falhas/15 min
+  (384/dia/conta), e o rate limit por IP nao restringe ataque distribuido.
+  Controle compensatorio (backoff exponencial ou rate limit por conta) e
+  follow-up registrado, fora do escopo da Sprint 33.
 
 ## 6. Step-up authentication
 
@@ -291,9 +315,11 @@ app:
       issuer: ${APP_TOTP_ISSUER:SEP}
       window-size: ${APP_TOTP_WINDOW_SIZE:1}
       encryption-key: ${APP_TOTP_ENCRYPTION_KEY:dev-totp-encryption-key-min-32-bytes-please-change}
+    # Invariante Sprint 33: rate limit por IP estritamente > lockout.max-attempts,
+    # senao o 423 fica inalcancavel (o filtro barra a 6a tentativa com 429).
     rate-limit:
-      login-per-minute-per-ip: ${APP_RATE_LIMIT_LOGIN:5}
-      totp-verify-per-minute-per-ip: ${APP_RATE_LIMIT_TOTP_VERIFY:5}
+      login-per-minute-per-ip: ${APP_RATE_LIMIT_LOGIN:10}
+      totp-verify-per-minute-per-ip: ${APP_RATE_LIMIT_TOTP_VERIFY:10}
     lockout:
       max-attempts: ${APP_LOCKOUT_MAX_ATTEMPTS:5}
       window-minutes: ${APP_LOCKOUT_WINDOW_MINUTES:15}

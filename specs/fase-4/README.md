@@ -27,6 +27,7 @@ As tabelas usam a ordem recomendada de execucao.
 | 30 | [`030-sprint-30-credora-matching-operacao.md`](./030-sprint-30-credora-matching-operacao.md) | Matching credora<->operacao (assistido) | 7 |
 | 31 | [`031-sprint-31-pix-gestao-chaves.md`](./031-sprint-31-pix-gestao-chaves.md) | Gestao de chaves Pix (assistido, Provider Pattern) | 6 |
 | 32 | [`032-sprint-32-adapters-celcoin-skeleton.md`](./032-sprint-32-adapters-celcoin-skeleton.md) | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar) | 5 |
+| 33 | [`033-sprint-33-lockout-conformidade.md`](./033-sprint-33-lockout-conformidade.md) | Conformidade da politica de lockout (15/30 min) + `423` alcancavel — **correcao de defeito**; **MERGEADA develop+main** (PR #101/#102, 2026-07-29) | 4 |
 
 ## Web (`sep-app`)
 
@@ -37,6 +38,7 @@ As tabelas usam a ordem recomendada de execucao.
 | F-18 | [`118-fsprint-18-aporte-matching-credora-web.md`](./118-fsprint-18-aporte-matching-credora-web.md) | Aporte e matching da credora no web | 6 |
 | F-19 | [`119-fsprint-19-hardening-tooling-contrato-web.md`](./119-fsprint-19-hardening-tooling-contrato-web.md) | Hardening de tooling + refresh contrato/collection | 5 |
 | F-20 | [`120-fsprint-20-chaves-pix-web.md`](./120-fsprint-20-chaves-pix-web.md) | Gestao de chaves Pix no web — **concluida** (PR #107/#108, 2026-07-21; fecha a pendencia do Gate F-18.0 e o recorte web do `v1.0-local`) | 7 |
+| F-21 | [`121-fsprint-21-lockout-login-web.md`](./121-fsprint-21-lockout-login-web.md) | Jornada de conta bloqueada no login web — **correcao de defeito** (bug reportado 2026-07-29; requisito original da Sprint 5/Fase 2) | 4 |
 
 ## Mobile (`sep-mobile`)
 
@@ -54,6 +56,11 @@ As tabelas usam a ordem recomendada de execucao.
 - Web F-16 depende da Sprint backend 24 (ja mergeada); F-17 e gap-closing (escopo confirmado no
   precheck); F-18 depende das Sprints backend 29-30; F-19 depende do OpenAPI vigente; F-20 depende da Sprint
   backend 31 (chaves Pix) e fecha a pendencia de visibilidade web do Gate F-18.0.
+- **Par corretivo 33 + F-21 (2026-07-29)**: dois lados do mesmo defeito (a jornada de conta bloqueada
+  nao chega em `/account-locked`). Sao **independentes para implementar** — a 33 nao depende da F-21
+  e a F-21 usa mock — mas o **smoke real** contra `:8080` so fecha com as duas integradas. Nenhuma
+  das duas entrega escopo novo: corrigem no backend e no web um requisito ja entregue pela Sprint 5
+  (Fase 2). A Task 33.4 tambem quita o `knownGaps` de `423`/`429` que a F-21 registra.
 - Mobile M-13 -> M-14 (nativo); M-15 depende da base nativa (M-13/M-14) e da Sprint 27; M-16 depende
   das Sprints backend 29-31 e da M-Sprint 10.
 - **Dependencia de persona (Gate M-16.0, 2026-07-20)**: contratos backend que exigem
