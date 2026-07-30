@@ -40,6 +40,7 @@ As tabelas usam a ordem recomendada de execucao.
 | F-19 | [`119-fsprint-19-hardening-tooling-contrato-web.md`](./119-fsprint-19-hardening-tooling-contrato-web.md) | Hardening de tooling + refresh contrato/collection | 5 |
 | F-20 | [`120-fsprint-20-chaves-pix-web.md`](./120-fsprint-20-chaves-pix-web.md) | Gestao de chaves Pix no web — **concluida** (PR #107/#108, 2026-07-21; fecha a pendencia do Gate F-18.0 e o recorte web do `v1.0-local`) | 7 |
 | F-21 | [`121-fsprint-21-lockout-login-web.md`](./121-fsprint-21-lockout-login-web.md) | Jornada de conta bloqueada no login web — **correcao de defeito**; **MERGEADA develop+main** (PR #113/#114, 2026-07-30; fecha o par corretivo com a Sprint 33; smoke real contra `:8080` aprovado) | 4 |
+| F-22 | [`122-fsprint-22-contrato-erro-followups-web.md`](./122-fsprint-22-contrato-erro-followups-web.md) | Contrato de erro verificavel no `contract:check` (status de erro + gap obsoleto) e follow-ups da F-21 (`verify-totp`, foco/landmarks, registro orfao, helper de erro) — **correcao de divida**; planejada | 6 |
 
 ## Mobile (`sep-mobile`)
 
@@ -49,6 +50,7 @@ As tabelas usam a ordem recomendada de execucao.
 | M-14 | [`214-msprint-14-empacotamento-nativo-ios.md`](./214-msprint-14-empacotamento-nativo-ios.md) | Empacotamento nativo iOS (Capacitor 8) | 4 |
 | M-15 | [`215-msprint-15-biometria-nativa.md`](./215-msprint-15-biometria-nativa.md) | Biometria nativa (substitui stub PWA) + hardening | 6 |
 | M-16 | [`216-msprint-16-aporte-pix-avancado-mobile.md`](./216-msprint-16-aporte-pix-avancado-mobile.md) | Aporte/matching e chaves Pix na credora mobile — **concluida com escopo reduzido** (Gate M-16.0: so aportes owner-scoped; matching/aporte POST/chaves Pix adiados por exigirem `FINANCEIRO`) | 6 -> 3 |
+| M-17 | [`217-msprint-17-followups-lockout-a11y-mobile.md`](./217-msprint-17-followups-lockout-a11y-mobile.md) | Jornada de conta bloqueada alcancavel e testada, race de duplo toque em `consultarStatusPix` (2 componentes), landmark `main` duplicado dentro do `ion-content` e recuperacao do smoke `golden-path-mobile` — **correcao de divida**; planejada | 6 |
 
 ## Dependencias gerais
 
@@ -62,6 +64,11 @@ As tabelas usam a ordem recomendada de execucao.
   e a F-21 usa mock — mas o **smoke real** contra `:8080` so fecha com as duas integradas. Nenhuma
   das duas entrega escopo novo: corrigem no backend e no web um requisito ja entregue pela Sprint 5
   (Fase 2). A Task 33.4 tambem quita o `knownGaps` de `423`/`429` que a F-21 registra.
+- **F-Sprint 22 (2026-07-30)**: par web da Sprint 34, tambem de divida. **As Tasks F-22.1 a F-22.5 sao
+  independentes** e podem rodar antes da 34; a **F-22.6 exige a 34 mergeada** e o `sep-api` no ar para
+  regenerar o snapshot OpenAPI — diferente do par 33/F-21, onde o mock bastava, porque aqui o
+  `contract:check` valida contra o snapshot versionado. O que ela entrega e o `423` deixar de poder
+  sumir do backend sem falhar nada em CI.
 - **Sprint 34 (2026-07-30)**: sprint de divida, nao de produto. Consome os follow-ups que a 33 e a
   F-21 registraram e as lacunas de OpenAPI abertas pela F-19 desde 2026-07-16. Depende da 33 (opera
   sobre o codigo que ela deixou) e nao desbloqueia frente nova — o que ela entrega e o
@@ -70,6 +77,10 @@ As tabelas usam a ordem recomendada de execucao.
   de fechamento.
 - Mobile M-13 -> M-14 (nativo); M-15 depende da base nativa (M-13/M-14) e da Sprint 27; M-16 depende
   das Sprints backend 29-31 e da M-Sprint 10.
+- **M-Sprint 17 (2026-07-30)**: terceira sprint de divida da fase, junto com a 34 e a F-22, e a
+  **unica das tres sem dependencia nenhuma** — nao consome contrato novo do `sep-api` (o `423` existe
+  desde a Sprint 5; a Sprint 33 apenas o tornou alcancavel). Pode rodar a qualquer momento, em
+  paralelo com as outras duas. **Nao** reabre o escopo do Gate M-16.0, que segue exigindo ADR.
 - **Dependencia de persona (Gate M-16.0, 2026-07-20)**: contratos backend que exigem
   `FINANCEIRO`/`ADMIN` sao inalcancaveis pelo `sep-mobile`, que so conhece
   `UsuarioRole = 'ADMIN' | 'CLIENTE'`. Antes de planejar sprint mobile sobre contrato novo,

@@ -18,21 +18,55 @@ _Atualizado em: 2026-07-30._
   fechados e mergeados; mobile **M-13 e M-16 mergeadas**; **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate
   externo de hardware macOS** (ver §Gates externos). O **par corretivo de lockout** aberto em
   2026-07-29 esta **fechado nos dois lados e mergeado**: Sprint 33 backend (PR #101/#102) e
-  F-Sprint 21 web (PR #113/#114). A divida que ele deixou registrada virou a **Sprint 34 (backend),
-  planejada em 2026-07-30 e ainda nao iniciada** — e a unica frente executavel restante da Fase 4.
-  Depois dela, a decisao e de rumo: fechar a Fase 4 (§41 do PRD-FASE-4, ainda em branco) ou abrir a
-  Fase 5.
+  F-Sprint 21 web (PR #113/#114). A divida acumulada virou **tres sprints planejadas em 2026-07-30 e
+  ainda nao iniciadas**: **Sprint 34 (backend)**, **F-Sprint 22 (web)** e **M-Sprint 17 (mobile)** — as
+  frentes executaveis restantes da Fase 4. A M-17 **nao depende de nenhuma das outras duas**. Depois
+  delas, a decisao e de rumo: fechar a Fase 4 (§41 do PRD-FASE-4, ainda em branco) ou abrir a Fase 5.
 - **Spec/step ativo**: **Sprint 34 (backend) — planejada, nao iniciada**. Spec
   [`034`](../specs/fase-4/034-sprint-34-followups-lockout-contrato.md) + steps
   [`034`](../steps-fase-4/backend/034-sprint-34-steps.md); branch sugerida
   `feature/sprint-34-followups-lockout-contrato`. Quita os cinco follow-ups backend da Sprint 33 e as
   cinco lacunas de OpenAPI que o `contract:check` do `sep-app` carrega como `knownGaps` desde a
   F-Sprint 19 (2026-07-16). **Com migration** (`V60`, amplia `chk_audit_seguranca_tipo`); sem estado
-  novo, sem ADR. Sem escopo de produto novo.
+  novo, sem ADR. Sem escopo de produto novo. O par web e a **F-Sprint 22**, spec
+  [`122`](../specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) + steps
+  [`122`](../steps-fase-4/web/122-fsprint-22-steps.md), tambem planejada e nao iniciada; **suas Tasks 1
+  a 5 nao dependem da 34** e podem rodar em paralelo.
 
 ## Onde estamos
 
-- **Sprint 34 (backend) PLANEJADA em 2026-07-30 — proxima frente, nao iniciada.** Sprint de divida,
+- **M-Sprint 17 (mobile) PLANEJADA em 2026-07-30 — nao iniciada, e sem dependencia nenhuma.** Spec
+  [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + steps
+  [`217`](../steps-fase-4/mobile/217-msprint-17-steps.md). Seis tasks, quatro defeitos independentes:
+  (a) **a jornada de conta bloqueada e inalcancavel e nao testada** — o mock nunca produz `423`
+  (`handlers.ts:46-62`), e embora o mobile **ja trate `423` em tres camadas** (login, verify-totp,
+  `errorInterceptor`), **nenhuma tem teste**; `verify-totp` e `account-locked` nao tem spec;
+  (b) a race de duplo toque em `consultarStatusPix` existe em **dois** componentes
+  (`portfolio-detail:130` e `parcela-detail:138`), nao um — o molde do fix e o teste por mutacao ja
+  vieram prontos da M-16; (c) **landmark `main` duplicado**: o `ion-content` do Ionic ja e
+  `role="main"` e 4 telas aninham um `<main>` dentro dele — problema **inverso** ao do web, onde
+  faltava landmark; (d) o smoke `golden-path-mobile` esta vermelho **desde a M-4** (nao desde a M-13,
+  como este arquivo registrava): sao 3 causas — seletor `/cadastr/i` que nunca casou com o CTA "Criar
+  conta", MSW nao ativado e senha do fixture violando a politica. **Fora de escopo**: plugar o MSW no
+  Vitest, `focusManagerPriority` global, portar o `contract:check` e o escopo do Gate M-16.0 (exige
+  ADR) — todos registrados como follow-up. Baseline medida: Vitest **503 / 68 arquivos**, Playwright
+  **27 (26 passam, 1 falha)**.
+- **F-Sprint 22 (web) PLANEJADA em 2026-07-30 — nao iniciada.** Par web da Sprint 34, tambem de
+  divida. Seis tasks. O item de maior valor nao e de tela: **`consumed-contracts.json` declara as 85
+  operacoes com `sucesso: [200]` e nenhum status de erro, e o `contract-check.mjs` so inspeciona
+  sucesso** — se o backend removesse o `423`, o `contract:check` passaria verde e a jornada de conta
+  bloqueada voltaria a quebrar em silencio. O checker tambem **nao detecta `knownGap` obsoleto**: os
+  quatro predicados `existeGap*` sao `.some()` puros, e o `knownGaps[0]` (`X-Step-Up-Token`,
+  `appliesTo: "*"`) produz sozinho 18 das 29 lacunas do output. As outras frentes sao os follow-ups da
+  F-21: `verify-totp` com o mesmo callback de erro pelado que o login tinha (**e sem nenhuma cobertura
+  — sem spec, sem e2e, sem handler MSW de TOTP**), foco em `access-denied` (que ja tem landmark; o gap
+  e so foco), landmark em `verify-totp` e `redirect-to-app`, remocao dos 4 arquivos orfaos do
+  `RegisterComponent` e consolidacao da extracao de mensagem de erro, hoje duplicada em **7 helpers /
+  56 chamadas** mais 9 sites inline. **Os 3 links "Criar conta" ficam** — levam ao
+  `RedirectToAppComponent` por decisao da Sprint 5 e sao travados por spec e e2e; o codigo morto e o
+  componente, nao a rota. A **Task 6 tem gate na Sprint 34** (mergeada + snapshot regenerado): consome
+  `politica-lockout` e `Retry-After`. Baseline de partida: Vitest 685/88, Playwright 38/11.
+- **Sprint 34 (backend) PLANEJADA em 2026-07-30 — nao iniciada.** Sprint de divida,
   nao de produto: consome os follow-ups que a 33 e a F-21 registraram e as lacunas de OpenAPI abertas
   pela F-19. Sete tasks: observabilidade da tentativa barrada (hoje **nenhuma tentativa contra conta
   bloqueada deixa rastro**, porque `verificar()` lanca antes de `registrar(...)`) com tipo de audit
@@ -203,40 +237,61 @@ _Atualizado em: 2026-07-30._
 
 ## Proximo passo
 
-1. **Sprint 34 (backend) — proxima frente** (planejada em 2026-07-30, **nao iniciada**): spec
+1. **Sprint 34 (backend)** (planejada em 2026-07-30, **nao iniciada**): spec
    [`034`](../specs/fase-4/034-sprint-34-followups-lockout-contrato.md) + steps
    [`034`](../steps-fase-4/backend/034-sprint-34-steps.md). Comecar pelo **Gate 34.0** (cadeia Git,
    baseline de **2173 testes** e reconfirmacao do estado levantado) antes de qualquer Task. Sete
    tasks, uma migration (`V60`), sem ADR.
-2. **Manual (dev humano) — commitar `docs-SEP`**: criacao da spec/steps 034 e as atualizacoes de
-   indice deste ciclo (`specs/fase-4/README.md`, `PRD-FASE-4.md` §36 — que **tambem ganhou a linha da
-   Sprint 33, ausente ate agora** —, `AI-ROADMAP.md` e este arquivo). As descricoes de PR
+2. **F-Sprint 22 (web)** (planejada em 2026-07-30, **nao iniciada**): spec
+   [`122`](../specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) + steps
+   [`122`](../steps-fase-4/web/122-fsprint-22-steps.md). **Independente da 34 nas Tasks 1 a 5** — pode
+   rodar em paralelo ou antes. O **Gate F-22.0 exige destravar o Playwright na maquina de dev**
+   (`chromium_headless_shell-1228` ausente; `test-results/`, `playwright-report/` e
+   `node_modules/.vite-temp` root-owned), senao a baseline de 38 e2e nao e verificavel — e o CI **nao**
+   roda Playwright.
+3. **M-Sprint 17 (mobile)** (planejada em 2026-07-30, **nao iniciada**): spec
+   [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + steps
+   [`217`](../steps-fase-4/mobile/217-msprint-17-steps.md). **Sem dependencia** — pode rodar a qualquer
+   momento, em paralelo com a 34 e a F-22. O **Gate M-17.0 exige remover
+   `node_modules/.vite-temp`** (root-owned apos execucao em container; o Vitest aborta com `EACCES`
+   antes de rodar qualquer teste) e **anotar sem corrigir** o vermelho preexistente do
+   `golden-path-mobile`, que e a Task M-17.6.
+4. **Manual (dev humano) — commitar `docs-SEP`**: criacao das specs/steps 034, 122 e 217 e as
+   atualizacoes de indice deste ciclo (`specs/fase-4/README.md`, `PRD-FASE-4.md` §36 — que **tambem ganhou a linha
+   da Sprint 33, ausente ate agora** —, `AI-ROADMAP.md` e este arquivo). As descricoes de PR
    `SPRINT-33-PR.md` e `SPRINT-F-21-PR.md` foram removidas no ciclo padrao de abertura de sprint,
-   junto com as referencias a elas.
-3. **Decisao de rumo** (depois da Sprint 34; fora dela so restam os gates externos). Duas
-   opcoes, ambas legitimas:
+   junto com as referencias a elas. `repos/sep-mobile/SPRINT-M-16-PR.md` segue pendente de remocao
+   (M-16 mergeada em 2026-07-20).
+5. **Decisao de rumo** (depois das tres sprints de divida — 34, F-22 e M-17; fora delas so restam os
+   gates externos). Duas opcoes, ambas legitimas:
    - **fechar a Fase 4** preenchendo o §41 do PRD-FASE-4 (hoje em branco) com status, PRs,
      back-merges e as dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do
      Epic 14 (M-14/M-15) entram como adiados, nao como pendencias em aberto; ou
    - **abrir a Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)) nas frentes que nao dependem de
      credencial Celcoin, conta AWS ou conta de loja.
-4. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+6. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos). Enquanto ele nao abre, avaliar o fallback por runner CI macOS (spec 214.3.4)
    para validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
    spec e permanece preso ao gate.
-5. **Follow-ups tecnicos abertos** (nao bloqueiam). **Absorvidos pela Sprint 34** (backend, ainda nao
+7. **Follow-ups tecnicos abertos** (nao bloqueiam). **Absorvidos pela Sprint 34** (backend, ainda nao
    executada): registrar tentativas `CONTA_BLOQUEADA`, tempo restante no `423`, evicção do
    `RateLimiterRegistry`, validador de startup da invariante `rate-limit > max-attempts`, assert do
    audit `LOCKOUT` na `LockoutLoginIT`, expor `lockout-minutes` no contrato e `X-Step-Up-Token` fora
-   do OpenAPI (`knownGaps[0]`). **Seguem abertos**: controle compensatorio contra brute force lento
-   (exige ADR); da F-Sprint 21 — `verify-totp.component.ts` com o mesmo callback de erro pelado que o
-   login tinha, mock do `sep-mobile` sem `423`, `access-denied.component.ts` com o mesmo gap de foco
-   em destino de redirect, `verify-totp` e `redirect-to-app` sem landmark `<main>`,
-   `RegisterComponent` como codigo morto (nao roteado) e `contract:check` sem opiniao sobre status de
-   erro (o descriptor declara so `sucesso: [200]`, entao remover o `423` do backend passaria verde —
-   escopo web); race condition de duplo toque em
-   `consultarStatusPix` no `sep-mobile` (M-11.4, ja em `main`); smoke `golden-path-mobile`
-   vermelho desde a M-13;
+   do OpenAPI (`knownGaps[0]`). **Absorvidos pela F-Sprint 22** (web, ainda nao executada):
+   `verify-totp.component.ts` com o mesmo callback de erro pelado que o login tinha, gap de foco em
+   `access-denied.component.ts` (que **ja tem landmark** — a redacao anterior deste item estava
+   errada), landmark ausente em `verify-totp` e `redirect-to-app`, `RegisterComponent` como codigo
+   morto e `contract:check` sem opiniao sobre status de erro. **Seguem abertos**: controle
+   compensatorio contra brute force lento (exige ADR); rotulo "Criar conta" prometendo formulario e
+   entregando pagina informativa (UX, nao defeito); auto-cadastro web descontinuado na Sprint 5;
+   `idCurto` e `formatarMoeda` duplicados em 6 arquivos cada (o segundo com **duas assinaturas**);
+   Playwright fora do CI-APP. **Absorvidos pela M-Sprint 17** (mobile, ainda nao executada): mock do
+   `sep-mobile` sem `423` e as tres camadas de `423` sem teste; race condition de duplo toque em
+   `consultarStatusPix` nos **dois** componentes; `<main>` aninhado dentro do `ion-content`; foco nos
+   destinos de redirect; smoke `golden-path-mobile`. **Seguem abertos no mobile**: plugar o MSW no
+   Vitest; `focusManagerPriority` global no `provideIonicAngular()`; ausencia de `contract:check` no
+   `sep-mobile`; Playwright fora do `CI-MOBILE`; `README.md` do `sep-mobile` dizendo "Vitest 2" com o
+   repo em Vitest 3;
    escopo mobile adiado pelo Gate M-16.0 (matching, aporte POST, chaves Pix) registrado na spec 216.
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)

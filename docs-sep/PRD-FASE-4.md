@@ -171,7 +171,7 @@ quitando a divida que o par corretivo registrou; no mobile restam M-14/M-15, blo
 externo de hardware macOS). Cada
 sprint mantem no maximo 7 tasks de implementacao; precheck, E2E/smoke, documentacao e collections nao
 entram na contagem. As **specs ja existem** em [`specs/fase-4/`](../specs/fase-4/README.md)
-(18 arquivos, incluindo a `120` criada para o Gate F-18.0 e o trio corretivo `033`/`121`/`034`); os **steps** continuam **just-in-time**
+(20 arquivos, incluindo a `120` criada para o Gate F-18.0, o par corretivo `033`/`121` e o trio de divida `034`/`122`/`217`); os **steps** continuam **just-in-time**
 em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-15, mobile ate M-12).
 
 ### Backend (`sep-api`)
@@ -197,6 +197,7 @@ em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numer
 | F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | concluida (2026-07-16; em `develop` por push direto fast-forward — desvio aceito — e `main` via PR #96; `contract:check` + snapshot OpenAPI, audit 9->0 dentro do Angular 20, collections Postman/Insomnia renovadas sem PII/secrets, [ADR 0018](../adr/0018-avaliacao-angular-22-no-web.md) ADIA Angular 22 com revisao em 2026-09-30) |
 | F-20 | Epic 15 | Gestao de chaves Pix da conta operacional no web (fecha o Gate F-18.0) | [`120`](../specs/fase-4/120-fsprint-20-chaves-pix-web.md) | concluida (PR #107 develop / #108 main, 2026-07-21; lista mascarada + cadastro e remocao assistidos com step-up estrito, `roleGuard` proprio `FINANCEIRO`/`ADMIN` mais restrito que `/app/pix`, idempotencia por intencao preservada no round-trip de step-up; valor bruto nunca lido nem persistido; Vitest 664, Playwright 36, `contract:check`/audit verdes. **Fecha o recorte web do `v1.0-local`**) |
 | F-21 | Follow-up / correcao de defeito | Jornada de conta bloqueada no login web (lado web do par corretivo com a Sprint 33) | [`121`](../specs/fase-4/121-fsprint-21-lockout-login-web.md) | concluida (PR #113 develop / #114 main, 2026-07-30; login distingue `400`/`401`/`423`/`429`/rede em vez de acusar senha invalida em tudo e usa o `message` do corpo onde ele e autoritativo; navegacao do `423` segue exclusiva do `errorInterceptor`; `/account-locked` com cada afirmacao conferida contra o `sep-api`, mais landmark e foco no heading; mock MSW stateful. Vitest 685, Playwright 38, snapshot OpenAPI renovado para `a613c6c`, `contract:check`/audit verdes; smoke real contra `:8080` aprovado. **Nao entrega escopo novo**: corrige requisito da Sprint 5/Fase 2) |
+| F-22 | Follow-up / correcao de divida | Contrato de erro verificavel no `contract:check` (status de erro declarados + deteccao de `knownGap` obsoleto) e follow-ups da F-21: `verify-totp` por status, foco em `access-denied`, landmarks, remocao do registro orfao, helper unico de erro; Task final consome a Sprint 34 | [`122`](../specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) | planejada (2026-07-30; Tasks 1-5 independentes, Task 6 com gate na Sprint 34) |
 
 ### Mobile (`sep-mobile`)
 
@@ -206,6 +207,7 @@ em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numer
 | M-14 | Epic 14 | Empacotamento nativo iOS (Capacitor 8) | [`214`](../specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) | **bloqueada por gate externo** (2026-07-20): exige host macOS 13+ Ventura para Xcode 15+; ver §38 e [`STATE.md`](./STATE.md) §Gates externos |
 | M-15 | Epic 14 | Biometria nativa (substitui stub PWA) + hardening nativo | [`215`](../specs/fase-4/215-msprint-15-biometria-nativa.md) | **bloqueada pelo mesmo gate macOS** (depende da base nativa iOS da M-14) |
 | M-16 | Epic 14/15 | Aporte/matching e Pix avancado visiveis ao usuario (quando backend existir) | [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) | concluida com **escopo reduzido** (PR #124/#125, 2026-07-20; Gate M-16.0: so a leitura owner-scoped de aportes — matching, aporte POST e chaves Pix exigem `FINANCEIRO`/`ADMIN`, role inexistente no `sep-mobile`) |
+| M-17 | Follow-up / correcao de divida | Jornada de conta bloqueada alcancavel e testada (o mock nunca produziu `423`, e as tres camadas que ja o tratam nao tinham teste), guard de reentrancia em `consultarStatusPix` nos **dois** componentes, landmark `main` duplicado dentro do `ion-content` em 4 telas, foco nos destinos de redirect e recuperacao do smoke `golden-path-mobile` (vermelho desde a **M-4**, nao desde a M-13) | [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) | planejada (2026-07-30; sem dependencia de sprint backend nem web) |
 
 **Decisoes de planejamento**:
 

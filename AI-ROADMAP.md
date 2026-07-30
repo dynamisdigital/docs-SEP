@@ -39,8 +39,8 @@ Leitura base para qualquer agente:
 > das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
 > planejamento de infraestrutura AWS (Epic 16) e follow-ups de go-live. Fecha o marco `v1.0-local`
 > (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). **Specs criadas** em
-> [`specs/fase-4/`](specs/fase-4/README.md) (18 arquivos: backend `027`-`034`, web `116`-`121`,
-> mobile `213`-`216`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
+> [`specs/fase-4/`](specs/fase-4/README.md) (20 arquivos: backend `027`-`034`, web `116`-`122`,
+> mobile `213`-`217`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
 > Sprint 27+, web F-16+, mobile M-13+. A F-16 web esta **concluida** (PR #87/#88 +
 > follow-up #89/#90, 2026-07-15; steps [`116`](steps-fase-4/web/116-fsprint-16-steps.md)).
 > A F-17 web esta **concluida** (PR #92/#93, 2026-07-15; spec
@@ -86,7 +86,13 @@ Leitura base para qualquer agente:
 > (observabilidade da tentativa barrada, `Retry-After`, invariante de config, evicção do registry e
 > as lacunas de OpenAPI da F-19) e a **Sprint 34**, spec
 > [`034`](specs/fase-4/034-sprint-34-followups-lockout-contrato.md) + steps
-> [`034`](steps-fase-4/backend/034-sprint-34-steps.md), **planejada em 2026-07-30**.
+> [`034`](steps-fase-4/backend/034-sprint-34-steps.md), **planejada em 2026-07-30**. O par web dela e a
+> **F-Sprint 22** (spec [`122`](specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) + steps
+> [`122`](steps-fase-4/web/122-fsprint-22-steps.md), **planejada em 2026-07-30**), que torna o contrato
+> de erro verificavel em CI — hoje `consumed-contracts.json` declara so `sucesso: [200]` e o checker so
+> inspeciona sucesso, entao o backend remover o `423` passaria verde — e quita os follow-ups de tela da
+> F-21. **Suas Tasks 1 a 5 nao dependem da Sprint 34**; so a Task 6 exige a 34 mergeada e o snapshot
+> regenerado.
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
@@ -105,8 +111,16 @@ Leitura base para qualquer agente:
 > (`UsuarioRole = 'ADMIN' | 'CLIENTE'`), e ficaram **adiados** — reativa-los exige ADR + revisao da
 > spec 216, ou backend admitindo a credora dona nesses contratos; o item de Pix avancado **nao** e
 > fechado pela M-16 no mobile. A pendencia web equivalente **foi fechada pela F-Sprint 20**
-> (Gate F-18.0). A **frente executavel restante na Fase 4 e a Sprint 34** (backend, divida do par
-> corretivo); fora dela, so M-14 e M-15, ambas presas ao gate de hardware macOS.
+> (Gate F-18.0). As **frentes executaveis restantes na Fase 4 sao tres sprints de divida**: Sprint 34
+> (backend), F-Sprint 22 (web) e **M-Sprint 17** (mobile, spec
+> [`217`](specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + steps
+> [`217`](steps-fase-4/mobile/217-msprint-17-steps.md), planejada em 2026-07-30) — esta ultima **sem
+> dependencia nenhuma**, podendo rodar em paralelo com as outras duas: torna a jornada de conta
+> bloqueada alcancavel e testada no mobile (o mock nunca produziu `423`, e as tres camadas que ja o
+> tratam nao tinham teste), fecha a race de duplo toque em `consultarStatusPix` nos **dois**
+> componentes, remove o landmark `main` duplicado dentro do `ion-content` e recupera o smoke
+> `golden-path-mobile`, vermelho desde a **M-4**. Fora delas, so M-14 e M-15, presas ao gate de
+> hardware macOS.
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
@@ -116,8 +130,11 @@ Leitura base para qualquer agente:
 > correcao de lockout na Fase 4, spec [`033`](specs/fase-4/033-sprint-33-lockout-conformidade.md), e
 > a 34 pelos follow-ups dela, spec
 > [`034`](specs/fase-4/034-sprint-34-followups-lockout-contrato.md)),
-> infra I-Sprint 1+, mobile M-17+, go-live G-1+. Web na Fase 5 segue F-Sprint **22+** (a 21 foi
-> consumida pela mesma correcao).
+> infra I-Sprint 1+, mobile **M-18+** (a 17 foi consumida pelos follow-ups de lockout/a11y na Fase 4,
+> spec [`217`](specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md)), go-live G-1+. Web na
+> Fase 5 segue F-Sprint **23+** (a 21 foi
+> consumida pela mesma correcao e a 22 pelos follow-ups dela, spec
+> [`122`](specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md)).
 
 ## Pacotes de leitura por tarefa
 
