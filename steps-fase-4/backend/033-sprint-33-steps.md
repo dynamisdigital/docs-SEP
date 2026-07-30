@@ -5,7 +5,8 @@
 **Status**: **CONCLUIDA e MERGEADA develop+main (2026-07-29)** — Tasks 33.0-33.4 executadas; PR #101
 (squash `a613c6c`) em `develop` + PR #102 (`15f7833`) em `main`; `develop` == `main` por conteudo.
 2173 testes, 0 falhas; sem migration, sem estado novo, sem ADR. Detalhe em
-[`SPRINT-33-PR.md`](../../repos/sep-api/SPRINT-33-PR.md).
+[`CONTEXT-PARTE-2.md`](../../docs-sep/CONTEXT-PARTE-2.md) §Sprint 33. Os follow-ups que esta sprint
+registrou sao escopo da [`034`](../../specs/fase-4/034-sprint-34-followups-lockout-contrato.md).
 
 **Objetivo geral**: fazer o `sep-api` cumprir a politica de lockout que ele proprio documenta
 ("5 falhas em 15 minutos -> bloqueio de 30 minutos") e permitir que o cliente chegue a receber o

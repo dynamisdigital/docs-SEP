@@ -5,7 +5,8 @@
 - **ID da Spec**: 121
 - **Titulo**: F-Sprint 21 - Correcao da jornada de conta bloqueada (lockout) no login web
 - **Status**: **MERGEADA develop+main** (2026-07-30, PR #113/#114) — todas as tasks entregues,
-  smoke real contra `:8080` aprovado no criterio final. Detalhe em [`SPRINT-F-21-PR.md`](../../repos/sep-app/SPRINT-F-21-PR.md)
+  smoke real contra `:8080` aprovado no criterio final. Detalhe em
+  [`CONTEXT-PARTE-2.md`](../../docs-sep/CONTEXT-PARTE-2.md) §F-Sprint 21
 - **Fase do produto**: Fase 4 - correcao de requisito da Sprint 5 (Fase 2) no recorte web
 - **Trilha**: Web (`sep-app`)
 - **Origem**: bug reportado pelo dev em 2026-07-29 contra o backend real `:8080` — apos 5 senhas

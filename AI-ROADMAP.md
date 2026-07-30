@@ -39,7 +39,7 @@ Leitura base para qualquer agente:
 > das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
 > planejamento de infraestrutura AWS (Epic 16) e follow-ups de go-live. Fecha o marco `v1.0-local`
 > (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). **Specs criadas** em
-> [`specs/fase-4/`](specs/fase-4/README.md) (14 arquivos: backend `027`-`032`, web `116`-`119`,
+> [`specs/fase-4/`](specs/fase-4/README.md) (18 arquivos: backend `027`-`034`, web `116`-`121`,
 > mobile `213`-`216`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
 > Sprint 27+, web F-16+, mobile M-13+. A F-16 web esta **concluida** (PR #87/#88 +
 > follow-up #89/#90, 2026-07-15; steps [`116`](steps-fase-4/web/116-fsprint-16-steps.md)).
@@ -70,8 +70,7 @@ Leitura base para qualquer agente:
 > (5 falhas em 15 min -> 30 min de bloqueio, antes implementada como contagem em 30 min) e eleva o
 > rate limit acima do limiar, porque com ambos em 5 o `429` mascara o `423` — **MERGEADA develop+main
 > em 2026-07-29 via PR #101 (squash `a613c6c`) + PR #102 (`15f7833`); `develop` == `main` conferido
-> por conteudo. Verificacoes verdes (2173 testes, `clean build`/`spotlessCheck`)**; detalhe em
-> [`SPRINT-33-PR.md`](repos/sep-api/SPRINT-33-PR.md). A IT revelou que nenhuma falha chegava a
+> por conteudo. Verificacoes verdes (2173 testes, `clean build`/`spotlessCheck`)**. A IT revelou que nenhuma falha chegava a
 > `login_attempt` (registro desfeito pelo rollback do `BadCredentialsException`): o account lockout
 > nunca bloqueou de fato desde a Sprint 5, corrigido com `REQUIRES_NEW`. A **F-Sprint 21 web**
 > (spec [`121`](specs/fase-4/121-fsprint-21-lockout-login-web.md) + steps
@@ -82,9 +81,12 @@ Leitura base para qualquer agente:
 > autoritativo, `/account-locked` informa o prazo e o mecanismo reais de desbloqueio, e o mock MSW
 > produz `423` — Vitest **685**, Playwright **38**, snapshot OpenAPI renovado para `a613c6c` (sem
 > `knownGaps` novo). **Smoke real contra `:8080` aprovado no criterio final**: 5 senhas erradas e a
-> 6a, mesmo correta, cai em `/account-locked`. Detalhe em
-> [`SPRINT-F-21-PR.md`](repos/sep-app/SPRINT-F-21-PR.md). Nenhuma das duas entrega escopo novo —
-> corrigem um requisito ja entregue pela Sprint 5 (Fase 2).
+> 6a, mesmo correta, cai em `/account-locked`. Nenhuma das duas entrega escopo novo —
+> corrigem um requisito ja entregue pela Sprint 5 (Fase 2). A divida que o par deixou registrada
+> (observabilidade da tentativa barrada, `Retry-After`, invariante de config, evicção do registry e
+> as lacunas de OpenAPI da F-19) e a **Sprint 34**, spec
+> [`034`](specs/fase-4/034-sprint-34-followups-lockout-contrato.md) + steps
+> [`034`](steps-fase-4/backend/034-sprint-34-steps.md), **planejada em 2026-07-30**.
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
@@ -103,15 +105,17 @@ Leitura base para qualquer agente:
 > (`UsuarioRole = 'ADMIN' | 'CLIENTE'`), e ficaram **adiados** — reativa-los exige ADR + revisao da
 > spec 216, ou backend admitindo a credora dona nesses contratos; o item de Pix avancado **nao** e
 > fechado pela M-16 no mobile. A pendencia web equivalente **foi fechada pela F-Sprint 20**
-> (Gate F-18.0). **Nao ha frente executavel restante na Fase 4**: so M-14 e M-15, ambas presas ao
-> gate de hardware macOS.
+> (Gate F-18.0). A **frente executavel restante na Fase 4 e a Sprint 34** (backend, divida do par
+> corretivo); fora dela, so M-14 e M-15, ambas presas ao gate de hardware macOS.
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
 > lojas e go-live de producao (conformidade CMN 4.656/LGPD). Cada frente e **gated** pelo acesso
 > correspondente (credenciais Celcoin, conta AWS, contas de loja). Specs e steps just-in-time em
-> `specs/fase-5/` e `steps-fase-5/`. Numeracao: backend Sprint **34+** (a 33 foi consumida pela
-> correcao de lockout na Fase 4, spec [`033`](specs/fase-4/033-sprint-33-lockout-conformidade.md)),
+> `specs/fase-5/` e `steps-fase-5/`. Numeracao: backend Sprint **35+** (a 33 foi consumida pela
+> correcao de lockout na Fase 4, spec [`033`](specs/fase-4/033-sprint-33-lockout-conformidade.md), e
+> a 34 pelos follow-ups dela, spec
+> [`034`](specs/fase-4/034-sprint-34-followups-lockout-contrato.md)),
 > infra I-Sprint 1+, mobile M-17+, go-live G-1+. Web na Fase 5 segue F-Sprint **22+** (a 21 foi
 > consumida pela mesma correcao).
 

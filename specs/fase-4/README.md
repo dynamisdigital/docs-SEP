@@ -28,6 +28,7 @@ As tabelas usam a ordem recomendada de execucao.
 | 31 | [`031-sprint-31-pix-gestao-chaves.md`](./031-sprint-31-pix-gestao-chaves.md) | Gestao de chaves Pix (assistido, Provider Pattern) | 6 |
 | 32 | [`032-sprint-32-adapters-celcoin-skeleton.md`](./032-sprint-32-adapters-celcoin-skeleton.md) | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar) | 5 |
 | 33 | [`033-sprint-33-lockout-conformidade.md`](./033-sprint-33-lockout-conformidade.md) | Conformidade da politica de lockout (15/30 min) + `423` alcancavel — **correcao de defeito**; **MERGEADA develop+main** (PR #101/#102, 2026-07-29) | 4 |
+| 34 | [`034-sprint-34-followups-lockout-contrato.md`](./034-sprint-34-followups-lockout-contrato.md) | Follow-ups do lockout (observabilidade, `Retry-After`, invariante de config, evicção do registry) + divida de contrato OpenAPI (`knownGaps` da F-19) — **correcao de divida**; planejada | 7 |
 
 ## Web (`sep-app`)
 
@@ -61,6 +62,12 @@ As tabelas usam a ordem recomendada de execucao.
   e a F-21 usa mock — mas o **smoke real** contra `:8080` so fecha com as duas integradas. Nenhuma
   das duas entrega escopo novo: corrigem no backend e no web um requisito ja entregue pela Sprint 5
   (Fase 2). A Task 33.4 tambem quita o `knownGaps` de `423`/`429` que a F-21 registra.
+- **Sprint 34 (2026-07-30)**: sprint de divida, nao de produto. Consome os follow-ups que a 33 e a
+  F-21 registraram e as lacunas de OpenAPI abertas pela F-19 desde 2026-07-16. Depende da 33 (opera
+  sobre o codigo que ela deixou) e nao desbloqueia frente nova — o que ela entrega e o
+  `contract:check` passar a ter opiniao real sobre o `X-Step-Up-Token`, hoje silenciado em 18
+  endpoints por um `knownGap` com `appliesTo: "*"`. Toca o `sep-app` apenas em `contracts/`, no gate
+  de fechamento.
 - Mobile M-13 -> M-14 (nativo); M-15 depende da base nativa (M-13/M-14) e da Sprint 27; M-16 depende
   das Sprints backend 29-31 e da M-Sprint 10.
 - **Dependencia de persona (Gate M-16.0, 2026-07-20)**: contratos backend que exigem

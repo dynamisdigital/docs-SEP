@@ -5,7 +5,8 @@
 **Status**: **MERGEADA develop+main** (2026-07-30, PR #113 squash `b3e3f90` + PR #114 `84eb47c`).
 Gate F-21.0 e Tasks F-21.1 a F-21.4 executadas, cada uma com code review de subagente e hotfix
 pos-review; review manual do usuario sem findings. Smoke real contra `:8080` aprovado no criterio
-final (com a Sprint 33 integrada). Detalhe em [`SPRINT-F-21-PR.md`](../../repos/sep-app/SPRINT-F-21-PR.md).
+final (com a Sprint 33 integrada). Detalhe em
+[`CONTEXT-PARTE-2.md`](../../docs-sep/CONTEXT-PARTE-2.md) §F-Sprint 21.
 
 **Sprint irma**: [`033`](../backend/033-sprint-33-steps.md) (Sprint backend 33 - conformidade da
 politica de lockout, branch `feature/sprint-33-lockout-conformidade`). Ela eleva o rate limit acima do

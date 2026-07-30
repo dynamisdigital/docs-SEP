@@ -165,11 +165,13 @@ AWS.
 
 ## 36. Mapeamento Fase 4: Projetos x Sprints
 
-Mapa da fase com o status corrente de cada sprint (atualizado em 2026-07-30: backend e web
-**concluidos**, incluindo o par corretivo de lockout (Sprint 33 + F-21); no mobile restam M-14/M-15, bloqueadas por gate externo de hardware macOS). Cada
+Mapa da fase com o status corrente de cada sprint (atualizado em 2026-07-30: web **concluido**,
+incluindo o par corretivo de lockout (Sprint 33 + F-21); no backend a **Sprint 34 esta planejada**,
+quitando a divida que o par corretivo registrou; no mobile restam M-14/M-15, bloqueadas por gate
+externo de hardware macOS). Cada
 sprint mantem no maximo 7 tasks de implementacao; precheck, E2E/smoke, documentacao e collections nao
 entram na contagem. As **specs ja existem** em [`specs/fase-4/`](../specs/fase-4/README.md)
-(15 arquivos, incluindo a `120` criada para o Gate F-18.0); os **steps** continuam **just-in-time**
+(18 arquivos, incluindo a `120` criada para o Gate F-18.0 e o trio corretivo `033`/`121`/`034`); os **steps** continuam **just-in-time**
 em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numeracao continua a sequencia da Fase 3 (backend ate 26, web ate F-15, mobile ate M-12).
 
 ### Backend (`sep-api`)
@@ -182,6 +184,8 @@ em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numer
 | 30 | Epic 15 | Matching credora <-> operacao (assistido) | [`030`](../specs/fase-4/030-sprint-30-credora-matching-operacao.md) | concluida (PR #95 develop / #96 main, 2026-07-13) |
 | 31 | Epic 15 | Pix avancado — recorte inicial: gestao de chaves Pix (assistido) | [`031`](../specs/fase-4/031-sprint-31-pix-gestao-chaves.md) | concluida (PR #97 develop / #98 main, 2026-07-14) |
 | 32 | Epic 15 / integracao | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar; Fake segue default) | [`032`](../specs/fase-4/032-sprint-32-adapters-celcoin-skeleton.md) | concluida (PR #99 develop / #100 main, 2026-07-15; fecha o backend da Fase 4; ativacao real -> Fase 5) |
+| 33 | Follow-up / correcao de defeito | Conformidade da politica de lockout (5 falhas em 15 min -> 30 min de bloqueio) + `423` alcancavel (rate limit de 5 para 10) | [`033`](../specs/fase-4/033-sprint-33-lockout-conformidade.md) | concluida (PR #101 develop / #102 main, 2026-07-29; lado backend do par corretivo com a F-21. `PoliticaLockout` como value object puro; audit `LOCKOUT` na transicao; `REQUIRES_NEW` no registro da tentativa — a IT nova revelou que **nenhuma falha chegava a `login_attempt` desde a Sprint 5**, e o lockout nunca bloqueou de fato. 2173 testes; sem migration, sem estado novo, sem ADR) |
+| 34 | Follow-up / correcao de divida | Follow-ups do lockout (observabilidade da tentativa barrada, `Retry-After`, invariante de config no startup, evicção do `RateLimiterRegistry`, politica de lockout no contrato) + as 5 lacunas de OpenAPI registradas como `knownGaps` pela F-19 | [`034`](../specs/fase-4/034-sprint-34-followups-lockout-contrato.md) | planejada (2026-07-30; sem escopo de produto novo. Migration `V60` amplia `chk_audit_seguranca_tipo`) |
 
 ### Web (`sep-app`)
 
