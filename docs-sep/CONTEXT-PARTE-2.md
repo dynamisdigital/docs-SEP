@@ -1420,3 +1420,93 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   testes (`PoliticaLockoutTest` novo, `LockoutServiceTest`, `LoginAttemptRepositoryTest`,
   `LockoutLoginIT` novo). No `docs-SEP` — `SEGURANCA.md` §5/§10, `AI-ROADMAP.md`, `STATE.md`, este
   historico e `SPRINT-33-PR.md` (criado; `SPRINT-32-PR.md` removido no ciclo padrao).
+
+## F-Sprint 21 (web) — Jornada de conta bloqueada no login — CONCLUIDA na branch (2026-07-30)
+
+Lado web do par corretivo aberto em 2026-07-29; **correcao de defeito, sem escopo novo**. Spec
+[`121`](../specs/fase-4/121-fsprint-21-lockout-login-web.md) + steps
+[`121`](../steps-fase-4/web/121-fsprint-21-steps.md). Branch `feature/fsprint-21-lockout-login-web`
+(base `bffb6c8`), 7 commits; **push e PR manuais pendentes**.
+
+- **Gate F-21.0 — prechecks**: cadeia Git conferida (F-20 `66b5f04` em `develop`; `origin/main` a
+  frente por dois merges mas **diff de conteudo vazio**). Baseline Vitest 664/87, Playwright 36,
+  demais gates 0. **A reconferencia da ordem de avaliacao no `sep-api` derrubou uma premissa do
+  step**: o step 121.1.2 afirmava que `USUARIO_INEXISTENTE` conta no lockout — nao conta, nem hoje
+  nem antes da Sprint 33 (`LockoutService.STATUSES_FALHA = [SENHA_INVALIDA, TOTP_INVALIDO]`,
+  conferido tambem em `406eef8`). Verificado no fio contra `:8080`: 6 falhas de username inexistente
+  devolvem 6x `401` e gravam 6 linhas `USUARIO_INEXISTENTE`, nenhuma contada. O step foi corrigido.
+  O defeito foi reproduzido no cenario **com a Sprint 33** (a 6a tentativa imediata ja responde
+  `423`), o que fixou o criterio de aceite final do Step 121.4.3.
+- **Task F-21.1 — mock MSW stateful**: contador de falhas por usuario, `423` a partir da 6a,
+  bloqueio verificado **antes** da credencial (espelhando `AutenticarUsuarioUseCase`), sucesso nao
+  zera o contador. **Divergencia deliberada, decidida pelo dono do repo**: o mock conta tambem
+  username desconhecido, vazio ou fora do formato e-mail — o backend nao (os dois ultimos nem chegam
+  ao use case, caem em `400` por bean validation). O mock fica mais estrito que a producao; a
+  assimetria e segura (falha offline, passa em producao) e mantem `/account-locked` alcancavel
+  offline com qualquer e-mail. Comentada no codigo e travada por teste.
+- **Task F-21.2 — mensagens por status**: funcao pura local traduz o erro do login. `400` dados
+  invalidos, `401` credencial, `423` bloqueio, `429` rate limit por IP (explicitamente **nao** o
+  lockout), `0` conexao, `5xx`/demais entregam o `message` da API. Usa o corpo onde ele e
+  autoritativo: em `423` porque `lockout-minutes` e sobrescrevivel por ambiente, em `5xx` porque o
+  `withSupportReference` injeta ali o codigo de suporte. Guarda `instanceof HttpErrorResponse`
+  porque o `tap` de `AuthService.login` roda **depois** do `200`, fora do alcance do interceptor: um
+  `DOMException` de `localStorage` cheio chegava sem `status` e a tela culpava a conexao num login
+  que o servidor aceitou. O spec do login usava `provideHttpClient()` pelado, sem interceptor na
+  cadeia — passou a montar a cadeia real, com um ramo sem interceptor provando que o mapeamento
+  independe do redirect.
+- **Task F-21.3 — copy de `/account-locked`**: cada afirmacao foi conferida contra o `sep-api` e
+  quatro eram falsas ou incompletas. (1) "por 30 minutos": `PoliticaLockout` mede o prazo a partir da
+  falha que fecha a janela, nao de quando a tela abre — quem chega depois tem menos tempo restante;
+  virou "por ate 30 minutos, contados a partir da ultima tentativa". (2) "credenciais invalidas":
+  `TOTP_INVALIDO` tambem conta e `VerificarTotpUseCase` lanca o mesmo `423`, entao quem errou o
+  codigo caia ali sendo mandado trocar a senha; virou "senha ou codigo de verificacao". (3) "nao e
+  preciso acionar o suporte" fechava a porta de quem esqueceu a senha — **nao existe recuperacao de
+  senha para nao autenticado** no `sep-api`; virou "nao existe liberacao manual", que descreve o
+  sistema sem mandar desistir. (4) "revise os dispositivos conectados" apontava para capacidade
+  inexistente: nao ha tela de sessoes e `AuthService.logoutAll()` **nao tem nenhum chamador**;
+  removida. Confirmado por varredura que **nao ha caminho de desbloqueio manual**: nenhum endpoint de
+  unlock, nenhuma acao de backoffice, nenhum `delete*` em `LoginAttemptRepository`, nenhum job.
+  A pagina era ainda uma das **tres publicas sem landmark** (com `verify-totp` e `redirect-to-app`) e, sendo destino de redirect automatico,
+  deixava o usuario de leitor de tela em `<body>` sem anuncio — `<main>` + `<section
+  aria-labelledby>` + foco no heading, alinhando com `access-denied`/`login`/`register`/`landing`.
+- **Task F-21.4 — smoke, contrato e fechamento**: `e2e/account-locked.spec.ts` cobre 5 senhas erradas
+  -> 6a (com a senha **correta**) -> `/account-locked`, fiel a ordem do backend. Snapshot OpenAPI
+  renovado de `7f40056` para `a613c6c`, exportado do `:8080` com profile `dev`; **diferenca semantica
+  de exatamente 4 adicoes** (`423` e `429` em `/auth/login` e `/auth/totp/verify`, entregues pela
+  Task 33.4). **Nenhuma entrada de `knownGaps` foi criada**, conforme o proprio Step 121.4.2 manda
+  quando a Sprint 33 ja esta integrada; `contract:check` com saida identica ao baseline.
+- **Code review por subagentes, um por Task, com hotfix pos-review em todas as tres**. Os achados que
+  mais importaram: um mutante que tratava `429` como `423` no `errorInterceptor` — apagando a sessao
+  de um usuario apenas rate-limitado e mandando-o para `/account-locked` — **atravessou a suite
+  inteira de 676 testes**; e a spec de `/account-locked` era uma denylist de tres frases, entao um
+  mutante que revertia a intencao inteira do commit ("acione o atendimento e peca a reativacao")
+  passava verde. Ambos fechados: teste negativo do `429` e assercao da copy integral.
+- **Verificacao por mutacao** (manual, sem tooling: aplicar e reverter a quebra na producao):
+  **30 mutantes executados, 30 mortos** apos as correcoes; sete
+  sobreviveram na primeira rodada e foram exatamente o que motivou os commits de pos-review.
+- **Verificacoes**: Vitest **685 / 88 arquivos** (baseline 664/87), Playwright **38** (+2), lint,
+  SCSS lint, `format:check`, `contract:check`, build AOT e `npm audit --omit=dev` todos verdes.
+  **Smoke real contra `:8080` executado e aprovado no criterio final** (`sep-api` servindo conteudo
+  identico a `origin/develop`, front em `ng serve` com `useMsw: false`): 5 senhas erradas exibem a
+  mensagem de credencial e a 6a, com a senha correta, redireciona para `/account-locked`.
+- **Riscos aceitos**: o e2e e mais verde que a producao **de proposito** (o mock omite o `429`); o
+  mock nao simula janela nem duracao (sem relogio); o "30" de `/account-locked` continua literal e
+  desalinha se `APP_LOCKOUT_LOCKOUT_MINUTES` for sobrescrito — a `message` do servidor nao chega
+  aquela pagina, so ao login.
+- **Follow-ups registrados**: `verify-totp.component.ts` com o mesmo callback de erro pelado; mock do
+  `sep-mobile` sem `423`; `access-denied.component.ts` com o mesmo gap de foco; `verify-totp` e
+  `redirect-to-app` sem landmark `<main>`; `RegisterComponent` nao roteado (codigo morto, `/register`
+  carrega `RedirectToAppComponent`); **a renovacao do snapshot nao trava contrato nenhum hoje** —
+  `consumed-contracts.json` declara `auth.login`/`mfa.totpVerify` com `sucesso: [200]` e nenhum status
+  de erro, e o checker so inspeciona sucesso, entao o backend remover o `423` passaria verde; assert vacuo
+  pre-existente no caso de `401` do `error.interceptor.spec.ts`; `errorMessage.set(null)` load-bearing
+  para o `role="alert"` sem teste de duplo submit; backend expor `lockout-minutes` no contrato.
+- **Artefatos**: no `sep-app` — `src/mocks/handlers.ts`, `src/app/core/auth/auth.service.spec.ts`,
+  `src/app/features/public/login/login.component.ts`/`.spec.ts`,
+  `src/app/core/interceptors/error.interceptor.spec.ts`,
+  `src/app/features/public/account-locked/account-locked.component.ts`/`.spec.ts` (spec nova),
+  `e2e/account-locked.spec.ts` (novo), `contracts/openapi.snapshot.json` +
+  `contracts/openapi.snapshot.meta.json`. No `docs-SEP` — spec e steps `121` (com as correcoes
+  factuais), `SEGURANCA.md` §5 (subsecao nova "O que o usuario ve (web)"), `AI-ROADMAP.md`,
+  `specs/fase-4/README.md`, `STATE.md`, este historico e `SPRINT-F-21-PR.md` (criado;
+  `SPRINT-F-20-PR.md` removido no ciclo padrao).

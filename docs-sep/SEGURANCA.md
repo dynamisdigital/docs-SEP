@@ -180,6 +180,35 @@ recebam dois pares validos.
   Controle compensatorio (backoff exponencial ou rate limit por conta) e
   follow-up registrado, fora do escopo da Sprint 33.
 
+### O que o usuario ve (web, F-Sprint 21)
+
+O backend so protege a conta; quem informa o usuario e o front. Registrado aqui
+porque o defeito corrigido em 2026-07-30 passou 28 sprints despercebido — a
+politica estava documentada e implementada, mas a jornada nunca chegava ao fim.
+
+- **O HTTP status e o unico discriminador de categoria no fio.** O
+  `ErrorResponseDto` nao tem campo de codigo e o `AUTH-423-001` nunca e
+  serializado. O login mapeia `400`/`401`/`423`/`429`/rede para mensagens
+  distintas; antes tratava todos como senha invalida, entao um usuario com a
+  conta trancada era informado de que errou a senha.
+- **`429` nunca e apresentado como bloqueio.** Rate limit por IP nao tranca
+  conta nenhuma; confundir os dois informa um bloqueio inexistente e apaga a
+  sessao de quem so tentou rapido demais.
+- **O redirect de `423` para `/account-locked` vive so no `errorInterceptor`**
+  do `sep-app`, junto com `clearSession()`, e cobre tambem o `423` de
+  `/auth/totp/verify`. Nenhum componente duplica essa navegacao.
+- **`/account-locked` nao pode prometer o que o backend nao faz**: informa ate
+  30 minutos contados da ultima tentativa, desbloqueio automatico e a
+  inexistencia de liberacao manual. Nao cita suporte, reenvio nem revisao de
+  dispositivos — nao existe endpoint de unlock, nem recuperacao de senha para
+  usuario nao autenticado, nem tela de sessoes.
+- **O valor de `lockout-minutes` e sobrescrevivel por ambiente.** O login ecoa o
+  `message` do backend, entao acompanha um override; `/account-locked` nao (o
+  interceptor descarta o erro ao navegar) e fixa 30 — se o default mudar, essa
+  pagina desalinha. Follow-up: expor o valor no contrato.
+- O `sep-mobile` trata o `423` no proprio componente, porque la nao existe esse
+  redirect no interceptor; o mock de la ainda nao produz `423` (follow-up).
+
 ## 6. Step-up authentication
 
 Operacoes sensiveis (alterar senha, desabilitar MFA, futuras transacoes Pix /

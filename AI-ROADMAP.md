@@ -73,12 +73,17 @@ Leitura base para qualquer agente:
 > por conteudo. Verificacoes verdes (2173 testes, `clean build`/`spotlessCheck`)**; detalhe em
 > [`SPRINT-33-PR.md`](repos/sep-api/SPRINT-33-PR.md). A IT revelou que nenhuma falha chegava a
 > `login_attempt` (registro desfeito pelo rollback do `BadCredentialsException`): o account lockout
-> nunca bloqueou de fato desde a Sprint 5, corrigido com `REQUIRES_NEW`. Ainda **pendente** a
-> **F-Sprint 21 web** (planejada para 2026-07-30)
+> nunca bloqueou de fato desde a Sprint 5, corrigido com `REQUIRES_NEW`. A **F-Sprint 21 web**
 > (spec [`121`](specs/fase-4/121-fsprint-21-lockout-login-web.md) + steps
 > [`121`](steps-fase-4/web/121-fsprint-21-steps.md); branch `feature/fsprint-21-lockout-login-web`)
-> faz o login diferenciar status de erro e o mock MSW produzir `423`. Nenhuma das duas entrega escopo
-> novo — corrigem um requisito ja entregue pela Sprint 5 (Fase 2).
+> esta **CONCLUIDA na branch em 2026-07-30, aguardando push/PR manuais**: o login mapeia cada status
+> HTTP para a mensagem correta (`400`/`401`/`423`/`429`/rede) e usa o `message` do corpo onde ele e
+> autoritativo, `/account-locked` informa o prazo e o mecanismo reais de desbloqueio, e o mock MSW
+> produz `423` — Vitest **685**, Playwright **38**, snapshot OpenAPI renovado para `a613c6c` (sem
+> `knownGaps` novo). **Smoke real contra `:8080` aprovado no criterio final**: 5 senhas erradas e a
+> 6a, mesmo correta, cai em `/account-locked`. Detalhe em
+> [`SPRINT-F-21-PR.md`](repos/sep-app/SPRINT-F-21-PR.md). Nenhuma das duas entrega escopo novo —
+> corrigem um requisito ja entregue pela Sprint 5 (Fase 2).
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
@@ -175,7 +180,7 @@ Leitura base para qualquer agente:
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |
 | jornada de usuario, teste manual, roteiro de teste, smoke local, checklist de QA, validacao fim-a-fim | repo **`sep-test-app`** (irmao): [`CENARIOS-TESTE-JORNADAS-USUARIO.md`](../sep-test-app/CENARIOS-TESTE-JORNADAS-USUARIO.md) (hub); preparo de ambiente e bootstrap do primeiro ADMIN em [`ROTEIRO-00`](../sep-test-app/ROTEIRO-00-AMBIENTE-E-MASSA.md); execucao pelo app via `npm start` (autosave em `data/db.json`; `dados.js` gerado por `npm run gerar`) |
 | MFA, TOTP, refresh, step-up, auditoria de seguranca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) |
-| conta bloqueada, lockout, `/account-locked`, rate limit no login, mensagens de erro do login web | [`docs-sep/SEGURANCA.md` §5](docs-sep/SEGURANCA.md) (politica autoritativa) + backend [`005`](specs/fase-2/005-sprint-5-endurecimento-seguranca.md) Task 5.4/5.8 + **par corretivo 2026-07-29**: backend [`033`](specs/fase-4/033-sprint-33-lockout-conformidade.md)/[`step 033`](steps-fase-4/backend/033-sprint-33-steps.md) (janela 15/30 min + `423` alcancavel) e web [`121`](specs/fase-4/121-fsprint-21-lockout-login-web.md)/[`step 121`](steps-fase-4/web/121-fsprint-21-steps.md) (mensagens por status + mock `423`) |
+| conta bloqueada, lockout, `/account-locked`, rate limit no login, mensagens de erro do login web | [`docs-sep/SEGURANCA.md` §5](docs-sep/SEGURANCA.md) (politica autoritativa) + backend [`005`](specs/fase-2/005-sprint-5-endurecimento-seguranca.md) Task 5.4/5.8 + **par corretivo 2026-07-29/30, ambos os lados concluidos**: backend [`033`](specs/fase-4/033-sprint-33-lockout-conformidade.md)/[`step 033`](steps-fase-4/backend/033-sprint-33-steps.md) (janela 15/30 min + `423` alcancavel; mergeada develop+main) e web [`121`](specs/fase-4/121-fsprint-21-lockout-login-web.md)/[`step 121`](steps-fase-4/web/121-fsprint-21-steps.md) + [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md) §F-Sprint 21 (mensagens por status, copy conferida contra o backend, mock `423`; concluida na branch) |
 | multi-role, roles cumulativas, FINANCEIRO+BACKOFFICE, parametros operacionais, governanca | [`docs-sep/SEGURANCA.md`](docs-sep/SEGURANCA.md) §multi-role + [`018`](specs/fase-3/018-sprint-18-governanca-rbac-parametros.md) |
 | governanca web, roles na UI, parametros operacionais web, /app/admin | [`112`](specs/fase-3/112-fsprint-12-governanca-web.md) (mergeada PR #51 -> develop) + [`step 112`](steps-fase-3/web/112-fsprint-12-steps.md) + [`repos/sep-app/README.md`](repos/sep-app/README.md) §Administracao e governanca |
 | tela web, Angular, design Apple/Notion | [`docs-sep/WEB-SCREENS-PLAN.md`](docs-sep/WEB-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) quando envolver UI/design atual |

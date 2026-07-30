@@ -2,7 +2,9 @@
 
 **Spec de origem**: [`121-fsprint-21-lockout-login-web.md`](../../specs/fase-4/121-fsprint-21-lockout-login-web.md)
 
-**Status**: planejada (2026-07-29). Branch criada; nenhuma Task executada.
+**Status**: **CONCLUIDA** (2026-07-30). Gate F-21.0 e Tasks F-21.1 a F-21.4 executadas, cada uma com
+code review de subagente e hotfix pos-review. Smoke real contra `:8080` aprovado no criterio final
+(com a Sprint 33 integrada). Detalhe em [`SPRINT-F-21-PR.md`](../../repos/sep-app/SPRINT-F-21-PR.md).
 
 **Sprint irma**: [`033`](../backend/033-sprint-33-steps.md) (Sprint backend 33 - conformidade da
 politica de lockout, branch `feature/sprint-33-lockout-conformidade`). Ela eleva o rate limit acima do
@@ -45,8 +47,10 @@ F-Sprint 20 `66b5f04` e o merge `main -> develop`).
 - Politica de lockout (`LockoutProperties`, `application.yml`): `max-attempts=5`,
   `window-minutes=15`, `lockout-minutes=30`. **Nao ha endpoint de unlock**; o desbloqueio e por
   expiracao das falhas na janela.
-- Rate limit (`RateLimitFilter`): 5 POSTs/min/IP em `/auth/login` e `/auth/totp/verify`, refresh de
-  1 minuto, resposta `429` com o mesmo `ErrorResponseDto`.
+- Rate limit (`RateLimitFilter`): **10** POSTs/min/IP em `/auth/login` e `/auth/totp/verify`, refresh
+  de 1 minuto, resposta `429` com o mesmo `ErrorResponseDto`. Era 5 quando este step foi escrito; a
+  Sprint 33 elevou para 10 com a invariante `rate-limit > max-attempts` comentada no `application.yml`
+  — com ambos em 5, o `429` mascarava o `423`.
 
 ### Ordem de avaliacao no backend (define o comportamento do mock)
 
@@ -66,13 +70,13 @@ usuario e antes de registrar a tentativa. Consequencias que o mock precisa repro
 - **Login com sucesso nao zera o contador**: `estaBloqueada` apenas conta falhas na janela; nao ha
   reset em `LockoutService`.
 
-> **Nota de contrato**: o snapshot OpenAPI declara apenas `200/400/401` para `auth.login`
-> (`AuthController#login` nao tem `@ApiResponse` para `423`/`429`). Verificado em
-> `scripts/contract-check.mjs`: o checker inspeciona somente `sucesso`, entao consumir `423`/`429`
-> **nao quebra** `npm run contract:check`. A entrada em `knownGaps` da Task F-21.4 e registro de
-> divida do backend, nao correcao de check. **A divida tem dono e prazo**: a Task 33.4 da Sprint
-> backend declara os dois status; ao integra-la, renovar o snapshot e **remover** a entrada de
-> `knownGaps` — ela e temporaria por construcao.
+> **Nota de contrato — RESOLVIDA na execucao (2026-07-30).** O step previa registrar `423`/`429` em
+> `knownGaps` como divida do backend. Nao foi preciso: a Sprint 33 ja estava integrada em `develop`
+> quando a Task F-21.4 rodou, entao seguiu-se a instrucao do proprio Step 121.4.2 ("se a Sprint 33 for
+> integrada antes desta Task, pular o Step inteiro e apenas renovar o snapshot"). O snapshot foi
+> renovado de `7f40056` para `a613c6c`; a diferenca semantica e de exatamente 4 adicoes — `423` e
+> `429` em `/auth/login` e `/auth/totp/verify`. **Nenhuma entrada de `knownGaps` foi criada** e
+> `contract:check` produz saida identica ao baseline.
 
 ## Decisoes da sprint
 
@@ -99,7 +103,7 @@ usuario e antes de registrar a tentativa. Consequencias que o mock precisa repro
   de responsabilidade do frontend.
 - **Fidelidade do mock e deliberada, nao conveniencia**: checar bloqueio antes da credencial, sucesso
   nao zerar contador, `401` na 5a e `423` na 6a. Cada escolha rastreia uma linha do `sep-api`.
-- Estado de mock exige reset por spec (`resetLoginLockoutState`), no padrao de `resetPixState` /
+- Estado de mock exige reset por spec (`resetLoginMockState`), no padrao de `resetPixState` /
   `resetChavesPixState` / `resetGovernancaState`. **Vitest isola modulos por arquivo, nao por teste**:
   sem reset, o contador acumula e um teste nao relacionado acaba navegando para `/account-locked` no
   6o caso do arquivo.
@@ -245,11 +249,19 @@ Apos a declaracao de `currentMockUser`, no padrao dos `reset*State` existentes:
 
 ```text
 LOCKOUT_MAX_TENTATIVAS = 5
-falhasDeLoginPorUsuario: Record<string, number>
-export function resetLoginLockoutState(): void
+LOCKOUT_MINUTOS = 30
+falhasDeLoginPorUsuario: Map<string, number>
+export function resetLoginMockState(): void
 ```
 
 Comentar a origem: espelha `LockoutService` + `LockoutProperties` do `sep-api`.
+
+> **Desvio aplicado (2026-07-30, pos-review).** O nome planejado era `resetLoginLockoutState`, mas o
+> reset precisou cobrir tambem `currentMockUser` — sem isso um login valido de uma spec vazava para
+> as specs de `/auth/me` do mesmo arquivo, e o teste de escopo por usuario tinha sido **enfraquecido**
+> para contornar a limitacao. Nome final: `resetLoginMockState`. `Map` em vez de `Record` pelo
+> precedente do proprio arquivo (`chavePixPorKey`, `desembolsoPorChave`) e para tirar do caminho
+> chaves herdadas de `Object.prototype`.
 
 ### Step 121.1.2 - Reescrever o handler de `POST /auth/login`
 
@@ -260,11 +272,23 @@ Ordem obrigatoria, espelhando `AutenticarUsuarioUseCase`:
 2. Validar credencial. Falha incrementa o contador do usuario e responde `401`.
 3. Sucesso define `currentMockUser` e responde `200`. **Nao zerar o contador** — o backend nao zera.
 
-Usuario inexistente tambem incrementa (`LoginAttemptStatus.USUARIO_INEXISTENTE` conta no backend).
+> **Correcao factual (2026-07-30, Gate 121.0.3).** A versao original deste step afirmava que
+> "usuario inexistente tambem incrementa, porque `USUARIO_INEXISTENTE` conta no backend". **E falso.**
+> `LockoutService.STATUSES_FALHA` e `[SENHA_INVALIDA, TOTP_INVALIDO]` — nem hoje nem antes da
+> Sprint 33 (conferido em `406eef8`, que tinha `[SENHA_INVALIDA, TOTP_INVALIDO, CONTA_BLOQUEADA]`).
+> Verificado no fio contra `:8080`: 6 falhas de username inexistente devolvem 6x `401` e gravam 6
+> linhas `USUARIO_INEXISTENTE`, nenhuma contada. Um username desconhecido **nunca tranca**.
+>
+> **Decisao do dono do repo (2026-07-30)**: mesmo assim o mock incrementa para qualquer credencial
+> recusada, inclusive username desconhecido, vazio ou fora do formato e-mail (estes dois ultimos o
+> backend rejeita com `400` por bean validation, antes do use case). O mock fica **mais estrito** que
+> a producao; a assimetria e segura (falha offline, passa em producao — nunca o contrario) e mantem
+> `/account-locked` alcancavel offline com qualquer e-mail. A divergencia esta comentada no
+> `handlers.ts` e travada por teste, para nao ser "corrigida" em silencio.
 
 ### Step 121.1.3 - Evitar vazamento de estado entre specs
 
-Adicionar `beforeEach(() => resetLoginLockoutState())` em `auth.service.spec.ts` — o teste de login
+Adicionar `beforeEach(() => resetLoginMockState())` em `auth.service.spec.ts` — o teste de login
 invalido que ja existe passa a incrementar o contador. Mesmo motivo dos resets em
 `pix.service.spec.ts` e `chaves-pix-page.component.spec.ts`.
 
@@ -286,7 +310,7 @@ bloqueio ainda da 423" deve falhar.
 
 - [ ] Mock devolve `401` ate a 5a falha e `423` a partir da 6a, por usuario.
 - [ ] Bloqueio verificado antes da credencial; sucesso nao zera o contador.
-- [ ] `resetLoginLockoutState` exportado e usado em `auth.service.spec.ts`.
+- [ ] `resetLoginMockState` exportado e usado em `auth.service.spec.ts`.
 - [ ] Suite completa verde, sem vazamento de contador entre arquivos.
 
 ### Commit sugerido
@@ -355,7 +379,7 @@ navegacao de verdade acontecer e mascararia stub faltando.
 Casos: `423` com interceptor -> navegou para `/account-locked`; `423` sem interceptor -> mensagem de
 bloqueio (prova que o mapeamento independe do redirect); `429` -> orientacao de aguardar ~1 minuto e
 **ausencia** da copy de `401`; `400`; `HttpResponse.error()` -> generica e **ausencia** da copy de
-`401`. Adicionar `beforeEach(() => resetLoginLockoutState())`.
+`401`. Adicionar `beforeEach(() => resetLoginMockState())`.
 
 ```bash
 npm run test -- --run src/app/core/interceptors/error.interceptor.spec.ts

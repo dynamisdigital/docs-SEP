@@ -4,7 +4,8 @@
 
 - **ID da Spec**: 121
 - **Titulo**: F-Sprint 21 - Correcao da jornada de conta bloqueada (lockout) no login web
-- **Status**: planejada (2026-07-29)
+- **Status**: **concluida** (2026-07-30) — todas as tasks entregues, smoke real contra `:8080`
+  aprovado no criterio final. Detalhe em [`SPRINT-F-21-PR.md`](../../repos/sep-app/SPRINT-F-21-PR.md)
 - **Fase do produto**: Fase 4 - correcao de requisito da Sprint 5 (Fase 2) no recorte web
 - **Trilha**: Web (`sep-app`)
 - **Origem**: bug reportado pelo dev em 2026-07-29 contra o backend real `:8080` — apos 5 senhas
@@ -80,7 +81,7 @@ smoke real contra `:8080` exige as duas.
 
 ## Tasks de implementacao
 
-1. Mock MSW de login com contador de falhas por usuario + `resetLoginLockoutState` e teste de limiar
+1. Mock MSW de login com contador de falhas por usuario + `resetLoginMockState` e teste de limiar
    no `auth.service.spec.ts`.
 2. Mapeamento de status para mensagem no `LoginComponent` + spec do `423` no `errorInterceptor` +
    rewire do `login.component.spec.ts` com interceptors reais.
