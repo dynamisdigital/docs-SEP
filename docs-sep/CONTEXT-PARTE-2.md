@@ -1421,12 +1421,14 @@ falta de acessos externos (AWS e Celcoin/BaaS), que separa a entrega em uma vers
   `LockoutLoginIT` novo). No `docs-SEP` — `SEGURANCA.md` §5/§10, `AI-ROADMAP.md`, `STATE.md`, este
   historico e `SPRINT-33-PR.md` (criado; `SPRINT-32-PR.md` removido no ciclo padrao).
 
-## F-Sprint 21 (web) — Jornada de conta bloqueada no login — CONCLUIDA na branch (2026-07-30)
+## F-Sprint 21 (web) — Jornada de conta bloqueada no login — MERGEADA develop+main (2026-07-30)
 
 Lado web do par corretivo aberto em 2026-07-29; **correcao de defeito, sem escopo novo**. Spec
 [`121`](../specs/fase-4/121-fsprint-21-lockout-login-web.md) + steps
-[`121`](../steps-fase-4/web/121-fsprint-21-steps.md). Branch `feature/fsprint-21-lockout-login-web`
-(base `bffb6c8`), 7 commits; **push e PR manuais pendentes**.
+[`121`](../steps-fase-4/web/121-fsprint-21-steps.md). Em `origin/develop` via PR #113 (squash
+`b3e3f90`, 8 commits absorvidos da branch `feature/fsprint-21-lockout-login-web`, base `bffb6c8`) e
+promovida a `main` via PR #114 (`84eb47c`); `develop` == `main` conferido por diff de conteudo
+(vazio).
 
 - **Gate F-21.0 — prechecks**: cadeia Git conferida (F-20 `66b5f04` em `develop`; `origin/main` a
   frente por dois merges mas **diff de conteudo vazio**). Baseline Vitest 664/87, Playwright 36,

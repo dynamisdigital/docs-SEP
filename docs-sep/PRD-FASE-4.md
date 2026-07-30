@@ -165,8 +165,8 @@ AWS.
 
 ## 36. Mapeamento Fase 4: Projetos x Sprints
 
-Mapa da fase com o status corrente de cada sprint (atualizado em 2026-07-21: backend e web
-**concluidos**; no mobile restam M-14/M-15, bloqueadas por gate externo de hardware macOS). Cada
+Mapa da fase com o status corrente de cada sprint (atualizado em 2026-07-30: backend e web
+**concluidos**, incluindo o par corretivo de lockout (Sprint 33 + F-21); no mobile restam M-14/M-15, bloqueadas por gate externo de hardware macOS). Cada
 sprint mantem no maximo 7 tasks de implementacao; precheck, E2E/smoke, documentacao e collections nao
 entram na contagem. As **specs ja existem** em [`specs/fase-4/`](../specs/fase-4/README.md)
 (15 arquivos, incluindo a `120` criada para o Gate F-18.0); os **steps** continuam **just-in-time**
@@ -192,6 +192,7 @@ em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numer
 | F-18 | Epic 15/10 | Aporte e matching da credora no web (quando backend existir) | [`118`](../specs/fase-4/118-fsprint-18-aporte-matching-credora-web.md) | concluida (PR #94/#95, 2026-07-16; matching assistido + aporte idempotente com step-up estrito + leitura owner-scoped na carteira; Gate F-18.0: chaves Pix fora — destino web dedicado pos-F-19, **cumprido pela F-20**) |
 | F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | concluida (2026-07-16; em `develop` por push direto fast-forward — desvio aceito — e `main` via PR #96; `contract:check` + snapshot OpenAPI, audit 9->0 dentro do Angular 20, collections Postman/Insomnia renovadas sem PII/secrets, [ADR 0018](../adr/0018-avaliacao-angular-22-no-web.md) ADIA Angular 22 com revisao em 2026-09-30) |
 | F-20 | Epic 15 | Gestao de chaves Pix da conta operacional no web (fecha o Gate F-18.0) | [`120`](../specs/fase-4/120-fsprint-20-chaves-pix-web.md) | concluida (PR #107 develop / #108 main, 2026-07-21; lista mascarada + cadastro e remocao assistidos com step-up estrito, `roleGuard` proprio `FINANCEIRO`/`ADMIN` mais restrito que `/app/pix`, idempotencia por intencao preservada no round-trip de step-up; valor bruto nunca lido nem persistido; Vitest 664, Playwright 36, `contract:check`/audit verdes. **Fecha o recorte web do `v1.0-local`**) |
+| F-21 | Follow-up / correcao de defeito | Jornada de conta bloqueada no login web (lado web do par corretivo com a Sprint 33) | [`121`](../specs/fase-4/121-fsprint-21-lockout-login-web.md) | concluida (PR #113 develop / #114 main, 2026-07-30; login distingue `400`/`401`/`423`/`429`/rede em vez de acusar senha invalida em tudo e usa o `message` do corpo onde ele e autoritativo; navegacao do `423` segue exclusiva do `errorInterceptor`; `/account-locked` com cada afirmacao conferida contra o `sep-api`, mais landmark e foco no heading; mock MSW stateful. Vitest 685, Playwright 38, snapshot OpenAPI renovado para `a613c6c`, `contract:check`/audit verdes; smoke real contra `:8080` aprovado. **Nao entrega escopo novo**: corrige requisito da Sprint 5/Fase 2) |
 
 ### Mobile (`sep-mobile`)
 

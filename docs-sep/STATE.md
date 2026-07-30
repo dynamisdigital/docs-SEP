@@ -14,25 +14,25 @@ _Atualizado em: 2026-07-30._
 
 ## Leia agora
 
-- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend (Sprints 27-33) e web (F-16 a F-20)
-  fechados; **F-21 concluida na branch**, com push/PR manuais pendentes; mobile **M-13 e M-16
-  mergeadas**; **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate
+- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend (Sprints 27-33) e web (F-16 a F-21)
+  fechados e mergeados; mobile **M-13 e M-16 mergeadas**; **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate
   externo de hardware macOS** (ver §Gates externos). O **par corretivo de lockout** aberto em
-  2026-07-29 esta **fechado nos dois lados**: Sprint 33 backend mergeada develop+main e F-Sprint 21
-  web concluida na branch (push/PR manuais pendentes). Fora os gates externos, a decisao restante e
-  de rumo: fechar a Fase 4 com as dividas registradas (§41 do PRD-FASE-4, ainda em branco) ou abrir
+  2026-07-29 esta **fechado nos dois lados e mergeado**: Sprint 33 backend (PR #101/#102) e
+  F-Sprint 21 web (PR #113/#114). Fora os gates externos, a decisao restante e de rumo: fechar a Fase 4 com as dividas registradas (§41 do PRD-FASE-4, ainda em branco) ou abrir
   a Fase 5.
-- **Spec/step ativo**: F-Sprint 21 (web) **CONCLUIDA na branch** `feature/fsprint-21-lockout-login-web`
-  em 2026-07-30 (8 commits, base `bffb6c8`); **push e PR sao manuais e seguem pendentes**. Spec
+- **Spec/step ativo**: F-Sprint 21 (web) **MERGEADA develop+main em 2026-07-30** via PR #113
+  (squash `b3e3f90`) + PR #114 (`84eb47c`); `develop` == `main` conferido por diff de conteudo
+  (vazio). Spec
   [`121`](../specs/fase-4/121-fsprint-21-lockout-login-web.md) + steps
   [`121`](../steps-fase-4/web/121-fsprint-21-steps.md); detalhe em
   [`SPRINT-F-21-PR.md`](../repos/sep-app/SPRINT-F-21-PR.md). Sem endpoint, DTO, migration ou ADR.
 
 ## Onde estamos
 
-- **F-Sprint 21 (web) CONCLUIDA na branch em 2026-07-30** — jornada de conta bloqueada no login
-  (correcao de defeito; lado web do par corretivo). 8 commits em
-  `feature/fsprint-21-lockout-login-web`, base `bffb6c8`; **push e PR manuais pendentes**. O login
+- **F-Sprint 21 (web) MERGEADA develop+main em 2026-07-30** — jornada de conta bloqueada no login
+  (correcao de defeito; lado web do par corretivo). Em `origin/develop` via PR #113 (squash
+  `b3e3f90`, 8 commits absorvidos) e promovida a `main` via PR #114 (`84eb47c`); `develop` == `main`
+  conferido por diff de conteudo (vazio). O login
   passa a distinguir `400`/`401`/`423`/`429`/rede em vez de acusar senha invalida em tudo, usando o
   `message` do corpo onde ele e autoritativo; a navegacao do `423` permanece exclusiva do
   `errorInterceptor`. `/account-locked` teve **cada afirmacao conferida contra o `sep-api`** — quatro
@@ -65,7 +65,7 @@ _Atualizado em: 2026-07-30._
   seguir a doc torna o sistema 2x mais permissivo contra brute force lento (384/dia/conta vs 192);
   controle compensatorio fica como follow-up. Detalhe em
   [`SPRINT-33-PR.md`](../repos/sep-api/SPRINT-33-PR.md). O lado web e a **F-Sprint 21**, concluida
-  na branch em 2026-07-30 (push/PR manuais pendentes). Nada mudou em `sep-app`/`sep-mobile`.
+  e mergeada em 2026-07-30 (PR #113/#114). Nada mudou em `sep-app`/`sep-mobile`.
 - **F-Sprint 20 (web) MERGEADA em 2026-07-21** — gestao assistida das chaves Pix da conta
   operacional/escrow (Epic 15; consome o backend da Sprint 31). Em `origin/develop` via PR #107
   (squash `66b5f04`, 11 commits absorvidos) e promovida a `main` via PR #108 (`c00d8ae`);
@@ -184,17 +184,10 @@ _Atualizado em: 2026-07-30._
 
 ## Proximo passo
 
-1. **Manual (dev humano) — push e PR da F-Sprint 21**: a branch `feature/fsprint-21-lockout-login-web`
-   esta pronta com 7 commits e todos os gates verdes. `feature -> develop` e depois `develop -> main`,
-   conforme o fluxo. Descricao pronta em
-   [`SPRINT-F-21-PR.md`](../repos/sep-app/SPRINT-F-21-PR.md), com checklist pos-merge.
-2. **Manual (dev humano) — commitar `docs-SEP`**: fechamento da F-Sprint 21 (`SPRINT-F-21-PR.md`
-   criado e `SPRINT-F-20-PR.md` removido pelo ciclo padrao; SEGURANCA.md §5, AI-ROADMAP,
-   specs/README, spec e steps
-   `121` com as correcoes factuais, STATE/historico). O snapshot OpenAPI **ja foi renovado** no
-   `sep-app` (parte da F-21), e a entrada de `knownGaps` do `423`/`429` nunca chegou a existir —
-   a Sprint 33 ja estava integrada quando a Task rodou.
-3. **Decisao de rumo** (o par corretivo esta fechado; fora dele so restam os gates externos). Duas
+1. **Checklist pos-merge da F-Sprint 21 (manual)**: linha F-21 no §36 do PRD-FASE-4; apagar
+   `repos/sep-app/SPRINT-F-21-PR.md` **junto com as referencias a ele** em `AI-ROADMAP.md` e neste
+   arquivo, senao viram links mortos.
+2. **Decisao de rumo** (o par corretivo esta fechado; fora dele so restam os gates externos). Duas
    opcoes, ambas legitimas:
    - **fechar a Fase 4** preenchendo o §41 do PRD-FASE-4 (hoje em branco) com status, PRs,
      back-merges e as dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do
