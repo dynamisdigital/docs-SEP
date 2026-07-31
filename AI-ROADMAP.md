@@ -88,11 +88,17 @@ Leitura base para qualquer agente:
 > [`034`](specs/fase-4/034-sprint-34-followups-lockout-contrato.md) + steps
 > [`034`](steps-fase-4/backend/034-sprint-34-steps.md), **planejada em 2026-07-30**. O par web dela e a
 > **F-Sprint 22** (spec [`122`](specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) + steps
-> [`122`](steps-fase-4/web/122-fsprint-22-steps.md), **planejada em 2026-07-30**), que torna o contrato
-> de erro verificavel em CI — hoje `consumed-contracts.json` declara so `sucesso: [200]` e o checker so
-> inspeciona sucesso, entao o backend remover o `423` passaria verde — e quita os follow-ups de tela da
-> F-21. **Suas Tasks 1 a 5 nao dependem da Sprint 34**; so a Task 6 exige a 34 mergeada e o snapshot
-> regenerado.
+> [`122`](steps-fase-4/web/122-fsprint-22-steps.md)), **MERGEADA develop+main em 2026-07-31 via
+> PR #116 (`63eb2b6`); `develop` == `main` conferido por conteudo — exceto a Task 6**. O contrato de
+> erro passou a ser verificavel em CI: o campo `erros` e validado contra o OpenAPI (**9 operacoes**
+> declaram), `responseHeaders` virou mapa por status — sem isso o `Retry-After`, que so existe em
+> `423`/`429`, era inalcancavel pelo checker — e um `knownGap` que nenhuma operacao consome passa a
+> **falhar** com exit 1 contra o snapshot versionado. Antes, o backend remover o `423` passava verde.
+> Vitest **745**, Playwright **38**, `contract:check` **84 operacoes** (`auth.registrar` saiu com o
+> `RegisterComponent` orfao) e 29 lacunas; snapshot **nao** renovado. **A Task 6 nao foi executada** —
+> exige a Sprint 34 mergeada **e** o `sep-api` rodando local para regenerar o snapshot. A ordem foi
+> deliberada: a deteccao de gap obsoleto entregue aqui e o que permite a Sprint 34 limpar as 5 lacunas
+> de OpenAPI sem fazer no escuro.
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
@@ -196,7 +202,7 @@ Leitura base para qualquer agente:
 | Pix, gestao de chaves, desembolso, recebimento Pix, conciliacao Pix, leitura owner-scoped (backend) | [`repos/sep-api/PIX.md`](repos/sep-api/PIX.md) + [`019`](specs/fase-3/019-sprint-19-pix-foundation-escrow-provider.md) + [`020`](specs/fase-3/020-sprint-20-pix-desembolso-assistido.md) + [`021`](specs/fase-3/021-sprint-21-pix-recebimento-conciliacao.md) + [`026`](specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md) (P1-P3 tomador/credora) + [`031`](specs/fase-4/031-sprint-31-pix-gestao-chaves.md) + [`step 031`](steps-fase-4/backend/031-sprint-31-steps.md) (gestao assistida de chaves, implementada — `PIX.md` §Gestao de chaves) |
 | Pix web, desembolso/recebimento/divergencia no app | [`repos/sep-app/README.md` §Pix](repos/sep-app/README.md) + [`113`](specs/fase-3/113-fsprint-13-pix-web.md) + [`step 113`](steps-fase-3/web/113-fsprint-13-steps.md) |
 | chaves Pix no web, cadastro/remocao assistida de chave, `/app/pix/chaves` | [`repos/sep-app/README.md` §F-Sprint 20](repos/sep-app/README.md) + [`120`](specs/fase-4/120-fsprint-20-chaves-pix-web.md) + [`step 120`](steps-fase-4/web/120-fsprint-20-steps.md); consome o backend [`031`](specs/fase-4/031-sprint-31-pix-gestao-chaves.md) |
-| contrato front<->API, contract:check, snapshot OpenAPI, collections Postman/Insomnia, audit tooling web, Angular 22 | [`repos/sep-app/README.md` §F-Sprint 19](repos/sep-app/README.md) + `sep-app/contracts/README.md` + [`119`](specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md)/[`step 119`](steps-fase-4/web/119-fsprint-19-steps.md) + [ADR 0018](adr/0018-avaliacao-angular-22-no-web.md) |
+| contrato front<->API, contract:check, snapshot OpenAPI, collections Postman/Insomnia, audit tooling web, Angular 22 | [`repos/sep-app/README.md` §F-Sprint 19](repos/sep-app/README.md) + `sep-app/contracts/README.md` + [`119`](specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md)/[`step 119`](steps-fase-4/web/119-fsprint-19-steps.md) + [ADR 0018](adr/0018-avaliacao-angular-22-no-web.md). **Status de erro, `responseHeaders` por status e `knownGap` obsoleto**: [`122`](specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md)/[`step 122`](steps-fase-4/web/122-fsprint-22-steps.md) + [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md) §F-Sprint 22 (a regra do campo `erros` esta no `$comment` do descriptor e no `contracts/README.md`) |
 | Pix mobile, status de desembolso/pagamento da parcela/operacao credora, M-Sprint 11 | [`211`](specs/fase-3/211-msprint-11-pix-mobile.md) + [`step 211`](steps-fase-3/mobile/211-msprint-11-steps.md); Gates backend P1-P3 fechados pela Sprint 26 ([`026`](specs/fase-3/026-sprint-26-pix-leitura-owner-scoped.md), mergeada `develop` PR #87 + `main` PR #88); M-11 mobile mergeada em `develop` via PR #111 (squash `34f4f0f`; P1 contrato + P2 parcela + P3 carteira) e promovida a `main` via PR #112 (`ec74f5e`) |
 | KYC, KYB, documentos, Celcoin onboarding | [`repos/sep-api/ONBOARDING.md`](repos/sep-api/ONBOARDING.md) |
 | PLD, COAF, OFAC, background check | [`repos/sep-api/PLD.md`](repos/sep-api/PLD.md) |

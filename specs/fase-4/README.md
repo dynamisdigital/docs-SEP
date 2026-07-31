@@ -40,7 +40,7 @@ As tabelas usam a ordem recomendada de execucao.
 | F-19 | [`119-fsprint-19-hardening-tooling-contrato-web.md`](./119-fsprint-19-hardening-tooling-contrato-web.md) | Hardening de tooling + refresh contrato/collection | 5 |
 | F-20 | [`120-fsprint-20-chaves-pix-web.md`](./120-fsprint-20-chaves-pix-web.md) | Gestao de chaves Pix no web — **concluida** (PR #107/#108, 2026-07-21; fecha a pendencia do Gate F-18.0 e o recorte web do `v1.0-local`) | 7 |
 | F-21 | [`121-fsprint-21-lockout-login-web.md`](./121-fsprint-21-lockout-login-web.md) | Jornada de conta bloqueada no login web — **correcao de defeito**; **MERGEADA develop+main** (PR #113/#114, 2026-07-30; fecha o par corretivo com a Sprint 33; smoke real contra `:8080` aprovado) | 4 |
-| F-22 | [`122-fsprint-22-contrato-erro-followups-web.md`](./122-fsprint-22-contrato-erro-followups-web.md) | Contrato de erro verificavel no `contract:check` (status de erro + gap obsoleto) e follow-ups da F-21 (`verify-totp`, foco/landmarks, registro orfao, helper de erro) — **correcao de divida**; planejada | 6 |
+| F-22 | [`122-fsprint-22-contrato-erro-followups-web.md`](./122-fsprint-22-contrato-erro-followups-web.md) | Contrato de erro verificavel no `contract:check` (status de erro + gap obsoleto) e follow-ups da F-21 (`verify-totp`, foco/landmarks, registro orfao, helper de erro) — **correcao de divida**; **MERGEADA develop+main** (PR #116, 2026-07-31) **exceto a Task 6**, que depende da Sprint 34 e da regeneracao do snapshot OpenAPI | 6 |
 
 ## Mobile (`sep-mobile`)
 

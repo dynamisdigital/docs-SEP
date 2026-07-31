@@ -10,30 +10,47 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-07-30._
+_Atualizado em: 2026-07-31._
 
 ## Leia agora
 
-- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend (Sprints 27-33) e web (F-16 a F-21)
+- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Backend (Sprints 27-33) e web (F-16 a **F-22**)
   fechados e mergeados; mobile **M-13 e M-16 mergeadas**; **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate
   externo de hardware macOS** (ver §Gates externos). O **par corretivo de lockout** aberto em
   2026-07-29 esta **fechado nos dois lados e mergeado**: Sprint 33 backend (PR #101/#102) e
-  F-Sprint 21 web (PR #113/#114). A divida acumulada virou **tres sprints planejadas em 2026-07-30 e
-  ainda nao iniciadas**: **Sprint 34 (backend)**, **F-Sprint 22 (web)** e **M-Sprint 17 (mobile)** — as
-  frentes executaveis restantes da Fase 4. A M-17 **nao depende de nenhuma das outras duas**. Depois
-  delas, a decisao e de rumo: fechar a Fase 4 (§41 do PRD-FASE-4, ainda em branco) ou abrir a Fase 5.
+  F-Sprint 21 web (PR #113/#114). Das tres sprints de divida planejadas em 2026-07-30, a **F-Sprint 22
+  (web) foi executada e mergeada em 2026-07-31** (PR #116). Restam **Sprint 34 (backend)** e
+  **M-Sprint 17 (mobile)** — as frentes executaveis restantes da Fase 4; a M-17 **nao depende da 34**.
+  Depois delas, a decisao e de rumo: fechar a Fase 4 (§41 do PRD-FASE-4, ainda em branco) ou abrir a
+  Fase 5.
 - **Spec/step ativo**: **Sprint 34 (backend) — planejada, nao iniciada**. Spec
   [`034`](../specs/fase-4/034-sprint-34-followups-lockout-contrato.md) + steps
   [`034`](../steps-fase-4/backend/034-sprint-34-steps.md); branch sugerida
   `feature/sprint-34-followups-lockout-contrato`. Quita os cinco follow-ups backend da Sprint 33 e as
   cinco lacunas de OpenAPI que o `contract:check` do `sep-app` carrega como `knownGaps` desde a
   F-Sprint 19 (2026-07-16). **Com migration** (`V60`, amplia `chk_audit_seguranca_tipo`); sem estado
-  novo, sem ADR. Sem escopo de produto novo. O par web e a **F-Sprint 22**, spec
-  [`122`](../specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) + steps
-  [`122`](../steps-fase-4/web/122-fsprint-22-steps.md), tambem planejada e nao iniciada; **suas Tasks 1
-  a 5 nao dependem da 34** e podem rodar em paralelo.
+  novo, sem ADR. Sem escopo de produto novo. **O gate de fechamento dela ficou mais barato**: a F-22
+  entregou deteccao de `knownGap` obsoleto, entao o `contract:check` agora **nomeia** cada gap que
+  sobrou em vez de a limpeza ser feita no escuro. Falta so a **Task F-22.6** do lado web, que depende
+  desta sprint (ver §Onde estamos).
 
 ## Onde estamos
+
+- **F-Sprint 22 (web) MERGEADA develop+main em 2026-07-31** — contrato de erro verificavel em CI e
+  follow-ups da F-21 (sprint de divida; sem endpoint, DTO, migration ou regra nova). Em `origin/main`
+  via PR #116 (`63eb2b6`); `develop` fecha com o merge de volta (`346546e`) e **`develop` == `main`
+  conferido por diff de conteudo remoto** (vazio). O `contract:check` deixa de ser cego a erro: campo
+  `erros` validado contra o OpenAPI (**9 operacoes** declaram), `responseHeaders` vira **mapa por
+  status** — o loop antigo iterava `sucesso`, o que tornava o `Retry-After` inalcancavel — e
+  `knownGap` obsoleto passa a **falhar** com exit 1, mas so contra o snapshot versionado. Alem disso:
+  `verify-totp` traduz erro por status (antes acusava "codigo invalido" em bloqueio, rate limit, 5xx e
+  queda de rede), foco no heading de `access-denied`, landmark em `verify-totp` e `redirect-to-app`,
+  `RegisterComponent` orfao removido e extracao de mensagem unificada em `core/api/`. **Vitest 745 / 91
+  arquivos** (era 685/88), Playwright 38, `contract:check` **84 operacoes** (era 85 — `auth.registrar`
+  saiu com o componente morto) e 29 lacunas, audit 0. **Snapshot OpenAPI nao renovado** (segue
+  `a613c6c`); nenhum `knownGap` criado ou removido. **A Task F-22.6 nao foi executada** — ver
+  §Proximo passo. Dois reviews geraram hotfix, ambos por furos que deixavam o check verde quando
+  deveria reprovar. Detalhe em [`SPRINT-F-22-PR.md`](../repos/sep-app/SPRINT-F-22-PR.md).
 
 - **M-Sprint 17 (mobile) PLANEJADA em 2026-07-30 — nao iniciada, e sem dependencia nenhuma.** Spec
   [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + steps
@@ -51,21 +68,6 @@ _Atualizado em: 2026-07-30._
   Vitest, `focusManagerPriority` global, portar o `contract:check` e o escopo do Gate M-16.0 (exige
   ADR) — todos registrados como follow-up. Baseline medida: Vitest **503 / 68 arquivos**, Playwright
   **27 (26 passam, 1 falha)**.
-- **F-Sprint 22 (web) PLANEJADA em 2026-07-30 — nao iniciada.** Par web da Sprint 34, tambem de
-  divida. Seis tasks. O item de maior valor nao e de tela: **`consumed-contracts.json` declara as 85
-  operacoes com `sucesso: [200]` e nenhum status de erro, e o `contract-check.mjs` so inspeciona
-  sucesso** — se o backend removesse o `423`, o `contract:check` passaria verde e a jornada de conta
-  bloqueada voltaria a quebrar em silencio. O checker tambem **nao detecta `knownGap` obsoleto**: os
-  quatro predicados `existeGap*` sao `.some()` puros, e o `knownGaps[0]` (`X-Step-Up-Token`,
-  `appliesTo: "*"`) produz sozinho 18 das 29 lacunas do output. As outras frentes sao os follow-ups da
-  F-21: `verify-totp` com o mesmo callback de erro pelado que o login tinha (**e sem nenhuma cobertura
-  — sem spec, sem e2e, sem handler MSW de TOTP**), foco em `access-denied` (que ja tem landmark; o gap
-  e so foco), landmark em `verify-totp` e `redirect-to-app`, remocao dos 4 arquivos orfaos do
-  `RegisterComponent` e consolidacao da extracao de mensagem de erro, hoje duplicada em **7 helpers /
-  56 chamadas** mais 9 sites inline. **Os 3 links "Criar conta" ficam** — levam ao
-  `RedirectToAppComponent` por decisao da Sprint 5 e sao travados por spec e e2e; o codigo morto e o
-  componente, nao a rota. A **Task 6 tem gate na Sprint 34** (mergeada + snapshot regenerado): consome
-  `politica-lockout` e `Retry-After`. Baseline de partida: Vitest 685/88, Playwright 38/11.
 - **Sprint 34 (backend) PLANEJADA em 2026-07-30 — nao iniciada.** Sprint de divida,
   nao de produto: consome os follow-ups que a 33 e a F-21 registraram e as lacunas de OpenAPI abertas
   pela F-19. Sete tasks: observabilidade da tentativa barrada (hoje **nenhuma tentativa contra conta
@@ -242,27 +244,26 @@ _Atualizado em: 2026-07-30._
    [`034`](../steps-fase-4/backend/034-sprint-34-steps.md). Comecar pelo **Gate 34.0** (cadeia Git,
    baseline de **2173 testes** e reconfirmacao do estado levantado) antes de qualquer Task. Sete
    tasks, uma migration (`V60`), sem ADR.
-2. **F-Sprint 22 (web)** (planejada em 2026-07-30, **nao iniciada**): spec
-   [`122`](../specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) + steps
-   [`122`](../steps-fase-4/web/122-fsprint-22-steps.md). **Independente da 34 nas Tasks 1 a 5** — pode
-   rodar em paralelo ou antes. O **Gate F-22.0 exige destravar o Playwright na maquina de dev**
-   (`chromium_headless_shell-1228` ausente; `test-results/`, `playwright-report/` e
-   `node_modules/.vite-temp` root-owned), senao a baseline de 38 e2e nao e verificavel — e o CI **nao**
-   roda Playwright.
+2. **Task F-22.6 (web) — unico resto da F-Sprint 22, com gate na Sprint 34.** Consome
+   `GET /api/v1/auth/politica-lockout` e o `Retry-After`, renova o snapshot OpenAPI e apaga os
+   `knownGaps` que a 34 fechar (steps [`122`](../steps-fase-4/web/122-fsprint-22-steps.md) §F-22.6).
+   **Bloqueio duplo**: alem da 34 mergeada, exige o `sep-api` **rodando local** (Docker Postgres +
+   `bootRun`) para reexportar o snapshot — o `contract:check` valida contra o arquivo versionado, nao
+   contra o mock. Como toca so `contracts/` e duas telas, pode ser embutida no gate de fechamento da
+   34 em vez de virar sprint propria. **Cuidado**: `PoliticaLockout` (classe, CamelCase) e da Sprint 33
+   e ja esta em `main`; `politica-lockout` (rota, kebab-case) e da 34 e nao existe.
 3. **M-Sprint 17 (mobile)** (planejada em 2026-07-30, **nao iniciada**): spec
    [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + steps
    [`217`](../steps-fase-4/mobile/217-msprint-17-steps.md). **Sem dependencia** — pode rodar a qualquer
-   momento, em paralelo com a 34 e a F-22. O **Gate M-17.0 exige remover
+   momento, em paralelo com a 34. O **Gate M-17.0 exige remover
    `node_modules/.vite-temp`** (root-owned apos execucao em container; o Vitest aborta com `EACCES`
    antes de rodar qualquer teste) e **anotar sem corrigir** o vermelho preexistente do
    `golden-path-mobile`, que e a Task M-17.6.
-4. **Manual (dev humano) — commitar `docs-SEP`**: criacao das specs/steps 034, 122 e 217 e as
-   atualizacoes de indice deste ciclo (`specs/fase-4/README.md`, `PRD-FASE-4.md` §36 — que **tambem ganhou a linha
-   da Sprint 33, ausente ate agora** —, `AI-ROADMAP.md` e este arquivo). As descricoes de PR
-   `SPRINT-33-PR.md` e `SPRINT-F-21-PR.md` foram removidas no ciclo padrao de abertura de sprint,
-   junto com as referencias a elas. `repos/sep-mobile/SPRINT-M-16-PR.md` segue pendente de remocao
-   (M-16 mergeada em 2026-07-20).
-5. **Decisao de rumo** (depois das tres sprints de divida — 34, F-22 e M-17; fora delas so restam os
+4. **Manual (dev humano) — commitar `docs-SEP`**: fechamento da F-Sprint 22 neste arquivo, a
+   descricao [`SPRINT-F-22-PR.md`](../repos/sep-app/SPRINT-F-22-PR.md) e a linha da F-22 no
+   `PRD-FASE-4.md` §36 / `AI-ROADMAP.md`. `repos/sep-mobile/SPRINT-M-16-PR.md` segue pendente de
+   remocao (M-16 mergeada em 2026-07-20).
+5. **Decisao de rumo** (depois das sprints de divida restantes — 34 e M-17; fora delas so restam os
    gates externos). Duas opcoes, ambas legitimas:
    - **fechar a Fase 4** preenchendo o §41 do PRD-FASE-4 (hoje em branco) com status, PRs,
      back-merges e as dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do
@@ -277,11 +278,19 @@ _Atualizado em: 2026-07-30._
    executada): registrar tentativas `CONTA_BLOQUEADA`, tempo restante no `423`, evicção do
    `RateLimiterRegistry`, validador de startup da invariante `rate-limit > max-attempts`, assert do
    audit `LOCKOUT` na `LockoutLoginIT`, expor `lockout-minutes` no contrato e `X-Step-Up-Token` fora
-   do OpenAPI (`knownGaps[0]`). **Absorvidos pela F-Sprint 22** (web, ainda nao executada):
-   `verify-totp.component.ts` com o mesmo callback de erro pelado que o login tinha, gap de foco em
-   `access-denied.component.ts` (que **ja tem landmark** — a redacao anterior deste item estava
-   errada), landmark ausente em `verify-totp` e `redirect-to-app`, `RegisterComponent` como codigo
-   morto e `contract:check` sem opiniao sobre status de erro. **Seguem abertos**: controle
+   do OpenAPI (`knownGaps[0]`). **FECHADOS pela F-Sprint 22** (mergeada em 2026-07-31):
+   `verify-totp.component.ts` com callback de erro pelado, foco em `access-denied`, landmark em
+   `verify-totp` e `redirect-to-app`, `RegisterComponent` como codigo morto e `contract:check` sem
+   opiniao sobre status de erro. **Abertos pela F-Sprint 22** (web, achados nos code reviews dela):
+   `message: ""` apaga o alerta em `login.component.ts` e em `core/api/api-error.ts` — produzivel
+   porque o `JwtAuthenticationFilter` usa `response.sendError` e `server.error.include-message` nao
+   esta configurado; o `authInterceptor` isenta so `/auth/login`, entao token expirado viaja para
+   `/auth/totp/verify` e derruba o usuario no meio do MFA (corrigir limpando `SEP_ACCESS_TOKEN` no
+   ramo `mfaRequired` de `handleTokenResponse`); 3 literais byte-identicos entre `login` e
+   `verify-totp`; `backoffice.reprocessarWebhook` ramifica `400` que o OpenAPI nao documenta; e **~20
+   pontos de ramificacao por status ainda sem `erros`** — a premissa da spec 122 ("83 operacoes usam
+   `apiErr?.message ?? padrao`") **nao se confirmou**, a varredura acha ~30 pontos em 29 componentes.
+   **Seguem abertos**: controle
    compensatorio contra brute force lento (exige ADR); rotulo "Criar conta" prometendo formulario e
    entregando pagina informativa (UX, nao defeito); auto-cadastro web descontinuado na Sprint 5;
    `idCurto` e `formatarMoeda` duplicados em 6 arquivos cada (o segundo com **duas assinaturas**);

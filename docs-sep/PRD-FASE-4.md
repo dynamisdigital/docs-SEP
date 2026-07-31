@@ -165,10 +165,10 @@ AWS.
 
 ## 36. Mapeamento Fase 4: Projetos x Sprints
 
-Mapa da fase com o status corrente de cada sprint (atualizado em 2026-07-30: web **concluido**,
-incluindo o par corretivo de lockout (Sprint 33 + F-21); no backend a **Sprint 34 esta planejada**,
-quitando a divida que o par corretivo registrou; no mobile restam M-14/M-15, bloqueadas por gate
-externo de hardware macOS). Cada
+Mapa da fase com o status corrente de cada sprint (atualizado em 2026-07-31: web **concluido**,
+incluindo o par corretivo de lockout (Sprint 33 + F-21) e a **F-22 mergeada, exceto a Task 6**, que
+depende da Sprint 34; no backend a **Sprint 34 esta planejada**, quitando a divida que o par
+corretivo registrou; no mobile restam M-14/M-15, bloqueadas por gate externo de hardware macOS). Cada
 sprint mantem no maximo 7 tasks de implementacao; precheck, E2E/smoke, documentacao e collections nao
 entram na contagem. As **specs ja existem** em [`specs/fase-4/`](../specs/fase-4/README.md)
 (20 arquivos, incluindo a `120` criada para o Gate F-18.0, o par corretivo `033`/`121` e o trio de divida `034`/`122`/`217`); os **steps** continuam **just-in-time**
@@ -197,7 +197,7 @@ em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numer
 | F-19 | Follow-up | Hardening de tooling + validacao de contrato (Postman/OpenAPI); avaliar Angular 22 via ADR | [`119`](../specs/fase-4/119-fsprint-19-hardening-tooling-contrato-web.md) | concluida (2026-07-16; em `develop` por push direto fast-forward — desvio aceito — e `main` via PR #96; `contract:check` + snapshot OpenAPI, audit 9->0 dentro do Angular 20, collections Postman/Insomnia renovadas sem PII/secrets, [ADR 0018](../adr/0018-avaliacao-angular-22-no-web.md) ADIA Angular 22 com revisao em 2026-09-30) |
 | F-20 | Epic 15 | Gestao de chaves Pix da conta operacional no web (fecha o Gate F-18.0) | [`120`](../specs/fase-4/120-fsprint-20-chaves-pix-web.md) | concluida (PR #107 develop / #108 main, 2026-07-21; lista mascarada + cadastro e remocao assistidos com step-up estrito, `roleGuard` proprio `FINANCEIRO`/`ADMIN` mais restrito que `/app/pix`, idempotencia por intencao preservada no round-trip de step-up; valor bruto nunca lido nem persistido; Vitest 664, Playwright 36, `contract:check`/audit verdes. **Fecha o recorte web do `v1.0-local`**) |
 | F-21 | Follow-up / correcao de defeito | Jornada de conta bloqueada no login web (lado web do par corretivo com a Sprint 33) | [`121`](../specs/fase-4/121-fsprint-21-lockout-login-web.md) | concluida (PR #113 develop / #114 main, 2026-07-30; login distingue `400`/`401`/`423`/`429`/rede em vez de acusar senha invalida em tudo e usa o `message` do corpo onde ele e autoritativo; navegacao do `423` segue exclusiva do `errorInterceptor`; `/account-locked` com cada afirmacao conferida contra o `sep-api`, mais landmark e foco no heading; mock MSW stateful. Vitest 685, Playwright 38, snapshot OpenAPI renovado para `a613c6c`, `contract:check`/audit verdes; smoke real contra `:8080` aprovado. **Nao entrega escopo novo**: corrige requisito da Sprint 5/Fase 2) |
-| F-22 | Follow-up / correcao de divida | Contrato de erro verificavel no `contract:check` (status de erro declarados + deteccao de `knownGap` obsoleto) e follow-ups da F-21: `verify-totp` por status, foco em `access-denied`, landmarks, remocao do registro orfao, helper unico de erro; Task final consome a Sprint 34 | [`122`](../specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) | planejada (2026-07-30; Tasks 1-5 independentes, Task 6 com gate na Sprint 34) |
+| F-22 | Follow-up / correcao de divida | Contrato de erro verificavel no `contract:check` (status de erro declarados + deteccao de `knownGap` obsoleto) e follow-ups da F-21: `verify-totp` por status, foco em `access-denied`, landmarks, remocao do registro orfao, helper unico de erro; Task final consome a Sprint 34 | [`122`](../specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) | concluida **exceto a Task 6** (PR #116, 2026-07-31; `contract:check` passa a validar status de erro declarados em `erros` — 9 operacoes —, `responseHeaders` vira mapa por status e `knownGap` obsoleto falha com exit 1 contra o snapshot versionado; `verify-totp` traduz erro por status usando o corpo no `400`, que colapsa tres causas; foco em `access-denied`, landmarks em `verify-totp`/`redirect-to-app`, `RegisterComponent` orfao removido, extracao de mensagem unificada em `core/api/`. Vitest 745, Playwright 38, `contract:check` 84 operacoes/29 lacunas, audit 0; snapshot **nao** renovado. **Task 6 nao executada**: a Sprint 34 nao existe como codigo e a regeneracao do snapshot exige o `sep-api` rodando local. **Nao entrega escopo novo**) |
 
 ### Mobile (`sep-mobile`)
 

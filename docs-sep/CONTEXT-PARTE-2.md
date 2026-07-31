@@ -1512,3 +1512,97 @@ promovida a `main` via PR #114 (`84eb47c`); `develop` == `main` conferido por di
   factuais), `SEGURANCA.md` §5 (subsecao nova "O que o usuario ve (web)"), `AI-ROADMAP.md`,
   `specs/fase-4/README.md`, `STATE.md`, este historico e `SPRINT-F-21-PR.md` (criado;
   `SPRINT-F-20-PR.md` removido no ciclo padrao).
+
+## F-Sprint 22 (web) — Contrato de erro verificavel e follow-ups da F-21 — MERGEADA develop+main (2026-07-31)
+
+**Sprint de divida, sem escopo de produto novo.** Spec
+[`122`](../specs/fase-4/122-fsprint-22-contrato-erro-followups-web.md) + steps
+[`122`](../steps-fase-4/web/122-fsprint-22-steps.md). Em `origin/main` via PR #116 (`63eb2b6`);
+`develop` fecha com o merge de volta (`346546e`) e **`develop` == `main` conferido por diff de
+conteudo remoto** (vazio). Branch `feature/fsprint-22-contrato-erro-followups-web`, base `b3e3f90`,
+8 commits. Nada mudou em `sep-api`/`sep-mobile`.
+
+- **Gate F-22.0 — prechecks**: baseline batia exata (Vitest 685/88, Playwright 38/11,
+  `contract:check` 85 operacoes / 29 lacunas, audit 0) e **sem vermelho preexistente**. Tres
+  divergencias contra o step: (1) o Playwright **ja estava destravado** — o cache tinha
+  `chromium-1228` e `chromium_headless_shell-1228`, nao so o `1217` registrado; so `test-results/` e
+  `playwright-report/` estavam root-owned; (2) a Sprint 34 **nao existe como codigo em lugar nenhum**
+  do `sep-api` (sem branch local/remota, sem stash, sem worktree, arvore limpa, zero ocorrencia de
+  `V60`/`politica-lockout`/`Retry-After`), o que tornou a **Task F-22.6 inexecutavel**; (3) **defeito
+  de desenho no Step 122.2.3**, que mandava declarar `401` em `mfa.totpVerify` prometendo
+  `contract:check` verde — os dois nao cabem juntos, porque `MfaController.verify` declara so
+  `200/400/423/429` e `MfaChallengeInvalidoException extends ValidacaoException`, que o
+  `ApiExceptionHandler` mapeia para `400`. Decidido com o usuario: **cortar o 401**.
+- **Task F-22.1 — checker com opiniao sobre erro**: campo `erros` lido com `?? []` (as demais
+  operacoes seguem intactas), `responseHeaders` migrado de lista plana para **mapa por status** — o
+  loop antigo iterava `operacao.sucesso`, o que tornava **inalcancavel** qualquer header que so exista
+  em resposta de erro, caso do `Retry-After` — e os quatro predicados `existeGap*` (`.some()` puros)
+  viraram `consumirGap*` com registro de consumo, alimentando um `obsoletos[]` novo. **Exit 1 so
+  contra o snapshot versionado**: com `SEP_OPENAPI_SCHEMA` a fonte pode estar adiante do snapshot.
+- **Hotfix F-22.1** (code review): tres furos deixavam o check **verde quando deveria reprovar**. O
+  gap `field-type-mismatch` era consumido **antes** de a divergencia ser verificada, o que o tornava
+  imune a deteccao de obsolescencia (objetivo 3 falhava em 1 dos 4 tipos de gap); a chave de status de
+  `responseHeaders` nao era validada, e um status errado silenciava tanto o header quanto a deteccao;
+  e `consumirGap` usava `findIndex`, marcando so o primeiro match — o que faria um gap **em uso** ser
+  acusado de obsoleto ao estreitar um `appliesTo: "*"`, exatamente o caminho que a Sprint 34 vai tomar.
+  Alem disso a **politica de exit code nao tinha teste**: tres mutacoes da regra deixavam a suite
+  inteira verde porque `main()` nao era exportado; extraida para `decidirCodigoDeSaida`.
+- **Task F-22.2 — `verify-totp` por status**: o callback era literalmente
+  `error: () => { errorMessage.set('Codigo TOTP invalido ou expirado.') }`, entao bloqueio, rate
+  limit, `5xx` e queda de rede acusavam o usuario de digitar errado. Passa a ramificar. **O `400` usa
+  o `message` do corpo** porque o endpoint colapsa **tres causas** no mesmo status ("Codigo invalido,
+  challenge expirado ou MFA nao habilitado") e o backend so as discrimina pelo `message` — o
+  `ErrorResponseDto` **nao serializa** o codigo `MFA-400-00x`. Um literal mandaria quem teve o desafio
+  expirado redigitar codigo para sempre. **`429` usa literal local e `423` usa o corpo**: a janela do
+  rate limit e `Duration.ofMinutes(1)` fixa no `RateLimitFilter`, entao "cerca de 1 minuto" nao pode
+  mentir; ja o `lockout-minutes` e sobrescrevivel por ambiente. Spec nova — o componente **nao tinha
+  cobertura nenhuma** (sem spec, sem e2e, e `handlers.ts` sem nenhuma rota `/auth/totp/*`).
+- **Hotfix F-22.2** (code review, bateria de 16 mutantes; 5 sobreviveram): `??` deixava passar
+  `message: ""`, que o `@if` trata como falsy — o no `role="alert"` **nao era criado** e a tela ficava
+  muda, pior que o bug corrigido. **E produzivel**: o `JwtAuthenticationFilter` usa
+  `response.sendError(...)` e `server.error.include-message` nao esta configurado, entao o Boot emite
+  `message` vazia. `Validators.required` aceitava so espacos, e o `@NotBlank` do backend fazia a tela
+  exibir **`codigo must not be blank`** cru. E a excecao de `applyMfaVerifyResponse` roda no callback
+  `next`, onde o RxJS **nao** a encaminha para o callback de erro: tela muda com o desafio ja
+  consumido. **Correcao factual**: o comentario afirmava que o endpoint "nunca responde 401" — o
+  *handler* nunca, mas o `JwtAuthenticationFilter` responde com token expirado, e o `authInterceptor`
+  isenta apenas `/auth/login`.
+- **Task F-22.3 — foco e landmarks**: `access-denied` **ganha foco** (destino de redirect automatico
+  por dois caminhos — `error.interceptor.ts` no `403` e `role.guard.ts`); `redirect-to-app`
+  **deliberadamente nao**, por ser alcancado via `routerLink` — roubar foco de quem clicou atrapalha.
+  Os dois lados travados por teste. Varredura confirmou: as 6 paginas publicas tem `<main>`.
+- **Task F-22.4 — remocao e consolidacao**: `RegisterComponent` era inalcancavel desde a Sprint 5 (a
+  rota `/register` carrega o `RedirectToAppComponent`) e tinha **5 testes verdes provando o
+  comportamento de uma tela que ninguem abria**. Removido com o que ficou orfao junto:
+  `AuthService.register()`, o tipo `UsuarioCreateRequest`, a operacao `auth.registrar` e o handler MSW
+  de `POST /usuarios`. **A rota e os 3 links "Criar conta" ficam.** `mensagemDeErroDaApi` extraida para
+  `core/api/` com spec propria — primeiro teste unitario desse comportamento no repo — e os 7 helpers
+  de dominio delegam **preservando nome e comentario**, com 0 call sites alterados. **Medida por
+  mutacao, a delegacao de tres deles (`formalizacao`, `onboarding`, `credito`) nao era coberta por
+  teste algum**, daí um spec dedicado.
+- **Task F-22.5 — dividas de teste da F-21**: o step estava desatualizado em 2 dos 3 pontos, o que so
+  apareceu por mutacao. O assert do `401` **matava** o mutante pelo token, mas o
+  `expect(currentUser()).toBeNull()` era decorativo (nunca semeava usuario); o `withSupportReference`
+  ja tinha cobertura no `error.interceptor.spec.ts`, mas o `login.component.spec.ts` sozinho nao
+  matava nada — rodava sem interceptor e escrevia "Codigo de suporte" a mao. Os tres viraram
+  regressao real.
+- **Task F-22.7 — nova, criada apos code review**: a premissa da spec 122 ("83 operacoes usam
+  `apiErr?.message ?? padrao`") **nao se confirmou** — uma varredura por `err.status ===` acha ~30
+  pontos de ramificacao em 29 componentes. Declaradas mais 7 operacoes, cada uma rastreada do call
+  site ao handler e conferida contra o snapshot antes de declarar, e **verificada por mutacao do
+  OpenAPI** (remover o status faz o check reprovar; 7/7).
+- **Gates de saida**: Vitest **745 / 91 arquivos** (era 685/88), Playwright **38**, `contract:check`
+  **84 operacoes** (era 85 — `auth.registrar` saiu com o componente morto) e **29 lacunas**, audit 0,
+  format/lint/scss/build verdes. **Snapshot OpenAPI nao renovado** (segue `a613c6c`); **nenhum
+  `knownGap` criado ou removido**.
+- **Task F-22.6 nao executada**, com bloqueio duplo: a Sprint 34 nao existe como codigo, e mesmo apos
+  o merge dela a regeneracao do snapshot exige o `sep-api` rodando local. A DoD da spec 122 sanciona.
+  **A ordem F-22 antes da 34 foi deliberada**: a deteccao de gap obsoleto entregue aqui e a ferramenta
+  que o gate de fechamento da 34 precisa para limpar as 5 lacunas de OpenAPI sem fazer no escuro.
+- **Arquivos** — no `sep-app`: `scripts/contract-check.mjs` + spec, `contracts/consumed-contracts.json`,
+  `contracts/README.md`, `verify-totp.component.{ts,html}` + spec (nova), `access-denied.component.ts`
+  + spec, `redirect-to-app.component.ts` + spec (nova), `core/api/api-error.ts` + 2 specs (novos), os
+  7 helpers de dominio, `auth.service.{ts,spec.ts}`, `api.models.ts`, `mocks/handlers.ts`,
+  `error.interceptor.spec.ts`, `login.component.spec.ts`, e remocao de
+  `features/public/register/` (4 arquivos). No `docs-SEP`: `STATE.md`, este historico,
+  `PRD-FASE-4.md` §36, `AI-ROADMAP.md`, `specs/fase-4/README.md` e `SPRINT-F-22-PR.md` (criado).
