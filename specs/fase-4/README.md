@@ -50,7 +50,7 @@ As tabelas usam a ordem recomendada de execucao.
 | M-14 | [`214-msprint-14-empacotamento-nativo-ios.md`](./214-msprint-14-empacotamento-nativo-ios.md) | Empacotamento nativo iOS (Capacitor 8) | 4 |
 | M-15 | [`215-msprint-15-biometria-nativa.md`](./215-msprint-15-biometria-nativa.md) | Biometria nativa (substitui stub PWA) + hardening | 6 |
 | M-16 | [`216-msprint-16-aporte-pix-avancado-mobile.md`](./216-msprint-16-aporte-pix-avancado-mobile.md) | Aporte/matching e chaves Pix na credora mobile — **concluida com escopo reduzido** (Gate M-16.0: so aportes owner-scoped; matching/aporte POST/chaves Pix adiados por exigirem `FINANCEIRO`) | 6 -> 3 |
-| M-17 | [`217-msprint-17-followups-lockout-a11y-mobile.md`](./217-msprint-17-followups-lockout-a11y-mobile.md) | Jornada de conta bloqueada alcancavel e testada, race de duplo toque em `consultarStatusPix` (2 componentes), landmark `main` duplicado dentro do `ion-content` e recuperacao do smoke `golden-path-mobile` — **correcao de divida**; **implementada e verde em 2026-07-31, sem push nem PR** (suite e2e a 41 verdes / 0 falhas; Vitest 527/70) | 6 |
+| M-17 | [`217-msprint-17-followups-lockout-a11y-mobile.md`](./217-msprint-17-followups-lockout-a11y-mobile.md) | Jornada de conta bloqueada alcancavel e testada, race de duplo toque em `consultarStatusPix` (2 componentes), landmark `main` duplicado dentro do `ion-content` e recuperacao do smoke `golden-path-mobile` — **correcao de divida**; **concluida** (PR #135 develop / #136 main, 2026-07-31; suite e2e a 41 verdes / 0 falhas, o smoke estava vermelho desde a M-4; Vitest 527/70) | 6 |
 
 ## Dependencias gerais
 

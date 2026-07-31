@@ -19,8 +19,8 @@ _Atualizado em: 2026-07-31._
   externo de hardware macOS** (ver §Gates externos). O **par corretivo de lockout** aberto em
   2026-07-29 esta **fechado nos dois lados e mergeado**: Sprint 33 backend (PR #101/#102) e
   F-Sprint 21 web (PR #113/#114). Das tres sprints de divida planejadas em 2026-07-30, duas ja
-  sairam: a **F-Sprint 22 (web) mergeada em 2026-07-31** (PR #116) e a **M-Sprint 17 (mobile)
-  implementada e verde em 2026-07-31, mas ainda SEM push e SEM PR** — pendencia manual do dev. Resta
+  sairam e estao **mergeadas em develop+main**: a **F-Sprint 22 (web)** em 2026-07-31 (PR #116) e a
+  **M-Sprint 17 (mobile)** no mesmo dia (PR #135/#136). Resta
   executar a **Sprint 34 (backend)**, unica frente ainda nao iniciada.
   Depois delas, a decisao e de rumo: fechar a Fase 4 (§41 do PRD-FASE-4, ainda em branco) ou abrir a
   Fase 5.
@@ -53,15 +53,20 @@ _Atualizado em: 2026-07-31._
   §Proximo passo. Dois reviews geraram hotfix, ambos por furos que deixavam o check verde quando
   deveria reprovar. Detalhe em [`SPRINT-F-22-PR.md`](../repos/sep-app/SPRINT-F-22-PR.md).
 
-- **M-Sprint 17 (mobile) IMPLEMENTADA e verde em 2026-07-31 — na branch, SEM push e SEM PR.** Spec
+- **M-Sprint 17 (mobile) MERGEADA develop+main em 2026-07-31** — follow-ups de lockout,
+  acessibilidade e smoke (sprint de divida; sem jornada, rota, endpoint ou contrato novo). Spec
   [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + steps
-  [`217`](../steps-fase-4/mobile/217-msprint-17-steps.md). Branch
-  `feature/msprint-17-followups-lockout-a11y-mobile`, 13 commits sobre `77ea01a` (= `origin/develop`);
-  **push e PR sao manuais e ainda nao foram feitos**. As seis tasks fecharam os quatro defeitos:
+  [`217`](../steps-fase-4/mobile/217-msprint-17-steps.md). Em `origin/develop` via PR #135 (squash
+  `4c33367`, 13 commits absorvidos, 23 arquivos) e promovida a `main` via PR #136 (`96cd13c`), com
+  back-merge `4c29d17`. **`develop` != `main` por conteudo**, mas **nao por causa desta sprint**: o
+  Dependabot #133 (`fast-uri` 3.1.2 -> 3.1.5, `892a94d`) entrou em `main` as 16:26, 18 min depois do
+  back-merge das 16:08. A divergencia e **so `package-lock.json`**, nenhum arquivo de app — conteudo
+  da M-17 conferido integralmente em `main` por arquivos-assinatura e marcadores de codigo. Resolve
+  com um back-merge (ver §Proximo passo). As seis tasks fecharam os quatro defeitos:
   mock MSW com lockout (`/account-locked` alcancavel offline pela primeira vez); cobertura do `423`
   nas tres camadas, que era tratado desde a Sprint 5 sem nenhum teste; guarda de reentrancia nos
   **dois** componentes; `<main>` aninhado removido das 4 telas; foco no heading de `/account-locked` e
-  `/access-denied`; e o `golden-path-mobile` reescrito contra MSW. **A suite e2e vai a 41 verdes, sem
+  `/access-denied`; e o `golden-path-mobile` reescrito contra MSW. **A suite e2e foi a 41 verdes, sem
   nenhuma falha** — o smoke estava vermelho desde a M-4, ha quatro meses. Vitest **527 / 70** (era
   503/68); `cap sync android` e `gradlew assembleDebug` verdes **rodados localmente** (a maquina de
   dev tem Android SDK; o registro da M-16 dizendo o contrario estava desatualizado).
@@ -262,10 +267,11 @@ _Atualizado em: 2026-07-31._
    contra o mock. Como toca so `contracts/` e duas telas, pode ser embutida no gate de fechamento da
    34 em vez de virar sprint propria. **Cuidado**: `PoliticaLockout` (classe, CamelCase) e da Sprint 33
    e ja esta em `main`; `politica-lockout` (rota, kebab-case) e da 34 e nao existe.
-3. **Manual (dev humano) — push e PR da M-Sprint 17**: a branch
-   `feature/msprint-17-followups-lockout-a11y-mobile` esta implementada, verde e **so no local**, com
-   13 commits sobre `77ea01a`. Falta `git push`, PR para `develop` e a promocao para `main`. Descricao
-   pronta em [`SPRINT-M-17-PR.md`](../repos/sep-mobile/SPRINT-M-17-PR.md).
+3. **Manual (dev humano) — back-merge `main` -> `develop` no `sep-mobile`.** `develop` esta 1 commit
+   atras de `main`: o Dependabot #133 (`fast-uri` 3.1.2 -> 3.1.5, `892a94d`) entrou em `main` as
+   16:26 de 2026-07-31, depois do back-merge das 16:08 que fechou a M-17. Diferenca **so em
+   `package-lock.json`**, nenhum arquivo de app, mas quebra a invariante `develop` == `main` que o
+   projeto confere no fechamento de cada sprint — e o Gate da proxima sprint mobile vai tropecar nela.
 4. **Manual (dev humano) — commitar `docs-SEP`**: fechamento da F-Sprint 22 e da M-Sprint 17 neste
    arquivo, as descricoes [`SPRINT-F-22-PR.md`](../repos/sep-app/SPRINT-F-22-PR.md) e
    [`SPRINT-M-17-PR.md`](../repos/sep-mobile/SPRINT-M-17-PR.md), a remocao de

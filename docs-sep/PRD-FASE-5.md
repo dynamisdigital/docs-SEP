@@ -109,17 +109,19 @@ implementacao desta fase.
 
 Planejamento de alto nivel; todas as sprints **planejadas** e **gated** pelo acesso da sua frente.
 Specs e steps sao criados **just-in-time** em `specs/fase-5/` e `steps-fase-5/`. A numeracao continua
-a sequencia (backend a partir de 33; mobile a partir de M-17). Frentes de infra usam prefixo
-`I-Sprint` (infraestrutura) por nao serem sprints de codigo de aplicacao.
+a sequencia: **backend a partir de 35** (a 33 foi consumida pela correcao de lockout da Fase 4 e a 34
+pelos follow-ups dela) e **mobile a partir de M-18** (a M-17 foi consumida pelos follow-ups de
+lockout/a11y da Fase 4, mergeada em 2026-07-31). Frentes de infra usam prefixo `I-Sprint`
+(infraestrutura) por nao serem sprints de codigo de aplicacao.
 
 ### Backend / integracao (`sep-api`)
 
 | Sprint | Frente | Tema | Gate | Status |
 |--------|--------|------|------|--------|
-| 33 | A | Ativacao adapter real KYC/PLD (Celcoin) + validacao sandbox | credenciais Celcoin | planejada |
-| 34 | A | Ativacao adapter real assinatura/CCB + validacao sandbox | credenciais Celcoin | planejada |
-| 35 | A | Ativacao adapter real Pix + escrow + aporte + conciliacao (sandbox) | credenciais Celcoin | planejada |
-| 36 | A | Promocao das integracoes de sandbox para producao + trilha de auditoria | credenciais prod | planejada |
+| 35 | A | Ativacao adapter real KYC/PLD (Celcoin) + validacao sandbox | credenciais Celcoin | planejada |
+| 36 | A | Ativacao adapter real assinatura/CCB + validacao sandbox | credenciais Celcoin | planejada |
+| 37 | A | Ativacao adapter real Pix + escrow + aporte + conciliacao (sandbox) | credenciais Celcoin | planejada |
+| 38 | A | Promocao das integracoes de sandbox para producao + trilha de auditoria | credenciais prod | planejada |
 
 ### Infraestrutura (`sep-api` + `docs-SEP/ci-pipelines`)
 
@@ -133,8 +135,8 @@ a sequencia (backend a partir de 33; mobile a partir de M-17). Frentes de infra 
 
 | Sprint | Frente | Tema | Gate | Status |
 |--------|--------|------|------|--------|
-| M-17 | C | Build assinado de producao + publicacao Google Play (interno/beta -> prod) | conta Play | planejada |
-| M-18 | C | Build assinado de producao + publicacao App Store (TestFlight -> prod) | conta Apple | planejada |
+| M-18 | C | Build assinado de producao + publicacao Google Play (interno/beta -> prod) | conta Play | planejada |
+| M-19 | C | Build assinado de producao + publicacao App Store (TestFlight -> prod) | conta Apple | planejada |
 
 ### Go-live (cross-repo)
 
@@ -158,7 +160,7 @@ a sequencia (backend a partir de 33; mobile a partir de M-17). Frentes de infra 
 
 - **Credenciais Celcoin/BaaS** (sandbox e producao) — Frente A e Sprints 33-36.
 - **Conta/ambiente AWS aprovado** — Frente B e I-Sprints 1-3.
-- **Contas de desenvolvedor de loja** (Google Play, Apple Developer) — Frente C e M-17/M-18.
+- **Contas de desenvolvedor de loja** (Google Play, Apple Developer) — Frente C e M-18/M-19.
 - **Aprovacao regulatoria/juridica** para operar movimentacao financeira real (conformidade
   CMN 4.656/2018) — Frente D.
 - **ADRs candidatos** (just-in-time): estrategia de deploy/secrets AWS; feature flag de provider por

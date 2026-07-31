@@ -1607,15 +1607,21 @@ conteudo remoto** (vazio). Branch `feature/fsprint-22-contrato-erro-followups-we
   `features/public/register/` (4 arquivos). No `docs-SEP`: `STATE.md`, este historico,
   `PRD-FASE-4.md` §36, `AI-ROADMAP.md`, `specs/fase-4/README.md` e `SPRINT-F-22-PR.md` (criado).
 
-## M-Sprint 17 (mobile) — Follow-ups de lockout, acessibilidade e smoke — IMPLEMENTADA, sem push/PR (2026-07-31)
+## M-Sprint 17 (mobile) — Follow-ups de lockout, acessibilidade e smoke — MERGEADA develop+main (2026-07-31)
 
 - **Natureza**: sprint de **divida**, nao de produto. Nenhuma jornada, rota, endpoint ou contrato
   novo; nada mudou em `sep-api` nem em `sep-app`. Quita quatro defeitos registrados como follow-up
   desde a M-11, a M-16 e a F-21.
-- **Estado**: 13 commits na branch `feature/msprint-17-followups-lockout-a11y-mobile`, criada de
-  `origin/develop` (`77ea01a`). **Push e PR sao manuais e ainda nao foram feitos** — a sprint esta
-  verde so no local.
-- **Resultado mais visivel**: a suite e2e vai a **41 verdes, zero falhas**. O smoke
+- **Merge**: em `origin/develop` via PR **#135** (squash `4c33367`, 13 commits absorvidos, 23
+  arquivos), promovida a `main` via PR **#136** (`96cd13c`), com back-merge `4c29d17`. Conteudo da
+  sprint conferido integralmente em `main` por arquivos-assinatura (os 3 e2e novos e as 2 specs
+  novas) e por marcadores de codigo (`ionViewDidEnter`, guarda `carregandoPix()`, `senhaAceita`,
+  zero `<main>` nos 4 templates).
+- **`develop` != `main` no fechamento, e nao por causa desta sprint.** O Dependabot #133 (`fast-uri`
+  3.1.2 -> 3.1.5, `892a94d`) entrou em `main` as 16:26, 18 min **depois** do back-merge das 16:08. A
+  diferenca e **so `package-lock.json`**; nenhum arquivo de app. Resolve com um back-merge
+  `main` -> `develop`, registrado no §Proximo passo do `STATE.md`.
+- **Resultado mais visivel**: a suite e2e foi a **41 verdes, zero falhas**. O smoke
   `golden-path-mobile` estava vermelho **desde a M-Sprint 4** — quatro meses —, e a atribuicao
   anterior ("desde a M-13") estava errada; corrigida aqui e no `STATE.md`.
 - **Gate M-17.0 — o ambiente custou mais que o previsto.** O step antecipava so
