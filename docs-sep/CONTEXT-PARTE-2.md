@@ -1606,3 +1606,89 @@ conteudo remoto** (vazio). Branch `feature/fsprint-22-contrato-erro-followups-we
   `error.interceptor.spec.ts`, `login.component.spec.ts`, e remocao de
   `features/public/register/` (4 arquivos). No `docs-SEP`: `STATE.md`, este historico,
   `PRD-FASE-4.md` §36, `AI-ROADMAP.md`, `specs/fase-4/README.md` e `SPRINT-F-22-PR.md` (criado).
+
+## M-Sprint 17 (mobile) — Follow-ups de lockout, acessibilidade e smoke — IMPLEMENTADA, sem push/PR (2026-07-31)
+
+- **Natureza**: sprint de **divida**, nao de produto. Nenhuma jornada, rota, endpoint ou contrato
+  novo; nada mudou em `sep-api` nem em `sep-app`. Quita quatro defeitos registrados como follow-up
+  desde a M-11, a M-16 e a F-21.
+- **Estado**: 13 commits na branch `feature/msprint-17-followups-lockout-a11y-mobile`, criada de
+  `origin/develop` (`77ea01a`). **Push e PR sao manuais e ainda nao foram feitos** — a sprint esta
+  verde so no local.
+- **Resultado mais visivel**: a suite e2e vai a **41 verdes, zero falhas**. O smoke
+  `golden-path-mobile` estava vermelho **desde a M-Sprint 4** — quatro meses —, e a atribuicao
+  anterior ("desde a M-13") estava errada; corrigida aqui e no `STATE.md`.
+- **Gate M-17.0 — o ambiente custou mais que o previsto.** O step antecipava so
+  `node_modules/.vite-temp` root-owned; o real eram **1223 arquivos root-owned fora de
+  `node_modules`/`.git`** (mais 60696 dentro), incluindo fonte versionada — o que fazia o
+  `git checkout` deixar a arvore num estado misto que nao correspondia a commit nenhum. Exigiu
+  `sudo chown` do dev. Alem disso o `develop` local estava 4 commits atras com um merge local nunca
+  pushado, e o Playwright pedia `chromium_headless_shell-1228` (o disco tinha 1217).
+- **M-17.1** — mock MSW com contador de falhas por username e `423` a partir da 6a tentativa,
+  espelhando a **ordem de avaliacao** do `AutenticarUsuarioUseCase` (lockout antes de resolver o
+  usuario e de avaliar a credencial). A 5a senha errada ainda responde `401`; a senha **correta** apos
+  o bloqueio tambem responde `423`; sucesso nao zera o contador. `/account-locked` alcancavel offline
+  pela primeira vez.
+- **M-17.2** — o `423` era tratado em `login.component`, `verify-totp.component` e `errorInterceptor`
+  desde a Sprint 5 e **nenhuma das tres tinha teste**; `verify-totp` e `account-locked` nao tinham
+  spec nenhuma. Inclui negativo do `429` e o `423` vindo de `/auth/login`, rota que o interceptor
+  isenta do `401` mas nao do `423`. A copy de `/account-locked` foi conferida afirmacao por afirmacao
+  contra o `sep-api`, como a F-21 fez no web: **tres estavam erradas** — mandava "revise os
+  dispositivos conectados" sem que exista tela de sessoes ou endpoint que os liste; prometia "alguns
+  minutos" quando sao ate 30 contados da ultima tentativa; e atribuia o bloqueio so a senha, ignorando
+  que `TOTP_INVALIDO` soma no mesmo contador.
+- **M-17.3** — guarda de reentrancia em `consultarStatusPix` nos **dois** componentes
+  (`portfolio-detail` e `parcela-detail`), replicando o fix da M-16 em `consultarAportes`. O follow-up
+  original registrava um componente; eram dois.
+- **M-17.4** — `<main>` aninhado removido de 4 telas publicas. Confirmado no fonte do Ionic 8.8.11
+  que o `ion-content` aplica `role="main"` (`isMainContent = closest('ion-menu, ion-popover,
+  ion-modal') === null`) e que o app **nao usa nenhum dos tres**, entao nenhuma tela ficou sem
+  landmark. O teste vive no Playwright porque **no happy-dom o componente do Ionic nao hidrata** e o
+  `ion-content` sai sem `role` — no Vitest a contagem daria zero e passaria provando o contrario.
+- **M-17.5** — foco no heading de `/account-locked` e `/access-denied`. O hook e **`ionViewDidEnter`,
+  nao `ngAfterViewInit`** como no `sep-app`: medido em Chromium, no `ngAfterViewInit` o heading esta
+  visivel por estilo mas **sem caixa de layout** (`offsetParent` nulo, rect 0x0), porque os web
+  components do Ionic ainda nao renderizaram, e `focus()` sem caixa e no-op. O heading do
+  `account-locked` virou `h1` — o `ion-title` nao e exposto como heading, entao a pagina nao tinha
+  nivel 1, e o Ionic so neutraliza o outline de foco de `h1[tabindex="-1"]`.
+- **M-17.6** — o `golden-path-mobile` tinha **tres** causas independentes, e o seletor era a menor:
+  `/cadastr/i` nunca casou com o CTA "Criar conta" (esse texto existe desde a M-2); era o unico dos 9
+  specs sem `NG_APP_USE_MSW`; e as senhas do fixture violavam a politica. A **quarta** causa era o
+  grosso: o mock nao tinha o que a jornada exige — `POST /usuarios` devolvia `201` e **esquecia** o
+  usuario, `/auth/me` respondia sempre com o seed e **nao existia** `PATCH /usuarios/:id/senha`. Uma
+  **quinta** apareceu na execucao: o `ion-router-outlet` mantem a pagina anterior no DOM e
+  `getByLabel` casava register e login ao mesmo tempo.
+- **Tres defeitos fora do escopo planejado**, achados pelos code reviews e corrigidos com teste:
+  (a) o `errorInterceptor` **nao redirecionava** se `clearSession()` rejeitasse — `tokenStorage.clearAll()`
+  e Capacitor Preferences em device e pode falhar; como `from(promiseRejeitada)` nunca executa o
+  `switchMap`, o usuario ficava na tela autenticada e ainda recebia o erro de storage no lugar do
+  `401`/`423`. Preexistente, nos dois ramos. (b) `consultarAportes` (M-16) prendia o card **carregando
+  para sempre** quando havia reentrada na stack com o Pix em voo: a chamada de geracao vencida tomava
+  a guarda, a geracao corrente desistia da propria leitura e o `finally` da obsoleta pulava o reset.
+  Reproduzido por probe antes de corrigir. (c) o mock era **mais permissivo que producao** em tres
+  pontos — `senhaAceita()` sem o `MIN_CHARS_POR_PALAVRA` da `PasswordPolicy` (aceitava `"a b c d"`),
+  `PATCH` de senha sem `Authorization` nem ownership, e sem `@RequireStepUp` — a direcao perigosa da
+  assimetria, porque passa offline e quebra no device.
+- **Verificacao por mutacao em todas as Tasks**, conforme a spec exige. Os reviews acharam **nove
+  assercoes evadiveis** por reescrita parcial (copy casando pedacos soltos, `toHaveBeenCalledWith`
+  aceitando navegacao dupla, `expect.poll` mascarando foco setado-e-perdido, landmark invisivel
+  quando injetado no shell do app, `tabindex` removivel sem quebrar o unitario); todas foram
+  endurecidas e reverificadas.
+- **Gates de saida**: Vitest **527 / 70 arquivos** (era 503/68), Playwright **41 (0 falhas)** rodado
+  2x sem flake — um review rodou `--repeat-each=3` (120/120) —, format/lint/scss/build verdes,
+  `cap sync android` e `gradlew assembleDebug` verdes **rodados localmente**. **Achado de ambiente**:
+  a maquina de dev **tem** Android SDK (`~/Android/Sdk`); o registro da M-16 dizendo que nao tinha
+  estava desatualizado.
+- **Fora de escopo por decisao** (mantida): plugar o MSW no Vitest, `focusManagerPriority` global,
+  portar o `contract:check` e o escopo do Gate M-16.0. Sobre o `focusManagerPriority`, um review
+  trouxe **evidencia nova a favor**: ele faz `tabIndex=-1; focus()` em `main` -> `h1` -> `header` e
+  ainda **restaura o foco no back** via `[ion-last-focus]`, fechando os **13** destinos de redirect de
+  uma vez. Exige ADR; vale reabrir.
+- **Arquivos** — no `sep-mobile`: `src/mocks/handlers.ts`, `error.interceptor.{ts,spec.ts}`,
+  `login.component.spec.ts`, `verify-totp.component.spec.ts` (nova), `account-locked.component.{ts,spec.ts}`
+  (spec nova), `access-denied.component.{ts,html,spec.ts}`, `portfolio-detail.component.{ts,spec.ts}`,
+  `parcela-detail.component.{ts,spec.ts}`, 4 templates publicos, `e2e/golden-path-mobile.spec.ts`,
+  `e2e/fixtures/users.ts`, e os e2e novos `account-locked-mobile`, `landmarks-mobile` e
+  `foco-redirect-mobile`. No `docs-SEP`: `STATE.md`, este historico, `PRD-FASE-4.md` §36,
+  `AI-ROADMAP.md`, `specs/fase-4/README.md`, `SPRINT-M-17-PR.md` (criado) e `SPRINT-M-16-PR.md`
+  (removido, ciclo padrao).

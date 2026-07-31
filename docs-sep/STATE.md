@@ -18,9 +18,10 @@ _Atualizado em: 2026-07-31._
   fechados e mergeados; mobile **M-13 e M-16 mergeadas**; **M-14 (iOS) e M-15 (biometria iOS) bloqueadas por gate
   externo de hardware macOS** (ver §Gates externos). O **par corretivo de lockout** aberto em
   2026-07-29 esta **fechado nos dois lados e mergeado**: Sprint 33 backend (PR #101/#102) e
-  F-Sprint 21 web (PR #113/#114). Das tres sprints de divida planejadas em 2026-07-30, a **F-Sprint 22
-  (web) foi executada e mergeada em 2026-07-31** (PR #116). Restam **Sprint 34 (backend)** e
-  **M-Sprint 17 (mobile)** — as frentes executaveis restantes da Fase 4; a M-17 **nao depende da 34**.
+  F-Sprint 21 web (PR #113/#114). Das tres sprints de divida planejadas em 2026-07-30, duas ja
+  sairam: a **F-Sprint 22 (web) mergeada em 2026-07-31** (PR #116) e a **M-Sprint 17 (mobile)
+  implementada e verde em 2026-07-31, mas ainda SEM push e SEM PR** — pendencia manual do dev. Resta
+  executar a **Sprint 34 (backend)**, unica frente ainda nao iniciada.
   Depois delas, a decisao e de rumo: fechar a Fase 4 (§41 do PRD-FASE-4, ainda em branco) ou abrir a
   Fase 5.
 - **Spec/step ativo**: **Sprint 34 (backend) — planejada, nao iniciada**. Spec
@@ -52,22 +53,29 @@ _Atualizado em: 2026-07-31._
   §Proximo passo. Dois reviews geraram hotfix, ambos por furos que deixavam o check verde quando
   deveria reprovar. Detalhe em [`SPRINT-F-22-PR.md`](../repos/sep-app/SPRINT-F-22-PR.md).
 
-- **M-Sprint 17 (mobile) PLANEJADA em 2026-07-30 — nao iniciada, e sem dependencia nenhuma.** Spec
+- **M-Sprint 17 (mobile) IMPLEMENTADA e verde em 2026-07-31 — na branch, SEM push e SEM PR.** Spec
   [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + steps
-  [`217`](../steps-fase-4/mobile/217-msprint-17-steps.md). Seis tasks, quatro defeitos independentes:
-  (a) **a jornada de conta bloqueada e inalcancavel e nao testada** — o mock nunca produz `423`
-  (`handlers.ts:46-62`), e embora o mobile **ja trate `423` em tres camadas** (login, verify-totp,
-  `errorInterceptor`), **nenhuma tem teste**; `verify-totp` e `account-locked` nao tem spec;
-  (b) a race de duplo toque em `consultarStatusPix` existe em **dois** componentes
-  (`portfolio-detail:130` e `parcela-detail:138`), nao um — o molde do fix e o teste por mutacao ja
-  vieram prontos da M-16; (c) **landmark `main` duplicado**: o `ion-content` do Ionic ja e
-  `role="main"` e 4 telas aninham um `<main>` dentro dele — problema **inverso** ao do web, onde
-  faltava landmark; (d) o smoke `golden-path-mobile` esta vermelho **desde a M-4** (nao desde a M-13,
-  como este arquivo registrava): sao 3 causas — seletor `/cadastr/i` que nunca casou com o CTA "Criar
-  conta", MSW nao ativado e senha do fixture violando a politica. **Fora de escopo**: plugar o MSW no
-  Vitest, `focusManagerPriority` global, portar o `contract:check` e o escopo do Gate M-16.0 (exige
-  ADR) — todos registrados como follow-up. Baseline medida: Vitest **503 / 68 arquivos**, Playwright
-  **27 (26 passam, 1 falha)**.
+  [`217`](../steps-fase-4/mobile/217-msprint-17-steps.md). Branch
+  `feature/msprint-17-followups-lockout-a11y-mobile`, 13 commits sobre `77ea01a` (= `origin/develop`);
+  **push e PR sao manuais e ainda nao foram feitos**. As seis tasks fecharam os quatro defeitos:
+  mock MSW com lockout (`/account-locked` alcancavel offline pela primeira vez); cobertura do `423`
+  nas tres camadas, que era tratado desde a Sprint 5 sem nenhum teste; guarda de reentrancia nos
+  **dois** componentes; `<main>` aninhado removido das 4 telas; foco no heading de `/account-locked` e
+  `/access-denied`; e o `golden-path-mobile` reescrito contra MSW. **A suite e2e vai a 41 verdes, sem
+  nenhuma falha** — o smoke estava vermelho desde a M-4, ha quatro meses. Vitest **527 / 70** (era
+  503/68); `cap sync android` e `gradlew assembleDebug` verdes **rodados localmente** (a maquina de
+  dev tem Android SDK; o registro da M-16 dizendo o contrario estava desatualizado).
+  **Tres defeitos fora do escopo planejado** foram achados pelos reviews e corrigidos com teste:
+  (a) o `errorInterceptor` **nao redirecionava** se `clearSession()` rejeitasse, e ainda trocava o
+  `401`/`423` original pelo erro de storage; (b) `consultarAportes` (M-16) prendia o card carregando
+  **para sempre** quando havia reentrada com o Pix em voo — reproduzido por probe; (c) o mock era mais
+  permissivo que producao em tres pontos (politica de senha sem o piso por palavra, `PATCH` de senha
+  sem `Authorization`/ownership, e sem `@RequireStepUp`), a direcao perigosa da assimetria.
+  A copy de `/account-locked` teve **cada afirmacao conferida contra o `sep-api`** e tres estavam
+  erradas. **Fora de escopo por decisao**: plugar o MSW no Vitest, `focusManagerPriority` global,
+  portar o `contract:check` e o escopo do Gate M-16.0 (exige ADR). Detalhe em
+  [`SPRINT-M-17-PR.md`](../repos/sep-mobile/SPRINT-M-17-PR.md); historico em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §M-Sprint 17. Nada mudou em `sep-api`/`sep-app`.
 - **Sprint 34 (backend) PLANEJADA em 2026-07-30 — nao iniciada.** Sprint de divida,
   nao de produto: consome os follow-ups que a 33 e a F-21 registraram e as lacunas de OpenAPI abertas
   pela F-19. Sete tasks: observabilidade da tentativa barrada (hoje **nenhuma tentativa contra conta
@@ -155,13 +163,15 @@ _Atualizado em: 2026-07-31._
   e **sem nenhum CTA de mutacao**. `stepUpInterceptor` inalterado (GET nao consome o token de uso
   unico; ha teste travando). Badge `aporte-status` com rotulo textual e switch exaustivo sobre o
   union. Vitest **503** (era 487), Playwright 26 passed / 1 failed (`golden-path-mobile`,
-  preexistente da M-13), audit 0, build e `cap sync android` OK; `gradlew assembleDebug` roda no
-  job CI `Build Android (debug)` (a maquina de dev nao tem Android SDK). Escopo adiado
+  preexistente — **da M-4, nao da M-13**; ver M-Sprint 17), audit 0, build e `cap sync android` OK;
+  `gradlew assembleDebug` rodava no job CI `Build Android (debug)` (a M-17 constatou que a maquina de
+  dev **tem** Android SDK, ao contrario do que este registro dizia). Escopo adiado
   (matching, aporte POST, chaves Pix) **preservado como registro** na spec 216 e nos steps 216;
   reativar exige ADR + revisao da spec ou backend que admita a credora dona. Follow-up:
   `consultarStatusPix` (M-11.4, ja em `main`) tem a mesma race condition de duplo toque corrigida
-  aqui nos aportes. Detalhe em
-  [`SPRINT-M-16-PR.md`](../repos/sep-mobile/SPRINT-M-16-PR.md).
+  aqui nos aportes — **quitado pela M-Sprint 17**, que achou o defeito em dois componentes, nao um. A
+  descricao temporaria `SPRINT-M-16-PR.md` foi removida no ciclo padrao ao fechar a M-17; historico
+  em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §M-Sprint 16.
 
 - **M-Sprint 13 (mobile) MERGEADA em 2026-07-17** — empacotamento nativo Android via
   Capacitor 8 (Epic 14; sem jornada/endpoint/contrato novo, sem regressao PWA). Em
@@ -252,18 +262,16 @@ _Atualizado em: 2026-07-31._
    contra o mock. Como toca so `contracts/` e duas telas, pode ser embutida no gate de fechamento da
    34 em vez de virar sprint propria. **Cuidado**: `PoliticaLockout` (classe, CamelCase) e da Sprint 33
    e ja esta em `main`; `politica-lockout` (rota, kebab-case) e da 34 e nao existe.
-3. **M-Sprint 17 (mobile)** (planejada em 2026-07-30, **nao iniciada**): spec
-   [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + steps
-   [`217`](../steps-fase-4/mobile/217-msprint-17-steps.md). **Sem dependencia** — pode rodar a qualquer
-   momento, em paralelo com a 34. O **Gate M-17.0 exige remover
-   `node_modules/.vite-temp`** (root-owned apos execucao em container; o Vitest aborta com `EACCES`
-   antes de rodar qualquer teste) e **anotar sem corrigir** o vermelho preexistente do
-   `golden-path-mobile`, que e a Task M-17.6.
-4. **Manual (dev humano) — commitar `docs-SEP`**: fechamento da F-Sprint 22 neste arquivo, a
-   descricao [`SPRINT-F-22-PR.md`](../repos/sep-app/SPRINT-F-22-PR.md) e a linha da F-22 no
-   `PRD-FASE-4.md` §36 / `AI-ROADMAP.md`. `repos/sep-mobile/SPRINT-M-16-PR.md` segue pendente de
-   remocao (M-16 mergeada em 2026-07-20).
-5. **Decisao de rumo** (depois das sprints de divida restantes — 34 e M-17; fora delas so restam os
+3. **Manual (dev humano) — push e PR da M-Sprint 17**: a branch
+   `feature/msprint-17-followups-lockout-a11y-mobile` esta implementada, verde e **so no local**, com
+   13 commits sobre `77ea01a`. Falta `git push`, PR para `develop` e a promocao para `main`. Descricao
+   pronta em [`SPRINT-M-17-PR.md`](../repos/sep-mobile/SPRINT-M-17-PR.md).
+4. **Manual (dev humano) — commitar `docs-SEP`**: fechamento da F-Sprint 22 e da M-Sprint 17 neste
+   arquivo, as descricoes [`SPRINT-F-22-PR.md`](../repos/sep-app/SPRINT-F-22-PR.md) e
+   [`SPRINT-M-17-PR.md`](../repos/sep-mobile/SPRINT-M-17-PR.md), a remocao de
+   `repos/sep-mobile/SPRINT-M-16-PR.md` (feita no ciclo padrao ao fechar a M-17) e as linhas das duas
+   sprints no `PRD-FASE-4.md` §36 / `AI-ROADMAP.md` / `specs/fase-4/README.md`.
+5. **Decisao de rumo** (depois da Sprint 34, ultima frente de divida; fora dela so restam os
    gates externos). Duas opcoes, ambas legitimas:
    - **fechar a Fase 4** preenchendo o §41 do PRD-FASE-4 (hoje em branco) com status, PRs,
      back-merges e as dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do
@@ -294,11 +302,25 @@ _Atualizado em: 2026-07-31._
    compensatorio contra brute force lento (exige ADR); rotulo "Criar conta" prometendo formulario e
    entregando pagina informativa (UX, nao defeito); auto-cadastro web descontinuado na Sprint 5;
    `idCurto` e `formatarMoeda` duplicados em 6 arquivos cada (o segundo com **duas assinaturas**);
-   Playwright fora do CI-APP. **Absorvidos pela M-Sprint 17** (mobile, ainda nao executada): mock do
+   Playwright fora do CI-APP. **FECHADOS pela M-Sprint 17** (implementada em 2026-07-31): mock do
    `sep-mobile` sem `423` e as tres camadas de `423` sem teste; race condition de duplo toque em
    `consultarStatusPix` nos **dois** componentes; `<main>` aninhado dentro do `ion-content`; foco nos
-   destinos de redirect; smoke `golden-path-mobile`. **Seguem abertos no mobile**: plugar o MSW no
-   Vitest; `focusManagerPriority` global no `provideIonicAngular()`; ausencia de `contract:check` no
+   destinos de redirect; smoke `golden-path-mobile`. **Abertos pela M-Sprint 17** (mobile, achados nos
+   code reviews dela): **`/session-expired` nao move foco** — irmao de arquivo do `access-denied`,
+   alcancado por `401` sem gesto, ficou de fora porque o step nomeava so dois destinos;
+   **`onboarding-shell.iniciar()` sem guarda de reentrancia, e e MUTACAO** (POST que cria onboarding —
+   duplo toque dispara dois POSTs; e o item de maior valor da lista); `setup-biometric` e tela roteada
+   **sem `h1`** (o `ion-title` nao e exposto como heading); `src/app/home/home.page.html` e **orfa** e
+   tem `ion-header` dentro do `ion-content` (`banner` dentro de `main`), armadilha se alguem a rotear;
+   `paginaAtiva` duplicado em 4 specs e `enableMsw` nos 9, candidatos a `e2e/fixtures/`; nenhuma tela
+   de desfecho tem `aria-live`/`role="alert"` — o que foi medido e **foco no DOM em Chromium**, e em
+   VoiceOver iOS `focus()` programatico em elemento nao interativo frequentemente nao move o cursor;
+   `verify-totp` sem teste do ramo `precisaRedefinirSenha` nem do duplo-submit (o `login` tem a mesma
+   lacuna do primeiro); `resetAuthMockState()` sem chamador. **Seguem abertos no mobile**: plugar o
+   MSW no Vitest; `focusManagerPriority` global no `provideIonicAngular()` — **evidencia nova a favor**:
+   um review da M-17 leu a implementacao do Ionic e constatou que ele faz `tabIndex=-1; focus()` em
+   `main` -> `h1` -> `header` e ainda **restaura o foco no back** via `[ion-last-focus]`, fechando os
+   **13** destinos de redirect de uma vez (exige ADR); ausencia de `contract:check` no
    `sep-mobile`; Playwright fora do `CI-MOBILE`; `README.md` do `sep-mobile` dizendo "Vitest 2" com o
    repo em Vitest 3;
    escopo mobile adiado pelo Gate M-16.0 (matching, aporte POST, chaves Pix) registrado na spec 216.

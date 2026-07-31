@@ -11,8 +11,10 @@ backend.
 
 > **Status: CONCLUIDA** — mergeada em `develop` via PR #124 (squash `77ea01a`) e em `main` via
 > PR #125 (`a694f2d`), 2026-07-20; `develop` == `main` conferido por conteudo remoto. Vitest
-> 503/503; Playwright 26 passed / 1 failed (`golden-path-mobile`, preexistente da M-13). Detalhe em
-> [`repos/sep-mobile/SPRINT-M-16-PR.md`](../../repos/sep-mobile/SPRINT-M-16-PR.md).
+> 503/503; Playwright 26 passed / 1 failed (`golden-path-mobile`, preexistente — **da M-4, nao da
+> M-13**, como a M-Sprint 17 apurou; ela recuperou o smoke e a suite foi a 41 verdes). Detalhe em
+> [`CONTEXT-PARTE-2.md`](../../docs-sep/CONTEXT-PARTE-2.md) §M-Sprint 16 — a descricao temporaria
+> `SPRINT-M-16-PR.md` foi removida no ciclo padrao ao fechar a M-17.
 >
 > **ESCOPO REDUZIDO PELO GATE M-16.0 (2026-07-20).** O precheck constatou que o `sep-mobile` so
 > conhece `UsuarioRole = 'ADMIN' | 'CLIENTE'` (`src/app/core/api/api.models.ts:1`) e que 5 dos 6
