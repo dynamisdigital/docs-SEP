@@ -1698,3 +1698,79 @@ conteudo remoto** (vazio). Branch `feature/fsprint-22-contrato-erro-followups-we
   `foco-redirect-mobile`. No `docs-SEP`: `STATE.md`, este historico, `PRD-FASE-4.md` §36,
   `AI-ROADMAP.md`, `specs/fase-4/README.md`, `SPRINT-M-17-PR.md` (criado) e `SPRINT-M-16-PR.md`
   (removido, ciclo padrao).
+
+## Sprint 34 (backend) — Follow-ups de lockout e divida de contrato OpenAPI — MERGEADA develop+main (2026-08-03)
+
+Sprint de divida, nao de produto. Em `origin/develop` via PR #103 (squash `0d24602`) e promovida a
+`main` via PR #104 (`550fed3`); `develop` == `main` conferido por diff de conteudo (vazio). 13 commits
+na branch (7 de task, 6 de hotfix de code review), **2220 testes / 0 falhas** (partida 2173), migration
+`V60`, sem ADR, sem estado novo. O gate de contrato no `sep-app` saiu junto: PR #120 (`83681e2`) em
+`develop` e #121 (`ed9c816`) em `main`, restrito a `contracts/` — `contract:check` de **29 lacunas
+para 1**, `knownGaps` de 8 para 1, Vitest 745. Descricao completa em
+[`SPRINT-34-PR.md`](../repos/sep-api/SPRINT-34-PR.md).
+
+**Observabilidade do bloqueio (34.1)** — ate a Sprint 33 nenhuma tentativa contra conta bloqueada
+deixava rastro: `verificar()` lanca antes de qualquer `registrar(...)`, entao uma conta sob ataque
+durante o bloqueio ficava invisivel. Os dois use cases capturam, gravam `CONTA_BLOQUEADA` em
+`REQUIRES_NEW` e repropagam. Tipo de audit proprio `LOCKOUT_TENTATIVA_BARRADA` (migration `V60`)
+porque "bloqueou agora" e "tentou durante o bloqueio" sao fatos distintos. O `LIMITE_DE_LEITURA`
+deixou de ser constante: o javadoc declarava que o teto de 100 so era seguro **porque** tentativas
+bloqueadas nao eram registradas, premissa que esta task removeu.
+
+**`detalhes` serializado (34.2)** — o campo e `jsonb` e o `username` vem da request, mas o documento
+era concatenado; username com aspas produzia JSON invalido e derrubava a gravacao inteira do rastro.
+
+**`Retry-After` (34.3)** — `PoliticaLockout` ja tinha o instante do evento, mas `estaBloqueada`
+devolvia `boolean` e o descartava: conta bloqueada ha 29 min mandava esperar 30. O `423` publica o
+restante; o `429`, o periodo de refresh. `ErrorResponseDto` inalterado. **O review pegou que
+`Retry-After` nao e safelisted pelo CORS** e `exposed-headers` so tinha `X-Correlation-Id` — a
+feature nascia inerte no browser, e nenhum IT via, porque RestAssured nao aplica CORS.
+
+**Invariante e evicção (34.4)** — `RateLimitLockoutValidator` derruba o boot com
+`rate-limit <= max-attempts`, lendo pelo `Binder` para enxergar o relaxed binding que o
+`@ConfigurationProperties` usa (com `getProperty` um override em camelCase ficava invisivel ao
+validador e visivel ao runtime). **Os defaults do POJO violavam a propria invariante** (5 vs 5); so o
+YAML segurava. O mapa de limitadores ganhou teto LRU de 10.000 e a origem passou a ser limitada a 45
+chars — um token de 8 KB inflava a memoria 20x e estourava `login_attempt.ip`, abortando o rastro com
+500.
+
+**Endpoint de politica (34.5)** — `GET /api/v1/auth/politica-lockout`, publico, derivado da **mesma**
+`PoliticaLockout` que o service aplica, com `permitAll` por metodo.
+
+**Contrato (34.6/34.7)** — `OperationCustomizer` declara `X-Step-Up-Token` nos **24** endpoints (10
+`required`, 14 condicional: `@RequireStepUp` tem bypass para usuario sem MFA); enums de contrato e
+assinatura publicados; headers de resposta do documento assinado documentados. A 34.7 converteu tudo
+em regressao — o `OpenApiConfigTest` so fazia `.exists()`, e apagar as quatro declaracoes deixava a
+suite verde.
+
+**Duas premissas da spec caiam.** (a) O `Duration` do dashboard: a spec dizia que o Jackson emitia
+numero e mandava anotar `@Schema(type = "number")`; o `JacksonAutoConfiguration` **desliga**
+`WRITE_DURATIONS_AS_TIMESTAMPS` e o fio leva ISO-8601 (medido). O `type: string` do springdoc **ja
+estava certo** e quem diverge e o `sep-app`, que declara `frontendType: number` — o dashboard
+backoffice renderiza **`NaNmin`** hoje. Anotar como `number` teria apagado o unico detector disso.
+**Esse `knownGap` nao fecha nesta sprint.** A suite nao pegava porque `DashboardBackofficeTest` usa um
+`ObjectMapper` cru, sem a auto-config do Boot. (b) Os defaults de `RateLimitProperties`, acima.
+
+**Metodo** — todo comportamento novo foi verificado por mutacao (13 regressoes aplicadas e revertidas,
+cada uma deixando vermelho o teste correspondente). Duas mutacoes revelaram testes que passavam
+provando nada: a contagem de enum derivada de `values()` (os dois lados andavam juntos) e o guard de
+`permitAll` assertando apenas "diferente de 200" (o matcher sem metodo devolve 500, tambem diferente
+de 200). Ambos endurecidos.
+
+**Gate de fechamento**: executado em 2026-08-03. Snapshot reexportado do runtime da branch da sprint
+em perfil `dev`; fecharam as 18 ocorrencias do `X-Step-Up-Token` (o gap usava `appliesTo: "*"`), os 8
+enums e os 2 headers de resposta; entraram o `Retry-After` nos `423`/`429` e a rota
+`politica-lockout`, que a F-22.6 consome. A lacuna do `Duration` **permanece de proposito**, com o
+`reason` corrigido.
+
+**Incidente de merge.** O back-merge `main` -> `develop` (`4a02fc1`) duplicou
+`falhasRecentes(int, Duration)` em `LockoutServiceTest`, quebrando `compileTestJava` no CI de
+`develop` -> `main`. Nao foi o squash da feature, que entrou correto com 2 definicoes: o back-merge
+virou 3, adicionando 8 linhas num arquivo que `main` nao havia alterado desde a base comum — merge
+automatico manteria `develop` intacto, entao foi resolucao manual. Corrigido em `fd4b4b1` (-8 linhas).
+Raio medido, nao presumido: a branch estava 13 a frente e 0 atras de `origin/develop`, entao um merge
+limpo obriga diff vazio; o diff real era de 8 linhas em 1 arquivo, e `main` ainda nao tinha a sprint.
+Terceira ocorrencia de evil merge no projeto, primeira no `sep-api`, e variante nova — antes foram
+injecao de texto (F-10, F-14) e reversao silenciosa (M-7), agora duplicacao. **Nao e pego por
+`format:check` nem por teste**: o bloco duplicado esta bem formatado e a suite nem chega a rodar; so
+a compilacao pega.

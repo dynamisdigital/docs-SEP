@@ -147,10 +147,38 @@ recebam dois pares validos.
   com os dois valores em 5, a 6a tentativa — a unica capaz de responder `423`
   — era barrada com `429` e o cliente nunca via o bloqueio. O rate limit
   protege o servico; quem protege a conta e o lockout.
-- Backend: Resilience4j `RateLimiterRegistry` com chave dinamica `login:<ip>` /
-  `totp-verify:<ip>`.
+- **Validada no boot desde a Sprint 34** (`RateLimitLockoutValidator`,
+  `BeanFactoryPostProcessor`): a aplicacao nao sobe com `rate-limit <=
+  max-attempts`, citando property, valor e regra. Ate entao a invariante vivia
+  num comentario do `application.yml` e num assert de teste, e as cinco env vars
+  podiam quebra-la em silencio em qualquer ambiente. Le pelo `Binder`, e nao por
+  `getProperty`, para enxergar o mesmo relaxed binding que o
+  `@ConfigurationProperties` usa — senao um override em camelCase ficaria
+  invisivel ao validador e visivel ao runtime.
+- Os **defaults do POJO** `RateLimitProperties` eram `5`, iguais a
+  `max-attempts`: os proprios defaults violavam a invariante e so o
+  `application.yml` (10) segurava. Corrigidos para 10 na Sprint 34.
+- Backend: um `RateLimiter` do Resilience4j por chave `login:<ip>` /
+  `totp-verify:<ip>`. Desde a Sprint 34 vivem num mapa **LRU por ordem de
+  acesso com teto de 10.000**; antes era get-or-create sem TTL nem teto, e como
+  a origem e escolhida pelo cliente (ver abaixo) a heap crescia sem limite. A
+  entrada mais antiga em acesso e a que tem mais chance de ja estar cheia, e
+  limitador cheio e indistinguivel de recem-criado, entao a evicção nao devolve
+  orcamento a ninguem.
+- **A origem nao e confiavel.** Com `server.forward-headers-strategy: framework`
+  o `ForwardedHeaderFilter` consome o `X-Forwarded-For` e copia o primeiro token
+  — sem allowlist de proxy — para o `getRemoteAddr()`. Quem escolhe o valor e o
+  cliente, nos dois caminhos. Fechar isso e mudanca de configuracao
+  (`forward-headers-strategy: native` com `server.tomcat.remoteip.internal-proxies`
+  restrito ao CIDR do balanceador) e segue como follow-up. A Sprint 34 limitou o
+  **tamanho** a 45 chars (o mesmo de `login_attempt.ip`), porque um token de 8 KB
+  inflava a memoria do mapa em mais de 20x e estourava a coluna, abortando o
+  rastro dentro do `REQUIRES_NEW` e devolvendo 500 sem registro.
 - Excedido: `429 Too Many Requests` com `ErrorResponseDto` JSON e header
-  Retry-After (futuro).
+  **`Retry-After`** (Sprint 34) com o **periodo de refresh** do limitador (60s).
+  E limite superior deliberado, nao o tempo exato ate a proxima permissao: esse
+  valor so existe em `AtomicRateLimiter.getDetailedMetrics().getNanosToWait()`,
+  do pacote `internal`, e o `RateLimiter.Metrics` publico nao o expoe.
 
 ### Account lockout (`LockoutService`)
 
@@ -165,9 +193,23 @@ recebam dois pares validos.
   manual (administrativo ou self-service); senha correta durante o bloqueio
   tambem recebe `423` (o lockout e verificado antes da credencial).
 - Sem estado persistido: o bloqueio e derivado de `login_attempt` na leitura.
-  `CONTA_BLOQUEADA` nao conta como falha (nenhum caminho de producao o
-  escreve; se contasse, cada tentativa barrada renovaria o proprio bloqueio).
-- HTTP 423 Locked (`ContaBloqueadaException`, codigo `AUTH-423-001`).
+  `CONTA_BLOQUEADA` **passou a ser escrito na Sprint 34** — ate a 33 nenhuma
+  tentativa contra conta bloqueada deixava rastro, porque `verificar()` lanca
+  antes de qualquer registro, e uma conta sob ataque durante o bloqueio ficava
+  invisivel. Continua **fora** da contagem de falhas: se contasse, cada tentativa
+  barrada renovaria o proprio bloqueio (bloqueio auto-perpetuante), e ha teste de
+  guarda travando isso.
+- HTTP 423 Locked (`ContaBloqueadaException`, codigo `AUTH-423-001`), com header
+  **`Retry-After`** (Sprint 34) trazendo os segundos **restantes deste** bloqueio,
+  arredondados para cima. Nao se confunde com a `message`, que enuncia a politica
+  (30 minutos): um bloqueio que ja correu metade do tempo anuncia a mesma politica
+  e uma espera menor. Ate a Sprint 33 o instante do evento existia em
+  `PoliticaLockout` mas era descartado, e o `423` anunciava a duracao configurada
+  como se fosse a espera restante.
+  > `Retry-After` **nao e safelisted pelo CORS**. Para o browser conseguir le-lo,
+  > ele precisa constar em `app.cors.exposed-headers` — sem isso o
+  > `headers.get('Retry-After')` devolve `null` no `sep-app`/`sep-mobile`, que sao
+  > origens distintas da API, e nenhum IT percebe (RestAssured nao aplica CORS).
 - Audit `LOCKOUT` + email sao emitidos **na transicao** (quando a falha
   recem-registrada e a que trancou a conta), uma vez por evento de bloqueio,
   em transacao propria (`REQUIRES_NEW`) — o registro da tentativa e o audit
@@ -177,8 +219,10 @@ recebam dois pares validos.
   sistema 2x mais permissivo contra brute force lento — para nunca bloquear,
   o atacante passa de 4 falhas/30 min (192/dia/conta) para 4 falhas/15 min
   (384/dia/conta), e o rate limit por IP nao restringe ataque distribuido.
-  Controle compensatorio (backoff exponencial ou rate limit por conta) e
-  follow-up registrado, fora do escopo da Sprint 33.
+  Controle compensatorio (backoff exponencial ou rate limit por conta)
+  **segue aberto**: ficou fora da Sprint 33 e tambem da 34, por exigir ADR.
+  A Sprint 34 nao mudou a exposicao — o atacante otimo nunca dispara o `423`,
+  entao o `Retry-After` e o endpoint de politica nao lhe acrescentam capacidade.
 
 ### O que o usuario ve (web, F-Sprint 21)
 
@@ -186,11 +230,13 @@ O backend so protege a conta; quem informa o usuario e o front. Registrado aqui
 porque o defeito corrigido em 2026-07-30 passou 28 sprints despercebido — a
 politica estava documentada e implementada, mas a jornada nunca chegava ao fim.
 
-- **O HTTP status e o unico discriminador de categoria no fio.** O
-  `ErrorResponseDto` nao tem campo de codigo e o `AUTH-423-001` nunca e
-  serializado. O login mapeia `400`/`401`/`423`/`429`/rede para mensagens
-  distintas; antes tratava todos como senha invalida, entao um usuario com a
-  conta trancada era informado de que errou a senha.
+- **O HTTP status segue sendo o unico discriminador de _categoria_ no fio**, e e
+  nele que o cliente deve ramificar. O `ErrorResponseDto` nao tem campo de codigo
+  e o `AUTH-423-001` nunca e serializado. O login mapeia
+  `400`/`401`/`423`/`429`/rede para mensagens distintas; antes tratava todos como
+  senha invalida, entao um usuario com a conta trancada era informado de que
+  errou a senha. Desde a Sprint 34 o fio carrega tambem `Retry-After` no `423` e
+  no `429` — informacao de _tempo_, nao de categoria.
 - **`429` nunca e apresentado como bloqueio.** Rate limit por IP nao tranca
   conta nenhuma; confundir os dois informa um bloqueio inexistente e apaga a
   sessao de quem so tentou rapido demais.
@@ -203,9 +249,28 @@ politica estava documentada e implementada, mas a jornada nunca chegava ao fim.
   dispositivos — nao existe endpoint de unlock, nem recuperacao de senha para
   usuario nao autenticado, nem tela de sessoes.
 - **O valor de `lockout-minutes` e sobrescrevivel por ambiente.** O login ecoa o
-  `message` do backend, entao acompanha um override; `/account-locked` nao (o
-  interceptor descarta o erro ao navegar) e fixa 30 — se o default mudar, essa
-  pagina desalinha. Follow-up: expor o valor no contrato.
+  `message` do backend, entao acompanha um override; `/account-locked` nao — o
+  interceptor descarta o erro ao navegar — e por isso fixava 30 no texto.
+  **Entregue na Sprint 34**: `GET /api/v1/auth/politica-lockout`, publico e
+  somente leitura, devolve `maxAttempts`/`windowMinutes`/`lockoutMinutes`
+  **efetivos** do ambiente, derivados da mesma `PoliticaLockout` que o
+  `LockoutService` aplica. `permitAll` **por metodo** (`GET`): escrita no mesmo
+  path continua exigindo autenticacao. Consumir isso em `/account-locked` e a
+  Task F-22.6, ainda aberta.
+  > **Armadilha para a F-22.6**: o `authInterceptor` do `sep-app` isenta apenas
+  > `/auth/login`. Reload ou navegacao direta a `/account-locked` com token velho
+  > no storage manda o token, leva `401` do `JwtAuthenticationFilter` e cai de
+  > volta no texto fixo — exatamente o cenario para o qual o endpoint existe.
+  > Isentar `/auth/politica-lockout` junto de `/auth/login`.
+- **Exposicao aceita.** Dos tres numeros, so `lockoutMinutes` ja saia na
+  `message` do `423`. Os outros dois eram legiveis no `/v3/api-docs` — que e
+  `permitAll` e fica habilitado em producao —, la com os **defaults fixos no
+  codigo**. O incremento real do endpoint e refletir o valor efetivo. Aceito: os
+  numeros sao de baixa entropia, o lockout e por conta (spraying nao o dispara),
+  um atacante os mede com ~6 tentativas numa conta propria (`POST /api/v1/usuarios`
+  e publico), e a alternativa e o cliente adivinhar. Nao ha enumeracao: username
+  inexistente grava `USUARIO_INEXISTENTE`, que esta fora de `STATUSES_FALHA`, entao
+  **nunca** produz `423`.
 - O `sep-mobile` trata o `423` no proprio componente, porque la nao existe esse
   redirect no interceptor; o mock de la ainda nao produz `423` (follow-up).
 
@@ -267,7 +332,8 @@ retencao minima 90 dias (LGPD Art. 16).
 | `LOGIN_OK`, `LOGIN_FAIL` | `RegistrarTentativaLoginUseCase` | Senha valida/invalida |
 | `TOTP_OK`, `TOTP_FAIL` | `RegistrarTentativaLoginUseCase` / `VerificarTotpUseCase` | MFA verify |
 | `BACKUP_CODE_USED` | `VerificarTotpUseCase` | Login via backup code |
-| `LOCKOUT` | `LockoutService` | Conta entra em lockout |
+| `LOCKOUT` | `LockoutService` | Conta entra em lockout (**transicao**, uma vez por evento) |
+| `LOCKOUT_TENTATIVA_BARRADA` | `RegistrarTentativaLoginUseCase` (Sprint 34) | Tentativa recusada **durante** o bloqueio, a cada recusa |
 | `PASSWORD_CHANGED` | `AlterarSenhaUseCase` | Redefinicao de senha |
 | `MFA_ENABLED`, `MFA_DISABLED` | `ConfirmarTotpUseCase` / `DesabilitarTotpUseCase` | Toggle MFA |
 | `REFRESH_REUSE_DETECTED` | `RefreshTokenUseCase` | Reuse de refresh marcado USADO |
@@ -276,6 +342,19 @@ retencao minima 90 dias (LGPD Art. 16).
 
 Helper centralizado: `AuditLogSegurancaService` (3 overloads de
 `gravar(tipo, usuarioId, [ip], [userAgent], [detalhesJson])`).
+
+> `LOCKOUT` e `LOCKOUT_TENTATIVA_BARRADA` sao **fatos distintos** e por isso tipos
+> distintos (migration `V60`): "bloqueou agora" e "tentou durante o bloqueio".
+> Com o mesmo tipo, separa-los exigiria parsear o `jsonb`, e
+> `findByUsuarioIdAndTipoOrderByDataEventoDesc` deixaria de ser util. O caminho de
+> `RegistrarTentativaLoginUseCase` **propaga** ip e user-agent; o de
+> `LockoutService.avaliarPosFalha` os passa como `null` (o service nao os recebe).
+>
+> O campo `detalhes` e **serializado** com `ObjectMapper` desde a Sprint 34. Era
+> montado por concatenacao de string contra uma coluna `jsonb`, e o `username` vem
+> do corpo da request: um username com aspas produzia JSON invalido, que o Postgres
+> rejeita na conversao — derrubando a gravacao inteira do rastro, dentro de um
+> `REQUIRES_NEW`. O `@Email` do DTO nao protege: a RFC admite local-part entre aspas.
 
 > Webhook Pix (`POST /api/v1/webhooks/celcoin/pix`, Sprint 19): autenticacao por
 > HMAC SHA-256 (`WebhookSignatureValidator`, secret `app.webhooks.secrets.celcoin-pix`),

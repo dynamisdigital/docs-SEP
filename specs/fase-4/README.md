@@ -28,7 +28,7 @@ As tabelas usam a ordem recomendada de execucao.
 | 31 | [`031-sprint-31-pix-gestao-chaves.md`](./031-sprint-31-pix-gestao-chaves.md) | Gestao de chaves Pix (assistido, Provider Pattern) | 6 |
 | 32 | [`032-sprint-32-adapters-celcoin-skeleton.md`](./032-sprint-32-adapters-celcoin-skeleton.md) | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar) | 5 |
 | 33 | [`033-sprint-33-lockout-conformidade.md`](./033-sprint-33-lockout-conformidade.md) | Conformidade da politica de lockout (15/30 min) + `423` alcancavel — **correcao de defeito**; **MERGEADA develop+main** (PR #101/#102, 2026-07-29) | 4 |
-| 34 | [`034-sprint-34-followups-lockout-contrato.md`](./034-sprint-34-followups-lockout-contrato.md) | Follow-ups do lockout (observabilidade, `Retry-After`, invariante de config, evicção do registry) + divida de contrato OpenAPI (`knownGaps` da F-19) — **correcao de divida**; planejada | 7 |
+| 34 | [`034-sprint-34-followups-lockout-contrato.md`](./034-sprint-34-followups-lockout-contrato.md) | Follow-ups do lockout (observabilidade, `Retry-After`, invariante de config, evicção do registry) + divida de contrato OpenAPI (`knownGaps` da F-19) — **correcao de divida**; **concluida** (PR #103 develop / #104 main, 2026-08-03; 13 commits, 2220 testes, migration `V60`; gate de contrato no `sep-app` via PR #120/#121, `contract:check` de 29 lacunas para 1) | 7 |
 
 ## Web (`sep-app`)
 
@@ -40,7 +40,7 @@ As tabelas usam a ordem recomendada de execucao.
 | F-19 | [`119-fsprint-19-hardening-tooling-contrato-web.md`](./119-fsprint-19-hardening-tooling-contrato-web.md) | Hardening de tooling + refresh contrato/collection | 5 |
 | F-20 | [`120-fsprint-20-chaves-pix-web.md`](./120-fsprint-20-chaves-pix-web.md) | Gestao de chaves Pix no web — **concluida** (PR #107/#108, 2026-07-21; fecha a pendencia do Gate F-18.0 e o recorte web do `v1.0-local`) | 7 |
 | F-21 | [`121-fsprint-21-lockout-login-web.md`](./121-fsprint-21-lockout-login-web.md) | Jornada de conta bloqueada no login web — **correcao de defeito**; **MERGEADA develop+main** (PR #113/#114, 2026-07-30; fecha o par corretivo com a Sprint 33; smoke real contra `:8080` aprovado) | 4 |
-| F-22 | [`122-fsprint-22-contrato-erro-followups-web.md`](./122-fsprint-22-contrato-erro-followups-web.md) | Contrato de erro verificavel no `contract:check` (status de erro + gap obsoleto) e follow-ups da F-21 (`verify-totp`, foco/landmarks, registro orfao, helper de erro) — **correcao de divida**; **MERGEADA develop+main** (PR #116, 2026-07-31) **exceto a Task 6**, que depende da Sprint 34 e da regeneracao do snapshot OpenAPI | 6 |
+| F-22 | [`122-fsprint-22-contrato-erro-followups-web.md`](./122-fsprint-22-contrato-erro-followups-web.md) | Contrato de erro verificavel no `contract:check` (status de erro + gap obsoleto) e follow-ups da F-21 (`verify-totp`, foco/landmarks, registro orfao, helper de erro) — **correcao de divida**; **MERGEADA develop+main** (PR #116, 2026-07-31) **exceto a Task 6**, que dependia da Sprint 34 e da regeneracao do snapshot OpenAPI — **ambos feitos em 2026-08-03, entao a Task 6 esta destravada** | 6 |
 
 ## Mobile (`sep-mobile`)
 
@@ -72,9 +72,12 @@ As tabelas usam a ordem recomendada de execucao.
 - **Sprint 34 (2026-07-30)**: sprint de divida, nao de produto. Consome os follow-ups que a 33 e a
   F-21 registraram e as lacunas de OpenAPI abertas pela F-19 desde 2026-07-16. Depende da 33 (opera
   sobre o codigo que ela deixou) e nao desbloqueia frente nova — o que ela entrega e o
-  `contract:check` passar a ter opiniao real sobre o `X-Step-Up-Token`, hoje silenciado em 18
+  `contract:check` passar a ter opiniao real sobre o `X-Step-Up-Token`, ate entao silenciado em 18
   endpoints por um `knownGap` com `appliesTo: "*"`. Toca o `sep-app` apenas em `contracts/`, no gate
-  de fechamento.
+  de fechamento. **Achado da execucao**: uma das cinco lacunas estava mal diagnosticada — o
+  `Duration` do dashboard ja era documentado corretamente como `string` (o Spring Boot desliga
+  `WRITE_DURATIONS_AS_TIMESTAMPS`), e quem diverge e o `sep-app`. Esse `knownGap` **nao fecha nesta
+  sprint**; fecha do lado web.
 - Mobile M-13 -> M-14 (nativo); M-15 depende da base nativa (M-13/M-14) e da Sprint 27; M-16 depende
   das Sprints backend 29-31 e da M-Sprint 10.
 - **M-Sprint 17 (2026-07-30)**: terceira sprint de divida da fase, junto com a 34 e a F-22, e a

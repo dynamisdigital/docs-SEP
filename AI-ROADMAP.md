@@ -127,8 +127,16 @@ Leitura base para qualquer agente:
 > tratam nao tinham teste), fechou a race de duplo toque em `consultarStatusPix` nos **dois**
 > componentes, removeu o landmark `main` duplicado dentro do `ion-content`, moveu o foco nos destinos
 > de redirect e recuperou o smoke `golden-path-mobile`, vermelho desde a **M-4** — **a suite e2e foi
-> a 41 verdes, zero falhas**. Resta a **Sprint 34** (backend). Fora dela, so M-14 e M-15, presas ao
-> gate de hardware macOS.
+> a 41 verdes, zero falhas**. A **Sprint 34** (backend) esta **mergeada em develop+main**
+> (2026-08-03, PR #103/#104, 2220 testes, migration `V60`), com o gate de contrato no `sep-app` junto
+> (PR #120/#121, `contract:check` de 29 lacunas para 1): tentativa contra conta bloqueada passa a
+> deixar rastro, `Retry-After` no `423`/`429`, invariante de rate limit validada no boot,
+> `GET /api/v1/auth/politica-lockout` publico e as lacunas de OpenAPI fechadas com regressao. Uma
+> das cinco lacunas caiu por diagnostico errado da spec: o `Duration` do dashboard ja era
+> documentado corretamente como `string`, e a divergencia e do `sep-app` — esse `knownGap` fecha do
+> lado web, junto da **Task F-22.6**, que a Sprint 34 acaba de destravar. Fora disso, so M-14 e M-15,
+> presas ao gate de hardware macOS — **a Fase 4 nao tem mais frente executavel sobre fake**, e a
+> proxima decisao e de rumo: fechar a fase (§41 do PRD-FASE-4) ou abrir a Fase 5.
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em
