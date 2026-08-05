@@ -775,3 +775,74 @@ Endpoints (`hasRole('ADMIN')`; `PATCH` com `@RequireStepUp`):
 Auditoria: `PARAMETRO_OPERACIONAL_ALTERADO` (V44). Consumo em regras de negocio: **adocao
 incremental** — `credito`/`backoffice` ainda leem properties; a porta `ParametroOperacionalReader`
 (com fallback ao default) habilita migracao gradual sem quebrar regras existentes.
+
+## 18. Supply chain de dependencias (D-Sprint 1 — 2026-08-05)
+
+### Numeros antes/depois
+
+Medidos com `npm audit` em `develop`, na branch da sprint. A medicao registrada na spec 300 para o
+`sep-mobile` (25 total / 1 critical / 15 high) **nao vale**: foi tirada da branch de feature da M-17,
+antes do back-merge. A linha abaixo e a do Gate D-1.0.
+
+| Repo | Momento | critical | high | moderate | low | total |
+|---|---|---|---|---|---|---|
+| `sep-app` | baseline (Gate, 2026-08-05) | 0 | **12** | 7 | 0 | 19 |
+| `sep-app` | final (2026-08-05) | 0 | **0** | 3 | 0 | 3 |
+| `sep-mobile` | baseline (Gate, 2026-08-05) | 0 | **11** | 8 | 0 | 19 |
+| `sep-mobile` | final (2026-08-05) | 0 | **0** | 8 | 0 | 8 |
+
+**`high` + `critical` foi a zero nos dois repos**, inteiramente dentro da baseline: nenhum major
+subido. No `sep-app` a correcao foi o Angular `20.3.26 -> 20.3.27` (o range vulneravel terminava
+exatamente em `20.3.26`) mais `@angular/build`/`@angular/cli` `20.3.32 -> 20.3.33`; no `sep-mobile`,
+o `npm audit fix` resolveu sozinho, sem tocar o `package.json`. Ionic 8.8.11 e Capacitor 8.4.0
+permanecem intactos, conforme [ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md).
+
+Os advisories `high` fechados incluiam *Angular i18n: XSS via event-handler attributes* e
+*Cache-Key Ambiguity no `HttpTransferCache`* (reuso de resposta entre requisicoes).
+
+### Divida residual — nenhuma e `high`/`critical`
+
+Todos os itens remanescentes sao `moderate` e **so tem correcao em major**, o que contraria o
+[ADR 0018](../adr/0018-avaliacao-angular-22-no-web.md) (Angular 22 adiado, revisao em **2026-09-30**)
+ou o ADR 0019. Sao insumo dessa revisao, nao omissao.
+
+| Repo | Pacote | Direto? | Corrige em | Por que nao foi aplicado |
+|---|---|---|---|---|
+| ambos | `@angular/cli` | sim | `@angular/cli@21.0.4` | major; ADR 0018 |
+| ambos | `@hono/node-server` | nao | via `@angular/cli@21.0.4` | transitivo do CLI; major |
+| ambos | `@modelcontextprotocol/sdk` | nao | via `@angular/cli@21.0.4` | transitivo do CLI; major |
+| `sep-mobile` | `@angular-devkit/build-angular` | sim | `@22.1.3` | major; ADR 0018 |
+| `sep-mobile` | `@analogjs/vite-plugin-angular` | sim | `@2.6.4` | major |
+| `sep-mobile` | `sockjs`, `uuid`, `webpack-dev-server` | nao | via `@angular-devkit/build-angular@22.1.3` | transitivos; major |
+
+### Gate de CI
+
+Os dois repos passaram a ter gate de `npm audit` no CI, com **limiar explicito no comando**:
+
+```json
+"audit": "npm audit --audit-level=high"
+```
+
+Roda no job `test` de `CI-APP` e de `CI-MOBILE`. No `CI-MOBILE` fica **so** nesse job: `build` e
+`android` instalam do mesmo lock, entao repetir triplicaria o tempo sem cobrir nada a mais.
+
+O limiar e `high`, e nao `total`: `moderate`/`low` frequentemente so tem correcao em major, e um gate
+cronicamente vermelho e um gate que o time aprende a ignorar. `moderate` continua visivel na saida.
+
+**Provado que morde**, e nao so instalado: com `--audit-level=low` e com `moderate` o comando sai `1`
+nos dois repos; revertido para `high`, sai `0`. Gate nunca visto vermelho e gate nao verificado.
+
+> **O `sep-api` NAO tem cobertura equivalente.** O `build.gradle` nao tem plugin de scan nenhum — so
+> `java`, `org.springframework.boot`, `io.spring.dependency-management`, `com.diffplug.spotless` e
+> `jacoco`. Medir exigiria **adicionar tooling** (OWASP dependency-check ou equivalente) e configurar
+> supressao de falso-positivo, o que e escopo de instalar ferramenta, nao de remediar divida.
+> Follow-up nomeado, candidato a sprint propria. Enquanto isso, o backend nao tem deteccao de
+> vulnerabilidade de dependencia — nem manual, nem em CI.
+
+### Por que a divida existiu
+
+A F-Sprint 19 zerou o `sep-app` em 2026-07-16 e **ninguem soube que o numero voltara a subir** ate a
+medicao manual de 2026-08-03, 18 dias depois. Nao houve regressao de codigo: a contagem saiu identica
+em `develop` intocada, entao foi deriva por advisory novo publicado contra dependencia existente.
+E exatamente contra isso que o gate acima existe — remediar sem instalar o gate reproduziria a mesma
+condicao.
