@@ -1774,3 +1774,87 @@ Terceira ocorrencia de evil merge no projeto, primeira no `sep-api`, e variante 
 injecao de texto (F-10, F-14) e reversao silenciosa (M-7), agora duplicacao. **Nao e pego por
 `format:check` nem por teste**: o bloco duplicado esta bem formatado e a suite nem chega a rodar; so
 a compilacao pega.
+
+## F-Sprint 23 (web) — Politica de lockout e Retry-After — MERGEADA develop+main (2026-08-05)
+
+Em `origin/develop` via PR #125 (squash `9fb9788`, 8 commits absorvidos, 15 arquivos) e promovida a
+`main` via PR #126 (`b2809b3`), com back-merge `c72b393`. **`develop` == `main` conferido por diff de
+conteudo** (vazio), e a arvore de `origin/develop` conferida **byte-identica** a da branch que passou
+nos gates — o back-merge veio **vazio**, sem evil merge, ao contrario da Sprint 34. Gates
+reconferidos em `develop` pos-merge com `npm ci`: Vitest 765, Playwright 39, `contract:check` 85/1,
+`lint`/`lint:scss`/`format:check`/`build` verdes.
+
+**Retomada da Task F-22.6 como sprint propria.** A F-22 fechou sem ela por gate duplo (Sprint 34 nao
+mergeada + snapshot OpenAPI sem o endpoint); os dois bloqueios cairam em 2026-08-03. Como a F-22 ja
+estava mergeada e registrada, e retomar a task exigiria branch e PR novos de qualquer forma, virou
+F-Sprint 23 — enfia-la na sprint fechada obrigaria a reabrir tres registros historicos para caber uma
+entrega feita seis dias depois. Spec [`123`](../specs/fase-4/123-fsprint-23-politica-lockout-web.md) +
+steps [`123`](../steps-fase-4/web/123-fsprint-23-steps.md). Sem ADR, sem migration, sem endpoint novo;
+nada mudou em `sep-api` nem em `sep-mobile`.
+
+**O problema.** `/account-locked` anunciava "ate 30 minutos" em texto fixo, com o valor real vindo de
+`app.security.lockout.lockout-minutes`, sobrescrivel por ambiente: um override em ops fazia a tela
+mentir sem nada quebrar. Os outros dois numeros da politica — quantas falhas bloqueiam e em que
+janela — nao apareciam em lugar nenhum, e sao justamente o que explica ao usuario por que ele esta
+ali. O login dizia "cerca de 1 minuto" no `429`.
+
+**A entrega.** `PoliticaLockoutService` novo (service proprio, nao metodo no `AuthService`: o endpoint
+existe para a tela que **nao** tem sessao, e acoplar faria a pagina do `423` depender do objeto que o
+`423` invalidou), com `catchError` no servico — que e load-bearing, porque `toSignal` relanca o erro
+na leitura do signal — e validacao do corpo, ja que o springdoc nao emite `required`. A tela usa
+`toSignal` + `computed`, e **so a interpolacao do primeiro `<p>` muda**: o `<h1>` continua estatico e
+fora de `@if`, entao a chegada da politica troca um text node e o foco movido em `ngAfterViewInit`
+sobrevive. A copy passa a revelar `maxAttempts` e `windowMinutes`, exposicao ja registrada como aceita
+em `SEGURANCA.md` §5. No login, o `Retry-After` **ganha do corpo** no `423`: a `message` do sep-api e
+montada a partir de `lockoutMinutes` e superestima a espera por design.
+
+**Achado que corrige registro anterior.** A armadilha do `authInterceptor` estava documentada em
+`STATE.md` e `SEGURANCA.md` como "cai de volta no texto fixo". E pior: `error.interceptor.ts:21`
+isenta do redirect de `401` apenas `/auth/login`, entao o `401` do endpoint publico dispara
+`clearSession()` + `navigateByUrl('/login')` e o usuario e **arrancado de `/account-locked`** —
+justamente a tela que o endpoint existe para servir, e alcancavel por URL direta e reload, caminhos em
+que ninguem limpou o token antes. Os dois documentos foram corrigidos.
+
+**Premissa da spec 122 que era falsa.** A §Autorizacao afirmava que "nao ha mecanismo novo a criar"
+para chamadas pre-login, porque o `authInterceptor` ja passa sem `Authorization` quando nao ha token.
+O caso que ela nao previu e o token **presente e velho**.
+
+**Numeros.** Vitest 745 -> **765 / 94 arquivos**; `contract:check` 84 -> **85 operacoes**, 1 lacuna (a
+do `Duration`, mantida de proposito); Playwright 38 -> **39**; `format:check`, `lint`, `lint:scss` e
+`build` verdes, todos rodados **depois** dos commits, porque o `lint-staged` reescreve arquivos.
+**26 mutacoes** aplicadas, cada uma derrubando o teste que alegava cobrir, e revertidas.
+
+**Code review gerou hotfix de sete achados**, tres deles premissa errada e nao descuido:
+(a) `Number.isInteger` no servico estava **sem cobertura** — remove-lo mantinha a spec verde, porque
+`{}` ja cai por `undefined > 0` e o zero por `0 > 0`;
+(b) o **fallback com "30 minutos" e o estado inicial de toda renderizacao**, nao so do endpoint fora
+do ar — a Decisao 7 dos steps alegava o contrario e o proprio teste "nasce completa com a copy de
+fallback" a contradizia; sob override e rede lenta, leitor de tela le o valor errado apos o `focus()`
+e nunca ouve a correcao, porque a troca e um text node sem live region. Virou "por um periodo
+limitado";
+(c) `esperaDoRetryAfter` aceitava fracionario e exponencial (`1e21` rendia
+"1.6666666666666666e+19 minutos");
+(d) **dois comentarios ficaram falsos por causa da sprint** — o docblock do array sugeria enumerar os
+`permitAll` (sao oito, a lista tem dois) e `verify-totp.component.ts` afirmava que o interceptor
+isenta apenas `/auth/login`;
+(e) no e2e o assert de URL era **sincrono sem retry**, deixando passar redirect tardio.
+
+**Follow-ups nomeados, nao corrigidos** (detalhe em
+[`SPRINT-F-23-PR.md`](../repos/sep-app/SPRINT-F-23-PR.md)): a pagina ainda pode se autodestruir por
+outro vetor — a cadeia e `clientChannel -> auth -> stepUp -> error`, entao o `errorInterceptor` roda
+**antes** do `catchError` do servico e um `401`/`403` na consulta navega para fora, sem depender de
+header nenhum (web novo contra backend sem a Sprint 34 basta); as assercoes de copy colada quebram com
+reformatacao pura de template; `/auth/totp/verify` tambem recebe `Authorization` morto e o usuario
+perde o desafio de MFA (defeito anterior a esta sprint).
+
+**Gate declarado pendente, nao silenciado**: smoke real contra `:8080` nao executado por decisao.
+Ficam sem prova a exposicao do `Retry-After` via CORS — o MSW monta a resposta localmente e nao emula
+a filtragem de headers nao-safelisted, entao Vitest **e** Playwright a veriam mesmo com
+`app.cors.exposed-headers` quebrado, que foi como a Sprint 34 quase entregou a feature inerte — e um
+eventual `429` na propria `/account-locked`.
+
+**Nota de infra**: tres execucoes da suite e2e falharam em specs **nao tocadas** e diferentes a cada
+vez (`pix-chaves:45`, `cobranca:27`, `cobranca:51`). Nao e regressao: quando `cobranca.spec.ts` falhou,
+o arquivo levou 53,7s, e na execucao seguinte os mesmos 6 testes levaram 14,9s e passaram, com `load
+average` em 9,08. Com `--workers=2` e depois com workers padrao, 39/39. E saturacao de CPU da maquina
+estourando timeout do Playwright.

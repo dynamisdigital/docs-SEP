@@ -39,7 +39,7 @@ Leitura base para qualquer agente:
 > das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
 > planejamento de infraestrutura AWS (Epic 16) e follow-ups de go-live. Fecha o marco `v1.0-local`
 > (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). **Specs criadas** em
-> [`specs/fase-4/`](specs/fase-4/README.md) (20 arquivos: backend `027`-`034`, web `116`-`122`,
+> [`specs/fase-4/`](specs/fase-4/README.md) (21 arquivos: backend `027`-`034`, web `116`-`123`,
 > mobile `213`-`217`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
 > Sprint 27+, web F-16+, mobile M-13+. A F-16 web esta **concluida** (PR #87/#88 +
 > follow-up #89/#90, 2026-07-15; steps [`116`](steps-fase-4/web/116-fsprint-16-steps.md)).
@@ -95,10 +95,18 @@ Leitura base para qualquer agente:
 > `423`/`429`, era inalcancavel pelo checker — e um `knownGap` que nenhuma operacao consome passa a
 > **falhar** com exit 1 contra o snapshot versionado. Antes, o backend remover o `423` passava verde.
 > Vitest **745**, Playwright **38**, `contract:check` **84 operacoes** (`auth.registrar` saiu com o
-> `RegisterComponent` orfao) e 29 lacunas; snapshot **nao** renovado. **A Task 6 nao foi executada** —
-> exige a Sprint 34 mergeada **e** o `sep-api` rodando local para regenerar o snapshot. A ordem foi
+> `RegisterComponent` orfao) e 29 lacunas; snapshot **nao** renovado. **A Task 6 nao foi executada ali**
+> — exigia a Sprint 34 mergeada **e** o `sep-api` rodando local para regenerar o snapshot. A ordem foi
 > deliberada: a deteccao de gap obsoleto entregue aqui e o que permite a Sprint 34 limpar as 5 lacunas
-> de OpenAPI sem fazer no escuro.
+> de OpenAPI sem fazer no escuro. Ela virou a **F-Sprint 23** (spec
+> [`123`](specs/fase-4/123-fsprint-23-politica-lockout-web.md) + steps
+> [`123`](steps-fase-4/web/123-fsprint-23-steps.md)), **MERGEADA develop+main em 2026-08-05 via
+> PR #125 (squash `9fb9788`) + PR #126 (`b2809b3`); `develop` == `main` conferido por conteudo**:
+> `/account-locked` deriva os tres numeros de `GET /auth/politica-lockout` e segue funcional sem a
+> chamada, o `authInterceptor` isenta o endpoint publico — fechando um caminho em que o token velho
+> fazia o usuario ser arrancado da pagina para `/login` — e o login usa o `Retry-After`. Vitest
+> **765**, Playwright **39**, `contract:check` **85 operacoes / 1 lacuna**. **Esgota o recorte web da
+> Fase 4.**
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
@@ -133,10 +141,15 @@ Leitura base para qualquer agente:
 > deixar rastro, `Retry-After` no `423`/`429`, invariante de rate limit validada no boot,
 > `GET /api/v1/auth/politica-lockout` publico e as lacunas de OpenAPI fechadas com regressao. Uma
 > das cinco lacunas caiu por diagnostico errado da spec: o `Duration` do dashboard ja era
-> documentado corretamente como `string`, e a divergencia e do `sep-app` — esse `knownGap` fecha do
-> lado web, junto da **Task F-22.6**, que a Sprint 34 acaba de destravar. Fora disso, so M-14 e M-15,
-> presas ao gate de hardware macOS — **a Fase 4 nao tem mais frente executavel sobre fake**, e a
-> proxima decisao e de rumo: fechar a fase (§41 do PRD-FASE-4) ou abrir a Fase 5.
+> documentado corretamente como `string`, e a divergencia e do `sep-app` — esse `knownGap`
+> **permanece aberto de proposito** e fecha do lado web, fora do escopo da F-23.
+> A **F-Sprint 23** (2026-08-05, PR #125/#126, `develop` == `main`) executou a Task F-22.6 como sprint
+> propria: `/account-locked` deriva os tres numeros do endpoint e segue funcional sem a chamada, o
+> `authInterceptor` isenta o endpoint publico — fechando um caminho em que o token velho fazia o
+> usuario ser **arrancado da pagina** para `/login` — e o login usa o `Retry-After`. Com ela, **o
+> recorte web da Fase 4 esta esgotado**. Fora disso, so M-14 e M-15, presas ao gate de hardware
+> macOS — **a Fase 4 nao tem mais frente executavel sobre fake**, e a proxima decisao e de rumo:
+> fechar a fase (§41 do PRD-FASE-4) ou abrir a Fase 5.
 >
 > **Fase 5 (fechamento)**: escopo em [`docs-sep/PRD-FASE-5.md`](docs-sep/PRD-FASE-5.md) — integracao
 > real Celcoin/BaaS, provisionamento AWS + deploy remoto (Epic 16 execucao), publicacao mobile em

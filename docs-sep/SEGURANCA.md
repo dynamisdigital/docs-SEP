@@ -243,11 +243,17 @@ politica estava documentada e implementada, mas a jornada nunca chegava ao fim.
 - **O redirect de `423` para `/account-locked` vive so no `errorInterceptor`**
   do `sep-app`, junto com `clearSession()`, e cobre tambem o `423` de
   `/auth/totp/verify`. Nenhum componente duplica essa navegacao.
-- **`/account-locked` nao pode prometer o que o backend nao faz**: informa ate
-  30 minutos contados da ultima tentativa, desbloqueio automatico e a
+- **`/account-locked` nao pode prometer o que o backend nao faz**: informa o
+  numero de tentativas, a janela e a duracao **vindos do endpoint de politica**
+  (F-Sprint 23), contados da ultima tentativa, mais o desbloqueio automatico e a
   inexistencia de liberacao manual. Nao cita suporte, reenvio nem revisao de
   dispositivos — nao existe endpoint de unlock, nem recuperacao de senha para
   usuario nao autenticado, nem tela de sessoes.
+  O texto de **fallback** — usado entre o primeiro paint e a resposta, e sempre
+  que a consulta falha — diz "por um periodo limitado" e **nao cita numero**: ele
+  e o estado inicial de toda renderizacao, e um literal mentiria sob override de
+  ambiente para quem le a tela antes da resposta chegar, inclusive leitor de
+  tela, que nao ouve a correcao (a troca e um text node sem live region).
 - **O valor de `lockout-minutes` e sobrescrevivel por ambiente.** O login ecoa o
   `message` do backend, entao acompanha um override; `/account-locked` nao — o
   interceptor descarta o erro ao navegar — e por isso fixava 30 no texto.
@@ -255,13 +261,22 @@ politica estava documentada e implementada, mas a jornada nunca chegava ao fim.
   somente leitura, devolve `maxAttempts`/`windowMinutes`/`lockoutMinutes`
   **efetivos** do ambiente, derivados da mesma `PoliticaLockout` que o
   `LockoutService` aplica. `permitAll` **por metodo** (`GET`): escrita no mesmo
-  path continua exigindo autenticacao. Consumir isso em `/account-locked` e a
-  Task F-22.6, ainda aberta.
-  > **Armadilha para a F-22.6**: o `authInterceptor` do `sep-app` isenta apenas
+  path continua exigindo autenticacao. **Consumido pela F-Sprint 23** (era a Task
+  F-22.6), que fecha o texto fixo em `/account-locked`.
+  > **Armadilha, resolvida na F-Sprint 23**: o `authInterceptor` isentava apenas
   > `/auth/login`. Reload ou navegacao direta a `/account-locked` com token velho
-  > no storage manda o token, leva `401` do `JwtAuthenticationFilter` e cai de
-  > volta no texto fixo — exatamente o cenario para o qual o endpoint existe.
-  > Isentar `/auth/politica-lockout` junto de `/auth/login`.
+  > no storage mandava o token e levava `401` do `JwtAuthenticationFilter`.
+  > **A consequencia registrada aqui antes estava subestimada**: nao era "cair de
+  > volta no texto fixo". O `errorInterceptor` isenta do redirect de `401` so
+  > `/auth/login`, entao o `401` dispara `clearSession()` + `navigateByUrl`
+  > (`/login`) e o usuario e **arrancado da pagina** que o `423` acabou de abrir.
+  > Corrigido isentando `/auth/politica-lockout`, com teste unitario e e2e.
+  >
+  > **Segue aberto**: `/auth/totp/verify` tambem e `permitAll` e tambem **nao**
+  > esta isento. `handleTokenResponse` retorna cedo no ramo `mfaRequired` sem
+  > limpar o token, entao a verificacao de TOTP leva `Authorization` morto, toma
+  > `401` e o usuario perde o desafio. Defeito anterior a F-23 e fora do escopo
+  > dela; fecha com uma linha no array e um teste.
 - **Exposicao aceita.** Dos tres numeros, so `lockoutMinutes` ja saia na
   `message` do `423`. Os outros dois eram legiveis no `/v3/api-docs` — que e
   `permitAll` e fica habilitado em producao —, la com os **defaults fixos no

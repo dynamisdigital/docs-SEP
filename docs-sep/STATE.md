@@ -10,23 +10,56 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-08-03._
+_Atualizado em: 2026-08-05._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). **Todas as frentes planejadas da Fase 4
-  estao executadas e mergeadas.** A Sprint 34 (backend) fechou em 2026-08-03 em `develop` **e**
-  `main`, junto com o gate de contrato no `sep-app`. Restam apenas: a **Task F-22.6** do web (agora
-  destravada), o **back-merge `main` -> `develop` no `sep-mobile`** e **M-14/M-15**, presas ao gate
-  externo de hardware macOS (ver §Gates externos).
+  estao executadas e mergeadas.** A F-Sprint 23 fechou a ultima delas em 2026-08-05, em `develop`
+  **e** `main`, e **esgota o recorte web**. Restam apenas: o **back-merge `main` -> `develop` no
+  `sep-mobile`** e **M-14/M-15**, presas ao gate externo de hardware macOS (ver §Gates externos).
 - **Spec/step ativo**: **nenhum.** A proxima decisao e de rumo — fechar a Fase 4 preenchendo o §41 do
   `PRD-FASE-4.md` (hoje em branco) ou abrir a Fase 5. Ver §Proximo passo.
-- **Aprendizado que vale carregar**: uma das cinco lacunas de OpenAPI estava **mal diagnosticada na
-  spec**. O `Duration` do dashboard ja era documentado corretamente como `string` — o Spring Boot
-  desliga `WRITE_DURATIONS_AS_TIMESTAMPS` e o fio leva ISO-8601 —, e quem diverge e o `sep-app`. Esse
-  `knownGap` **permanece aberto de proposito** e fecha do lado web, nao do backend.
+- **Aprendizado que vale carregar**: **documento nao substitui leitura do codigo.** A F-23 encontrou
+  tres registros errados sobre a propria area que ia mexer — a §Autorizacao da spec 122 dizia que
+  "nao ha mecanismo novo a criar" para o endpoint publico (ignorava o token velho e **presente**);
+  este `STATE.md` e o `SEGURANCA.md` descreviam a consequencia como "cai de volta no texto fixo",
+  quando o usuario e **arrancado da pagina** para `/login`; e a propria Decisao 7 dos steps da F-23
+  justificava manter "30 minutos" no fallback com uma premissa que o teste da sprint contradizia.
+  Os tres foram corrigidos na fonte.
+- **Segue valendo**: uma das cinco lacunas de OpenAPI estava **mal diagnosticada na spec**. O
+  `Duration` do dashboard ja era documentado corretamente como `string` — o Spring Boot desliga
+  `WRITE_DURATIONS_AS_TIMESTAMPS` e o fio leva ISO-8601 —, e quem diverge e o `sep-app`. Esse
+  `knownGap` **permanece aberto de proposito** e fecha do lado web, fora do escopo da F-23.
 
 ## Onde estamos
+
+- **F-Sprint 23 (web) MERGEADA develop+main em 2026-08-05** — politica de lockout e `Retry-After`
+  (retomada da Task F-22.6 como sprint propria; correcao de divida, sem escopo de produto novo).
+  Em `origin/develop` via PR #125 (squash `9fb9788`, 8 commits absorvidos, 15 arquivos) e promovida a
+  `main` via PR #126 (`b2809b3`), com back-merge `c72b393`; **`develop` == `main` conferido por diff
+  de conteudo** (vazio), e a arvore de `origin/develop` conferida **byte-identica** a da branch que
+  passou nos gates. O back-merge veio **vazio** — sem evil merge, ao contrario do que aconteceu na
+  Sprint 34. `/account-locked` deixa de anunciar "ate 30
+  minutos" fixo e deriva os tres numeros efetivos de `GET /auth/politica-lockout`, continuando
+  funcional se a chamada falhar — ela e destino de redirect e alcancavel por URL direta, entao nada
+  ali pode depender de rede. O login usa o `Retry-After` no `423`/`429`, onde **o header ganha do
+  corpo**: a `message` do sep-api e montada a partir de `lockoutMinutes` e superestima a espera por
+  design. O `authInterceptor` passa a isentar o endpoint publico, fechando um caminho em que o token
+  velho levava `401` e o usuario era **arrancado da pagina** (ver §Leia agora).
+  **Vitest 765 / 94** (partida 745/91), `contract:check` **85 operacoes / 1 lacuna**, Playwright
+  **39**, demais gates verdes — todos rodados **depois** dos commits, porque o `lint-staged`
+  reescreve arquivos, e **reconferidos em `develop` pos-merge com `npm ci`**. **26 mutacoes**
+  verificadas. O code review gerou hotfix de sete achados, tres
+  deles premissa errada e nao descuido: `Number.isInteger` entregue sem teste que o cobrisse, o
+  fallback com numero literal sendo o estado inicial de **toda** renderizacao, e dois comentarios que
+  a propria sprint tornou falsos. **Gate declarado pendente**: smoke real contra `:8080` nao
+  executado, entao o CORS do `Retry-After` e um eventual `429` na propria pagina seguem sem prova —
+  o MSW nao consegue provar nenhum dos dois. Follow-ups nomeados em
+  [`SPRINT-F-23-PR.md`](../repos/sep-app/SPRINT-F-23-PR.md), com destaque para o vetor ainda aberto:
+  o `errorInterceptor` roda **antes** do `catchError` do servico, entao um `401`/`403` na consulta
+  navega para fora sem depender de header nenhum. Historico em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §F-Sprint 23. Nada mudou em `sep-api`/`sep-mobile`.
 
 - **Sprint 34 (backend) MERGEADA develop+main em 2026-08-03** — follow-ups de lockout e divida de
   contrato OpenAPI (sprint de divida; sem escopo de produto novo). Em `origin/develop` via PR #103
@@ -81,9 +114,11 @@ _Atualizado em: 2026-08-03._
   `RegisterComponent` orfao removido e extracao de mensagem unificada em `core/api/`. **Vitest 745 / 91
   arquivos** (era 685/88), Playwright 38, `contract:check` **84 operacoes** (era 85 — `auth.registrar`
   saiu com o componente morto) e 29 lacunas, audit 0. **Snapshot OpenAPI nao renovado** (segue
-  `a613c6c`); nenhum `knownGap` criado ou removido. **A Task F-22.6 nao foi executada** — ver
-  §Proximo passo. Dois reviews geraram hotfix, ambos por furos que deixavam o check verde quando
-  deveria reprovar. Detalhe em [`SPRINT-F-22-PR.md`](../repos/sep-app/SPRINT-F-22-PR.md).
+  `a613c6c`); nenhum `knownGap` criado ou removido. **A Task F-22.6 nao foi executada aqui** — ela
+  virou a **F-Sprint 23**, concluida em 2026-08-05. Dois reviews geraram hotfix, ambos por furos que
+  deixavam o check verde quando deveria reprovar. Historico em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §F-Sprint 22 (a descricao de PR temporaria foi
+  removida no ciclo padrao ao abrir a F-23).
 
 - **M-Sprint 17 (mobile) MERGEADA develop+main em 2026-07-31** — follow-ups de lockout,
   acessibilidade e smoke (sprint de divida; sem jornada, rota, endpoint ou contrato novo). Spec
@@ -278,16 +313,7 @@ _Atualizado em: 2026-08-03._
      iOS do Epic 14 (M-14/M-15) entram como **adiados**, nao como pendencias em aberto; ou
    - **abrir a Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)) nas frentes que nao dependem de
      credencial Celcoin, conta AWS ou conta de loja.
-2. **Task F-22.6 (web) — destravada.** Unico resto da F-Sprint 22. A Sprint 34 esta mergeada e o
-   snapshot ja foi regenerado, entao os dois bloqueios cairam. Consome
-   `GET /api/v1/auth/politica-lockout` e o `Retry-After`
-   (steps [`122`](../steps-fase-4/web/122-fsprint-22-steps.md) §F-22.6). **Armadilha**: o
-   `authInterceptor` do `sep-app` isenta so `/auth/login`, entao reload ou navegacao direta a
-   `/account-locked` com token velho manda o token, leva `401` do `JwtAuthenticationFilter` e cai de
-   volta no texto fixo — o cenario exato para o qual o endpoint existe. Isentar
-   `/auth/politica-lockout` junto. **Cuidado com os nomes**: `PoliticaLockout` (classe, CamelCase) e
-   value object da Sprint 33; `politica-lockout` (rota, kebab-case) e da 34.
-3. **Manual (dev humano) — back-merge `main` -> `develop` no `sep-mobile`.** A divergencia **cresceu**
+2. **Manual (dev humano) — back-merge `main` -> `develop` no `sep-mobile`.** A divergencia **cresceu**
    desde 2026-07-31 e nao e mais so o `fast-uri`: `main` esta **7 commits a frente**, com seis PRs do
    Dependabot (#137 `@modelcontextprotocol/sdk`+`@angular/cli`, #126 `gradle/actions` 4->6, #129
    `@hono/node-server`+`@angular/cli`, #130 `immutable`, #132 `tar`, #133 `fast-uri`) alem da
@@ -295,11 +321,7 @@ _Atualizado em: 2026-08-03._
    `.github/workflows/ci.yml` —, **nenhum arquivo de app**, mas quebra a invariante
    `develop` == `main` que o Gate da proxima sprint mobile confere. Ao fazer, rodar `npm ci` +
    `npm run format:check` local antes do push.
-4. **Manual (dev humano) — commitar `docs-SEP`**: fechamento da Sprint 34 neste arquivo, a descricao
-   [`SPRINT-34-PR.md`](../repos/sep-api/SPRINT-34-PR.md), `SEGURANCA.md` §5/§7, a entrada em
-   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) e as linhas em `PRD-FASE-4.md` §36 /
-   `AI-ROADMAP.md` / `specs/fase-4/README.md`.
-5. **Divida de seguranca de dependencias (nova, nao bloqueia).** O `npm audit` do `sep-app` regrediu
+3. **Divida de seguranca de dependencias (nao bloqueia).** O `npm audit` do `sep-app` regrediu
    de 0 (F-Sprint 19) para **19 — 12 high e 7 moderate**, medido em 2026-08-03 e **identico em
    `develop` intocada**, entao e deriva por advisories novos contra deps existentes, nao regressao de
    codigo. Dez pacotes `@angular/*` diretos em high, incluindo *i18n XSS via event-handler
@@ -307,16 +329,16 @@ _Atualizado em: 2026-08-03._
    `brace-expansion` DoS e `fast-uri` host confusion. O Angular 20 esta em LTS ate 2026-11-28
    (ADR 0018 adiou o 22), entao provavelmente resolve com patch dentro do 20.x. Num sistema sob
    CMN 4.656 isso merece uma sprint curta e propria; conferir tambem `sep-mobile` e `sep-api`.
-6. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+4. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos). Enquanto ele nao abre, avaliar o fallback por runner CI macOS (spec 214.3.4)
    para validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
    spec e permanece preso ao gate.
-7. **Opcional — `openapi.snapshot.meta.json` do `sep-app` referencia `f37ffc8`**, o tip da branch da
+5. **Opcional — `openapi.snapshot.meta.json` do `sep-app` referencia `f37ffc8`**, o tip da branch da
    Sprint 34, que deixa de resolver quando a branch for apagada. As arvores de `f37ffc8`, do squash
    `0d24602` e de `origin/develop` foram **conferidas identicas**, entao o snapshot continua fiel; e
    so a referencia que envelhece. Trocar por `0d24602` num commit de documentacao, se valer o ciclo
    de PR — o campo e documental e nenhum script o le.
-8. **Follow-ups tecnicos abertos** (nao bloqueiam). **Abertos pela Sprint 34**: `NaNmin` no KPI do
+6. **Follow-ups tecnicos abertos** (nao bloqueiam). **Abertos pela Sprint 34**: `NaNmin` no KPI do
    dashboard backoffice do `sep-app` (`backoffice-format.ts` faz `Math.round` sobre `"PT2H"`; o mock
    MSW devolve `7200`, entao nenhum teste do front ve) e o `api.models.ts` declarando
    `tempoMedioResolucao30d: number` onde deveria ser `string`; `forward-headers-strategy: native`
@@ -337,7 +359,16 @@ _Atualizado em: 2026-08-03._
    cada; Playwright fora do CI-APP. **Abertos pela F-Sprint 22** (web): `message: ""` apaga o alerta
    em `login.component.ts` e em `core/api/api-error.ts`; 3 literais byte-identicos entre `login` e
    `verify-totp`; `backoffice.reprocessarWebhook` ramifica `400` que o OpenAPI nao documenta; ~20
-   pontos de ramificacao por status ainda sem `erros`. **Abertos pela M-Sprint 17** (mobile):
+   pontos de ramificacao por status ainda sem `erros`. **Abertos pela F-Sprint 23** (web): a `/account-locked` **ainda pode se autodestruir por outro
+   vetor** — a cadeia e `clientChannel -> auth -> stepUp -> error`, entao o `errorInterceptor` roda
+   antes do `catchError` do servico e um `401`/`403` na consulta da politica navega para fora **sem
+   depender de header nenhum** (web novo contra backend sem a Sprint 34 ja basta); as assercoes de
+   copy colada em `account-locked.component.spec.ts` quebram com reformatacao pura de template;
+   `/auth/totp/verify` e `permitAll` e **nao** esta isento no `authInterceptor`, entao leva
+   `Authorization` morto e o usuario perde o desafio de MFA; `ehUtilizavel` e tudo-ou-nada
+   (`windowMinutes = 0` derruba os tres numeros, e `LockoutProperties` nao tem `@Min`); no mock o
+   `Retry-After` coincide byte a byte com a `message`, entao "o header ganha do corpo" e inobservavel
+   offline; `estabilizar()` e a terceira copia do helper no repo. **Abertos pela M-Sprint 17** (mobile):
    `/session-expired` nao move foco; `onboarding-shell.iniciar()` sem guarda de reentrancia (e e
    MUTACAO); `setup-biometric` sem `h1`; `home.page.html` orfa com `ion-header` dentro do
    `ion-content`; `paginaAtiva`/`enableMsw` duplicados; nenhuma tela de desfecho tem `aria-live`;
