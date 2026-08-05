@@ -1840,7 +1840,7 @@ isenta apenas `/auth/login`;
 (e) no e2e o assert de URL era **sincrono sem retry**, deixando passar redirect tardio.
 
 **Follow-ups nomeados, nao corrigidos** (detalhe em
-[`SPRINT-F-23-PR.md`](../repos/sep-app/SPRINT-F-23-PR.md)): a pagina ainda pode se autodestruir por
+nesta secao): a pagina ainda pode se autodestruir por
 outro vetor — a cadeia e `clientChannel -> auth -> stepUp -> error`, entao o `errorInterceptor` roda
 **antes** do `catchError` do servico e um `401`/`403` na consulta navega para fora, sem depender de
 header nenhum (web novo contra backend sem a Sprint 34 basta); as assercoes de copy colada quebram com
@@ -1858,3 +1858,81 @@ vez (`pix-chaves:45`, `cobranca:27`, `cobranca:51`). Nao e regressao: quando `co
 o arquivo levou 53,7s, e na execucao seguinte os mesmos 6 testes levaram 14,9s e passaram, com `load
 average` em 9,08. Com `--workers=2` e depois com workers padrao, 39/39. E saturacao de CPU da maquina
 estourando timeout do Playwright.
+
+## D-Sprint 1 (cross-repo) — Divida de dependencias no web e no mobile — MERGEADA develop+main (2026-08-05)
+
+**Primeira sprint da faixa `3XX`**, criada para sprint que entrega em mais de um repo com **um**
+criterio de aceite. `sep-app` em `origin/develop` via PR #128 (`d987714`) e promovida a `main` via
+PR #129 (`7f232b3`); `sep-mobile` via PR #145 (`280857e`) e #146 (`7af2a1c`). **`develop` == `main`
+por diff de conteudo nos dois**, e as quatro pontas conferidas byte-identicas as branches que
+passaram nos gates — inclusive por conteudo material (step de audit no `ci.yml`, script no
+`package.json`, `@angular/core@20.3.27` no lock), e nao so por hash. Spec
+[`300`](../specs/fase-4/300-dsprint-1-divida-dependencias-web-mobile.md) + steps
+[`300`](../steps-fase-4/cross-repo/300-dsprint-1-steps.md). Sem ADR. Nada mudou no `sep-api`.
+
+**O defeito de fundo nao era o numero de vulnerabilidades.** Nenhum dos dois repos tinha gate de
+`npm audit` — nem no CI, nem como script. A F-Sprint 19 zerou o `sep-app` em 2026-07-16 e ninguem
+soube que a contagem voltara a subir ate a medicao manual de 2026-08-03, **18 dias depois**. Nao
+houve regressao de codigo: o numero saiu identico em `develop` intocada, entao foi deriva por
+advisory novo publicado contra dependencia existente. Remediar sem instalar o gate reproduziria a
+mesma condicao — dai a sprint ser cross-repo, com um gate de aceite so.
+
+**Resultado.** `high` + `critical` foi a **zero nos dois repos**: `sep-app` 19 -> 3 (12 high -> 0),
+`sep-mobile` 19 -> 8 (11 high -> 0). **Nenhum major subido** — 86 pacotes alterados no lock do web e
+35 no do mobile, nenhum cruzando fronteira de major; Ionic 8.8.11 e Capacitor 8.4.0 intactos
+(ADR 0019). Fecharam, entre outros, *Angular i18n: XSS via event-handler attributes* e *Cache-Key
+Ambiguity no `HttpTransferCache`*, este ultimo um reuso de resposta entre requisicoes distintas.
+
+**A correcao coube na baseline por pouco, e por sorte.** O range vulneravel terminava **exatamente**
+em `20.3.26`, a versao instalada, e o `20.3.27` ja estava publicado — nao houve decisao de major a
+tomar. Se o patch nao existisse dentro do 20.x, o item teria ido inteiro para o registro de divida,
+porque o ADR 0018 barra o Angular 22 ate a revisao de 2026-09-30.
+
+**No `sep-app` o `npm audit fix` nao deu conta sozinho**, e o motivo vale registrar: os pacotes
+`@angular/*` declaram peer em **versao exata** (`@angular/core@"20.3.27"` from
+`@angular/animations@20.3.27`), entao subir parcialmente conflita; e o `package-lock.json` antigo
+mantinha a raiz em `^20.3.26` e prendia a resolucao (`Found: @angular/animations@20.3.26`) mesmo com
+o manifesto ja editado. Resolveu subindo o conjunto inteiro no manifesto e deixando o npm resolver o
+grafo de uma vez. No `sep-mobile` o `audit fix --legacy-peer-deps` resolveu no lock **sem tocar o
+`package.json`**.
+
+**Gate instalado e provado.** `"audit": "npm audit --audit-level=high"` nos dois, com step no job
+`test` de `CI-APP` e de `CI-MOBILE`; no mobile so nesse job, porque os tres instalam do mesmo lock.
+Limiar `high` e nao `total`: `moderate`/`low` costumam so ter correcao em major, e gate cronicamente
+vermelho vira gate ignorado. **Provado que morde** — com `--audit-level=low` e com `moderate` sai 1;
+revertido para `high`, sai 0. Mesmo raciocinio da verificacao por mutacao nos testes.
+
+**A medicao do Gate D-1.0 derrubou dois numeros da spec**, o que e exatamente para o que o Gate
+existe. A baseline do `sep-mobile` registrada na spec (25 total, 1 `critical`, 15 `high`) fora medida
+na branch de feature da M-17 e nao valia: em `develop`, apos o back-merge, era 19/0/11 — os seis PRs
+do Dependabot ja tinham derrubado o `critical` e quatro `high`. E os "dez pacotes `@angular/*`
+diretos em `high`" eram **nove**.
+
+**Pre-requisito resolvido na sprint**: o back-merge `main` -> `develop` do `sep-mobile`, pendente
+desde 2026-07-31, foi feito aqui (`66ce65a`) — 3 arquivos, nenhum de app, sem conflito, deixando
+`develop` identica a `main` antes de qualquer bump.
+
+**Divida aceita**: 3 `moderate` no web e 8 no mobile, **todos** corrigiveis apenas em major
+(`@angular/cli@21.0.4`, `@angular-devkit/build-angular@22.1.3`, `@analogjs/vite-plugin-angular@2.6.4`
+e transitivos), barrados pelos ADR 0018/0019. Registrados item a item em
+[`SEGURANCA.md`](./SEGURANCA.md) §18, com os cinco campos, como insumo da revisao de 2026-09-30.
+
+**Declarado como pendente, nao simulado**: smoke real contra `:8080` nao executado — bump que altere
+comportamento de runtime nao aparece em Vitest nem em `npm audit`. E **o `sep-api` continua sem
+cobertura equivalente**: o `build.gradle` nao tem plugin de scan nenhum, entao medir exigiria
+adicionar tooling, o que e escopo de instalar ferramenta e nao de remediar divida. Hoje o backend nao
+tem deteccao de vulnerabilidade de dependencia, nem manual nem em CI.
+
+**Dois sustos investigados, nenhum era regressao.** O e2e do `sep-app` falhou **39/39** apos o bump:
+o lock subira `@playwright/test` `1.61.1 -> 1.62.1` e o binario do browser correspondente nao estava
+baixado; `npx playwright install chromium` resolveu. No `sep-mobile`, uma execucao deu 1 falha por
+timeout com `load average` em 12 — isolado passou 8/8 e a suite com `--workers=1` fechou 41 verdes, a
+baseline da M-17.
+
+**Incidente de processo, sem dano.** No back-merge, o comando encadeava
+`git pull --ff-only 2>&1 | tail -2 && git merge origin/main`. O `pull` falhou com "Not possible to
+fast-forward", mas **o `&&` le o exit do pipe, nao do git**, entao o merge rodou sobre uma `develop`
+local obsoleta e criou um merge commit errado. Desfeito com `git reset --hard origin/develop` apos
+confirmar que os commits descartados vinham todos de `origin/main` e que nada fora pushado; refeito
+do ponto certo. E a variante pior da armadilha ja registrada no projeto sobre exit code mascarado por
+pipe — em sequencia git onde um passo protege o seguinte, nunca encadear com `&&` depois de pipe.

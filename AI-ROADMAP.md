@@ -121,10 +121,18 @@ Leitura base para qualquer agente:
 > [`124`](steps-fase-4/web/124-fsprint-24-steps.md)) -> **Sprint 35** (divida de config/lockout/
 > contrato no backend; spec
 > [`035`](specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md) + steps
-> [`035`](steps-fase-4/backend/035-sprint-35-steps.md)). A D-1 tem pre-requisito **manual** (back-merge
-> `main` -> `develop` no `sep-mobile`) e instala o gate de `npm audit` que **nao existe** em nenhum dos
-> dois repos front; a F-24 leva o `contract:check` de 1 lacuna para **0**; a Sprint 35 consome o
-> numero 35 e por isso o backend da Fase 5 renumerou para **36-39**.
+> [`035`](steps-fase-4/backend/035-sprint-35-steps.md)). A F-24 leva o `contract:check` de 1 lacuna
+> para **0**; a Sprint 35 consome o numero 35 e por isso o backend da Fase 5 renumerou para **36-39**.
+>
+> A **D-Sprint 1 esta MERGEADA develop+main nos dois repos** (2026-08-05; `sep-app` PR #128/#129,
+> `sep-mobile` PR #145/#146): `high`+`critical` a **zero** nos dois (19->3 no web, 19->8 no mobile),
+> **sem nenhum major subido**, com Angular `20.3.26 -> 20.3.27` e Ionic/Capacitor intactos. O
+> pre-requisito manual (back-merge `main` -> `develop` no `sep-mobile`) foi resolvido na propria
+> sprint. O gate de `npm audit --audit-level=high` passou a existir nos dois CIs e **foi provado que
+> morde**. Residual so `moderate`, todo corrigivel apenas em major — registrado em
+> [`SEGURANCA.md`](docs-sep/SEGURANCA.md) §18. **O `sep-api` segue sem cobertura equivalente**:
+> `build.gradle` nao tem plugin de scan, entao o backend nao tem deteccao de vulnerabilidade de
+> dependencia nem manual nem em CI. **A proxima e a F-Sprint 24.**
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR
@@ -258,7 +266,7 @@ Leitura base para qualquer agente:
 | mobile, Ionic, Capacitor, biometria | [`docs-sep/MOBILE-SCREENS-PLAN.md`](docs-sep/MOBILE-SCREENS-PLAN.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) quando envolver UI/design; baseline Capacitor 8: [ADR 0019](adr/0019-baseline-capacitor-8-mobile.md) |
 | Android nativo, empacotamento, APK/AAB, deep link, back button, M-Sprint 13 (mergeada develop+main, PR #123) | [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md) + [`step 213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR 0019](adr/0019-baseline-capacitor-8-mobile.md) + [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) §Empacotamento nativo Android |
 | Aportes owner-scoped da credora no mobile, M-Sprint 16 (escopo reduzido pelo Gate M-16.0; matching/aporte POST/chaves Pix adiados por exigirem `FINANCEIRO`) | [`216`](specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) + [`step 216`](steps-fase-4/mobile/216-msprint-16-steps.md) + [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) §Aportes owner-scoped da credora |
-| conta bloqueada no mobile, mock MSW com `423`, landmark `main` no `ion-content`, foco em destino de redirect, smoke `golden-path-mobile`, M-Sprint 17 | [`217`](specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + [`step 217`](steps-fase-4/mobile/217-msprint-17-steps.md) + [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md) §M-Sprint 17 + [`SPRINT-M-17-PR.md`](repos/sep-mobile/SPRINT-M-17-PR.md). Mergeada develop+main via PR #135/#136 em 2026-07-31. Cuidado ao replicar padroes do `sep-app`: o foco usa **`ionViewDidEnter`**, nao `ngAfterViewInit` (no `ngAfterViewInit` o heading ainda nao tem caixa de layout e `focus()` e no-op), e o teste de landmark/foco vive no **Playwright** porque no happy-dom o Ionic nao hidrata e o `focus()` pega sem `tabindex` |
+| conta bloqueada no mobile, mock MSW com `423`, landmark `main` no `ion-content`, foco em destino de redirect, smoke `golden-path-mobile`, M-Sprint 17 | [`217`](specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) + [`step 217`](steps-fase-4/mobile/217-msprint-17-steps.md) + [`CONTEXT-PARTE-2.md`](docs-sep/CONTEXT-PARTE-2.md) §M-Sprint 17. Mergeada develop+main via PR #135/#136 em 2026-07-31. Cuidado ao replicar padroes do `sep-app`: o foco usa **`ionViewDidEnter`**, nao `ngAfterViewInit` (no `ngAfterViewInit` o heading ainda nao tem caixa de layout e `focus()` e no-op), e o teste de landmark/foco vive no **Playwright** porque no happy-dom o Ionic nao hidrata e o `focus()` pega sem `tabindex` |
 | iOS nativo, Xcode, simulador, IPA, safe area, teclado, Keychain, M-Sprint 14 (BLOQUEADA — gate externo de hardware macOS 13+, ver STATE.md §Gates externos) | [`214`](specs/fase-4/214-msprint-14-empacotamento-nativo-ios.md) + [`step 214`](steps-fase-4/mobile/214-msprint-14-steps.md) + [ADR 0019](adr/0019-baseline-capacitor-8-mobile.md) + [`docs-sep/STATE.md`](docs-sep/STATE.md) §Gates externos |
 | Aplicacao do design system mobile, M-Sprint 12 (implementada), splash/login/homes/shell/tabs, dark mode | [`212`](specs/fase-3/212-msprint-12-new-design-system-mobile.md) + [`step 212`](steps-fase-3/mobile/212-msprint-12-steps.md) + [`115`](specs/fase-3/115-fsprint-15-aplicacao-design-system-web.md) + [`docs-sep/New Design System Sep.md`](<docs-sep/New Design System Sep.md>) + [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) §Implementacao |
 | credito mobile, propostas mobile, Open Finance mobile, M-Sprint 7 | [`207`](specs/fase-3/207-msprint-7-credito-mobile.md) + [`step 207`](steps-fase-3/mobile/207-msprint-7-steps.md) + [`repos/sep-api/CREDITO.md`](repos/sep-api/CREDITO.md) + [`repos/sep-api/OPEN-FINANCE.md`](repos/sep-api/OPEN-FINANCE.md) + [`repos/sep-mobile/README.md`](repos/sep-mobile/README.md) |

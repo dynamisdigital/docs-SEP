@@ -63,7 +63,7 @@ As tabelas usam a ordem recomendada de execucao.
 
 | Sprint | Arquivo | Tema | Impl tasks |
 |--------|---------|------|------------|
-| D-1 | [`300-dsprint-1-divida-dependencias-web-mobile.md`](./300-dsprint-1-divida-dependencias-web-mobile.md) | Remediar vulnerabilidades de dependencia `high`/`critical` nos dois repos front e instalar o gate de `npm audit` no CI, que hoje **nao existe em nenhum dos dois** — **correcao de divida de seguranca**; **planejada** (2026-08-05). Metade mobile bloqueada ate o back-merge `main` -> `develop` no `sep-mobile` | 5 |
+| D-1 | [`300-dsprint-1-divida-dependencias-web-mobile.md`](./300-dsprint-1-divida-dependencias-web-mobile.md) | Remediar vulnerabilidades de dependencia `high`/`critical` nos dois repos front e instalar o gate de `npm audit` no CI, que hoje **nao existe em nenhum dos dois** — **correcao de divida de seguranca**; **MERGEADA develop+main nos dois repos** (`sep-app` PR #128/#129, `sep-mobile` PR #145/#146, 2026-08-05). `high`+`critical` a **zero** nos dois (19->3 e 19->8), sem nenhum major subido, e gate de `npm audit --audit-level=high` instalado nos dois CIs e **provado que morde**. O back-merge que bloqueava a metade mobile foi feito na propria sprint. Residual so `moderate`, todo corrigivel apenas em major | 5 |
 
 ## Dependencias gerais
 

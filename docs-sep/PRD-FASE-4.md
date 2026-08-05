@@ -227,6 +227,16 @@ em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numer
   (Play/App Store) e Fase 5.
 - **Steps just-in-time**: esta tabela cria o mapa; os steps sao criados antes de cada execucao.
 
+### Cross-repo (`sep-app` + `sep-mobile`)
+
+Faixa `3XX`, aberta em 2026-08-05: sprint que entrega em mais de um repo com **um** criterio de
+aceite. Continua tendo **uma branch e um PR por repo** — o que ela unifica e o gate e o registro de
+divida, nao a operacao git.
+
+| Sprint | Epic/frente | Tema | Spec | Status |
+|--------|-------------|------|------|--------|
+| D-1 | Follow-up / divida de seguranca | Remediar vulnerabilidades `high`/`critical` de dependencia nos dois repos front e instalar o gate de `npm audit` no CI, que nao existia em nenhum | [`300`](../specs/fase-4/300-dsprint-1-divida-dependencias-web-mobile.md) | concluida (`sep-app` PR #128/#129, `sep-mobile` PR #145/#146, 2026-08-05; `develop` == `main` por conteudo nos dois). **`high`+`critical` a zero nos dois** — 19->3 no web e 19->8 no mobile —, **sem nenhum major subido**: Angular `20.3.26 -> 20.3.27`, Ionic 8.8.11 e Capacitor 8.4.0 intactos ([ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md)). Gate `npm audit --audit-level=high` no job `test` dos dois CIs, **provado que morde** (limiar rebaixado falha, revertido passa). O back-merge `main` -> `develop` do `sep-mobile`, pre-requisito pendente desde 2026-07-31, foi feito na propria sprint. Residual so `moderate`, todo corrigivel apenas em major e barrado pelos ADR 0018/0019, registrado em [`SEGURANCA.md`](./SEGURANCA.md) §18. **Gate declarado pendente**: smoke real contra `:8080` nao executado. **O `sep-api` segue sem cobertura equivalente** — `build.gradle` sem plugin de scan; follow-up nomeado |
+
 ## 37. Marco v1.0-local (feature-complete)
 
 A Fase 4 fecha uma versao **`v1.0-local`**: o produto inteiro navegavel e testavel em ambiente local

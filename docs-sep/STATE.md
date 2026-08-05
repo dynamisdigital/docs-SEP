@@ -18,43 +18,70 @@ _Atualizado em: 2026-08-05._
   estao executadas e mergeadas — a F-Sprint 23 fechou a ultima em 2026-08-05, em `develop` **e**
   `main`, esgotando o recorte web. A Fase 5 esta **inteiramente gated** por acesso externo (Celcoin,
   AWS, contas de loja) e nao tem frente executavel.
-- **Spec/step ativo**: **tres sprints de divida planejadas em 2026-08-05**, a executar **nesta
-  ordem**. Sao a unica frente executavel sem nenhuma API externa:
-  1. **D-Sprint 1** — divida de dependencias (`sep-app` + `sep-mobile`). Spec
-     [`300`](../specs/fase-4/300-dsprint-1-divida-dependencias-web-mobile.md), steps
-     [`300`](../steps-fase-4/cross-repo/300-dsprint-1-steps.md). **Bloqueada no mobile** ate o
-     back-merge do item 1 do §Proximo passo.
+- **Spec/step ativo**: das tres sprints de divida planejadas em 2026-08-05, a **D-Sprint 1 esta
+  concluida** (mergeada nos dois repos em 2026-08-05). Restam duas, **nesta ordem**:
+  1. ~~**D-Sprint 1** — divida de dependencias (`sep-app` + `sep-mobile`).~~ **MERGEADA develop+main
+     nos dois repos**; ver §Onde estamos.
   2. **F-Sprint 24** — divida tecnica web. Spec
      [`124`](../specs/fase-4/124-fsprint-24-divida-tecnica-web.md), steps
-     [`124`](../steps-fase-4/web/124-fsprint-24-steps.md).
+     [`124`](../steps-fase-4/web/124-fsprint-24-steps.md). **E a proxima.**
   3. **Sprint 35** — divida de config/lockout/contrato no backend. Spec
      [`035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md), steps
      [`035`](../steps-fase-4/backend/035-sprint-35-steps.md).
 
-  **Comece pelo Gate D-1.0.** Cada sprint abre com um Gate que re-mede tudo e **invalida o
-  planejamento se divergir** — inclusive o `npm audit` do `sep-mobile`, medido no planejamento em
-  branch errada (ver §Onde estamos).
+  **Comece pelo Gate F-24.0.** Cada sprint abre com um Gate que re-mede tudo e **invalida o
+  planejamento se divergir** — na D-1 isso derrubou dois numeros da spec (ver §Onde estamos).
 - **Aprendizado que vale carregar**: **documento nao substitui leitura do codigo.** A F-23 encontrou
   tres registros errados sobre a propria area que ia mexer — a §Autorizacao da spec 122 dizia que
   "nao ha mecanismo novo a criar" para o endpoint publico (ignorava o token velho e **presente**);
   este `STATE.md` e o `SEGURANCA.md` descreviam a consequencia como "cai de volta no texto fixo",
   quando o usuario e **arrancado da pagina** para `/login`; e a propria Decisao 7 dos steps da F-23
   justificava manter "30 minutos" no fallback com uma premissa que o teste da sprint contradizia.
-  Os tres foram corrigidos na fonte. **O planejamento de 2026-08-05 repetiu a licao**: dois numeros
-  deste arquivo estavam desatualizados a favor do problema (ver §Onde estamos).
-- **Aprendizado que vale carregar**: **documento nao substitui leitura do codigo.** A F-23 encontrou
-  tres registros errados sobre a propria area que ia mexer — a §Autorizacao da spec 122 dizia que
-  "nao ha mecanismo novo a criar" para o endpoint publico (ignorava o token velho e **presente**);
-  este `STATE.md` e o `SEGURANCA.md` descreviam a consequencia como "cai de volta no texto fixo",
-  quando o usuario e **arrancado da pagina** para `/login`; e a propria Decisao 7 dos steps da F-23
-  justificava manter "30 minutos" no fallback com uma premissa que o teste da sprint contradizia.
-  Os tres foram corrigidos na fonte.
+  Os tres foram corrigidos na fonte. **A D-Sprint 1 repetiu a licao duas vezes**: a baseline de
+  `npm audit` do `sep-mobile` registrada na spec 300 estava errada (medida em branch de feature) e o
+  Gate a derrubou de 25/1-critical para 19/0; e a spec falava em "dez pacotes `@angular/*` diretos em
+  high", quando sao nove. Nenhum numero de planejamento sobreviveu a medicao do Gate intacto.
 - **Segue valendo**: uma das cinco lacunas de OpenAPI estava **mal diagnosticada na spec**. O
   `Duration` do dashboard ja era documentado corretamente como `string` — o Spring Boot desliga
   `WRITE_DURATIONS_AS_TIMESTAMPS` e o fio leva ISO-8601 —, e quem diverge e o `sep-app`. Esse
   `knownGap` **permanece aberto de proposito** e fecha do lado web, fora do escopo da F-23.
 
 ## Onde estamos
+
+- **D-Sprint 1 (cross-repo) MERGEADA develop+main nos DOIS repos em 2026-08-05** — divida de
+  dependencias no `sep-app` e no `sep-mobile` (correcao de divida de seguranca; sem jornada, tela,
+  endpoint, contrato ou regra nova). Primeira sprint da faixa `3XX`: branch e PR por repo, mas **um**
+  gate de aceite. `sep-app` via PR #128 (`d987714`) e #129 (`7f232b3`); `sep-mobile` via PR #145
+  (`280857e`) e #146 (`7af2a1c`). **`develop` == `main` por diff de conteudo nos dois**, e a arvore
+  das quatro pontas conferida byte-identica a das branches que passaram nos gates — conferido tambem
+  o conteudo material (step de audit no `ci.yml`, script no `package.json`, `@angular/core@20.3.27`
+  no lock), e nao so o hash.
+  **`high` + `critical` foi a ZERO nos dois repos**: `sep-app` 19 -> 3 (12 high -> 0) e `sep-mobile`
+  19 -> 8 (11 high -> 0), **sem nenhum major subido** — 86 e 35 pacotes alterados no lock,
+  respectivamente, nenhum cruzando fronteira de major. Ionic 8.8.11 e Capacitor 8.4.0 intactos
+  (ADR 0019). Fecharam, entre outros, *Angular i18n: XSS via event-handler attributes* e
+  *Cache-Key Ambiguity no `HttpTransferCache`* (reuso de resposta entre requisicoes).
+  A correcao foi Angular `20.3.26 -> 20.3.27`: o range vulneravel terminava **exatamente** na versao
+  instalada, e o patch ja existia dentro da baseline — nao havia decisao de major a tomar. No
+  `sep-app` o `npm audit fix` **nao** deu conta sozinho (os `@angular/*` declaram peer em versao
+  exata e o lock prendia a resolucao) e foi preciso subir o conjunto no manifesto; no `sep-mobile` ele
+  resolveu no lock sem tocar o `package.json`.
+  **Os dois repos ganharam gate de `npm audit` no CI** (`--audit-level=high`, no job `test`; no
+  `CI-MOBILE` so nesse job, porque os tres instalam do mesmo lock), e **foi provado que o gate morde**:
+  com `low` e com `moderate` sai 1, revertido para `high` sai 0. Era o defeito de fundo — a F-19
+  zerou o `sep-app` e ninguem soube que subira de novo por 18 dias.
+  **A medicao do Gate derrubou dois numeros da spec**: a baseline do `sep-mobile` (25/1 critical/15
+  high, medida em branch de feature) era 19/0/11, e os "dez pacotes `@angular/*` diretos" eram nove.
+  Residual: 3 `moderate` no web e 8 no mobile, **todos** corrigiveis so em major, barrados pelos
+  ADR 0018/0019 e registrados item a item em [`SEGURANCA.md`](./SEGURANCA.md) §18 — insumo da revisao
+  de ADR de 2026-09-30. **Gate declarado pendente**: smoke real contra `:8080` nao executado, entao
+  bump que altere comportamento de runtime segue sem prova. **O `sep-api` continua sem cobertura
+  equivalente** (sem plugin de scan no `build.gradle`) — follow-up nomeado, candidato a sprint
+  propria. Descricoes em [`SPRINT-D-1-PR.md`](../repos/sep-app/SPRINT-D-1-PR.md) (web) e
+  [`SPRINT-D-1-PR.md`](../repos/sep-mobile/SPRINT-D-1-PR.md) (mobile); historico em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §D-Sprint 1. Nada mudou no `sep-api`.
+  O back-merge `main` -> `develop` do `sep-mobile`, pendente desde 2026-07-31 e pre-requisito da
+  sprint, foi feito aqui (`66ce65a`): 3 arquivos, nenhum de app.
 
 - **Tres sprints de divida PLANEJADAS em 2026-08-05** — spec + steps criados para a **D-Sprint 1**
   (dependencias, cross-repo), a **F-Sprint 24** (web) e a **Sprint 35** (backend), nessa ordem de
@@ -100,7 +127,7 @@ _Atualizado em: 2026-08-05._
   a propria sprint tornou falsos. **Gate declarado pendente**: smoke real contra `:8080` nao
   executado, entao o CORS do `Retry-After` e um eventual `429` na propria pagina seguem sem prova —
   o MSW nao consegue provar nenhum dos dois. Follow-ups nomeados em
-  [`SPRINT-F-23-PR.md`](../repos/sep-app/SPRINT-F-23-PR.md), com destaque para o vetor ainda aberto:
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §F-Sprint 23, com destaque para o vetor ainda aberto:
   o `errorInterceptor` roda **antes** do `catchError` do servico, entao um `401`/`403` na consulta
   navega para fora sem depender de header nenhum. Historico em
   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §F-Sprint 23. Nada mudou em `sep-api`/`sep-mobile`.
@@ -191,7 +218,7 @@ _Atualizado em: 2026-08-05._
   A copy de `/account-locked` teve **cada afirmacao conferida contra o `sep-api`** e tres estavam
   erradas. **Fora de escopo por decisao**: plugar o MSW no Vitest, `focusManagerPriority` global,
   portar o `contract:check` e o escopo do Gate M-16.0 (exige ADR). Detalhe em
-  [`SPRINT-M-17-PR.md`](../repos/sep-mobile/SPRINT-M-17-PR.md); historico em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §M-Sprint 17; historico em
   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §M-Sprint 17. Nada mudou em `sep-api`/`sep-app`.
 - **F-Sprint 21 (web) MERGEADA develop+main em 2026-07-30** — jornada de conta bloqueada no login
   (correcao de defeito; lado web do par corretivo). Em `origin/develop` via PR #113 (squash
@@ -350,49 +377,36 @@ _Atualizado em: 2026-08-05._
 
 ## Proximo passo
 
-1. **Manual (dev humano) — back-merge `main` -> `develop` no `sep-mobile`.** E o **primeiro** item:
-   destrava a metade mobile da D-Sprint 1 e e pre-requisito do Gate D-1.0. A divergencia **cresceu**
-   desde 2026-07-31 e nao e mais so o `fast-uri`: `main` esta **7 commits a frente**, com seis PRs do
-   Dependabot (#137 `@modelcontextprotocol/sdk`+`@angular/cli`, #126 `gradle/actions` 4->6, #129
-   `@hono/node-server`+`@angular/cli`, #130 `immutable`, #132 `tar`, #133 `fast-uri`) alem da
-   promocao da M-17 (#136). Diferenca em **3 arquivos** — `package-lock.json`, `package.json` e
-   `.github/workflows/ci.yml` —, **nenhum arquivo de app**, mas quebra a invariante
-   `develop` == `main` que o Gate da proxima sprint mobile confere. Ao fazer, rodar `npm ci` +
-   `npm run format:check` local antes do push.
-2. **Executar as tres sprints de divida, nesta ordem** — D-Sprint 1 -> F-Sprint 24 -> Sprint 35. Sao
-   a unica frente executavel sem API externa; ver §Leia agora para os ponteiros de spec e steps.
-   Cada uma comeca por um Gate que re-mede a baseline e **invalida o planejamento se divergir**.
-   - **D-Sprint 1** (`sep-app` + `sep-mobile`): o `npm audit` do `sep-app` regrediu de 0 (F-Sprint 19)
-     para **19 — 12 high e 7 moderate**, **identico em `develop` intocada**, entao e deriva por
-     advisories novos contra deps existentes e nao regressao de codigo. Dez pacotes `@angular/*`
-     diretos em high, incluindo *i18n XSS via event-handler attributes* e *Cache-Key Ambiguity no
-     HttpTransferCache* (cross-request leak), mais `brace-expansion` DoS e `fast-uri` host confusion.
-     Angular 20 em LTS ate 2026-11-28 (ADR 0018 adiou o 22), entao deve resolver com patch dentro do
-     20.x — **subir major exige ADR novo**. O `sep-mobile` **nao tem baseline valida** (ver §Onde
-     estamos). Alem de remediar, a sprint **instala o gate de `npm audit` no CI dos dois**, que hoje
-     nao existe.
-   - **F-Sprint 24** (`sep-app`): dois defeitos vivos — o `errorInterceptor` ainda arranca o usuario
-     da `/account-locked` num `401`/`403` da consulta de politica, e o KPI do dashboard de backoffice
-     renderiza `NaNmin` (o mock devolve `7200` e esconde). Leva o `contract:check` de **1 lacuna para
-     0**, a primeira vez desde a F-19.
+1. **Executar as duas sprints de divida restantes, nesta ordem** — F-Sprint 24 -> Sprint 35. Sao a
+   unica frente executavel sem API externa; ver §Leia agora para os ponteiros de spec e steps. Cada
+   uma comeca por um Gate que re-mede a baseline e **invalida o planejamento se divergir** — na D-1
+   isso derrubou dois numeros da spec.
+   - ~~**D-Sprint 1**~~ **CONCLUIDA** em 2026-08-05, mergeada nos dois repos. `high`+`critical` a
+     zero no `sep-app` e no `sep-mobile`, gate de `npm audit` instalado nos dois CIs. Ver
+     §Onde estamos.
+   - **F-Sprint 24** (`sep-app`), **a proxima**: dois defeitos vivos — o `errorInterceptor` ainda
+     arranca o usuario da `/account-locked` num `401`/`403` da consulta de politica, e o KPI do
+     dashboard de backoffice renderiza `NaNmin` (o mock devolve `7200` e esconde). Leva o
+     `contract:check` de **1 lacuna para 0**, a primeira vez desde a F-19.
    - **Sprint 35** (`sep-api`): allowlist de proxy (hoje a origem do rate limit e escolhida pelo
      cliente), validacao de `LockoutProperties` no boot, `405` faltante, e codigo/config morto.
-   - **`sep-api` fora do escopo de dependencias por decisao**: `build.gradle` nao tem plugin de scan
-     nenhum, entao medir exigiria adicionar tooling. Follow-up nomeado, candidato a sprint propria.
-3. **Decisao de rumo, depois das tres.** Fechar a Fase 4 preenchendo o §41 do
+   - **`sep-api` segue fora do escopo de dependencias**: `build.gradle` nao tem plugin de scan
+     nenhum, entao medir exigiria adicionar tooling. Follow-up nomeado, candidato a sprint propria —
+     e hoje o backend **nao tem deteccao de vulnerabilidade de dependencia, nem manual nem em CI**.
+2. **Decisao de rumo, depois das duas.** Fechar a Fase 4 preenchendo o §41 do
    [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com status, PRs, back-merges e as dividas
    aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do Epic 14 (M-14/M-15) entram como
    **adiados**, nao como pendencias em aberto. A Fase 5 so abre com acesso externo liberado.
-4. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+3. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos). Enquanto ele nao abre, avaliar o fallback por runner CI macOS (spec 214.3.4)
    para validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
    spec e permanece preso ao gate.
-5. **Opcional — `openapi.snapshot.meta.json` do `sep-app` referencia `f37ffc8`**, o tip da branch da
+4. **Opcional — `openapi.snapshot.meta.json` do `sep-app` referencia `f37ffc8`**, o tip da branch da
    Sprint 34, que deixa de resolver quando a branch for apagada. As arvores de `f37ffc8`, do squash
    `0d24602` e de `origin/develop` foram **conferidas identicas**, entao o snapshot continua fiel; e
    so a referencia que envelhece. Trocar por `0d24602` num commit de documentacao, se valer o ciclo
    de PR — o campo e documental e nenhum script o le.
-6. **Follow-ups tecnicos abertos** (nao bloqueiam). **Boa parte desta lista ja esta recortada nas
+5. **Follow-ups tecnicos abertos** (nao bloqueiam). **Boa parte desta lista ja esta recortada nas
    tres sprints do item 2** — o `NaNmin`/`tempoMedioResolucao30d`, o `forward-headers-strategy`, o
    `resilience4j` morto, o `ApiExceptionHandler` sem `405`, os enums inline, a `message` do `423`, o
    `ContaBloqueadaException.CODIGO`, o `countByIpAndJanela`, o `MDC.get` literal, o `Clock`
