@@ -39,9 +39,14 @@ Leitura base para qualquer agente:
 > das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
 > planejamento de infraestrutura AWS (Epic 16) e follow-ups de go-live. Fecha o marco `v1.0-local`
 > (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). **Specs criadas** em
-> [`specs/fase-4/`](specs/fase-4/README.md) (21 arquivos: backend `027`-`034`, web `116`-`123`,
-> mobile `213`-`217`); steps just-in-time em `steps-fase-4/{backend,web,mobile}/`. Numeracao: backend
-> Sprint 27+, web F-16+, mobile M-13+. A F-16 web esta **concluida** (PR #87/#88 +
+> [`specs/fase-4/`](specs/fase-4/README.md) (24 arquivos: backend `027`-`035`, web `116`-`124`,
+> mobile `213`-`217`, **cross-repo `300`**); steps just-in-time em
+> `steps-fase-4/{backend,web,mobile,cross-repo}/`. Numeracao: backend Sprint 27+, web F-16+,
+> mobile M-13+, cross-repo D-1+.
+> **`steps-fase-4/cross-repo/` e pasta nova (2026-08-05)**, criada com a **D-Sprint 1**: abriga sprint
+> que entrega em mais de um repo com **um** criterio de aceite — a faixa de spec correspondente e
+> `3XX`. Uma sprint cross-repo mantem **uma branch e um PR por repo**; o que ela unifica e o gate e o
+> registro de divida, nao a operacao git. A F-16 web esta **concluida** (PR #87/#88 +
 > follow-up #89/#90, 2026-07-15; steps [`116`](steps-fase-4/web/116-fsprint-16-steps.md)).
 > A F-17 web esta **concluida** (PR #92/#93, 2026-07-15; spec
 > [`117`](specs/fase-4/117-fsprint-17-financeiro-conciliacao-web.md) + steps
@@ -107,6 +112,19 @@ Leitura base para qualquer agente:
 > fazia o usuario ser arrancado da pagina para `/login` — e o login usa o `Retry-After`. Vitest
 > **765**, Playwright **39**, `contract:check` **85 operacoes / 1 lacuna**. **Esgota o recorte web da
 > Fase 4.**
+> **Trio de divida planejado em 2026-08-05**, a executar **nesta ordem** e sem nenhuma dependencia de
+> API externa — sao as unicas frentes executaveis depois que o escopo de produto sobre fake se
+> esgotou: **D-Sprint 1** (dependencias, cross-repo; spec
+> [`300`](specs/fase-4/300-dsprint-1-divida-dependencias-web-mobile.md) + steps
+> [`300`](steps-fase-4/cross-repo/300-dsprint-1-steps.md)) -> **F-Sprint 24** (divida tecnica web;
+> spec [`124`](specs/fase-4/124-fsprint-24-divida-tecnica-web.md) + steps
+> [`124`](steps-fase-4/web/124-fsprint-24-steps.md)) -> **Sprint 35** (divida de config/lockout/
+> contrato no backend; spec
+> [`035`](specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md) + steps
+> [`035`](steps-fase-4/backend/035-sprint-35-steps.md)). A D-1 tem pre-requisito **manual** (back-merge
+> `main` -> `develop` no `sep-mobile`) e instala o gate de `npm audit` que **nao existe** em nenhum dos
+> dois repos front; a F-24 leva o `contract:check` de 1 lacuna para **0**; a Sprint 35 consome o
+> numero 35 e por isso o backend da Fase 5 renumerou para **36-39**.
 > Mobile: **M-Sprint 13** (empacotamento nativo Android via Capacitor 8) **mergeada** develop+main
 > via PR #123 (2026-07-17; spec [`213`](specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 > + steps [`213`](steps-fase-4/mobile/213-msprint-13-steps.md) + [ADR

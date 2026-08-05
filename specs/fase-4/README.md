@@ -8,7 +8,11 @@ As tabelas usam a ordem recomendada de execucao.
 
 ## Regras de planejamento
 
-- Specs separados por projeto: backend (`0XX`), web (`1XX`) e mobile (`2XX`).
+- Specs separados por projeto: backend (`0XX`), web (`1XX`), mobile (`2XX`) e **cross-repo (`3XX`)**.
+  A faixa `3XX` nasceu em 2026-08-05 com a D-Sprint 1 e vale para sprint que entrega em mais de um
+  repo com **um** criterio de aceite; os steps dela vivem em `steps-fase-4/cross-repo/`. Uma sprint
+  cross-repo continua tendo **uma branch e um PR por repo** — o que ela unifica e o gate e o registro
+  de divida, nao a operacao git.
 - Cada sprint tem no maximo **7 tasks de implementacao**.
 - Precheck, E2E/smoke, documentacao, collections e fechamento nao contam no limite de tasks.
 - Steps continuam just-in-time, criados apenas quando a sprint for aprovada para execucao.
@@ -29,6 +33,7 @@ As tabelas usam a ordem recomendada de execucao.
 | 32 | [`032-sprint-32-adapters-celcoin-skeleton.md`](./032-sprint-32-adapters-celcoin-skeleton.md) | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar) | 5 |
 | 33 | [`033-sprint-33-lockout-conformidade.md`](./033-sprint-33-lockout-conformidade.md) | Conformidade da politica de lockout (15/30 min) + `423` alcancavel — **correcao de defeito**; **MERGEADA develop+main** (PR #101/#102, 2026-07-29) | 4 |
 | 34 | [`034-sprint-34-followups-lockout-contrato.md`](./034-sprint-34-followups-lockout-contrato.md) | Follow-ups do lockout (observabilidade, `Retry-After`, invariante de config, evicção do registry) + divida de contrato OpenAPI (`knownGaps` da F-19) — **correcao de divida**; **concluida** (PR #103 develop / #104 main, 2026-08-03; 13 commits, 2220 testes, migration `V60`; gate de contrato no `sep-app` via PR #120/#121, `contract:check` de 29 lacunas para 1) | 7 |
+| 35 | [`035-sprint-35-divida-config-lockout-contrato.md`](./035-sprint-35-divida-config-lockout-contrato.md) | Allowlist de proxy (`forward-headers-strategy`), validacao de `LockoutProperties` no boot, `405` faltante, config e codigo morto, `Clock` injetavel e itens de contrato — **correcao de divida**; **planejada** (2026-08-05). Consome o numero 35, e o backend da Fase 5 renumerou para 36-39 | 7 |
 
 ## Web (`sep-app`)
 
@@ -42,6 +47,7 @@ As tabelas usam a ordem recomendada de execucao.
 | F-21 | [`121-fsprint-21-lockout-login-web.md`](./121-fsprint-21-lockout-login-web.md) | Jornada de conta bloqueada no login web — **correcao de defeito**; **MERGEADA develop+main** (PR #113/#114, 2026-07-30; fecha o par corretivo com a Sprint 33; smoke real contra `:8080` aprovado) | 4 |
 | F-22 | [`122-fsprint-22-contrato-erro-followups-web.md`](./122-fsprint-22-contrato-erro-followups-web.md) | Contrato de erro verificavel no `contract:check` (status de erro + gap obsoleto) e follow-ups da F-21 (`verify-totp`, foco/landmarks, registro orfao, helper de erro) — **correcao de divida**; **MERGEADA develop+main** (PR #116, 2026-07-31) **exceto a Task 6**, que dependia da Sprint 34 e da regeneracao do snapshot OpenAPI — **ambos feitos em 2026-08-03; a Task 6 foi executada pela F-23** | 6 |
 | F-23 | [`123-fsprint-23-politica-lockout-web.md`](./123-fsprint-23-politica-lockout-web.md) | Consumir `GET /auth/politica-lockout` e o `Retry-After` — retomada da Task F-22.6 como sprint propria, **correcao de divida**; **MERGEADA develop+main** (PR #125/#126, 2026-08-05). Fecha o texto fixo de `/account-locked` e um caminho em que o token velho arrancava o usuario da pagina. **Esgota o recorte web da Fase 4**; smoke real contra `:8080` fica como gate declarado pendente | 7 |
+| F-24 | [`124-fsprint-24-divida-tecnica-web.md`](./124-fsprint-24-divida-tecnica-web.md) | Vetor do `errorInterceptor` na `/account-locked`, `/auth/totp/verify` com `Authorization` morto, `message: ""` apagando alerta, `NaNmin` no KPI do dashboard, descriptor e duplicacoes de teste — **correcao de divida**; **planejada** (2026-08-05). Leva o `contract:check` de 1 lacuna para **0** | 7 |
 
 ## Mobile (`sep-mobile`)
 
@@ -52,6 +58,12 @@ As tabelas usam a ordem recomendada de execucao.
 | M-15 | [`215-msprint-15-biometria-nativa.md`](./215-msprint-15-biometria-nativa.md) | Biometria nativa (substitui stub PWA) + hardening | 6 |
 | M-16 | [`216-msprint-16-aporte-pix-avancado-mobile.md`](./216-msprint-16-aporte-pix-avancado-mobile.md) | Aporte/matching e chaves Pix na credora mobile — **concluida com escopo reduzido** (Gate M-16.0: so aportes owner-scoped; matching/aporte POST/chaves Pix adiados por exigirem `FINANCEIRO`) | 6 -> 3 |
 | M-17 | [`217-msprint-17-followups-lockout-a11y-mobile.md`](./217-msprint-17-followups-lockout-a11y-mobile.md) | Jornada de conta bloqueada alcancavel e testada, race de duplo toque em `consultarStatusPix` (2 componentes), landmark `main` duplicado dentro do `ion-content` e recuperacao do smoke `golden-path-mobile` — **correcao de divida**; **concluida** (PR #135 develop / #136 main, 2026-07-31; suite e2e a 41 verdes / 0 falhas, o smoke estava vermelho desde a M-4; Vitest 527/70) | 6 |
+
+## Cross-repo (`sep-app` + `sep-mobile`)
+
+| Sprint | Arquivo | Tema | Impl tasks |
+|--------|---------|------|------------|
+| D-1 | [`300-dsprint-1-divida-dependencias-web-mobile.md`](./300-dsprint-1-divida-dependencias-web-mobile.md) | Remediar vulnerabilidades de dependencia `high`/`critical` nos dois repos front e instalar o gate de `npm audit` no CI, que hoje **nao existe em nenhum dos dois** — **correcao de divida de seguranca**; **planejada** (2026-08-05). Metade mobile bloqueada ate o back-merge `main` -> `develop` no `sep-mobile` | 5 |
 
 ## Dependencias gerais
 
@@ -89,6 +101,18 @@ As tabelas usam a ordem recomendada de execucao.
   `FINANCEIRO`/`ADMIN` sao inalcancaveis pelo `sep-mobile`, que so conhece
   `UsuarioRole = 'ADMIN' | 'CLIENTE'`. Antes de planejar sprint mobile sobre contrato novo,
   conferir a role exigida no backend — foi o que reduziu a M-16 a um unico endpoint.
+- **Trio de divida planejado em 2026-08-05 (D-1 -> F-24 -> 35)**: a quarta, quinta e sexta sprints de
+  divida da fase, e as unicas frentes executaveis depois que o escopo de produto sobre fake se
+  esgotou. **Nenhuma depende de API externa, credencial ou provider real.**
+  - **D-1 -> F-24**: dependencia de **conveniencia, nao funcional**. A D-1 mexe em
+    `package-lock.json` do `sep-app`; rodar a F-24 antes forcaria rebase sobre o mesmo arquivo.
+  - **F-24 e 35 sao independentes entre si**: nenhuma consome contrato novo da outra. A ordem e de
+    severidade — a F-24 carrega dois defeitos vivos em producao.
+  - **A D-1 tem pre-requisito manual**: back-merge `main` -> `develop` no `sep-mobile` (`main` esta 7
+    commits a frente). Sem ele, as Tasks D-1.3/D-1.4 nao comecam; as do `sep-app` seguem.
+  - **Atencao na Sprint 35**: se a Task 35.7 mudar a forma dos enums no OpenAPI, ela **muda o
+    snapshot que o `contract:check` do `sep-app` valida** e pode reabrir uma lacuna que a F-24 acabou
+    de fechar. O Gate 35.0 mede isso antes de a task desenhar qualquer coisa.
 - Gates externos (credenciais Celcoin, conta AWS, contas de loja) nao bloqueiam a implementacao
   destas sprints sobre fake; a ativacao real e a publicacao sao escopo da Fase 5
   ([`../../docs-sep/PRD-FASE-5.md`](../../docs-sep/PRD-FASE-5.md)).

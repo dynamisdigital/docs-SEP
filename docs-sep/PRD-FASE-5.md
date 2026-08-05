@@ -109,19 +109,24 @@ implementacao desta fase.
 
 Planejamento de alto nivel; todas as sprints **planejadas** e **gated** pelo acesso da sua frente.
 Specs e steps sao criados **just-in-time** em `specs/fase-5/` e `steps-fase-5/`. A numeracao continua
-a sequencia: **backend a partir de 35** (a 33 foi consumida pela correcao de lockout da Fase 4 e a 34
-pelos follow-ups dela) e **mobile a partir de M-18** (a M-17 foi consumida pelos follow-ups de
-lockout/a11y da Fase 4, mergeada em 2026-07-31). Frentes de infra usam prefixo `I-Sprint`
-(infraestrutura) por nao serem sprints de codigo de aplicacao.
+a sequencia: **backend a partir de 36** e **mobile a partir de M-18** (a M-17 foi consumida pelos
+follow-ups de lockout/a11y da Fase 4, mergeada em 2026-07-31). Frentes de infra usam prefixo
+`I-Sprint` (infraestrutura) por nao serem sprints de codigo de aplicacao.
+
+**Historico da numeracao de backend**: a Fase 5 ja recuou tres vezes, sempre porque a Fase 4 consumiu
+o numero seguinte — a **33** pela correcao de lockout, a **34** pelos follow-ups dela, e a **35** pela
+sprint de divida de config/lockout/contrato planejada em 2026-08-05
+([`specs/fase-4/035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md)). Antes de
+criar a proxima spec de backend, conferir o maior numero ja usado em `specs/fase-4/`.
 
 ### Backend / integracao (`sep-api`)
 
 | Sprint | Frente | Tema | Gate | Status |
 |--------|--------|------|------|--------|
-| 35 | A | Ativacao adapter real KYC/PLD (Celcoin) + validacao sandbox | credenciais Celcoin | planejada |
-| 36 | A | Ativacao adapter real assinatura/CCB + validacao sandbox | credenciais Celcoin | planejada |
-| 37 | A | Ativacao adapter real Pix + escrow + aporte + conciliacao (sandbox) | credenciais Celcoin | planejada |
-| 38 | A | Promocao das integracoes de sandbox para producao + trilha de auditoria | credenciais prod | planejada |
+| 36 | A | Ativacao adapter real KYC/PLD (Celcoin) + validacao sandbox | credenciais Celcoin | planejada |
+| 37 | A | Ativacao adapter real assinatura/CCB + validacao sandbox | credenciais Celcoin | planejada |
+| 38 | A | Ativacao adapter real Pix + escrow + aporte + conciliacao (sandbox) | credenciais Celcoin | planejada |
+| 39 | A | Promocao das integracoes de sandbox para producao + trilha de auditoria | credenciais prod | planejada |
 
 ### Infraestrutura (`sep-api` + `docs-SEP/ci-pipelines`)
 
@@ -158,7 +163,7 @@ lockout/a11y da Fase 4, mergeada em 2026-07-31). Frentes de infra usam prefixo `
 
 ## 47. Gates e pre-requisitos
 
-- **Credenciais Celcoin/BaaS** (sandbox e producao) — Frente A e Sprints 33-36.
+- **Credenciais Celcoin/BaaS** (sandbox e producao) — Frente A e Sprints **36-39**.
 - **Conta/ambiente AWS aprovado** — Frente B e I-Sprints 1-3.
 - **Contas de desenvolvedor de loja** (Google Play, Apple Developer) — Frente C e M-18/M-19.
 - **Aprovacao regulatoria/juridica** para operar movimentacao financeira real (conformidade

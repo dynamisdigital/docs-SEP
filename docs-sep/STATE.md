@@ -14,12 +14,34 @@ _Atualizado em: 2026-08-05._
 
 ## Leia agora
 
-- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). **Todas as frentes planejadas da Fase 4
-  estao executadas e mergeadas.** A F-Sprint 23 fechou a ultima delas em 2026-08-05, em `develop`
-  **e** `main`, e **esgota o recorte web**. Restam apenas: o **back-merge `main` -> `develop` no
-  `sep-mobile`** e **M-14/M-15**, presas ao gate externo de hardware macOS (ver §Gates externos).
-- **Spec/step ativo**: **nenhum.** A proxima decisao e de rumo — fechar a Fase 4 preenchendo o §41 do
-  `PRD-FASE-4.md` (hoje em branco) ou abrir a Fase 5. Ver §Proximo passo.
+- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Todas as frentes **de produto** da Fase 4
+  estao executadas e mergeadas — a F-Sprint 23 fechou a ultima em 2026-08-05, em `develop` **e**
+  `main`, esgotando o recorte web. A Fase 5 esta **inteiramente gated** por acesso externo (Celcoin,
+  AWS, contas de loja) e nao tem frente executavel.
+- **Spec/step ativo**: **tres sprints de divida planejadas em 2026-08-05**, a executar **nesta
+  ordem**. Sao a unica frente executavel sem nenhuma API externa:
+  1. **D-Sprint 1** — divida de dependencias (`sep-app` + `sep-mobile`). Spec
+     [`300`](../specs/fase-4/300-dsprint-1-divida-dependencias-web-mobile.md), steps
+     [`300`](../steps-fase-4/cross-repo/300-dsprint-1-steps.md). **Bloqueada no mobile** ate o
+     back-merge do item 1 do §Proximo passo.
+  2. **F-Sprint 24** — divida tecnica web. Spec
+     [`124`](../specs/fase-4/124-fsprint-24-divida-tecnica-web.md), steps
+     [`124`](../steps-fase-4/web/124-fsprint-24-steps.md).
+  3. **Sprint 35** — divida de config/lockout/contrato no backend. Spec
+     [`035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md), steps
+     [`035`](../steps-fase-4/backend/035-sprint-35-steps.md).
+
+  **Comece pelo Gate D-1.0.** Cada sprint abre com um Gate que re-mede tudo e **invalida o
+  planejamento se divergir** — inclusive o `npm audit` do `sep-mobile`, medido no planejamento em
+  branch errada (ver §Onde estamos).
+- **Aprendizado que vale carregar**: **documento nao substitui leitura do codigo.** A F-23 encontrou
+  tres registros errados sobre a propria area que ia mexer — a §Autorizacao da spec 122 dizia que
+  "nao ha mecanismo novo a criar" para o endpoint publico (ignorava o token velho e **presente**);
+  este `STATE.md` e o `SEGURANCA.md` descreviam a consequencia como "cai de volta no texto fixo",
+  quando o usuario e **arrancado da pagina** para `/login`; e a propria Decisao 7 dos steps da F-23
+  justificava manter "30 minutos" no fallback com uma premissa que o teste da sprint contradizia.
+  Os tres foram corrigidos na fonte. **O planejamento de 2026-08-05 repetiu a licao**: dois numeros
+  deste arquivo estavam desatualizados a favor do problema (ver §Onde estamos).
 - **Aprendizado que vale carregar**: **documento nao substitui leitura do codigo.** A F-23 encontrou
   tres registros errados sobre a propria area que ia mexer — a §Autorizacao da spec 122 dizia que
   "nao ha mecanismo novo a criar" para o endpoint publico (ignorava o token velho e **presente**);
@@ -33,6 +55,28 @@ _Atualizado em: 2026-08-05._
   `knownGap` **permanece aberto de proposito** e fecha do lado web, fora do escopo da F-23.
 
 ## Onde estamos
+
+- **Tres sprints de divida PLANEJADAS em 2026-08-05** — spec + steps criados para a **D-Sprint 1**
+  (dependencias, cross-repo), a **F-Sprint 24** (web) e a **Sprint 35** (backend), nessa ordem de
+  execucao. Nenhuma delas depende de credencial, provider real ou API externa; sao a resposta a
+  "sobrou algo executavel?" depois que a Fase 4 esgotou o escopo de produto sobre fake. **Nada de
+  codigo foi tocado** — o trabalho foi so de planejamento, em `docs-SEP`.
+  O levantamento conferiu cada item **no codigo**, e **dois registros deste arquivo estavam
+  desatualizados a favor do problema**: `estabilizar()` tem **39 definicoes byte-identicas** em
+  `*.spec.ts` (o registro dizia "terceira copia" — subestimado em 36), e a constante
+  `CorrelationIdFilter.MDC_KEY` **ja existe** mas **quatro** call sites usam o literal
+  `MDC.get("correlationId")` (o registro nomeava so o `RateLimitFilter`). Os dois foram corrigidos
+  aqui e nas specs.
+  Achado novo que explica a divida de dependencias: **nenhum dos dois repos front tem `npm audit`,
+  nem no CI nem como script de `package.json`** — e por isso que a contagem voltou de 0 (F-19) a 19
+  sem deteccao. O gate entrou como Task, nao como bonus.
+  **Ressalva de medicao**: os 19 do `sep-app` foram medidos em `develop` (`c72b393`) e valem; os **25
+  do `sep-mobile` (1 critical, 15 high) foram medidos na branch `feature/msprint-17-...`**, que
+  estava com checkout ativo no repo, **e nao valem como baseline** — o Gate D-1.0 re-mede em
+  `develop` apos o back-merge, e seis PRs do Dependabot ja em `main` provavelmente derrubam parte da
+  contagem. **A numeracao consumiu o backend 35**, entao o backend da Fase 5 renumerou de 35-38 para
+  **36-39** em [`PRD-FASE-5.md`](./PRD-FASE-5.md) §46/§47, no mesmo precedente que ja recuou a fase
+  duas vezes.
 
 - **F-Sprint 23 (web) MERGEADA develop+main em 2026-08-05** — politica de lockout e `Retry-After`
   (retomada da Task F-22.6 como sprint propria; correcao de divida, sem escopo de produto novo).
@@ -306,14 +350,8 @@ _Atualizado em: 2026-08-05._
 
 ## Proximo passo
 
-1. **Decisao de rumo.** E o que resta decidir: a Fase 4 nao tem mais frente executavel sobre fake.
-   Duas opcoes, ambas legitimas:
-   - **fechar a Fase 4** preenchendo o §41 do [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com
-     status, PRs, back-merges e as dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o
-     iOS do Epic 14 (M-14/M-15) entram como **adiados**, nao como pendencias em aberto; ou
-   - **abrir a Fase 5** ([`PRD-FASE-5.md`](./PRD-FASE-5.md)) nas frentes que nao dependem de
-     credencial Celcoin, conta AWS ou conta de loja.
-2. **Manual (dev humano) — back-merge `main` -> `develop` no `sep-mobile`.** A divergencia **cresceu**
+1. **Manual (dev humano) — back-merge `main` -> `develop` no `sep-mobile`.** E o **primeiro** item:
+   destrava a metade mobile da D-Sprint 1 e e pre-requisito do Gate D-1.0. A divergencia **cresceu**
    desde 2026-07-31 e nao e mais so o `fast-uri`: `main` esta **7 commits a frente**, com seis PRs do
    Dependabot (#137 `@modelcontextprotocol/sdk`+`@angular/cli`, #126 `gradle/actions` 4->6, #129
    `@hono/node-server`+`@angular/cli`, #130 `immutable`, #132 `tar`, #133 `fast-uri`) alem da
@@ -321,14 +359,30 @@ _Atualizado em: 2026-08-05._
    `.github/workflows/ci.yml` —, **nenhum arquivo de app**, mas quebra a invariante
    `develop` == `main` que o Gate da proxima sprint mobile confere. Ao fazer, rodar `npm ci` +
    `npm run format:check` local antes do push.
-3. **Divida de seguranca de dependencias (nao bloqueia).** O `npm audit` do `sep-app` regrediu
-   de 0 (F-Sprint 19) para **19 — 12 high e 7 moderate**, medido em 2026-08-03 e **identico em
-   `develop` intocada**, entao e deriva por advisories novos contra deps existentes, nao regressao de
-   codigo. Dez pacotes `@angular/*` diretos em high, incluindo *i18n XSS via event-handler
-   attributes* e *Cache-Key Ambiguity no HttpTransferCache* (cross-request leak), mais
-   `brace-expansion` DoS e `fast-uri` host confusion. O Angular 20 esta em LTS ate 2026-11-28
-   (ADR 0018 adiou o 22), entao provavelmente resolve com patch dentro do 20.x. Num sistema sob
-   CMN 4.656 isso merece uma sprint curta e propria; conferir tambem `sep-mobile` e `sep-api`.
+2. **Executar as tres sprints de divida, nesta ordem** — D-Sprint 1 -> F-Sprint 24 -> Sprint 35. Sao
+   a unica frente executavel sem API externa; ver §Leia agora para os ponteiros de spec e steps.
+   Cada uma comeca por um Gate que re-mede a baseline e **invalida o planejamento se divergir**.
+   - **D-Sprint 1** (`sep-app` + `sep-mobile`): o `npm audit` do `sep-app` regrediu de 0 (F-Sprint 19)
+     para **19 — 12 high e 7 moderate**, **identico em `develop` intocada**, entao e deriva por
+     advisories novos contra deps existentes e nao regressao de codigo. Dez pacotes `@angular/*`
+     diretos em high, incluindo *i18n XSS via event-handler attributes* e *Cache-Key Ambiguity no
+     HttpTransferCache* (cross-request leak), mais `brace-expansion` DoS e `fast-uri` host confusion.
+     Angular 20 em LTS ate 2026-11-28 (ADR 0018 adiou o 22), entao deve resolver com patch dentro do
+     20.x — **subir major exige ADR novo**. O `sep-mobile` **nao tem baseline valida** (ver §Onde
+     estamos). Alem de remediar, a sprint **instala o gate de `npm audit` no CI dos dois**, que hoje
+     nao existe.
+   - **F-Sprint 24** (`sep-app`): dois defeitos vivos — o `errorInterceptor` ainda arranca o usuario
+     da `/account-locked` num `401`/`403` da consulta de politica, e o KPI do dashboard de backoffice
+     renderiza `NaNmin` (o mock devolve `7200` e esconde). Leva o `contract:check` de **1 lacuna para
+     0**, a primeira vez desde a F-19.
+   - **Sprint 35** (`sep-api`): allowlist de proxy (hoje a origem do rate limit e escolhida pelo
+     cliente), validacao de `LockoutProperties` no boot, `405` faltante, e codigo/config morto.
+   - **`sep-api` fora do escopo de dependencias por decisao**: `build.gradle` nao tem plugin de scan
+     nenhum, entao medir exigiria adicionar tooling. Follow-up nomeado, candidato a sprint propria.
+3. **Decisao de rumo, depois das tres.** Fechar a Fase 4 preenchendo o §41 do
+   [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com status, PRs, back-merges e as dividas
+   aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do Epic 14 (M-14/M-15) entram como
+   **adiados**, nao como pendencias em aberto. A Fase 5 so abre com acesso externo liberado.
 4. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos). Enquanto ele nao abre, avaliar o fallback por runner CI macOS (spec 214.3.4)
    para validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
@@ -338,7 +392,16 @@ _Atualizado em: 2026-08-05._
    `0d24602` e de `origin/develop` foram **conferidas identicas**, entao o snapshot continua fiel; e
    so a referencia que envelhece. Trocar por `0d24602` num commit de documentacao, se valer o ciclo
    de PR — o campo e documental e nenhum script o le.
-6. **Follow-ups tecnicos abertos** (nao bloqueiam). **Abertos pela Sprint 34**: `NaNmin` no KPI do
+6. **Follow-ups tecnicos abertos** (nao bloqueiam). **Boa parte desta lista ja esta recortada nas
+   tres sprints do item 2** — o `NaNmin`/`tempoMedioResolucao30d`, o `forward-headers-strategy`, o
+   `resilience4j` morto, o `ApiExceptionHandler` sem `405`, os enums inline, a `message` do `423`, o
+   `ContaBloqueadaException.CODIGO`, o `countByIpAndJanela`, o `MDC.get` literal, o `Clock`
+   injetavel, o `message: ""`, os 3 literais `login`/`verify-totp`, o `reprocessarWebhook`, o vetor
+   do `errorInterceptor` na `/account-locked`, o `/auth/totp/verify` e o `estabilizar()` duplicado.
+   **Seguem fora de qualquer sprint planejada**: controle compensatorio contra brute force lento
+   (exige ADR), os 4 contratos ausentes da F-17, deteccao de `knownGap` obsoleto no
+   `contract-check.mjs`, o rotulo "Criar conta", `idCurto`/`formatarMoeda` duplicados, Playwright
+   fora do CI, e **todo o bloco mobile**. **Abertos pela Sprint 34**: `NaNmin` no KPI do
    dashboard backoffice do `sep-app` (`backoffice-format.ts` faz `Math.round` sobre `"PT2H"`; o mock
    MSW devolve `7200`, entao nenhum teste do front ve) e o `api.models.ts` declarando
    `tempoMedioResolucao30d: number` onde deveria ser `string`; `forward-headers-strategy: native`
