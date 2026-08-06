@@ -2,7 +2,9 @@
 
 **Spec de origem**: [`124-fsprint-24-divida-tecnica-web.md`](../../specs/fase-4/124-fsprint-24-divida-tecnica-web.md)
 
-**Status**: **planejada** (criada em 2026-08-05). Nenhuma Task executada.
+**Status**: **em execucao**. Criada em 2026-08-05. **Gate F-24.0 concluido em 2026-08-06** — baseline
+medida, 8 ancoras conferidas byte a byte, cinco correcoes aplicadas a este documento e a spec 124
+(ver §Estado atual verificado e §Correcoes do Gate F-24.0 da spec). Nenhuma Task de codigo executada.
 
 **Sprint irma**: nenhuma. E a **segunda** das tres sprints de divida planejadas em 2026-08-05:
 [`D-1`](../cross-repo/300-dsprint-1-steps.md) -> `F-24` -> [`35`](../backend/035-sprint-35-steps.md).
@@ -20,7 +22,8 @@
   `features/public/login/login.component.ts`,
   `features/public/login/verify-totp/verify-totp.component.ts`,
   `features/public/account-locked/account-locked.component.spec.ts`,
-  `contracts/consumed-contracts.json`, `src/mocks/handlers.ts`, e os `*.spec.ts` da Task F-24.6.
+  `contracts/consumed-contracts.json`, `src/mocks/handlers.ts`, o helper novo de teste
+  (`src/testing/`, a criar) e os ~44 `*.spec.ts` da Task F-24.6.
 - `docs-SEP`: este step, a spec 124, indices e PR description; **Git manual**.
 
 **Branch sugerida**: `feature/fsprint-24-divida-tecnica`, criada de `develop` atualizado.
@@ -33,9 +36,15 @@ disputar `package-lock.json` entre duas branches vivas.
 
 ---
 
-## Estado atual verificado (2026-08-05)
+## Estado atual verificado (2026-08-05; **re-medido no Gate F-24.0 em 2026-08-06**)
 
 Levantado antes de planejar. Qualquer divergencia encontrada no Gate F-24.0 invalida o desenho abaixo.
+
+**Resultado do Gate**: as 8 ancoras de `arquivo:linha` conferiram **byte a byte**. Cairam dois numeros
+(Vitest `94` -> `93`, `estabilizar` `39` -> `38`) e uma premissa (`byte-identicas`), e apareceram dois
+achados que ampliam Tasks (`trim` na F-24.3, tres comentarios falsos na F-24.4). As secoes abaixo ja
+estao corrigidas; o registro completo, com a evidencia de cada medicao, esta em
+[`spec 124`](../../specs/fase-4/124-fsprint-24-divida-tecnica-web.md) §Correcoes do Gate F-24.0.
 
 ### O vetor da `/account-locked` (F-24.1)
 
@@ -77,17 +86,22 @@ O docblock tambem registra que o `SecurityConfig` tem **oito** `permitAll` e que
 deles — ficam de fora `POST /usuarios`, `/auth/refresh`, `/auth/logout` e os webhooks. A Task
 acrescenta **uma** rota, nao as oito.
 
-### `message: ""` (F-24.3) — o padrao correto ja existe no repo
+### `message: ""` (F-24.3) — o padrao correto ja existe no repo, e tem **duas** partes
 
-| Arquivo | Operador | Comportamento com `message: ""` |
-|---|---|---|
-| `api-error.ts:22` | `corpo?.message ?? padrao` | devolve `""` -> **alerta vazio** |
-| `login.component.ts:52` | `mensagemDaApi ?? '...'` | devolve `""` -> **alerta vazio** |
-| `login.component.ts:71` | `mensagemDaApi ?? '...'` | devolve `""` -> **alerta vazio** |
-| `verify-totp.component.ts:53,58,70` | `mensagemDaApi \|\| '...'` | cai no padrao -> **correto** |
+| Arquivo | Extracao | Operador | `message: ""` | `message: "   "` |
+|---|---|---|---|---|
+| `api-error.ts:21-22` | `?.message` (sem `trim`) | `?? padrao` | `""` -> **alerta vazio** | **alerta em branco** |
+| `login.component.ts:32,52` | `?.message` (sem `trim`) | `?? '...'` | `""` -> **alerta vazio** | **alerta em branco** |
+| `login.component.ts:32,71` | `?.message` (sem `trim`) | `?? '...'` | `""` -> **alerta vazio** | **alerta em branco** |
+| `verify-totp.component.ts:48,53,58,70` | `?.message?.trim()` | `\|\| '...'` | cai no padrao -> **correto** | cai no padrao -> **correto** |
 
 `??` so cai no fallback com `null`/`undefined`; `""` e um valor definido e vence. O `verify-totp` ja
 foi corrigido (F-22); o `login` e o helper compartilhado nao.
+
+**Achado do Gate F-24.0**: o acerto do `verify-totp` sao **duas** decisoes, nao uma — o `trim` em
+`:48` e o `||` nos tres pontos. Corrigir so o operador nos outros dois arquivos deixa
+`message: "   "` (whitespace puro do backend ou de um proxy) apagando o alerta exatamente como hoje.
+A Task F-24.3 fecha os dois.
 
 ### `NaNmin` no dashboard (F-24.4)
 
@@ -96,6 +110,11 @@ foi corrigido (F-22); o `login` e o helper compartilhado nao.
   (Jackson `WRITE_DURATIONS_AS_TIMESTAMPS`)"*. **A afirmacao e falsa**: o Spring Boot **desliga**
   `WRITE_DURATIONS_AS_TIMESTAMPS` e o fio leva ISO-8601 (`"PT2H"`). Medido na Sprint 34; o `knownGap`
   do `consumed-contracts.json` registra a medicao e o `openapiType: "string"` esta **correto**.
+- **Achado do Gate F-24.0: os comentarios falsos sao tres, nao um.** Alem do acima, tambem
+  `backoffice-format.ts:14-16` (*"a duracao como numero de segundos (Duration do backend)"*) e
+  `backoffice-format.ts:29` (*"O Duration do backend chega como numero de segundos"*) — os dois no
+  arquivo que a Task edita. Corrigir so o de `api.models.ts` deixaria dois vivos a centimetros da
+  correcao, que e como este defeito sobreviveu ate aqui.
 - `backoffice-format.ts:30-44` — `formatarDuracao(segundos: number)`. A guarda `:31`
   (`!segundos || segundos <= 0`) **nao pega** `"PT2H"`: a string e truthy e `"PT2H" <= 0` e falso.
   Segue para `:34` `Math.round("PT2H" / 60)` = `NaN` e `:43` devolve `"NaNmin"`.
@@ -111,12 +130,43 @@ foi corrigido (F-22); o `login` e o helper compartilhado nao.
 A regra do descriptor (F-22, registrada no `$comment` do arquivo): declarar status de erro **so** onde
 a tela ramifica; operacoes que usam `apiErr?.message ?? padrao` nao discriminam e nao declaram.
 
-### `estabilizar()` (F-24.6)
+### `estabilizar()` **e `flush()`** (F-24.6) — re-medido no Gate
 
-**39 definicoes byte-identicas** de
-`function estabilizar(fixture: ComponentFixture<unknown>): Promise<void>` em `*.spec.ts`, espalhadas
-por `features/authenticated/**` e `features/public/**`. O `STATE.md` registra "terceira copia" —
-**subestimado em 36**; conferir a contagem no Gate.
+**38** definicoes de `function estabilizar(fixture: ComponentFixture<unknown>): Promise<void>` em
+`*.spec.ts`, espalhadas por `features/authenticated/**` e `features/public/**`. O `STATE.md` registrava
+"terceira copia" e a spec registrava "39 byte-identicas"; **os dois estavam errados**.
+
+As **assinaturas** sao identicas. Os **corpos** sao tres, e a identidade textual esconde um split
+semantico, porque o corpo "padrao" chama um segundo helper local que tambem esta duplicado:
+
+```ts
+// 36x — corpo "padrao"                    // 42x — flush, com DOIS defaults
+async function estabilizar(fixture) {      async function flush(times = 5) {   // 31 arquivos
+  await fixture.whenStable();              async function flush(times = 6) {   // 11 arquivos
+  await flush();                             for (let i = 0; i < times; i += 1) {
+  fixture.detectChanges();                     await Promise.resolve();
+}                                            }
+                                           }
+```
+
+| Grupo | Arquivos | Drenagem real |
+|---|---|---|
+| corpo padrao + `flush(5)` | 25 | 5 microtasks |
+| corpo padrao + `flush(6)` | 11 | **6** microtasks |
+| `account-locked.component.spec.ts` (laco inline `i < 5`) | 1 | 5 — e `flush(5)` nao fatorado, nao uma decisao |
+| `aportes-list.component.spec.ts` (sem drenagem) | 1 | 0 |
+
+`flush` tem **42** definicoes (36 convivem com `estabilizar`; 6 arquivos so tem `flush`). Nao e import:
+e local em cada arquivo.
+
+**A drenagem e peso morto.** Quatro medicoes sobre a suite inteira: `6 -> 5` nos 11 (142 verdes),
+`times = 1` (765/93), `times = 0` (765/93) e — a decisiva — **`await flush()` removido dos 36**
+(765/93). O `times = 0` sozinho nao provaria nada: aguardar a promise de uma `async` ja custa um tick.
+**Controle de vacuo**: com a drenagem removida, mutar `chaves-pix-page.component.ts:145`
+(`this.chaves.set(chaves)` -> `set([])`) derrubou **20 testes** (exit 1) — os specs seguem detectando
+defeito real, entao a drenagem nao era o que os sustentava.
+
+**Logo a unificacao total e segura**, e nao ha motivo para deixar os dois divergentes locais.
 
 ### Copy da `/account-locked` e literais duplicados (F-24.7)
 
@@ -168,8 +218,13 @@ Literais byte-identicos entre `login` e `verify-totp` — **tres**, confirmados:
    tentado na Task 34.6 e **revertido**, porque publicaria um tipo que o servidor nunca emite e
    apagaria o unico detector do `NaNmin`.
 
-4. **A F-24.6 vai em commit proprio e isolado.** 39 arquivos de teste num diff mecanico; o risco nao e
-   regressao de produto, e mascarar as outras tasks no review.
+4. **A F-24.6 vai em commit proprio e isolado.** ~44 arquivos de teste; o risco nao e regressao de
+   produto, e mascarar as outras tasks no review.
+   **O helper compartilhado MANTEM a drenagem (`flush(5)`).** O Gate mediu que ela e dispensavel, mas
+   remove-la apertaria o timing de 37 arquivos para poupar quatro linhas — e teste sensivel a carga
+   fica flaky sob CPU saturada sem aparecer numa rodada limpa. Com `flush(5)` nenhum arquivo recebe
+   **menos** tempo de settle do que hoje: 25 ficam identicos, 11 vao de 6 para 5 (medido verde),
+   `account-locked` de 5 inline para 5 compartilhado e `aportes-list` de 0 para 5.
 
 5. **A F-24.7 preserva a intencao original do teste.** `account-locked.component.spec.ts` foi escrito
    para **quebrar** a cada mudanca de copy — o comentario diz *"Qualquer mudanca de copy DEVE quebrar
@@ -208,7 +263,7 @@ Literais byte-identicos entre `login` e `verify-totp` — **tres**, confirmados:
 | `message: ""` | F-24.3 |
 | `tempoMedioResolucao30d` + `NaNmin` + mock + comentario | F-24.4 |
 | `reprocessarWebhook` `400` + inventario | F-24.5 |
-| Helper `estabilizar()` | F-24.6 |
+| Helper `estabilizar()` + `flush()` | F-24.6 |
 | Copy robusta + literais duplicados | F-24.7 |
 | Baseline, gates e limitacoes | Gate F-24.0 e Fechamento |
 
@@ -224,13 +279,13 @@ Gate F-24.0 (precheck + baseline)
   -> F-24.3  message vazia          [independente]
   -> F-24.4  NaNmin + tipo + mock   [independente; fecha o ultimo knownGap]
   -> F-24.5  descriptor             [independente]
-  -> F-24.6  estabilizar()          [POR ULTIMO entre as de codigo: toca 39 arquivos e
+  -> F-24.6  estabilizar()+flush()  [POR ULTIMO entre as de codigo: toca ~44 arquivos e
                                      conflitaria com qualquer task anterior nao commitada]
   -> F-24.7  copy + literais        [depois da F-24.6: mexe em specs que ela acabou de tocar]
 Fechamento (gates completos + docs + PR description)
 ```
 
-A posicao da F-24.6 **nao e preferencia**: ela edita 39 `*.spec.ts`, entre eles os de `login`,
+A posicao da F-24.6 **nao e preferencia**: ela edita ~44 `*.spec.ts`, entre eles os de `login`,
 `verify-totp` e `account-locked`, que as Tasks F-24.1, F-24.2 e F-24.7 tambem tocam.
 
 ---
@@ -254,12 +309,22 @@ Se a D-Sprint 1 **nao** estiver em `develop`, parar e reportar (ver §Pre-requis
 
 ```bash
 npm ci
-npm test                     # partida esperada: 765 / 94 arquivos
-npm run contract:check       # partida esperada: 85 operacoes / 1 lacuna / exit 0
+npm test                     # MEDIDO 2026-08-06: 765 testes / 93 arquivos (a spec dizia 94)
+npm run contract:check       # MEDIDO: 85 operacoes / 1 lacuna / exit 0
 npm run lint && npm run format:check
 npm run build
-npx playwright test          # partida esperada: 39
+npx playwright test          # MEDIDO: 39
 ```
+
+Baseline do Gate, medida em `feature/fsprint-24-divida-tecnica` (de `develop` `d987714`):
+
+| Gate | Registrado na spec | Medido | |
+|---|---|---|---|
+| `npm ci` | — | exit 0, 3 `moderate` | bate o residual da D-1 |
+| Vitest | 765 / **94** | 765 / **93** | testes OK, arquivos **nao** |
+| `contract:check` | 85 ops / 1 lacuna / exit 0 | identico | OK |
+| `lint`, `format:check`, `build` | verdes | exit 0 | OK |
+| Playwright | 39 | 39 | OK |
 
 **Por que e gate e nao task**: numero nao medido aqui nao pode ser citado no fechamento.
 
@@ -272,18 +337,27 @@ Conferir no arquivo, e nao neste documento: `app.config.ts:24-28` (ordem da cade
 `api.models.ts:685-691` (comentario falso + tipo); `backoffice-format.ts:31` (a guarda que nao pega
 string); `consumed-contracts.json:1594-1602`.
 
-E **recontar** as definicoes de `estabilizar`:
+E **recontar** as definicoes dos helpers de teste — contando **corpos**, nao so arquivos, porque
+assinatura identica nao implica corpo identico:
 
 ```bash
-grep -rc "function estabilizar" src --include=*.spec.ts | grep -v ":0" | wc -l   # esperado: 39
+grep -rc "function estabilizar" src --include=*.spec.ts | grep -v ":0" | wc -l   # MEDIDO: 38
+grep -rc "function flush" src --include=*.spec.ts | grep -v ":0" | wc -l         # MEDIDO: 42
+grep -rh "function flush(times" src --include=*.spec.ts | sort | uniq -c         # MEDIDO: 31x(5), 11x(6)
+
+# corpos distintos de estabilizar — MEDIDO: 3 (36 + 1 + 1)
+for f in $(grep -rl "function estabilizar" src --include=*.spec.ts); do
+  awk '/function estabilizar/{f=1} f{print} f&&/^}/{exit}' "$f" | md5sum
+done | sort | uniq -c
 ```
 
-### Definicao de pronto do Gate F-24.0
+### Definicao de pronto do Gate F-24.0 — **CONCLUIDO 2026-08-06**
 
-- [ ] Branch criada de `develop` atualizado com a D-1 dentro; `develop == main` por conteudo.
-- [ ] Baseline anotada (Vitest, `contract:check`, lint, format, build, Playwright).
-- [ ] Os 8 pontos conferidos e a contagem de `estabilizar` recontada, ou a divergencia reportada
-      antes de qualquer codigo.
+- [x] Branch criada de `develop` atualizado com a D-1 dentro (`d987714`, PR #128);
+      `develop == main` por conteudo (`git diff --stat` vazio); `main` em `7f232b3` (PR #129).
+- [x] Baseline anotada (Vitest, `contract:check`, lint, format, build, Playwright) — ver 124.0.2.
+- [x] Os 8 pontos conferidos **byte a byte** e as contagens re-medidas; **as divergencias foram
+      reportadas e corrigidas na fonte antes de qualquer codigo**. Working tree limpa ao fim do Gate.
 
 ---
 
@@ -398,21 +472,25 @@ fix(core): isentar /auth/totp/verify do Authorization no authInterceptor
 
 ### Step 124.3.1 - Corrigir o helper
 
-`api-error.ts:22` — `corpo?.message ?? padrao` passa a tratar string vazia como ausente. Preferir
-checagem explicita de vazio a `||` cru: `||` tambem descartaria `0` e `false`, o que aqui nao importa
-(o campo e `string`), mas esconder essa premissa e o que faz a proxima leitura hesitar.
+`api-error.ts:21-22` — `corpo?.message ?? padrao` passa a tratar string vazia **e whitespace puro**
+como ausente. Sao as duas metades do acerto do `verify-totp`: o `trim` de `:48` e a queda no padrao.
+Preferir checagem explicita de vazio a `||` cru: `||` tambem descartaria `0` e `false`, o que aqui nao
+importa (o campo e `string`), mas esconder essa premissa e o que faz a proxima leitura hesitar.
 
 ### Step 124.3.2 - `login.component.ts` usa a mesma semantica
 
-`:52` e `:71` usam `??`. O `verify-totp` (`:53,58,70`) ja usa `||` e **acerta** — o alvo e uma
-semantica unica, nao espalhar `||` por call site.
+`:52` e `:71` usam `??`, e a extracao de `:32` nao faz `trim`. O `verify-totp` (`:48,53,58,70`) ja
+acerta nos dois — o alvo e uma semantica unica, nao espalhar `||` por call site.
 
 ### Step 124.3.3 - Testes
 
-Um teste por ponto corrigido, com corpo `{ message: '' }`, assertando o **texto padrao**.
+Um teste por ponto corrigido, com corpo `{ message: '' }` **e outro com `{ message: '   ' }`**,
+assertando o **texto padrao** nos dois.
 
-**Mutacao obrigatoria**: reverter para `??` em cada ponto — cada teste deve falhar. Um teste que passa
-com as duas versoes esta assertando outra coisa.
+**Mutacao obrigatoria**, uma por metade: (a) reverter para `??` em cada ponto — o teste de `''` deve
+falhar; (b) remover o `trim` — o teste de `'   '` deve falhar. Um teste que passa com as duas versoes
+esta assertando outra coisa. A mutacao (b) e o que impede a Task de fechar so metade do defeito, que
+foi como ele chegou ate aqui.
 
 ### Verificacao da Task F-24.3
 
@@ -422,8 +500,9 @@ npm test; echo "EXIT=$?"
 
 ### Definicao de pronto da Task F-24.3
 
-- [ ] Nenhum ponto do repo devolve `""` como mensagem de erro (`grep` por `message ??` prova).
-- [ ] Um teste por ponto, cada um falhando sob sua mutacao.
+- [ ] Nenhum ponto do repo devolve `""` **nem `"   "`** como mensagem de erro (`grep` por `message ??`
+      e por `?.message` sem `trim` prova).
+- [ ] Um teste por ponto e por metade (vazio e whitespace), cada um falhando sob sua mutacao.
 
 ### Commit sugerido
 
@@ -450,6 +529,10 @@ fix(core): tratar message vazio como ausente na extracao de erro da API
 `WRITE_DURATIONS_AS_TIMESTAMPS`)"*. **E falso e e a origem do defeito.** Substituir pelo que a Sprint
 34 mediu: o Spring Boot **desliga** essa feature, o fio leva ISO-8601 (`"PT2H"`), e o `openapiType:
 "string"` do snapshot esta correto.
+
+**Sao tres comentarios, nao um** (achado do Gate F-24.0): tambem `backoffice-format.ts:14-16` e
+`backoffice-format.ts:29` repetem "numero de segundos", no proprio arquivo que o Step 124.4.2 edita.
+Os tres caem na mesma Task.
 
 ### Step 124.4.2 - Parse
 
@@ -496,7 +579,8 @@ npm run build; echo "EXIT=$?"
 
 - [ ] `contract:check` **0 lacunas**, exit 0.
 - [ ] Teste de tela com `"PT2H"` passa e falha sob a mutacao do mock.
-- [ ] O comentario falso de `api.models.ts` foi substituido pelo resultado medido.
+- [ ] **Os tres** comentarios falsos (`api.models.ts:685-686`, `backoffice-format.ts:14-16` e `:29`)
+      foram substituidos pelo resultado medido; `grep` por "numero de segundos" nao acha mais nada.
 - [ ] `openapi.snapshot.json` e `.meta.json` intocados (`git diff --stat` prova).
 
 ### Commit sugerido
@@ -550,25 +634,36 @@ chore(contracts): declarar o 400 de backoffice.reprocessarWebhook
 
 ---
 
-## Task F-24.6 - Helper unico para `estabilizar()`
+## Task F-24.6 - Helper unico para `estabilizar()` e `flush()`
 
-**Objetivo**: uma definicao em vez de 39.
+**Objetivo**: uma definicao de cada, em vez de 38 + 42.
 **Pre-requisito**: Task F-24.5 concluida e aprovada.
-**Esforco**: 0,3 dia.
-**Arquivos esperados**: helper novo em `src/testing/` (ou o diretorio que o repo ja usar — conferir no
-Gate) + os 39 `*.spec.ts`.
+**Esforco**: 0,4 dia (era 0,3; o Gate achou o `flush`).
+**Arquivos esperados**: helper novo em `src/testing/` (ou o diretorio que o repo ja usar — conferir
+antes) + ~44 `*.spec.ts`.
 
 ### Step 124.6.1 - Criar o helper
 
 Assinatura identica a das copias:
-`estabilizar(fixture: ComponentFixture<unknown>): Promise<void>`. Copia byte-identica, sem
-"melhorias" — mudar o comportamento aqui muda 39 suites de uma vez.
+`estabilizar(fixture: ComponentFixture<unknown>): Promise<void>`, com o corpo padrao **e a drenagem
+preservada** (`flush(5)`). Exportar `flush` tambem, para os 6 arquivos que so tem ele.
+
+O default unico e **`5`**, nao `6`: os 11 arquivos com `times = 6` foram medidos verdes com `5`
+(142 testes) no Gate. Registrar no helper **por que** a drenagem fica, senao a proxima leitura
+"otimiza" e reabre o risco (ver Decisao 4).
 
 ### Step 124.6.2 - Substituir
 
 Remover a definicao local e importar, em cada arquivo. Preferir `Edit` a `sed`: o
 [`AGENT.md`](../../AGENT.md) §Como trabalhar registra que `sed` com `/` ou escape ja esvaziou arquivo
 neste repo.
+
+Dois arquivos **nao** sao substituicao cega — o Gate mediu os dois e ambos convergem para o helper:
+
+- `account-locked.component.spec.ts`: o laco inline de 5 iteracoes **e** `flush(5)`; trocar pelo
+  helper e semanticamente identico;
+- `aportes-list.component.spec.ts`: hoje nao drena; passa a drenar 5, ou seja, ganha tempo de settle.
+  Nenhum arquivo perde.
 
 ### Step 124.6.3 - Provar equivalencia
 
@@ -582,18 +677,20 @@ npm test; echo "EXIT=$?"        # contagem IDENTICA a da Task anterior
 npm run lint; echo "EXIT=$?"
 npm run format:check; echo "EXIT=$?"
 grep -rc "function estabilizar" src --include=*.spec.ts | grep -v ":0"   # esperado: nenhuma saida
+grep -rc "function flush" src --include=*.spec.ts | grep -v ":0"         # esperado: nenhuma saida
 ```
 
 ### Definicao de pronto da Task F-24.6
 
-- [ ] Zero definicoes locais restantes.
+- [ ] Zero definicoes locais restantes, **dos dois helpers**.
 - [ ] Contagem de testes **identica** a da Task F-24.5.
+- [ ] O helper registra por que a drenagem fica, e por que o default e `5`.
 - [ ] Commit **isolado**, sem nenhuma outra mudanca junto (Decisao 4).
 
 ### Commit sugerido
 
 ```text
-refactor(test): extrair estabilizar() para helper unico
+refactor(test): extrair estabilizar() e flush() para helper unico
 ```
 
 ---

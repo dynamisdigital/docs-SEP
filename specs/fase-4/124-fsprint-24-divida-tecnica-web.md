@@ -5,7 +5,8 @@
 - **ID da Spec**: 124
 - **Titulo**: F-Sprint 24 - Fechar os follow-ups abertos pela F-22 e pela F-23, o ultimo `knownGap` do
   `contract:check` e o vetor que ainda arranca o usuario da `/account-locked`
-- **Status**: **planejada** (criada em 2026-08-05)
+- **Status**: **em execucao** (criada em 2026-08-05; Gate F-24.0 executado em 2026-08-06, com cinco
+  correcoes aplicadas a este documento — ver §Correcoes do Gate F-24.0)
 - **Fase do produto**: Fase 4 - correcao de divida; sem tela, endpoint, DTO, migration ou regra nova
 - **Trilha**: Web (`sep-app`)
 - **Origem**: follow-ups nomeados pela [`122`](./122-fsprint-22-contrato-erro-followups-web.md) e pela
@@ -74,6 +75,12 @@ O comentario de `api.models.ts:685-686` ainda afirma *"serializado pelo backend 
 (Jackson `WRITE_DURATIONS_AS_TIMESTAMPS`)"*. **A afirmacao e falsa** e e a origem do defeito; corrigi-la
 faz parte da entrega.
 
+**O Gate F-24.0 achou que sao tres comentarios falsos, nao um.** Alem de `api.models.ts:685-686`,
+tambem `backoffice-format.ts:14-16` (*"a duracao como numero de segundos (Duration do backend)"*) e
+`backoffice-format.ts:29` (*"O Duration do backend chega como numero de segundos"*) repetem a mesma
+premissa — e os dois estao no arquivo que a Task 4 edita. Corrigir so o citado deixaria dois vivos a
+centimetros da correcao.
+
 ## Decisao tecnica principal — o `errorInterceptor` ganha a mesma nocao de rota publica que o `authInterceptor`
 
 O `authInterceptor` ja resolveu esse problema uma vez, e a justificativa dele (`auth.interceptor.ts:25-28`)
@@ -101,10 +108,10 @@ que e o status mais provavel.
 |---|---|---|
 | 1 | Isentar rotas publicas da navegacao global do `errorInterceptor` | `error.interceptor.ts:21,26`; `app.config.ts:24-28` |
 | 2 | Isentar `/auth/totp/verify` no `authInterceptor` e cobrir o caminho do challenge | `auth.interceptor.ts:11-15` — defeito e correcao ja **prescritos no proprio codigo** |
-| 3 | `message: ""` deixar de apagar o alerta | `api-error.ts:22` (`corpo?.message ?? padrao`) |
-| 4 | `tempoMedioResolucao30d` para `string`, parse ISO-8601, mock corrigido, comentario falso corrigido | `api.models.ts:685-691`; `backoffice-format.ts:30-44`; `handlers.ts:1683` |
+| 3 | `message: ""` **e `message: "   "`** deixarem de apagar o alerta | `api-error.ts:22` (`corpo?.message ?? padrao`, sem `trim`); `login.component.ts:32` (sem `trim`) contra `verify-totp.component.ts:48` (`?.message?.trim()`) |
+| 4 | `tempoMedioResolucao30d` para `string`, parse ISO-8601, mock corrigido, **os tres** comentarios falsos corrigidos | `api.models.ts:685-691`; `backoffice-format.ts:14-16`, `:29`, `:30-44`; `handlers.ts:1683` |
 | 5 | `backoffice.reprocessarWebhook` declarar o `400` que ramifica | `consumed-contracts.json:1594-1602` (`erros: [403, 429]`) |
-| 6 | Helper unico para `estabilizar()` | **39 definicoes byte-identicas** em `*.spec.ts` |
+| 6 | Helper unico para `estabilizar()` **e para `flush()`** | **38** definicoes de `estabilizar` (**3** corpos distintos) + **42** de `flush` (defaults `5` e `6`), medidas no Gate F-24.0 |
 | 7 | Asserçoes de copy robustas a reformatacao; literais duplicados `login`/`verify-totp` | `account-locked.component.spec.ts` |
 
 ### Fora
@@ -123,8 +130,8 @@ que e o status mais provavel.
 
 1. **`contract:check` sai de 1 lacuna para 0**, mantendo exit 0. Fecha o ultimo `knownGap`, aberto
    desde a F-Sprint 19 (2026-07-16).
-2. Vitest acima da baseline do Gate (partida esperada: 765 / 94 arquivos), Playwright verde, `lint`,
-   `format:check` e `build` verdes.
+2. Vitest acima da baseline do Gate (partida **medida**: 765 testes / **93** arquivos), Playwright
+   verde (39), `lint`, `format:check` e `build` verdes.
 3. **Todo teste novo verificado por mutacao** — aplicar a mutacao nomeada, ver o teste falhar,
    reverter. Teste que sobrevive conta como **nao entregue** (skill
    `sep-web-mutation-verified-testing`).
@@ -135,9 +142,11 @@ que e o status mais provavel.
 
 ## Riscos e limitacoes
 
-- **A Task 6 toca 39 arquivos de teste.** Diff grande e mecanico; o risco nao e regressao de produto e
-  sim mascarar as outras tasks no review. Vai em **commit proprio e isolado**, e o `git diff --stat`
-  do checkpoint precisa mostrar isso separado.
+- **A Task 6 toca ~44 arquivos de teste** (38 com `estabilizar`, 42 com `flush`, 36 com os dois). Diff
+  grande; o risco nao e regressao de produto e sim mascarar as outras tasks no review. Vai em **commit
+  proprio e isolado**, e o `git diff --stat` do checkpoint precisa mostrar isso separado.
+  **Nao e dedup mecanica**, ao contrario do que esta spec dizia antes do Gate: ver §Correcoes do Gate
+  F-24.0, item 3.
 - A Task 7 muda asserçoes que a F-21 criou **de proposito** para quebrar a cada mudanca de copy
   (`account-locked.component.spec.ts:44`: *"Qualquer mudanca de copy DEVE quebrar aqui"*). O objetivo e
   torna-las robustas a **reformatacao de template** sem perder a deteccao de **mudanca de texto** — se
@@ -145,6 +154,56 @@ que e o status mais provavel.
 - Smoke real contra `:8080` continua nao executavel; o vetor do item 1 e observavel offline (o MSW
   consegue devolver `401` na rota da politica), mas o comportamento contra backend real fica declarado
   como pendencia.
+
+## Correcoes do Gate F-24.0 (2026-08-06)
+
+O Gate re-mediu tudo antes de qualquer codigo. As **8 ancoras de `arquivo:linha` conferiram byte a
+byte**; o que nao sobreviveu foram os numeros e uma premissa. Cinco correcoes aplicadas a este
+documento e aos steps:
+
+1. **Vitest: `765 / 94` -> `765 / 93` arquivos.** Testes batem exato; a contagem de arquivos nunca foi
+   94. Rastreado por `git ls-tree`: a F-22 fechou com 91 e a F-23 acrescentou **dois**
+   (`retry-after.spec.ts`, `politica-lockout.service.spec.ts`) = 93, estavel em `9fb9788`, `c72b393`,
+   `d987714` e no tip da branch.
+
+2. **`estabilizar()`: `39` -> `38` definicoes.** `ed9c816` (F-22) tinha 37, `9fb9788` (F-23) tem 38.
+   Nunca foi 39. Nenhuma variante `const`/arrow, nenhuma em `e2e/` ou `scripts/`, nenhum arquivo que
+   use sem definir.
+
+3. **"39 definicoes byte-identicas" era falso — e essa e a correcao material.** Sao 38 definicoes com
+   **tres** corpos distintos, e a identidade textual escondia um split semantico:
+   - o corpo "padrao" (36x) chama `await flush()`, e **`flush` e outro helper local duplicado, com
+     42 definicoes e dois defaults** — `times = 5` em 31 arquivos e `times = 6` em 11. O mesmo texto
+     drena quantidades diferentes conforme o arquivo;
+   - `account-locked.component.spec.ts` inlineia um laco de 5 iteracoes: e `flush(5)` nao fatorado,
+     **nao** uma decisao;
+   - `aportes-list.component.spec.ts` nao drena nada.
+
+   Quatro medicoes sobre a suite inteira mostraram que a drenagem **nao sustenta nenhuma assercao**:
+   `6 -> 5` nos 11 (142 testes verdes), `times = 1` (765/93), `times = 0` (765/93) e, a decisiva,
+   **`await flush()` removido dos 36** (765/93). O `times = 0` sozinho nao provaria nada — aguardar a
+   promise de uma `async` ja custa um tick.
+
+   **Controle de vacuo**: com a drenagem removida, a mutacao
+   `chaves-pix-page.component.ts:145` (`this.chaves.set(chaves)` -> `set([])`) derrubou **20 testes**
+   (exit 1). Os specs seguem detectando defeito real sem drenagem; ela e peso morto, nao suporte.
+
+   **Consequencia para a Task 6**: a unificacao total e provadamente segura, e o helper compartilhado
+   **mantem** a drenagem (`flush(5)`). Nenhum arquivo passa a ter menos tempo de settle que hoje: 25
+   ficam identicos, 11 vao de 6 para 5 (medido verde), `account-locked` de 5 inline para 5
+   compartilhado e `aportes-list` de 0 para 5. Remover a drenagem tambem passaria, mas apertaria o
+   timing de 37 arquivos para poupar quatro linhas — e teste sensivel a carga fica flaky sob CPU
+   saturada sem aparecer numa rodada limpa.
+
+4. **`message` vazio: falta o `trim`.** `verify-totp.component.ts:48` usa `?.message?.trim()`;
+   `login.component.ts:32` e `api-error.ts:21` **nao**. O padrao correto do repo e `trim` **mais**
+   queda no padrao — corrigir so o operador deixaria `message: "   "` apagando o alerta igual.
+
+5. **Comentario falso do `Duration`: sao tres, nao um.** Ver §Os dois defeitos vivos.
+
+Nao houve divergencia nas 8 ancoras, no `contract:check` (85 operacoes / 1 lacuna / exit 0, e a lacuna
+e exatamente a do `tempoMedioResolucao30d`), no unico call site de `formatarDuracao`, nem no mock
+`handlers.ts:1683` (`7200`).
 
 ## Rastreabilidade
 
@@ -155,7 +214,7 @@ que e o status mais provavel.
 | `message: ""` | F-24.3 |
 | `tempoMedioResolucao30d` + `NaNmin` + mock + comentario | F-24.4 |
 | `reprocessarWebhook` `400` + inventario | F-24.5 |
-| Helper `estabilizar()` | F-24.6 |
+| Helper `estabilizar()` + `flush()` | F-24.6 |
 | Copy robusta + literais duplicados | F-24.7 |
 | Baseline, gates e limitacoes | Gate F-24.0 e Fechamento |
 

@@ -10,7 +10,7 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-08-05._
+_Atualizado em: 2026-08-06._
 
 ## Leia agora
 
@@ -24,7 +24,8 @@ _Atualizado em: 2026-08-05._
      nos dois repos**; ver §Onde estamos.
   2. **F-Sprint 24** — divida tecnica web. Spec
      [`124`](../specs/fase-4/124-fsprint-24-divida-tecnica-web.md), steps
-     [`124`](../steps-fase-4/web/124-fsprint-24-steps.md). **E a proxima.**
+     [`124`](../steps-fase-4/web/124-fsprint-24-steps.md). **EM EXECUCAO**: o **Gate F-24.0 fechou em
+     2026-08-06** e corrigiu cinco registros; nenhuma Task de codigo executada. Ver §Onde estamos.
   3. **Sprint 35** — divida de config/lockout/contrato no backend. Spec
      [`035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md), steps
      [`035`](../steps-fase-4/backend/035-sprint-35-steps.md).
@@ -41,12 +42,42 @@ _Atualizado em: 2026-08-05._
   `npm audit` do `sep-mobile` registrada na spec 300 estava errada (medida em branch de feature) e o
   Gate a derrubou de 25/1-critical para 19/0; e a spec falava em "dez pacotes `@angular/*` diretos em
   high", quando sao nove. Nenhum numero de planejamento sobreviveu a medicao do Gate intacto.
+  **O Gate F-24.0 (2026-08-06) subiu a aposta**: alem de dois numeros errados, derrubou uma
+  **premissa** — "39 definicoes byte-identicas" de `estabilizar()` era falso nas tres partes (sao 38,
+  com 3 corpos distintos, e a identidade textual escondia um segundo helper duplicado, `flush()`, com
+  42 definicoes e dois defaults). **Numero errado se corrige; premissa errada redesenha a Task.**
+  A licao operacional: contar **corpos**, nao assinaturas — e resolver o que o corpo chama antes de
+  chamar duas copias de "identicas".
 - **Segue valendo**: uma das cinco lacunas de OpenAPI estava **mal diagnosticada na spec**. O
   `Duration` do dashboard ja era documentado corretamente como `string` — o Spring Boot desliga
   `WRITE_DURATIONS_AS_TIMESTAMPS` e o fio leva ISO-8601 —, e quem diverge e o `sep-app`. Esse
   `knownGap` **permanece aberto de proposito** e fecha do lado web, fora do escopo da F-23.
 
 ## Onde estamos
+
+- **Gate F-24.0 (web) CONCLUIDO em 2026-08-06** — precheck e baseline da F-Sprint 24, em
+  `feature/fsprint-24-divida-tecnica` (de `develop` `d987714`, com a D-1 dentro; `develop == main` por
+  diff de conteudo). **Nenhuma linha de codigo escrita**; working tree limpa ao fim.
+  Baseline medida: **Vitest 765 / 93 arquivos**, `contract:check` **85 operacoes / 1 lacuna / exit 0**
+  (a lacuna e exatamente a do `tempoMedioResolucao30d`, que a F-24.4 fecha), `lint`, `format:check`,
+  `build` e **Playwright 39** verdes, `npm ci` com os 3 `moderate` residuais da D-1.
+  **As 8 ancoras de `arquivo:linha` do desenho conferiram byte a byte** — o que nao sobreviveu foram
+  os numeros e uma premissa. Cinco correcoes aplicadas na fonte antes de qualquer codigo:
+  (1) Vitest `765 / 94` -> **`765 / 93`** (a F-22 fechou com 91 e a F-23 somou dois arquivos; nunca foi
+  94, conferido por `git ls-tree` em quatro commits); (2) `estabilizar()` de `39` -> **38** definicoes;
+  (3) **a premissa "byte-identicas" e falsa** — 3 corpos distintos, e o corpo "padrao" chama um
+  **segundo helper local duplicado, `flush()`, com 42 definicoes e dois defaults** (`times = 5` em 31,
+  `times = 6` em 11), entao o mesmo texto drena quantidades diferentes; (4) o acerto do `message`
+  vazio tem **duas** metades (o `trim` de `verify-totp.component.ts:48` alem do operador), e a F-24.3
+  so fechava uma; (5) os comentarios falsos sobre o `Duration` sao **tres**, nao um
+  (`api.models.ts:685-686` mais `backoffice-format.ts:14-16` e `:29`).
+  **A drenagem foi medida como peso morto**: `6 -> 5` nos 11 (142 verdes), `times = 1` (765/93),
+  `times = 0` (765/93) e, a decisiva, `await flush()` removido dos 36 (765/93) — o `times = 0` sozinho
+  nao provaria nada, porque aguardar a promise de uma `async` ja custa um tick. **Controle de vacuo**:
+  com a drenagem removida, mutar `chaves-pix-page.component.ts:145` derrubou **20 testes** (exit 1),
+  entao os specs seguem detectando defeito real. Consequencia: a F-24.6 deixa de ser dedup mecanica,
+  passa a unificar **os dois** helpers (~44 arquivos) e **mantem** a drenagem em `flush(5)` — nenhum
+  arquivo recebe menos tempo de settle do que hoje. Nada mudou em `sep-api`/`sep-mobile`.
 
 - **D-Sprint 1 (cross-repo) MERGEADA develop+main nos DOIS repos em 2026-08-05** — divida de
   dependencias no `sep-app` e no `sep-mobile` (correcao de divida de seguranca; sem jornada, tela,
@@ -89,8 +120,10 @@ _Atualizado em: 2026-08-05._
   "sobrou algo executavel?" depois que a Fase 4 esgotou o escopo de produto sobre fake. **Nada de
   codigo foi tocado** — o trabalho foi so de planejamento, em `docs-SEP`.
   O levantamento conferiu cada item **no codigo**, e **dois registros deste arquivo estavam
-  desatualizados a favor do problema**: `estabilizar()` tem **39 definicoes byte-identicas** em
-  `*.spec.ts` (o registro dizia "terceira copia" — subestimado em 36), e a constante
+  desatualizados a favor do problema**: `estabilizar()` tem dezenas de copias em `*.spec.ts` (o
+  registro dizia "terceira copia" — subestimado em mais de 30; o levantamento anotou "39 definicoes
+  byte-identicas", e **o Gate F-24.0 derrubou tambem esse numero e essa premissa**: sao 38, com 3
+  corpos distintos, mais 42 definicoes de um segundo helper, `flush()`), e a constante
   `CorrelationIdFilter.MDC_KEY` **ja existe** mas **quatro** call sites usam o literal
   `MDC.get("correlationId")` (o registro nomeava so o `RateLimitFilter`). Os dois foram corrigidos
   aqui e nas specs.
@@ -118,7 +151,9 @@ _Atualizado em: 2026-08-05._
   corpo**: a `message` do sep-api e montada a partir de `lockoutMinutes` e superestima a espera por
   design. O `authInterceptor` passa a isentar o endpoint publico, fechando um caminho em que o token
   velho levava `401` e o usuario era **arrancado da pagina** (ver §Leia agora).
-  **Vitest 765 / 94** (partida 745/91), `contract:check` **85 operacoes / 1 lacuna**, Playwright
+  **Vitest 765 / 93** (partida 745/91; este registro dizia "94" — corrigido pela medicao do Gate
+  F-24.0 em 2026-08-06, que rastreou 91 + 2 arquivos novos = 93 por `git ls-tree`),
+  `contract:check` **85 operacoes / 1 lacuna**, Playwright
   **39**, demais gates verdes — todos rodados **depois** dos commits, porque o `lint-staged`
   reescreve arquivos, e **reconferidos em `develop` pos-merge com `npm ci`**. **26 mutacoes**
   verificadas. O code review gerou hotfix de sete achados, tres
@@ -384,10 +419,11 @@ _Atualizado em: 2026-08-05._
    - ~~**D-Sprint 1**~~ **CONCLUIDA** em 2026-08-05, mergeada nos dois repos. `high`+`critical` a
      zero no `sep-app` e no `sep-mobile`, gate de `npm audit` instalado nos dois CIs. Ver
      §Onde estamos.
-   - **F-Sprint 24** (`sep-app`), **a proxima**: dois defeitos vivos — o `errorInterceptor` ainda
+   - **F-Sprint 24** (`sep-app`), **em execucao**: dois defeitos vivos — o `errorInterceptor` ainda
      arranca o usuario da `/account-locked` num `401`/`403` da consulta de politica, e o KPI do
      dashboard de backoffice renderiza `NaNmin` (o mock devolve `7200` e esconde). Leva o
-     `contract:check` de **1 lacuna para 0**, a primeira vez desde a F-19.
+     `contract:check` de **1 lacuna para 0**, a primeira vez desde a F-19. **Gate F-24.0 fechado em
+     2026-08-06** (ver §Onde estamos); a proxima e a **Task F-24.1** (`errorInterceptor`).
    - **Sprint 35** (`sep-api`): allowlist de proxy (hoje a origem do rate limit e escolhida pelo
      cliente), validacao de `LockoutProperties` no boot, `405` faltante, e codigo/config morto.
    - **`sep-api` segue fora do escopo de dependencias**: `build.gradle` nao tem plugin de scan
@@ -411,7 +447,8 @@ _Atualizado em: 2026-08-05._
    `resilience4j` morto, o `ApiExceptionHandler` sem `405`, os enums inline, a `message` do `423`, o
    `ContaBloqueadaException.CODIGO`, o `countByIpAndJanela`, o `MDC.get` literal, o `Clock`
    injetavel, o `message: ""`, os 3 literais `login`/`verify-totp`, o `reprocessarWebhook`, o vetor
-   do `errorInterceptor` na `/account-locked`, o `/auth/totp/verify` e o `estabilizar()` duplicado.
+   do `errorInterceptor` na `/account-locked`, o `/auth/totp/verify` e o `estabilizar()` duplicado
+   (que o Gate F-24.0 mediu como **dois** helpers duplicados: 38 `estabilizar` + 42 `flush`).
    **Seguem fora de qualquer sprint planejada**: controle compensatorio contra brute force lento
    (exige ADR), os 4 contratos ausentes da F-17, deteccao de `knownGap` obsoleto no
    `contract-check.mjs`, o rotulo "Criar conta", `idCurto`/`formatarMoeda` duplicados, Playwright
@@ -445,7 +482,9 @@ _Atualizado em: 2026-08-05._
    `Authorization` morto e o usuario perde o desafio de MFA; `ehUtilizavel` e tudo-ou-nada
    (`windowMinutes = 0` derruba os tres numeros, e `LockoutProperties` nao tem `@Min`); no mock o
    `Retry-After` coincide byte a byte com a `message`, entao "o header ganha do corpo" e inobservavel
-   offline; `estabilizar()` e a terceira copia do helper no repo. **Abertos pela M-Sprint 17** (mobile):
+   offline; `estabilizar()` esta duplicado no repo (a F-23 registrou "terceira copia"; o Gate F-24.0
+   mediu **38** definicoes, com 3 corpos distintos, mais **42** do helper `flush()`).
+   **Abertos pela M-Sprint 17** (mobile):
    `/session-expired` nao move foco; `onboarding-shell.iniciar()` sem guarda de reentrancia (e e
    MUTACAO); `setup-biometric` sem `h1`; `home.page.html` orfa com `ion-header` dentro do
    `ion-content`; `paginaAtiva`/`enableMsw` duplicados; nenhuma tela de desfecho tem `aria-live`;
