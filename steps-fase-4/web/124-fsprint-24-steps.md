@@ -103,6 +103,25 @@ foi corrigido (F-22); o `login` e o helper compartilhado nao.
 `message: "   "` (whitespace puro do backend ou de um proxy) apagando o alerta exatamente como hoje.
 A Task F-24.3 fecha os dois.
 
+**Execucao (2026-08-06)** — a tabela acima descreve o estado ANTES da Task; as ancoras de linha nao
+resolvem mais. O que foi entregue divergiu do planejado em tres pontos, todos registrados no commit:
+
+1. **O `grep` achou 13 pontos, nao 3.** Alem do helper e do `login`, dez pontos em cinco componentes
+   de `admin`/`profile` repetiam o corpo do helper em vez de chama-lo. Todos passaram a delegar.
+2. **A extracao virou funcao propria** (`mensagemBrutaDaApi`, em `core/api/api-error.ts`), usada por
+   `login` e `verify-totp`. Com branco normalizado para `undefined`, os call sites voltam a usar
+   `??`, que e o operador correto — a preferencia por "checagem explicita" do Step 124.3.1 fica
+   satisfeita sem `||` cru.
+3. **A causa registrada estava errada, e o code review derrubou.** A premissa de que o Boot emite
+   `"message": ""` quando `include-message` e `never` e **falsa**: medido no bytecode do
+   `spring-boot-3.5.5.jar`, `ErrorAttributeOptions.retainIncluded` faz `Map.remove` da chave, entao
+   aquele caminho nunca produziu branco e o `??` ja o tratava certo. O produtor estruturalmente
+   capaz e o proprio `ErrorResponseDto` (o `DomainException` nao valida a mensagem; o
+   `@JsonInclude(NON_NULL)` suprime so `null`). **A correcao segue certa — como guarda defensiva, e
+   nao como conserto de bug observado.** A explicacao autoritativa mora no docblock de
+   `api-error.ts`; os registros da F-22 que diziam o contrario foram corrigidos na fonte
+   ([`CONTEXT-PARTE-2.md`](../../docs-sep/CONTEXT-PARTE-2.md) §F-Sprint 22).
+
 ### `NaNmin` no dashboard (F-24.4)
 
 - `api.models.ts:691` — `tempoMedioResolucao30d: number`.
@@ -220,11 +239,16 @@ Literais byte-identicos entre `login` e `verify-totp` — **tres**, confirmados:
 
 4. **A F-24.6 vai em commit proprio e isolado.** ~44 arquivos de teste; o risco nao e regressao de
    produto, e mascarar as outras tasks no review.
-   **O helper compartilhado MANTEM a drenagem (`flush(5)`).** O Gate mediu que ela e dispensavel, mas
-   remove-la apertaria o timing de 37 arquivos para poupar quatro linhas — e teste sensivel a carga
-   fica flaky sob CPU saturada sem aparecer numa rodada limpa. Com `flush(5)` nenhum arquivo recebe
-   **menos** tempo de settle do que hoje: 25 ficam identicos, 11 vao de 6 para 5 (medido verde),
-   `account-locked` de 5 inline para 5 compartilhado e `aportes-list` de 0 para 5.
+   **O helper compartilhado MANTEM a drenagem (`flush(5)`).** Efeito exato: 25 arquivos ficam
+   identicos, `account-locked` vai de 5 inline para 5 compartilhado, `aportes-list` de 0 para 5, e
+   **11 vao de 6 para 5 — uma drenagem A MENOS**. Esses 11 foram medidos verdes com `5` (142 testes)
+   **e tambem com `times = 0`**, entao a margem e o laco inteiro, nao um tick.
+   *(Correcao do code review da F-24.6, 2026-08-06: a redacao anterior afirmava que nenhum arquivo
+   recebia menos settle e listava, em seguida, os 11 que recebem.)*
+   Manter custou quatro linhas, e o objetivo da Task era equivalencia e nao otimizacao. **Nao e
+   protecao contra carga**: `await Promise.resolve()` so avanca cadeias ja resolvidas dentro de um
+   checkpoint de microtasks e nao espera macrotask nenhuma — quem absorve variacao de maquina e o
+   `fixture.whenStable()`. Se `5` basta numa maquina ociosa, basta numa saturada.
 
 5. **A F-24.7 preserva a intencao original do teste.** `account-locked.component.spec.ts` foi escrito
    para **quebrar** a cada mudanca de copy — o comentario diz *"Qualquer mudanca de copy DEVE quebrar
@@ -580,7 +604,11 @@ npm run build; echo "EXIT=$?"
 - [ ] `contract:check` **0 lacunas**, exit 0.
 - [ ] Teste de tela com `"PT2H"` passa e falha sob a mutacao do mock.
 - [ ] **Os tres** comentarios falsos (`api.models.ts:685-686`, `backoffice-format.ts:14-16` e `:29`)
-      foram substituidos pelo resultado medido; `grep` por "numero de segundos" nao acha mais nada.
+      foram substituidos pelo resultado medido. **Eram cinco, nao tres** — o code review achou o
+      quarto em [`README.md`](../../repos/sep-app/README.md) do `sep-app` e o quinto no registro da
+      F-10 em [`CONTEXT-PARTE-2.md`](../../docs-sep/CONTEXT-PARTE-2.md); os dois estavam fora do
+      `grep` original, que so varria `sep-app/src`. Criterio de pronto: nenhum comentario de codigo
+      **afirma** "numero de segundos"; as ocorrencias que sobram descrevem o defeito no passado.
 - [ ] `openapi.snapshot.json` e `.meta.json` intocados (`git diff --stat` prova).
 
 ### Commit sugerido
@@ -622,9 +650,51 @@ npm run contract:check; echo "EXIT=$?"
 
 ### Definicao de pronto da Task F-24.5
 
-- [ ] `400` declarado **ou** registrado como `knownGap` com o motivo (se o OpenAPI nao o documentar).
-- [ ] `contract:check` segue com **0 lacunas** ou com exatamente a lacuna criada aqui, justificada.
-- [ ] Inventario com numero, no PR description.
+- [x] `400` **nao** declarado e **nao** registrado como `knownGap`: as duas saidas previstas aqui sao
+      impossiveis, medido. Declarar o `400` produz falha dura (`verificarStatusDeErro` empurra
+      `falhas`, sem consultar `knownGaps`), e o fallback de gap tampouco funciona — nao ha `kind` para
+      status, e desde a F-22 o `varrerGapsObsoletos` reprova **qualquer** gap que nenhuma operacao
+      consuma, entao a entrada quebraria o check mesmo com um `kind` novo. Virou follow-up (abaixo).
+- [x] `contract:check` segue com **0 lacunas**, exit 0.
+- [x] Inventario com numero — abaixo, ja com o rotulo corrigido pelo code review.
+
+### Inventario de ramificacao por status (medido em 2026-08-06)
+
+O numero citado no commit da F-24.5 ("65 pontos") esta aritmeticamente certo e **mal rotulado**: conta
+so `if (<x>.status === NNN)` em `src/app/features/**`, fora de specs. Nao alcanca outras duas formas de
+discriminar por status que existem no codigo:
+
+| Forma | Onde | Pontos |
+|---|---|---|
+| `if (<x>.status === NNN)` | 30 arquivos em `features/**` | **65** |
+| `switch (erro.status)` | `login.component.ts:37`, `verify-totp.component.ts:62` | **10** (5 + 5 `case`) |
+| `Record<number, string>` indexado por status | `credora-cadastro-page.component.ts:14-18` | **3** |
+| | **Total** | **78** |
+
+Operacoes que declaram `erros`: **9 antes da Task -> 13 depois** (de 85). Ressalva de leitura: os 78
+sao pontos de discriminacao, **nao** o backlog — parte deles esta em operacoes que ja declaram. Medir
+o backlog real exige antes decidir a regra para **handlers compartilhados entre operacoes**
+(um `tratarErro` serve `assumir`/`comentar`/`resolver`/`ignorar`/`reprocesso`), e distinguir
+*ramo real com OpenAPI incompleto* de *ramo inalcancavel* — o `429` daquele handler, por exemplo, so
+existe nos dois reprocessos (`RateLimitFilter` limita apenas login e TOTP), entao nas quatro operacoes
+de fila ele e codigo morto, que e divida de frontend e nao lacuna de contrato.
+
+### Follow-ups abertos pela F-24.5
+
+1. **Frontend, mais barato e sob nosso controle** — `reprocessos-page.component.ts:45` valida
+   `webhookEventId` so com `Validators.required`, e `:50-51` tem o mesmo buraco no `entidadeId`. Um
+   `Validators.pattern` de UUID elimina o `400` na origem: hoje o usuario digita `abc`, faz o
+   round-trip **com step-up** e recebe `"Path/query param 'webhookEventId' invalido: nao eh UUID"`.
+   **Se este for feito primeiro, o item 2 deixa de ser pre-requisito de qualquer declaracao.**
+2. **Backend** — `BackofficeReprocessoController.java:56-61` deve publicar `400` no endpoint de
+   webhook, como o irmao de provider (`:78-84`) ja publica. O `400` e alcancavel por
+   `@PathVariable UUID` malformado (`MethodArgumentTypeMismatchException` -> `ApiExceptionHandler:69-75`),
+   e a conversao acontece **antes** do `@RequireStepUp` e do `@PreAuthorize`. Candidato a Sprint 35.
+3. **`contract-check.mjs`** — tres pontos cegos ja medidos: nao tem `kind` de gap para status;
+   e unidirecional (valida o que o front declara contra o OpenAPI, nunca o contrario); e cego a campo
+   **removido** do descriptor. Soma-se: valida `declarado ⊆ documentado`, nunca
+   `declarado = ramificado` — declarar `403` em `backoffice.assumir`, cuja guarda `exigeStepUp` exclui
+   a acao, passa verde. Sprint propria.
 
 ### Commit sugerido
 
@@ -737,9 +807,33 @@ npx playwright test; echo "EXIT=$?"
 
 ### Definicao de pronto da Task F-24.7
 
-- [ ] Mutacao dupla do 124.7.1 demonstrada (texto quebra, reformatacao nao).
-- [ ] Uma origem por frase (`grep` prova).
-- [ ] Follow-up do `30 minutos` fixo registrado.
+- [x] Mutacao dupla do 124.7.1 demonstrada: reformatar (quebra de linha dentro do `<span>` do badge)
+      **passa** — antes derrubava 3 testes —, e trocar uma palavra da copy **derruba 4**.
+- [x] Uma origem por frase (`grep` prova: 0 arquivos fora de `copy-de-erro.ts`).
+- [x] Follow-up do `30 minutos` fixo registrado (abaixo e no docblock da constante).
+
+### Medicao que refinou o 124.7.1
+
+A premissa "reformatacao quebra o teste" e verdadeira, mas **nao pelo motivo registrado**. Medido
+antes de mexer:
+
+- **reindentar, ou juntar badge e heading na mesma linha: PASSAVA.** O `preserveWhitespaces: false`
+  descarta whitespace ENTRE elementos, entao a colagem sobrevive a esse tipo de reformatacao.
+- **quebrar linha DENTRO do `<span>` do badge: derrubava 3 testes**, sem uma letra de copy mudar. E
+  o whitespace vira parte do proprio text node, e a normalizacao do teste o colapsa para um espaco,
+  quebrando a expectativa `'423Conta bloqueada temporariamente'`.
+
+A correcao foi comparar **elemento a elemento** (`textosDoCard`), e nao o `textContent` concatenado
+do card: assim a fronteira entre nos deixa de existir na expectativa, e a deteccao de mudanca de
+texto fica intacta — que e o que a Decisao 5 exige.
+
+### Follow-up aberto pela F-24.7
+
+- **`CONTA_BLOQUEADA_FALLBACK` embute "30 minutos" fixo**, enquanto
+  `app.security.lockout.lockout-minutes` e sobrescrivel por ambiente — mesmo defeito que a F-23
+  corrigiu na `/account-locked`, onde a pagina passou a derivar os numeros de
+  `GET /auth/politica-lockout`. O risco e menor que la, porque o literal so aparece quando corpo **e**
+  `Retry-After` faltam. Agora que as duas telas consomem uma constante so, consertar ficou barato.
 
 ### Commit sugerido
 

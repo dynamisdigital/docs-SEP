@@ -632,7 +632,7 @@ Com Sprint 0/F-Sprint 0/M-Sprint 0 (2026-05-04), Sprints 1-4, **Fase 2 backend S
   - spec de origem: `specs/fase-3/110-fsprint-10-backoffice-financeiro-web.md`; steps em `steps-fase-3/web/110-fsprint-10-steps.md`.
   - quinta sprint funcional do Epic 13 no `sep-app`, consumindo o modulo `backoffice` de `sep-api` (Sprint 14 + extensoes Pix das Sprints 20-21): dashboard consolidado, fila operacional, comentarios, resolucao/ignore e reprocessos. Transicoes, ownership, auditoria, anti-abuso e o gate de step-up permanecem no backend; o frontend so apresenta e dispara acoes. `CLIENTE` nao ve o menu nem acessa as rotas.
   - entregue (F-10.1 a F-10.7): `BackofficeService` + modelos de borda + MSW; feature lazy `/app/backoffice` com `roleGuard` (`BACKOFFICE`/`FINANCEIRO`/`ADMIN`) e item no sidenav; dashboard (KPIs + contadores, sem recalculo, `no-store`); fila com filtros/paginacao/ordenacao do backend + detalhe (comentarios + objeto original resumido); acoes assumir/comentar/resolver/ignorar; reprocessos webhook/provider. `stepUpInterceptor` estendido para `PATCH /backoffice/fila/{id}/resolver|ignorar` e `POST /backoffice/reprocessos/**` (403 -> `/app/step-up`, 409 recarrega, 429 anti-abuso sem retry). Componentes `BackofficeChipComponent` e `ReprocessoResultadoComponent`.
-  - decisoes: shell habilita cada card na Task que entrega a tela (staging, build verde); reprocesso so promete retentativa real para `PIX_TRANSFERENCIA` (demais stubs, UI neutra), `RECEBIMENTO_PIX_DIVERGENTE` so manual; `tempoMedioResolucao30d` = numero de segundos (Duration); input date -> OffsetDateTime `-03:00`; LGPD sem payload bruto/CPF-CNPJ/chave Pix/token. Fix de code review manual: MSW passou a persistir mutacoes e aplicar filtros data/atribuido/sort.
+  - decisoes: shell habilita cada card na Task que entrega a tela (staging, build verde); reprocesso so promete retentativa real para `PIX_TRANSFERENCIA` (demais stubs, UI neutra), `RECEBIMENTO_PIX_DIVERGENTE` so manual; `tempoMedioResolucao30d` = numero de segundos (Duration) — **premissa FALSA, corrigida na F-24.4 (2026-08-06)**: o `Duration` sempre saiu como string ISO-8601 (`"PT2H"`), e foi esta linha, replicada em quatro lugares do codigo e da doc, que produziu o `NaNmin` no KPI; input date -> OffsetDateTime `-03:00`; LGPD sem payload bruto/CPF-CNPJ/chave Pix/token. Fix de code review manual: MSW passou a persistir mutacoes e aplicar filtros data/atribuido/sort.
   - validacoes: `npm run lint`/`lint:scss`/`test -- --run` (281 testes) e `build` verdes; smoke E2E offline `e2e/backoffice.spec.ts` (dashboard, fila, detalhe, assumir, comentar). `resolver`/`ignorar`/reprocessos exigem step-up (MFA) e smoke com backend real ficam recomendados manualmente. Descricao consolidada em `repos/sep-app/SPRINT-F-10-PR.md`.
   - follow-up: smoke real backend `:8080` (DTOs reais, step-up, 400/403/404/409/429); confirmar campos das strategies stub de reprocesso provider. Proxima trilha web: F-Sprint 11 (jornada credora, spec `111`).
 - **F-Sprint 9 (Cobranca, parcelas e inadimplencia web) mergeada em `origin/develop` (PR #42) e `origin/main` (PR #43), 2026-06-05 (develop==main)**:
@@ -1559,9 +1559,15 @@ conteudo remoto** (vazio). Branch `feature/fsprint-22-contrato-erro-followups-we
   cobertura nenhuma** (sem spec, sem e2e, e `handlers.ts` sem nenhuma rota `/auth/totp/*`).
 - **Hotfix F-22.2** (code review, bateria de 16 mutantes; 5 sobreviveram): `??` deixava passar
   `message: ""`, que o `@if` trata como falsy — o no `role="alert"` **nao era criado** e a tela ficava
-  muda, pior que o bug corrigido. **E produzivel**: o `JwtAuthenticationFilter` usa
-  `response.sendError(...)` e `server.error.include-message` nao esta configurado, entao o Boot emite
-  `message` vazia. `Validators.required` aceitava so espacos, e o `@NotBlank` do backend fazia a tela
+  muda, pior que o bug corrigido. **Ressalva registrada em 2026-08-06 (F-24.3)**: o produtor apontado
+  aqui esta errado. Dizia-se que, como `server.error.include-message` nao esta configurado, o Boot
+  emitiria `message` vazia no caminho do `response.sendError(...)`. Medido no bytecode do
+  `spring-boot-3.5.5.jar` que o `sep-api` fixa: com `include-message` em `never` o
+  `ErrorAttributeOptions.retainIncluded` faz `Map.remove` da chave — o corpo sai **sem** `message`, e
+  o `??` ja tratava isso certo. Quem pode emitir branco e o proprio `ErrorResponseDto`, porque
+  `DomainException` nao valida a mensagem e o `@JsonInclude(NON_NULL)` suprime so `null`. A correcao
+  da F-22.2 segue valendo; o que estava errado era o motivo.
+  `Validators.required` aceitava so espacos, e o `@NotBlank` do backend fazia a tela
   exibir **`codigo must not be blank`** cru. E a excecao de `applyMfaVerifyResponse` roda no callback
   `next`, onde o RxJS **nao** a encaminha para o callback de erro: tela muda com o desafio ja
   consumido. **Correcao factual**: o comentario afirmava que o endpoint "nunca responde 401" — o
@@ -1936,3 +1942,61 @@ local obsoleta e criou um merge commit errado. Desfeito com `git reset --hard or
 confirmar que os commits descartados vinham todos de `origin/main` e que nada fora pushado; refeito
 do ponto certo. E a variante pior da armadilha ja registrada no projeto sobre exit code mascarado por
 pipe — em sequencia git onde um passo protege o seguinte, nunca encadear com `&&` depois de pipe.
+
+## F-Sprint 24 (web) — Divida tecnica do web — CONCLUIDA na branch (2026-08-06)
+
+**Sprint de divida, sem escopo de produto novo**: nenhuma tela, endpoint, DTO, migration ou regra.
+Fecha os follow-ups nomeados pela F-22 e pela F-23, os **dois defeitos vivos** que elas deixaram, e
+leva o `contract:check` a **zero lacunas** — primeira vez desde a criacao do gate na F-19
+(2026-07-16). Spec [`124`](../specs/fase-4/124-fsprint-24-divida-tecnica-web.md) + steps
+[`124`](../steps-fase-4/web/124-fsprint-24-steps.md). Sem ADR. 13 commits em
+`feature/fsprint-24-divida-tecnica`; **push e PR manuais, ainda nao feitos**. Nada mudou em
+`sep-api`/`sep-mobile`.
+
+**Numeros**: Vitest **765/93 -> 802/94**; `contract:check` **1 lacuna -> 0** (85 operacoes);
+Playwright 39; `lint`, `lint:scss`, `format:check`, `build`, `audit` verdes (3 `moderate` residuais da
+D-1, inalterados). **36 mutacoes** aplicadas e mortas. Definicoes de helper de teste: **80 -> 2**.
+
+**Os dois defeitos vivos.** (1) O `errorInterceptor` arrancava o usuario da `/account-locked`: a F-23
+isentou `/auth/politica-lockout` so no `authInterceptor`, o que impede o header de ser ENVIADO mas nao
+a resposta de ser TRATADA — o `errorInterceptor` e o ultimo da cadeia, logo o mais interno, e ve o erro
+antes do `catchError` do servico. (2) O KPI do dashboard renderizava `NaNmin`: o campo era `number` mas
+o backend serializa `Duration` como ISO-8601, e o mock devolvia `7200` — **mais correto que o
+servidor**, e por isso nenhum teste via.
+
+**Decisao que atravessa a sprint**: a lista de rotas publicas passou a ter **dois** efeitos (nao anexar
+`Authorization` E nao navegar em 401/403), entao uma rota so entra se os dois forem desejados —
+`/auth/refresh` e `/auth/logout`, ambos `permitAll`, ficam de fora porque um 401 neles significa sessao
+morta e PRECISA navegar. O `423` e assimetrico de proposito: isenta-lo mataria a unica navegacao que
+ABRE a `/account-locked`.
+
+**Nenhum numero de planejamento sobreviveu a medicao**, em sete de sete Tasks. O Gate derrubou "39
+definicoes byte-identicas" (eram 38, com tres corpos, escondendo um SEGUNDO helper duplicado com dois
+defaults). A F-24.3 derrubou a causa registrada de `message: ""`: medido no bytecode do
+`spring-boot-3.5.5.jar`, `ErrorAttributeOptions.retainIncluded` faz `Map.remove` da chave, entao o
+caminho de erro do Spring **nunca** produziu string vazia — quem pode e o `ErrorResponseDto` da propria
+aplicacao, porque `DomainException` nao valida a mensagem. A F-24.4 achou **cinco** comentarios falsos
+sobre o `Duration`, nao tres: dois estavam fora de `sep-app/src`. A F-24.5 constatou que o alvo da Task
+nao era declaravel **e** que o fallback prescrito era impossivel por dois motivos independentes. A
+F-24.7 mediu que "reformatacao quebra o teste" era meia verdade — reindentar passava; o que quebrava
+era quebra de linha DENTRO do `<span>` do badge.
+
+**Quatro pontos cegos do `contract-check.mjs`, todos medidos e nenhum corrigido aqui**: nao ha `kind`
+de gap para status de erro; o `varrerGapsObsoletos` reprova qualquer gap nao consumido (o que torna o
+fallback dos steps impossivel mesmo com um `kind` novo); o check e unidirecional; e valida
+`declarado ⊆ documentado`, **nunca** `declarado = ramificado` — declarar `403` em `backoffice.assumir`,
+cuja guarda `exigeStepUp` exclui a acao, passa verde. Como contrapartida, o gate **forca** o conserto
+do tipo e a remocao do `knownGap` no mesmo commit.
+
+**Riscos declarados, nao simulados**: smoke real contra `:8080` nao executado — o vetor da F-24.1 e
+observavel offline, mas o cenario que motiva a correcao (backend sem a Sprint 34) fica sem prova de
+ponta a ponta; e `PT0S` esconde falha de banco, porque o `resiliente(...)` do
+`ConsultarVisaoConsolidadaUseCase` engole `RuntimeException` e devolve `Duration.ZERO`, indistinguivel
+de "sem amostra" no fio — limitacao do backend, nao do web.
+
+**Tres erros de execucao, registrados por honestidade de processo**: um regex de deduplicacao
+retrocedeu e apagou 68 linhas de um spec (pego conferindo o `git diff`, nao os testes; refeito por
+linha com guarda que exige que toda linha removida pertenca ao helper); uma contagem de mutacao
+reportada como 8 quando era 14, por `head -8` truncar a saida — mesma familia do exit code mascarado
+por pipe, e a licao e nao truncar saida que vira numero em relatorio; e uma previsao de bloat no bundle
+desmentida pela medicao. Detalhe em [`SPRINT-F-24-PR.md`](../repos/sep-app/SPRINT-F-24-PR.md).

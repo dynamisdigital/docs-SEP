@@ -227,7 +227,11 @@ Tipos de borda em `src/app/core/api/api.models.ts`; transporte em
 - LGPD: filtros, fila e detalhe nao expoem payload bruto de webhook/provider, CPF/CNPJ
   completo, chave Pix, dados bancarios ou tokens; comentario/justificativa ficam so na memoria
   do form (nada em storage).
-- `tempoMedioResolucao30d` chega como numero de segundos (Duration); a apresentacao formata.
+- `tempoMedioResolucao30d` chega como **string ISO-8601** (`"PT2H"`): o `Duration` do backend e
+  serializado assim porque o `JacksonAutoConfiguration` desliga `WRITE_DURATIONS_AS_TIMESTAMPS`.
+  `backoffice-format.ts` parseia (`PT[nH][nM][nS]`, que e tudo o que `Duration.toString()` emite —
+  nunca componente de dias) e formata. Ate a F-24.4 este registro dizia "numero de segundos", que era
+  a origem do `NaNmin` no KPI do dashboard.
 
 ### Testes
 
@@ -596,11 +600,14 @@ Fase 3. Spec [`119`](../../specs/fase-4/119-fsprint-19-hardening-tooling-contrat
 - `scripts/contract-check.mjs` (`npm run contract:check`): verificador zero-dependencia; falha
   (exit != 0) em divergencia de path/metodo/parametro/header/status/campo/tipo/enum; le o snapshot
   por default ou `SEP_OPENAPI_SCHEMA=<path|url>` para validar contra um runtime exportado.
-  Lacunas conhecidas do OpenAPI ficam em `knownGaps` (reportadas sem falhar): `X-Step-Up-Token`
-  nao documentado nas operacoes sensiveis, `DashboardResponse.tempoMedioResolucao30d` documentado
-  como `string` (runtime = number), enums nao publicados de contratos/assinatura e headers de
-  resposta do documento assinado (`X-Document-Hash-Sha256`/`Content-Disposition`) — todos
-  follow-ups backend. springdoc nao publica `required`/`nullable` nas responses (limitacao
+  Lacunas conhecidas do OpenAPI ficam em `knownGaps` (reportadas sem falhar). **Desde a F-24.4
+  (2026-08-06) a lista esta VAZIA e o check sai com 0 lacunas** — a primeira vez desde que o gate
+  nasceu na F-19. As entradas historicas (`X-Step-Up-Token` nao documentado, enums de
+  contratos/assinatura, headers do documento assinado) fecharam na Sprint 34; a ultima era
+  `DashboardResponse.tempoMedioResolucao30d`, e o que divergia era o **frontend**, que declarava
+  `number` enquanto o runtime sempre mandou `string` ISO-8601. Um `knownGap` que deixa de ser
+  verdadeiro **falha** o check (`varrerGapsObsoletos`), entao corrigir o tipo e remover a entrada sao
+  obrigatoriamente o mesmo commit. springdoc nao publica `required`/`nullable` nas responses (limitacao
   registrada); `required` de request bodies E validado (campo obrigatorio novo no backend que o
   frontend nao envia falha o check), assim como parametros de path e tipos ausentes/quebrados.
 - Resultado da F-19: **zero divergencia real** — nenhum tipo de borda precisou mudar.

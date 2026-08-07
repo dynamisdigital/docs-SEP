@@ -267,16 +267,44 @@ politica estava documentada e implementada, mas a jornada nunca chegava ao fim.
   > `/auth/login`. Reload ou navegacao direta a `/account-locked` com token velho
   > no storage mandava o token e levava `401` do `JwtAuthenticationFilter`.
   > **A consequencia registrada aqui antes estava subestimada**: nao era "cair de
-  > volta no texto fixo". O `errorInterceptor` isenta do redirect de `401` so
-  > `/auth/login`, entao o `401` dispara `clearSession()` + `navigateByUrl`
-  > (`/login`) e o usuario e **arrancado da pagina** que o `423` acabou de abrir.
-  > Corrigido isentando `/auth/politica-lockout`, com teste unitario e e2e.
+  > volta no texto fixo". Ate a F-23 o `errorInterceptor` isentava do redirect de
+  > `401` so `/auth/login`, entao o `401` disparava `clearSession()` +
+  > `navigateByUrl` (`/login`) e o usuario era **arrancado da pagina** que o `423`
+  > acabou de abrir. A F-23 isentou `/auth/politica-lockout` **apenas no
+  > `authInterceptor`**, o que impede o header de ser ENVIADO mas nao impede a
+  > resposta de ser TRATADA — o vetor continuou vivo por outro caminho.
   >
-  > **Segue aberto**: `/auth/totp/verify` tambem e `permitAll` e tambem **nao**
-  > esta isento. `handleTokenResponse` retorna cedo no ramo `mfaRequired` sem
-  > limpar o token, entao a verificacao de TOTP leva `Authorization` morto, toma
-  > `401` e o usuario perde o desafio. Defeito anterior a F-23 e fora do escopo
-  > dela; fecha com uma linha no array e um teste.
+  > **Fechado pela F-Sprint 24 (Task F-24.1, 2026-08-06)**: a lista saiu para
+  > `core/interceptors/rotas-publicas.ts`, virou o predicado `ehRotaPublica(url)`
+  > e passou a ser consultada tambem pelo `errorInterceptor` nos ramos `401` e
+  > `403`. O `423` **nao** a consulta, de proposito: ele chega de `/auth/login`,
+  > que e rota publica, e e a navegacao que ABRE a `/account-locked`. O casamento
+  > e pelo fim do `pathname`, nao `includes` na URL crua, para que um futuro
+  > `/auth/login-attempts` nao seja isentado por colisao de prefixo. Quatro
+  > mutacoes travam o desenho, entre elas a que prova que a lista e de fato
+  > compartilhada (falha nos dois specs de interceptor).
+  >
+  > **Fechado pela Task F-24.2 (2026-08-06)**: `/auth/totp/verify` tambem e
+  > `permitAll` (`SecurityConfig.java:82-83`) e tambem nao estava isento.
+  > `handleTokenResponse` (`auth.service.ts:124-128`) retorna cedo no ramo
+  > `mfaRequired` **sem limpar o token**, entao um token de sessao anterior
+  > sobrevivia ate o desafio, viajava na verificacao, tomava `401` do
+  > `JwtAuthenticationFilter` e o usuario **perdia o desafio de MFA**. Defeito
+  > anterior a F-23. Corrigido acrescentando a rota a lista compartilhada, com
+  > teste do caminho inteiro do challenge (nao so da isencao no interceptor) e
+  > mutacao.
+  >
+  > **O segundo efeito da lista e vacuo nesta rota, e o registro importa**: a
+  > isencao tambem suprime o redirect global de `401`, mas
+  > `JwtAuthenticationFilter.java:39-42` faz `chain.doFilter` e retorna quando
+  > **nao ha header** — parar de enviar o `Authorization` remove o unico produtor
+  > de `401` no endpoint, ja que o handler nunca responde `401`
+  > (`MfaChallengeInvalidoException extends ValidacaoException` -> `400`). Por
+  > isso `verify-totp.component.ts` **continua sem ramo de `401`**: seria codigo
+  > morto. A justificativa anterior daquela ausencia ("o `errorInterceptor` navega
+  > para `/login` e destroi o componente") **caiu junto** e foi reescrita no
+  > proprio arquivo — a conclusao sobreviveu, o fundamento nao. Quem voltar a
+  > mandar `Authorization` nessa rota reabre o `401` **e** fica sem o redirect.
 - **Exposicao aceita.** Dos tres numeros, so `lockoutMinutes` ja saia na
   `message` do `423`. Os outros dois eram legiveis no `/v3/api-docs` — que e
   `permitAll` e fica habilitado em producao —, la com os **defaults fixos no

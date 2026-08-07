@@ -189,11 +189,16 @@ documento e aos steps:
    (exit 1). Os specs seguem detectando defeito real sem drenagem; ela e peso morto, nao suporte.
 
    **Consequencia para a Task 6**: a unificacao total e provadamente segura, e o helper compartilhado
-   **mantem** a drenagem (`flush(5)`). Nenhum arquivo passa a ter menos tempo de settle que hoje: 25
-   ficam identicos, 11 vao de 6 para 5 (medido verde), `account-locked` de 5 inline para 5
-   compartilhado e `aportes-list` de 0 para 5. Remover a drenagem tambem passaria, mas apertaria o
-   timing de 37 arquivos para poupar quatro linhas — e teste sensivel a carga fica flaky sob CPU
-   saturada sem aparecer numa rodada limpa.
+   **mantem** a drenagem (`flush(5)`). O efeito exato, sem arredondar: 25 arquivos ficam identicos,
+   `account-locked` vai de 5 inline para 5 compartilhado, `aportes-list` de 0 para 5, e **11 vao de 6
+   para 5 — uma drenagem A MENOS**. Esses 11 foram medidos verdes com `5` (142 testes) **e tambem com
+   `times = 0`**, entao a margem e o laco inteiro, nao um tick.
+   *(Correcao do code review da F-24.6, 2026-08-06: a redacao anterior dizia "nenhum arquivo passa a
+   ter menos tempo de settle" e listava, na frase seguinte, os 11 que passam — autocontraditoria.)*
+   Remover a drenagem tambem passaria; manter custou quatro linhas e o objetivo da Task era
+   equivalencia, nao otimizacao. **A drenagem nao protege contra carga**: `await Promise.resolve()` so
+   avanca cadeias ja resolvidas num mesmo checkpoint de microtasks — quem absorve variacao de maquina
+   e o `fixture.whenStable()`.
 
 4. **`message` vazio: falta o `trim`.** `verify-totp.component.ts:48` usa `?.message?.trim()`;
    `login.component.ts:32` e `api-error.ts:21` **nao**. O padrao correto do repo e `trim` **mais**
