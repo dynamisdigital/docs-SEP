@@ -1943,7 +1943,7 @@ confirmar que os commits descartados vinham todos de `origin/main` e que nada fo
 do ponto certo. E a variante pior da armadilha ja registrada no projeto sobre exit code mascarado por
 pipe — em sequencia git onde um passo protege o seguinte, nunca encadear com `&&` depois de pipe.
 
-## F-Sprint 24 (web) — Divida tecnica do web — CONCLUIDA na branch (2026-08-06)
+## F-Sprint 24 (web) — Divida tecnica do web — MERGEADA develop+main (concluida 2026-08-06; merge conferido por conteudo em 2026-08-21)
 
 **Sprint de divida, sem escopo de produto novo**: nenhuma tela, endpoint, DTO, migration ou regra.
 Fecha os follow-ups nomeados pela F-22 e pela F-23, os **dois defeitos vivos** que elas deixaram, e
@@ -1999,4 +1999,84 @@ retrocedeu e apagou 68 linhas de um spec (pego conferindo o `git diff`, nao os t
 linha com guarda que exige que toda linha removida pertenca ao helper); uma contagem de mutacao
 reportada como 8 quando era 14, por `head -8` truncar a saida — mesma familia do exit code mascarado
 por pipe, e a licao e nao truncar saida que vira numero em relatorio; e uma previsao de bloat no bundle
-desmentida pela medicao. Detalhe em [`SPRINT-F-24-PR.md`](../repos/sep-app/SPRINT-F-24-PR.md).
+desmentida pela medicao. A descricao de PR temporaria foi removida no ciclo padrao ao fechar a
+F-25; o registro da sprint no [`PRD-FASE-4.md`](./PRD-FASE-4.md) §36 foi criado na mesma data,
+porque a tabela nunca havia recebido a linha da F-24.
+
+## F-Sprint 25 (web) — Aviso de cookies e politica de privacidade — CONCLUIDA na branch (2026-08-21)
+
+**Produto novo** — primeira frente de produto no web desde que a Fase 4 esgotou o escopo sobre fake.
+O `sep-app` gravava dados no navegador do usuario desde a Sprint 5 e **nunca disse isso a ele**: nao
+havia aviso, pagina de politica, termos, nem mencao a tratamento de dados fora do rodape regulatorio
+da landing. Spec [`125`](../specs/fase-4/125-fsprint-25-aviso-cookies-privacidade-web.md) + steps
+[`125`](../steps-fase-4/web/125-fsprint-25-steps.md). Sem ADR. 7 commits em
+`feature/fsprint-25-aviso-cookies`; **push e PR manuais, ainda nao feitos**. Nada mudou em
+`sep-api`/`sep-mobile`.
+
+**Numeros**: Vitest **802/94 -> 833/97**; Playwright **39/11 -> 42/12**; `contract:check` **85
+operacoes / 0 lacunas, inalterado** (criterio, nao observacao: a sprint nao consome contrato nenhum);
+`audit` **1 high -> 0**; bundle inicial 307.01 -> 310.54 kB. **25 mutacoes distintas em 33
+aplicacoes**; **tres testes reescritos por terem sobrevivido**; um mutante equivalente registrado
+como equivalente em vez de contornado.
+
+**A decisao que definiu o escopo**: medido, o produto emite **um** cookie — `sep-refresh`, de
+autenticacao — e nao ha script de terceiro no `index.html` (13 linhas, zero `<script>`) nem
+biblioteca de rastreamento no bundle. Cookie estritamente necessario **nao e recusavel**, entao um
+banner de opt-in gatearia **zero** cookies: abstracao especulativa para consumidor inexistente. Dai
+a sprint entregar **transparencia, nao consentimento** — sem "recusar", sem categorias, botao
+"Entendi" e nao "Aceitar", e a politica **afirmando** a ausencia de opcao de recusa em vez de
+omiti-la. O aceite **nunca vai ao servidor**: persisti-lo criaria tratamento de dado pessoal que
+hoje nao existe, para resolver um problema que nao existe.
+
+**O Gate F-25.0 derrubou a baseline do `audit`, nos dois sentidos** — a spec dizia 0 high / 3
+moderate; a medicao deu **1 high / 0 moderate**. `nanoid@3.3.17` precisa `>=3.3.18`
+(GHSA-2v37-7h3g-55p8), transitiva via `@angular/build -> postcss`, fora do `package.json`. O achado
+maior nao e a versao: **o gate `npm audit --audit-level=high` que a D-Sprint 1 instalou no CI estava
+vermelho em `develop` e ninguem sabia** — exatamente o cenario que a D-1 previu ao registrar que a
+F-19 zerou o `sep-app` e a contagem voltou a 19 em 18 dias sem deteccao. Corrigido em commit
+isolado, antes de qualquer codigo de escopo. O Gate tambem constatou que a **F-24 ja estava em
+`develop`+`main`**, contra o que o `STATE.md` registrava.
+
+**O defeito que a medicao dos e2e encontrou** — e o motivo de o Step 125.6.1 mandar medir antes de
+blindar. Com a faixa montada, `onboarding.spec.ts:42` reprovou, e o proprio relatorio do Playwright
+nomeou o culpado: `<section role="region" class="sep-aviso-cookies"> ... subtree intercepts pointer
+events`, em **51 tentativas** de clique no botao "Iniciar onboarding". **Nao era artefato de teste**:
+sendo `position: fixed` no rodape, a faixa cobria o **ultimo elemento de qualquer pagina**, e como a
+rolagem e do `body`, chegar ao fim nao resolvia — um usuario de primeira visita tampouco conseguiria
+submeter o onboarding. **Os steps prescreviam blindar a suite com `storageState`, o que teria
+escondido o defeito e entregado a faixa quebrada**; a prescricao fora escrita antes de existir a
+medicao. A correcao faz o `body` reservar a altura da faixa enquanto ela existe — classe dirigida
+pelo signal (testavel em unidade), altura pelo `ResizeObserver` (a faixa quebra em duas linhas em
+tela estreita, e numero fixo mentiria em algum viewport) —, no mesmo precedente do `ThemeService`,
+que alterna classe no `documentElement`. **Nenhuma blindagem foi aplicada**: os 39 originais passam
+com a faixa viva.
+
+**Tres testes desta sprint provavam nada, e nenhum foi pego por leitura — so por mutacao.**
+(a) Falha de storage via `vi.spyOn(Storage.prototype, ...)`: no happy-dom o `localStorage` e um
+**Proxy**, `Object.getPrototypeOf(ls) === Storage.prototype` da `true`, `getItem` nao e own property,
+e ainda assim o spy de prototipo **nao intercepta** — o `catch` do servico nunca rodava, e duas
+mutacoes sobreviveram. Corrigido injetando `DOCUMENT` falso, que nao depende de interno do runtime de
+teste; registrado na skill `sep-web-mutation-verified-testing`. (b) Guarda dos links do rodape com
+busca global: `getAllByRole('link', {name: /entrar/i})` encontrava o "Entrar" do hero, entao apagar o
+do rodape passava verde; reescopado com `within()`. (c) O proprio teste de regressao da sobreposicao,
+que clicava num link do rodape da landing e sobreviveu a mutacao que apagava a regra CSS — o link nao
+estava coberto. Substituido por medicao direta do mecanismo (`padding-bottom` do `body` >= altura da
+faixa).
+
+**Inventario que a politica afirma**, cada linha conferida na fonte: cookie `sep-refresh` com
+`HttpOnly` **fixo em codigo** (`RefreshCookieService.java:64`), escopo `/api/v1/auth`, 30 dias
+(`2592000s`) e `Max-Age=0` no logout; `localStorage` com `SEP_ACCESS_TOKEN`,
+`SEP_PENDING_MFA_CHALLENGE` (ambas limpas no logout), `SEP_THEME` e `SEP_AVISO_COOKIES`;
+`sessionStorage` **sem uso**; rastreamento **nenhum**. `NG_APP_USE_MSW` fica **fora** de proposito —
+nao existe em build de producao —, com teste travando a ausencia.
+
+**Gates declarados pendentes, nao simulados**: o texto **nao passou por revisao juridica** (marcador
+visivel na pagina, e base legal/direitos do titular/encarregado nomeados como pendentes, nunca
+preenchidos com texto inventado — precedente do `PLD.md`); e a configuracao de producao do cookie
+**nao e observavel aqui**, porque a politica afirma `Secure`/`SameSite=Strict`, que producao exige,
+enquanto os defaults deste ambiente sao `false`/`Lax`.
+
+**Divida que a sprint EXPOE e nao corrige**: `SEP_ACCESS_TOKEN` guarda um **JWT de acesso em
+`localStorage`**, legivel por qualquer script na origem. Escrever a politica honestamente torna a
+exposicao publica. Corrigir muda o contrato de autenticacao dos tres repos e **exige ADR** — a
+politica descreve o que existe, e nao promete o que nao existe.

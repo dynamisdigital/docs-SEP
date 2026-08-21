@@ -10,50 +10,80 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-08-06._
+_Atualizado em: 2026-08-21._
 
 ## Leia agora
 
-- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). Todas as frentes **de produto** da Fase 4
-  estao executadas e mergeadas. A Fase 5 esta **inteiramente gated** por acesso externo (Celcoin, AWS,
-  contas de loja) e nao tem frente executavel.
-- **Spec/step ativo**: das tres sprints de divida planejadas em 2026-08-05, **duas estao concluidas**.
-  Resta uma:
-  1. ~~**D-Sprint 1** — dependencias (`sep-app` + `sep-mobile`).~~ **MERGEADA develop+main nos dois
-     repos** (2026-08-05).
-  2. ~~**F-Sprint 24** — divida tecnica web.~~ **CONCLUIDA na branch** em 2026-08-06, 13 commits;
-     **push e PR sao manuais e ainda nao foram feitos**. Ver §Onde estamos.
+- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). As frentes **de produto** da Fase 4 estao
+  executadas; a Fase 5 segue **inteiramente gated** por acesso externo (Celcoin, AWS, contas de loja).
+- **Spec/step ativo**: as tres sprints de divida planejadas em 2026-08-05 estao **todas fechadas na
+  branch ou mergeadas**, e a **F-Sprint 25** (aviso de cookies e politica de privacidade) foi
+  concluida em 2026-08-21.
+  1. ~~**D-Sprint 1** — dependencias.~~ **MERGEADA develop+main nos dois repos** (2026-08-05).
+  2. ~~**F-Sprint 24** — divida tecnica web.~~ **MERGEADA develop+main** (conferido por conteudo em
+     2026-08-21: `estabilizar.ts`, `knownGaps: 0` e `tempoMedioResolucao30d: string` presentes nas
+     duas pontas). O registro anterior dizia "push e PR pendentes" e estava **defasado**.
   3. **Sprint 35** — divida de config/lockout/contrato no backend. Spec
      [`035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md), steps
      [`035`](../steps-fase-4/backend/035-sprint-35-steps.md). **E a proxima**, e **comece pelo Gate
-     35.0** — cada sprint abre com um Gate que re-mede tudo e invalida o planejamento se divergir.
-- **Aprendizado que vale carregar**: **documento nao substitui leitura do codigo**, e a F-Sprint 24
-  levou a licao ao limite — **nenhum numero de planejamento sobreviveu a medicao, em sete de sete
-  Tasks**. Mais importante que os numeros: tres vezes a *premissa* caiu, nao so o valor.
-  - O Gate derrubou "39 definicoes byte-identicas" de `estabilizar()`: eram **38, com tres corpos**, e
-    a identidade textual escondia um **segundo** helper duplicado (`flush()`, 42 definicoes, defaults
-    `5` e `6`). **Numero errado se corrige; premissa errada redesenha a Task.** Licao operacional:
-    contar **corpos**, nao assinaturas, e resolver o que o corpo chama antes de chamar duas copias de
-    "identicas".
-  - A F-24.3 derrubou a causa registrada de `message: ""`. As duas premissas do registro eram
-    verdadeiras e a conclusao nao: medido no bytecode do `spring-boot-3.5.5.jar`,
-    `ErrorAttributeOptions.retainIncluded` faz `Map.remove` da chave, entao o caminho de erro do Spring
-    **nunca** produziu string vazia. Quem pode produzir e o `ErrorResponseDto` da propria aplicacao,
-    porque `DomainException` nao valida a mensagem.
-  - A F-24.5 constatou que o alvo da Task **nao era declaravel** e que o fallback prescrito nos steps
-    era **impossivel por dois motivos independentes**. Spec pode prescrever saida que a ferramenta nao
-    tem.
-- **Regra que a sprint deixou**: ao varrer o repo por um defeito, **o `grep` precisa alcancar tambem a
-  doc**. Os comentarios falsos sobre o `Duration` eram **cinco**, nao tres — dois estavam fora de
-  `sep-app/src` (no `README.md` do repo e num registro da F-10 aqui no historico). E **nao truncar
-  saida que vira numero em relatorio**: uma contagem de mutacao foi reportada como 8 quando era 14,
-  por `head -8` — mesma familia do exit code mascarado por pipe.
+     35.0**.
+  4. **F-Sprint 25** — **CONCLUIDA na branch** `feature/fsprint-25-aviso-cookies` em 2026-08-21, 7
+     commits; **push e PR sao manuais e ainda nao foram feitos**. Ver §Onde estamos.
+- **Aprendizado que vale carregar**: **medir antes de blindar**. O Step 125.6.1 mandava rodar os 39
+  Playwright *antes* de aplicar qualquer contorno, e foi essa ordem que transformou uma quebra de
+  suite em achado de produto: a faixa de cookies interceptava o clique no botao "Iniciar onboarding",
+  e **o remedio que os proprios steps prescreviam (`storageState`) teria escondido o defeito e
+  entregado a faixa quebrada**. Prescricao escrita antes da medicao nao vale mais que a medicao.
+- **Regra que a sprint deixou**: **teste de falha de storage nao se escreve com
+  `vi.spyOn(Storage.prototype, ...)`**. No happy-dom o `localStorage` e um Proxy e o spy de prototipo
+  nao intercepta — o `catch` nunca roda e o teste passa provando nada. Injetar `DOCUMENT` falso. Ja
+  registrado na skill `sep-web-mutation-verified-testing`. Mais amplo: **tres testes desta sprint
+  sobreviveram a mutacao**, e nenhum foi pego por leitura — so pela mutacao. Guarda com busca global
+  (`screen`) quando existe elemento homonimo fora do escopo, e "teste de regressao" que aponta para
+  elemento que nao reproduz o defeito, sao as duas outras formas.
 
 ## Onde estamos
 
-- **F-Sprint 24 (web) CONCLUIDA na branch em 2026-08-06** — divida tecnica do web; **push e PR sao
-  manuais e ainda NAO foram feitos**. 13 commits em `feature/fsprint-24-divida-tecnica`, a partir de
-  `develop` `d987714` (com a D-1 dentro; `develop == main` por diff de conteudo no Gate). Sprint de
+- **F-Sprint 25 (web) CONCLUIDA na branch em 2026-08-21** — aviso de cookies e politica de
+  privacidade; **push e PR sao manuais e ainda NAO foram feitos**. 7 commits em
+  `feature/fsprint-25-aviso-cookies`, a partir de `develop` `b821496` (com a F-24 dentro;
+  `develop == main` por diff de conteudo). **Produto novo**: primeira frente de produto no web desde
+  que a Fase 4 esgotou o escopo sobre fake. Nada mudou em `sep-api`/`sep-mobile`, e **nenhum contrato
+  foi consumido** — `contract:check` fecha identico a abertura (85 operacoes / 0 lacunas), o que aqui
+  e criterio, nao observacao.
+  **Transparencia, nao consentimento**: medido, o produto emite **um** cookie (`sep-refresh`, de
+  autenticacao) e nao ha script de terceiro no `index.html` nem biblioteca de rastreamento no bundle.
+  Cookie necessario nao e recusavel, entao opt-in gatearia zero cookies — dai nao haver "recusar" nem
+  categorias, e o botao dizer "Entendi". O aceite **nunca vai ao servidor**: persisti-lo criaria
+  tratamento de dado pessoal que hoje nao existe.
+  **O Gate F-25.0 derrubou a baseline do `audit`, nos dois sentidos** (spec dizia 0 high / 3 moderate;
+  medido **1 high / 0 moderate**): `nanoid@3.3.17` precisa `>=3.3.18` (GHSA-2v37-7h3g-55p8),
+  transitiva via `@angular/build -> postcss`. **O gate de `npm audit` que a D-1 instalou no CI estava
+  vermelho em `develop` sem ninguem saber** — o cenario que a propria D-1 previu. Corrigido em commit
+  isolado, antes de qualquer codigo de escopo.
+  **A medicao dos e2e achou defeito de produto, nao artefato de teste**: `onboarding.spec.ts:42`
+  reprovou com a `<section>` do aviso nomeada pelo Playwright como interceptadora dos ponteiros, em
+  51 tentativas de clique. Sendo `position: fixed` no rodape, a faixa cobria o **ultimo elemento de
+  qualquer pagina**, e como a rolagem e do `body` chegar ao fim nao resolvia. A faixa passou a
+  reservar a propria altura no `body` (classe pelo signal, altura pelo `ResizeObserver`), e
+  **nenhuma blindagem foi aplicada**: os 39 originais passam com a faixa viva.
+  Vitest **802/94 -> 833/97**, Playwright **39/11 -> 42/12**, `lint`, `lint:scss`, `format:check`,
+  `build` e `audit` verdes. **25 mutacoes distintas em 33 aplicacoes**; **tres testes reescritos por
+  terem sobrevivido** e um mutante equivalente registrado como tal.
+  **Gates declarados pendentes, nao simulados**: o texto **nao passou por revisao juridica** (marcador
+  visivel na pagina; base legal, direitos do titular e encarregado ficam nomeados como pendentes), e a
+  configuracao de producao do cookie **nao e observavel aqui** — a politica afirma `Secure`/`Strict`,
+  que producao exige, mas os defaults deste ambiente sao `false`/`Lax`.
+  **Divida que a sprint EXPOE e nao corrige**: `SEP_ACCESS_TOKEN` guarda JWT de acesso em
+  `localStorage`, legivel por qualquer script na origem. Corrigir exige ADR e toca os tres repos.
+  Descricao em [`SPRINT-F-25-PR.md`](../repos/sep-app/SPRINT-F-25-PR.md).
+
+- **F-Sprint 24 (web) MERGEADA develop+main** — divida tecnica do web. Concluida na branch em
+  2026-08-06; o merge foi conferido **por conteudo** no Gate F-25.0, em 2026-08-21
+  (`src/testing/estabilizar.ts` presente, `knownGaps: 0` e `tempoMedioResolucao30d: string` nas duas
+  pontas), e `develop == main` por diff vazio. **Este registro dizia "push e PR ainda NAO foram
+  feitos" e estava defasado por 15 dias** — mais um caso de documento desmentido pelo codigo.
+  13 commits em `feature/fsprint-24-divida-tecnica`, a partir de `develop` `d987714` (com a D-1 dentro; `develop == main` por diff de conteudo no Gate). Sprint de
   divida: nenhuma tela, endpoint, DTO, migration ou regra nova. Nada mudou em `sep-api`/`sep-mobile`.
   **`contract:check` sai de 1 lacuna para ZERO** (85 operacoes) — primeira vez desde a criacao do gate
   na F-19, em 2026-07-16 —, e ficou provado que o zero nao e vazio: mutar o tipo de volta reprova, e o
@@ -81,7 +111,7 @@ _Atualizado em: 2026-08-06._
   ponta; e `PT0S` esconde falha de banco, porque o `resiliente(...)` do
   `ConsultarVisaoConsolidadaUseCase` engole `RuntimeException` e devolve `Duration.ZERO`,
   indistinguivel de "sem amostra" no fio — limitacao do backend, nao do web.
-  Descricao em [`SPRINT-F-24-PR.md`](../repos/sep-app/SPRINT-F-24-PR.md); historico em
+  A descricao de PR temporaria foi removida no ciclo padrao ao fechar a F-25; historico em
   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §F-Sprint 24.
 
 - **D-Sprint 1 (cross-repo) MERGEADA develop+main nos DOIS repos em 2026-08-05** — divida de
@@ -113,8 +143,9 @@ _Atualizado em: 2026-08-06._
   de ADR de 2026-09-30. **Gate declarado pendente**: smoke real contra `:8080` nao executado, entao
   bump que altere comportamento de runtime segue sem prova. **O `sep-api` continua sem cobertura
   equivalente** (sem plugin de scan no `build.gradle`) — follow-up nomeado, candidato a sprint
-  propria. Descricoes em [`SPRINT-D-1-PR.md`](../repos/sep-app/SPRINT-D-1-PR.md) (web) e
-  [`SPRINT-D-1-PR.md`](../repos/sep-mobile/SPRINT-D-1-PR.md) (mobile); historico em
+  propria. A descricao do lado web foi removida no ciclo padrao ao fechar a F-25; a do mobile
+  ([`SPRINT-D-1-PR.md`](../repos/sep-mobile/SPRINT-D-1-PR.md)) **segue no repo** e esta na mesma
+  situacao de defasagem. Historico em
   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §D-Sprint 1. Nada mudou no `sep-api`.
   O back-merge `main` -> `develop` do `sep-mobile`, pendente desde 2026-07-31 e pre-requisito da
   sprint, foi feito aqui (`66ce65a`): 3 arquivos, nenhum de app.
@@ -417,10 +448,16 @@ _Atualizado em: 2026-08-06._
 
 ## Proximo passo
 
-1. **Push e PR da F-Sprint 24** (manuais, dev humano). A branch `feature/fsprint-24-divida-tecnica`
-   esta pronta com 13 commits e todos os gates verdes; descricao em
-   [`SPRINT-F-24-PR.md`](../repos/sep-app/SPRINT-F-24-PR.md). Fluxo padrao:
+1. **Push e PR da F-Sprint 25** (manuais, dev humano). A branch `feature/fsprint-25-aviso-cookies`
+   esta pronta com 7 commits e todos os gates verdes; descricao em
+   [`SPRINT-F-25-PR.md`](../repos/sep-app/SPRINT-F-25-PR.md). Fluxo padrao:
    `feature -> develop` (squash) e depois `develop -> main`.
+   As descricoes da **F-24** e da **D-1** ja foram removidas em 2026-08-21 — as duas sprints estao em
+   `develop`+`main` e as descricoes haviam sobrevivido ao ciclo padrao. O conteudo delas segue em
+   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) e no [`PRD-FASE-4.md`](./PRD-FASE-4.md) §36, que
+   **tambem ganhou a linha da F-24** — ela nunca havia sido registrada la.
+   **Depois do merge, revisar juridicamente o texto da politica** — ela entrou marcada como pendente,
+   com base legal, direitos do titular e contato do encarregado nomeados e nao preenchidos.
 
 2. **Sprint 35** (`sep-api`), a **unica** sprint de divida restante e a unica frente executavel sem
    API externa: allowlist de proxy (hoje a origem do rate limit e escolhida pelo cliente), validacao
@@ -447,6 +484,17 @@ _Atualizado em: 2026-08-06._
    so a referencia que envelhece. Trocar por `0d24602` num commit de documentacao, se valer o ciclo
    de PR — o campo e documental e nenhum script o le.
 6. **Follow-ups tecnicos abertos** (nao bloqueiam).
+   **ABERTOS pela F-Sprint 25** (2026-08-21): (a) **`SEP_ACCESS_TOKEN` guarda JWT de acesso em
+   `localStorage`** (`auth.service.ts:9`), legivel por qualquer script na origem — a politica de
+   privacidade torna a exposicao publica, e corrigir **exige ADR** porque muda o contrato de
+   autenticacao dos tres repos; **candidato a sprint propria**; (b) **revisao juridica** do texto da
+   politica, com base legal, direitos do titular e contato do encarregado nomeados e nao preenchidos;
+   (c) **termos de uso** ausentes — documento distinto, nao deriva de medicao do codigo;
+   (d) **`sep-mobile` sem equivalente**: o nativo nao usa cookie, mas a build PWA tem a mesma lacuna;
+   (e) conferencia visual da faixa em <768px, onde ela quebra em duas linhas.
+   **A F-25 reforca a urgencia do `sep-api` sem scan de dependencia**: o gate de `npm audit` do front
+   existe desde a D-1 e mesmo assim ficou vermelho em `develop` sem ninguem notar; no backend nao ha
+   nem gate.
    **FECHADOS pela F-Sprint 24** (2026-08-06): o vetor do `errorInterceptor` na `/account-locked`; o
    `/auth/totp/verify` com `Authorization` morto; o `NaNmin`/`tempoMedioResolucao30d`; o
    `message: ""` (e tambem o `"   "`, que o Gate mostrou ser a outra metade do defeito); os 3
