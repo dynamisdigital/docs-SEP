@@ -109,24 +109,43 @@ implementacao desta fase.
 
 Planejamento de alto nivel; todas as sprints **planejadas** e **gated** pelo acesso da sua frente.
 Specs e steps sao criados **just-in-time** em `specs/fase-5/` e `steps-fase-5/`. A numeracao continua
-a sequencia: **backend a partir de 36** e **mobile a partir de M-18** (a M-17 foi consumida pelos
-follow-ups de lockout/a11y da Fase 4, mergeada em 2026-07-31). Frentes de infra usam prefixo
-`I-Sprint` (infraestrutura) por nao serem sprints de codigo de aplicacao.
+a **faixa reservada da Fase 5**, fixada em 2026-09-01 e documentada em
+[`../AGENT.md`](../AGENT.md) §Numeracao de sprint e de spec: **backend a partir de 50** (specs `050+`)
+e **mobile a partir de M-50** (specs `250+`). A Fase 4 ocupa a faixa 0-49 e **nao alcanca mais a
+Fase 5**. Frentes de infra usam prefixo `I-Sprint` (infraestrutura) e go-live usa `G-Sprint`; os dois
+tem sequencia propria, fora da banda e da faixa.
 
-**Historico da numeracao de backend**: a Fase 5 ja recuou tres vezes, sempre porque a Fase 4 consumiu
-o numero seguinte — a **33** pela correcao de lockout, a **34** pelos follow-ups dela, e a **35** pela
-sprint de divida de config/lockout/contrato planejada em 2026-08-05
-([`specs/fase-4/035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md)). Antes de
-criar a proxima spec de backend, conferir o maior numero ja usado em `specs/fase-4/`.
+### Historico: o mecanismo de recuo, encerrado em 2026-09-01
+
+Ate 2026-09-01 a numeracao era uma **sequencia unica atravessando as fases**, entao toda sprint nova
+de Fase 4 renumerava sprints de Fase 5 que ninguem havia escrito. Aconteceu **oito** vezes:
+
+| Trilha | Recuos | Sprints de Fase 4 que os causaram |
+|---|---|---|
+| Backend | **seis** | 33 (lockout), 34 (follow-ups), 35 (divida de config), 36 (codigos de erro no fio), 37 (normalizacao da taxonomia), 38 (modulo de notificacao) |
+| Mobile | **duas** | M-18 (codigos de erro), M-19 (central de notificacao) |
+
+Cinco desses oito aconteceram **no mesmo dia** — 2026-09-01 —, quando a cadeia P1 e a frente de
+notificacao foram planejadas. Cada recuo obrigava a editar este arquivo, o
+[`README` de specs](../specs/fase-4/README.md) e o [`PRD-FASE-4.md`](./PRD-FASE-4.md): trabalho puro,
+sem valor de produto, e uma fonte recorrente de numero defasado espalhado por documento.
+
+**A faixa reservada encerra o mecanismo.** A Fase 4 cresce de 39 a 49 no backend, de F-28 a F-49 no
+web e de M-20 a M-49 no mobile — nada disso alcanca a Fase 5. Nenhum recuo e possivel, e por isso
+esta secao e historico, nao regra viva. A regra esta em
+[`../AGENT.md`](../AGENT.md) §Numeracao de sprint e de spec.
+
+Antes de criar spec da Fase 5, conferir o maior numero ja usado **em `specs/fase-5/`** — nao em
+`specs/fase-4/`, que agora e faixa alheia.
 
 ### Backend / integracao (`sep-api`)
 
 | Sprint | Frente | Tema | Gate | Status |
 |--------|--------|------|------|--------|
-| 36 | A | Ativacao adapter real KYC/PLD (Celcoin) + validacao sandbox | credenciais Celcoin | planejada |
-| 37 | A | Ativacao adapter real assinatura/CCB + validacao sandbox | credenciais Celcoin | planejada |
-| 38 | A | Ativacao adapter real Pix + escrow + aporte + conciliacao (sandbox) | credenciais Celcoin | planejada |
-| 39 | A | Promocao das integracoes de sandbox para producao + trilha de auditoria | credenciais prod | planejada |
+| 50 | A | Ativacao adapter real KYC/PLD (Celcoin) + validacao sandbox | credenciais Celcoin | planejada |
+| 51 | A | Ativacao adapter real assinatura/CCB + validacao sandbox | credenciais Celcoin | planejada |
+| 52 | A | Ativacao adapter real Pix + escrow + aporte + conciliacao (sandbox) | credenciais Celcoin | planejada |
+| 53 | A | Promocao das integracoes de sandbox para producao + trilha de auditoria | credenciais prod | planejada |
 
 ### Infraestrutura (`sep-api` + `docs-SEP/ci-pipelines`)
 
@@ -140,8 +159,8 @@ criar a proxima spec de backend, conferir o maior numero ja usado em `specs/fase
 
 | Sprint | Frente | Tema | Gate | Status |
 |--------|--------|------|------|--------|
-| M-18 | C | Build assinado de producao + publicacao Google Play (interno/beta -> prod) | conta Play | planejada |
-| M-19 | C | Build assinado de producao + publicacao App Store (TestFlight -> prod) | conta Apple | planejada |
+| M-50 | C | Build assinado de producao + publicacao Google Play (interno/beta -> prod) | conta Play | planejada |
+| M-51 | C | Build assinado de producao + publicacao App Store (TestFlight -> prod) | conta Apple | planejada |
 
 ### Go-live (cross-repo)
 
@@ -163,9 +182,9 @@ criar a proxima spec de backend, conferir o maior numero ja usado em `specs/fase
 
 ## 47. Gates e pre-requisitos
 
-- **Credenciais Celcoin/BaaS** (sandbox e producao) — Frente A e Sprints **36-39**.
+- **Credenciais Celcoin/BaaS** (sandbox e producao) — Frente A e Sprints **50-53**.
 - **Conta/ambiente AWS aprovado** — Frente B e I-Sprints 1-3.
-- **Contas de desenvolvedor de loja** (Google Play, Apple Developer) — Frente C e M-18/M-19.
+- **Contas de desenvolvedor de loja** (Google Play, Apple Developer) — Frente C e M-50/M-51.
 - **Aprovacao regulatoria/juridica** para operar movimentacao financeira real (conformidade
   CMN 4.656/2018) — Frente D.
 - **ADRs candidatos** (just-in-time): estrategia de deploy/secrets AWS; feature flag de provider por

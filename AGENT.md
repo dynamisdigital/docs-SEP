@@ -174,6 +174,35 @@ Atualize `AI-ROADMAP.md` no mesmo ciclo quando criar, mover, remover ou alterar 
 
 Docs globais de produto, contexto, seguranca transversal e operacao cross-repo ficam em `docs-SEP/docs-sep/`. ADRs ficam em `docs-SEP/adr/`. Specs ficam em `docs-SEP/specs/` (subpastas `fase-1/` a `fase-5/`). Steps ficam em `docs-SEP/steps-fase-1/` a `docs-SEP/steps-fase-5/` (subpastas `backend/`, `web/`, `mobile/`).
 
+### Numeracao de sprint e de spec (regra fixa desde 2026-09-01)
+
+O ID da spec e o numero da sprint sao o mesmo numero, dentro de uma **banda por repo** e de uma **faixa por fase**. As duas dimensoes sao independentes e ambas obrigatorias.
+
+**Banda por repo** (define a centena):
+
+| Banda | Trilha | Prefixo da sprint |
+|---|---|---|
+| `0XX` | backend (`sep-api`) | `Sprint N` |
+| `1XX` | web (`sep-app`) | `F-Sprint N` |
+| `2XX` | mobile (`sep-mobile`) | `M-Sprint N` |
+| `3XX` | cross-repo (um gate, varios repos) | `D-Sprint N` |
+
+**Faixa por fase** (define o numero dentro da banda):
+
+| Fase | Faixa | Exemplo backend | Exemplo mobile |
+|---|---|---|---|
+| Fases 1-4 | **0-49** | `038` = Sprint 38 | `219` = M-Sprint 19 |
+| Fase 5 | **50-99** | `050` = Sprint 50 | `250` = M-Sprint 50 |
+
+**Por que a faixa existe**: ate 2026-09-01 a numeracao era uma sequencia unica atravessando as fases, entao **toda sprint nova de Fase 4 renumerava sprints de Fase 5 que ninguem havia escrito**. O backend recuou **seis** vezes em quatro meses (33, 34, 35, 36, 37, 38) e o mobile **duas** (M-18, M-19). Cada recuo obrigava a editar `PRD-FASE-5.md`, o README de specs e o PRD da fase corrente — trabalho puro, sem valor. A faixa encerra o mecanismo: Fase 4 cresce de 39 a 49 sem tocar em nada da Fase 5.
+
+**Consequencias praticas**:
+
+- O numero da sprint continua **unico globalmente** — "Sprint 34", "a 036", "M-18" seguem sem ambiguidade em prosa, que e como todos os documentos ja referenciam.
+- Fase 4 tem 11 numeros livres no backend (39-49), 22 no web (F-28 a F-49) e 30 no mobile (M-20 a M-49). Se algum se esgotar, **e decisao propria**, nao ajuste silencioso.
+- `I-Sprint` (infraestrutura) e `G-Sprint` (go-live) tem prefixo proprio e sequencia propria; nao entram na banda nem na faixa.
+- Antes de criar spec, conferir o maior numero ja usado **na faixa da fase**, nao na trilha inteira.
+
 Contexto (regra fixa para nao inchar o arquivo de estado): o **estado atual, o proximo passo, os gates e o ponteiro "Leia agora"** vivem em `docs-sep/STATE.md` (pequeno; fonte unica; sempre lido). Ao **fechar uma sprint**, sobrescreva esse arquivo (estado + proximo passo + leia agora) e apende uma entrada curta ao historico em `docs-sep/CONTEXT-PARTE-2.md` (log por sprint; grande; lido so sob demanda). Nao trate `CONTEXT-PARTE-2.md` como fonte de estado; `CONTEXT-PARTE-1.md` e a fundacao estavel.
 
 ## Como trabalhar

@@ -39,10 +39,15 @@ Leitura base para qualquer agente:
 > das jornadas web/mobile (Epics 13/14 remanescentes), aporte real/matching e Pix avancado (Epic 15),
 > planejamento de infraestrutura AWS (Epic 16) e follow-ups de go-live. Fecha o marco `v1.0-local`
 > (tudo sobre providers Fake/WireMock; "tudo menos AWS e Celcoin"). **Specs criadas** em
-> [`specs/fase-4/`](specs/fase-4/README.md) (24 arquivos: backend `027`-`035`, web `116`-`124`,
-> mobile `213`-`217`, **cross-repo `300`**); steps just-in-time em
+> [`specs/fase-4/`](specs/fase-4/README.md) (**32 arquivos**: backend `027`-`038`, web `116`-`127`,
+> mobile `213`-`219`, **cross-repo `300`**); steps just-in-time em
 > `steps-fase-4/{backend,web,mobile,cross-repo}/`. Numeracao: backend Sprint 27+, web F-16+,
 > mobile M-13+, cross-repo D-1+.
+> **Faixa por fase (2026-09-01)**: dentro de cada banda, Fases 1-4 ocupam **0-49** e a Fase 5 ocupa
+> **50-99**. Regra em [`AGENT.md`](AGENT.md) §Numeracao de sprint e de spec. Antes disso a numeracao
+> era sequencia unica atravessando as fases, e toda sprint nova de Fase 4 renumerava sprints de
+> Fase 5 nao escritas — **oito recuos em quatro meses, cinco num unico dia**. O mecanismo acabou; a
+> Fase 4 cresce ate `049`/`149`/`249` sem tocar na Fase 5.
 > **`steps-fase-4/cross-repo/` e pasta nova (2026-08-05)**, criada com a **D-Sprint 1**: abriga sprint
 > que entrega em mais de um repo com **um** criterio de aceite — a faixa de spec correspondente e
 > `3XX`. Uma sprint cross-repo mantem **uma branch e um PR por repo**; o que ela unifica e o gate e o
@@ -122,7 +127,52 @@ Leitura base para qualquer agente:
 > contrato no backend; spec
 > [`035`](specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md) + steps
 > [`035`](steps-fase-4/backend/035-sprint-35-steps.md)). A F-24 leva o `contract:check` de 1 lacuna
-> para **0**; a Sprint 35 consome o numero 35 e por isso o backend da Fase 5 renumerou para **36-39**.
+> para **0**; a Sprint 35 consome o numero 35, o que na epoca renumerava o backend da Fase 5 — cadeia
+> que seguiu ate as Sprints 36, 37 e 38 e foi **encerrada em 2026-09-01** pela faixa por fase. A
+> Fase 5 e fixa em **50-99** e nao recua mais.
+>
+> **Cadeia P1, planejada em 2026-09-01** — primeira frente aberta a partir do
+> [`DIAGNOSTICO-PRODUTO.md`](docs-sep/DIAGNOSTICO-PRODUTO.md), que le o SEP sob *The Product-Minded
+> Engineer*. Publica no fio os codigos de erro que o dominio ja constroi e **descarta na
+> fronteira HTTP** (`getCodigo()` tem zero consumidores em `src/main`). Uma sprint por repo:
+> **Sprint 36** (spec [`036`](specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)) publica;
+> **F-Sprint 26** (spec [`126`](specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md)) e
+> **M-Sprint 18** (spec [`218`](specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md)) consomem.
+> Ordem `35 -> 36 -> {F-26, M-18}`; as duas de consumo sao independentes entre si. **A 36 depende da 35
+> por arquivo, nao por contrato** — as duas mexem em `ApiExceptionHandler.java`. **Conflito a resolver
+> antes**: a Task 35.5 planeja remover `ContaBloqueadaException.CODIGO` como codigo morto e a Task 36.4
+> lhe da consumidor. Steps ainda **nao criados** — just-in-time.
+>
+> **A revisao da propria cadeia, no mesmo dia, derrubou quatro numeros da Spec 036** e mudou o escopo
+> dela. A taxonomia **nao e 67 codigos em 9 prefixos, e ~103 em 12** — o `grep` original filtrava por
+> constantes **chamadas** `CODIGO`, quando o fenomeno e formato de string. Alem disso: **12 codigos
+> definidos duas vezes com significados diferentes** (`credores` reusou a faixa `CRD-*` de `credito`
+> em 8 deles), **12 violacoes de formato** (nao 1) e **3 excecoes orfas** de `DomainException`
+> (nao 1), duas delas sem getter. A 036 passou a publicar **so o subconjunto apto**, com **perimetro**
+> sobre o resto — publicar codigo com colisao o tornaria contrato permanente. Licao registrada:
+> **medir o fenomeno, nao o nome que ele costuma ter.**
+>
+> **Sprint 37** (spec [`037`](specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md)) normaliza o
+> que ficou fora do perimetro. **Nao e sprint de rename — e sprint de decisao**, e por isso **preve
+> ADR**: define o que o prefixo significa (hoje **nao e identificador de modulo**, e nao ha registro
+> dele em lugar nenhum) e qual e a convencao de sufixo (o modulo `PIX` tem **28 sufixos semanticos
+> contra 3 numericos** — e convencao paralela com dono, nao desvio). Depende da 036 **e da lista de
+> excluidos que a Task 36.7 entrega**, que e o que a dimensiona.
+>
+> **Frente A de notificacao, planejada em 2026-09-01** — a unica das quatro frentes do levantamento
+> de notificacoes que **nao depende de acesso externo**. Medido: o `sep-api` tem **71 eventos de
+> dominio e tres pontos de envio**, e os tres falam com o tomador em momento ruim (regua de cobranca,
+> renegociacao, conta bloqueada) — **o produto so fala com o tomador para cobrar divida ou avisar que
+> ele perdeu o acesso**. Ha **duas infra paralelas** (a completa presa dentro de `cobranca`; a rasa em
+> `shared.email`), **nenhum historico** e **nenhum opt-out**.
+> **Sprint 38** (spec [`038`](specs/fase-4/038-sprint-38-modulo-notificacao-historico.md), **ADR
+> previsto**, migration `V61`) cria o modulo transversal, o historico e o canal `IN_APP`, e prova o
+> pipeline com **um** gatilho (`PixTransferenciaConcluidaEvent` -> tomador, que ja carrega o
+> `tomadorId`). **F-Sprint 27** (spec [`127`](specs/fase-4/127-fsprint-27-central-notificacao-web.md))
+> e **M-Sprint 19** (spec [`219`](specs/fase-4/219-msprint-19-central-notificacao-mobile.md)) dao a
+> superficie. A 38 **corre em paralelo com a cadeia P1** — nao toca `ApiExceptionHandler`. Push fica
+> fora (gate Firebase/APNs, Fase 5), mas o contrato do `IN_APP` nasce compativel; a M-19 proibe
+> explicitamente pedir permissao de notificacao antes de haver push.
 >
 > A **D-Sprint 1 esta MERGEADA develop+main nos dois repos** (2026-08-05; `sep-app` PR #128/#129,
 > `sep-mobile` PR #145/#146): `high`+`critical` a **zero** nos dois (19->3 no web, 19->8 no mobile),

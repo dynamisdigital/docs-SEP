@@ -10,25 +10,47 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-08-21._
+_Atualizado em: 2026-09-01 (sessao de planejamento; nenhuma sprint fechada, nenhum codigo de app
+tocado)._
 
 ## Leia agora
 
-- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). As frentes **de produto** da Fase 4 estao
-  executadas; a Fase 5 segue **inteiramente gated** por acesso externo (Celcoin, AWS, contas de loja).
-- **Spec/step ativo**: as tres sprints de divida planejadas em 2026-08-05 estao **todas fechadas na
-  branch ou mergeadas**, e a **F-Sprint 25** (aviso de cookies e politica de privacidade) foi
-  concluida em 2026-08-21.
-  1. ~~**D-Sprint 1** — dependencias.~~ **MERGEADA develop+main nos dois repos** (2026-08-05).
-  2. ~~**F-Sprint 24** — divida tecnica web.~~ **MERGEADA develop+main** (conferido por conteudo em
-     2026-08-21: `estabilizar.ts`, `knownGaps: 0` e `tempoMedioResolucao30d: string` presentes nas
-     duas pontas). O registro anterior dizia "push e PR pendentes" e estava **defasado**.
-  3. **Sprint 35** — divida de config/lockout/contrato no backend. Spec
+- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). A Fase 5 segue **inteiramente gated** por
+  acesso externo (Celcoin, AWS, contas de loja).
+- **Mudou em 2026-09-01**: o registro anterior dizia que "as frentes de produto da Fase 4 estao
+  executadas". Isso continuava verdade **sobre o escopo planejado**, e deixou de ser a leitura util:
+  o [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md) abriu **seis lacunas de produto medidas no
+  codigo**, e duas delas viraram **sete specs novas**. Havia mais escopo executavel sem gate externo
+  do que o documento registrava.
+- **Spec/step ativo**: a fila cresceu. Ordem recomendada:
+  1. **F-Sprint 25** — **CONCLUIDA na branch** `feature/fsprint-25-aviso-cookies` (2026-08-21, 7
+     commits); **push e PR sao manuais e ainda nao foram feitos**.
+  2. **Sprint 35** — divida de config/lockout/contrato. Spec
      [`035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md), steps
-     [`035`](../steps-fase-4/backend/035-sprint-35-steps.md). **E a proxima**, e **comece pelo Gate
-     35.0**.
-  4. **F-Sprint 25** — **CONCLUIDA na branch** `feature/fsprint-25-aviso-cookies` em 2026-08-21, 7
-     commits; **push e PR sao manuais e ainda nao foram feitos**. Ver §Onde estamos.
+     [`035`](../steps-fase-4/backend/035-sprint-35-steps.md). **E a proxima a executar**, e **comece
+     pelo Gate 35.0**. **Conflito conhecido**: a Task 35.5 planeja remover
+     `ContaBloqueadaException.CODIGO` como codigo morto, e a Sprint 36 lhe da consumidor — manter so
+     a metade do `countByIpAndJanela`.
+  3. **Cadeia P1 (codigos de erro no fio)** — [`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)
+     publica, [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md) e
+     [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md) consomem. Depois,
+     [`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md) normaliza o que a 036
+     deixou fora do perimetro (**preve ADR**).
+  4. **Frente A de notificacao** — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
+     (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
+     e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). **Corre em paralelo com
+     a cadeia P1** — a 038 nao toca `ApiExceptionHandler`.
+  Steps das sete novas **nao existem** — just-in-time, ao aprovar cada uma.
+- **Regra nova, obrigatoria**: **faixa de numeracao por fase** — Fases 1-4 em **0-49**, Fase 5 em
+  **50-99**, dentro da banda por repo. Documentada em [`../AGENT.md`](../AGENT.md) §Numeracao de
+  sprint e de spec. Encerra o mecanismo de recuo que produziu **oito renumeracoes da Fase 5 em quatro
+  meses, cinco delas num unico dia**.
+- **Aprendizado de 2026-09-01**: **medir o fenomeno, nao o nome que ele costuma ter.** O
+  `grep -rh 'CODIGO = "'` parecia rigoroso — tinha comando, numero e distribuicao por prefixo — e
+  filtrava por **nome de constante** quando o fenomeno e **formato de string**. Errou por 36 codigos
+  (67 medidos, ~103 reais) e o erro atravessou o diagnostico e tres specs sem ninguem questionar,
+  **porque vinha com evidencia anexa**. Medicao com comando ao lado nao e medicao correta; e medicao
+  reproduzivel, que e outra coisa.
 - **Aprendizado que vale carregar**: **medir antes de blindar**. O Step 125.6.1 mandava rodar os 39
   Playwright *antes* de aplicar qualquer contorno, e foi essa ordem que transformou uma quebra de
   suite em achado de produto: a faixa de cookies interceptava o clique no botao "Iniciar onboarding",
@@ -43,6 +65,32 @@ _Atualizado em: 2026-08-21._
   elemento que nao reproduz o defeito, sao as duas outras formas.
 
 ## Onde estamos
+
+- **Sessao de planejamento e diagnostico em 2026-09-01** — **nenhuma sprint fechada, nenhum codigo de
+  app tocado**. Saiu do `docs-SEP` e do ambiente local; os tres repos de codigo estao intactos.
+  **Entregas**: (a) [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md), leitura do SEP sob
+  *The Product-Minded Engineer* (Hoskins), com **seis lacunas de produto medidas no codigo**;
+  (b) **sete specs novas** — a cadeia P1 revisada (036/126/218), a normalizacao (037) e a frente A de
+  notificacao (038/127/219); (c) **faixa de numeracao por fase**, encerrando o mecanismo de recuo;
+  (d) ambiente Android montado do zero na maquina de dev (`C:\Android\Sdk`, cmdline-tools 19.0,
+  `platforms;android-36`, `build-tools;36.0.0`), com **APK debug gerado e conferido** — 8,44 MB,
+  `BUILD SUCCESSFUL`, 243 tasks.
+  **Correcao de registro**: o `STATE.md` e a M-Sprint 17 afirmavam que a maquina de dev **tem**
+  Android SDK. Nao tinha — `C:\Android` nao existia. Agora tem.
+  **O que o diagnostico achou, resumido**: o `sep-api` constroi uma taxonomia de erro e a **descarta
+  na fronteira HTTP** (`getCodigo()` com zero consumidores em `src/main`); **personas nao existem**,
+  so papeis RBAC — e o Gate M-16.0 ja cortou escopo por causa disso; **nao ha metrica de produto**,
+  so de entrega (DORA) e de sistema (Prometheus); os testes E2E espelham **modulos**, nao jornadas; e
+  o `sep-api` tem **71 eventos de dominio para tres pontos de envio de notificacao**, os tres falando
+  com o tomador em momento ruim.
+  **Duas correcoes que a revisao das specs imps ao proprio diagnostico**: a taxonomia nao e 67
+  codigos e sim **~103** (o `grep` filtrava por nome de constante, nao por formato), e ha **12
+  codigos definidos duas vezes com significados diferentes** — o que derrubou a premissa "so publica
+  o que existe" e fez a Spec 036 adotar **perimetro**.
+  **Divida que a sessao EXPOE e nao corrige**: `npm audit` do `sep-mobile` mediu **8 vulnerabilidades
+  (3 moderate, 5 high)**; o `STATE.md` registra o residual da D-1 como **8 moderate, 0 high**. Subiu,
+  e o gate `--audit-level=high` do CI provavelmente esta **vermelho em `develop`** — mesmo cenario
+  que o Gate F-25.0 encontrou no `sep-app`. **Medir antes da Sprint 35.**
 
 - **F-Sprint 25 (web) CONCLUIDA na branch em 2026-08-21** — aviso de cookies e politica de
   privacidade; **push e PR sao manuais e ainda NAO foram feitos**. 7 commits em
@@ -442,9 +490,10 @@ _Atualizado em: 2026-08-21._
 - **Sprint 30 (backend) MERGEADA em 2026-07-13** — matching assistido credora-operacao
   (Epic 15). PR #95 develop + #96 main; 1975 testes. Com a Sprint 29 (aporte, PR #93/#94),
   desbloqueia F-Sprint 18 (web) e M-Sprint 16 (mobile).
-- **Fase 3 concluida tecnicamente em 2026-07-06**; **Fase 4 em execucao** (14 specs em
-  [`specs/fase-4/`](../specs/fase-4/README.md); marco `v1.0-local`); **Fase 5 planejada**
-  (Celcoin real, AWS, lojas) — [`PRD-FASE-5.md`](./PRD-FASE-5.md).
+- **Fase 3 concluida tecnicamente em 2026-07-06**; **Fase 4 em execucao** (**32 specs** em
+  [`specs/fase-4/`](../specs/fase-4/README.md) apos 2026-09-01: backend `027`-`038`, web `116`-`127`,
+  mobile `213`-`219`, cross-repo `300`; marco `v1.0-local`); **Fase 5 planejada** e fixa na faixa
+  **50-99** (Celcoin real, AWS, lojas) — [`PRD-FASE-5.md`](./PRD-FASE-5.md).
 
 ## Proximo passo
 
@@ -459,10 +508,15 @@ _Atualizado em: 2026-08-21._
    **Depois do merge, revisar juridicamente o texto da politica** — ela entrou marcada como pendente,
    com base legal, direitos do titular e contato do encarregado nomeados e nao preenchidos.
 
-2. **Sprint 35** (`sep-api`), a **unica** sprint de divida restante e a unica frente executavel sem
-   API externa: allowlist de proxy (hoje a origem do rate limit e escolhida pelo cliente), validacao
-   de `LockoutProperties` no boot, `405` faltante, e codigo/config morto. **Comece pelo Gate 35.0** —
-   nas tres sprints de divida anteriores o Gate derrubou numero ou premissa da spec, sem excecao.
+2. **Sprint 35** (`sep-api`): allowlist de proxy (hoje a origem do rate limit e escolhida pelo
+   cliente), validacao de `LockoutProperties` no boot, `405` faltante, e codigo/config morto.
+   **Comece pelo Gate 35.0** — nas tres sprints de divida anteriores o Gate derrubou numero ou
+   premissa da spec, sem excecao, **e em 2026-09-01 a revisao da Spec 036 derrubou quatro de uma vez**.
+   **O registro anterior a chamava de "a unica sprint de divida restante e a unica frente executavel
+   sem API externa". Isso caiu**: o diagnostico de 2026-09-01 abriu sete specs, todas executaveis sem
+   gate externo. A 35 continua sendo a **proxima**, nao a ultima.
+   **Ainda antes dela**: medir o `npm audit` do `sep-mobile` em `develop` (§Onde estamos — 5 `high`
+   onde o registro diz 0).
    **Entrada nova para a 35**: o `@ApiResponses` de `BackofficeReprocessoController.java:56-61` nao
    publica o `400` do endpoint de webhook, alcancavel por `@PathVariable UUID` malformado — a F-24.5
    nao pode declarar o status por causa disso. Ver §Follow-ups.
@@ -579,6 +633,14 @@ _Atualizado em: 2026-08-21._
 Ate os acessos existirem: banco PostgreSQL local via Docker Compose; providers em Fake + WireMock;
 empacotamento iOS adiado ate hardware/cloud Mac disponivel.
 
+**Gate de Android FECHADO em 2026-09-01**: a maquina de dev nao tinha Android SDK (`C:\Android` nao
+existia), ao contrario do que este arquivo e a M-Sprint 17 registravam. Foi montado do zero —
+cmdline-tools 19.0, `platform-tools`, `platforms;android-36`, `build-tools;36.0.0`, licencas aceitas,
+`local.properties` criado (ja em `.gitignore`) — e o APK debug foi gerado e conferido: **8,44 MB**,
+`BUILD SUCCESSFUL` em 1m16s, 243 tasks, os 5 plugins Capacitor compilados. `ANDROID_HOME` **nao**
+persiste no ambiente do usuario; setar por sessao ou fixar com
+`[Environment]::SetEnvironmentVariable("ANDROID_HOME", "C:\Android\Sdk", "User")`.
+
 ## Decisoes ativas ainda vigentes
 
 - **Stack**: backend Java 21 + Spring Boot 3.5.x + Gradle + PostgreSQL 16; web Angular 20.x
@@ -602,3 +664,5 @@ empacotamento iOS adiado ate hardware/cloud Mac disponivel.
 | Planejamento completo das fases | [`PRD.md`](./PRD.md) + `PRD-FASE-1..5.md` (referencia; nao obrigatorio se o "Leia agora" acima ja basta) |
 | Navegacao por tarefa/modulo | [`../AI-ROADMAP.md`](../AI-ROADMAP.md) (condicional — ver `../AGENT.md` §Ordem de leitura) |
 | Regras operacionais para agentes | [`../AGENT.md`](../AGENT.md) |
+| **Lacunas de produto medidas** (erros, personas, metricas, cenarios, docs, NFR) | [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md) (2026-09-01) |
+| **Que numero usar numa spec nova** | [`../AGENT.md`](../AGENT.md) §Numeracao de sprint e de spec — banda por repo **e** faixa por fase |

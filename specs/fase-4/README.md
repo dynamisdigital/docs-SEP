@@ -8,6 +8,13 @@ As tabelas usam a ordem recomendada de execucao.
 
 ## Regras de planejamento
 
+- **Faixa por fase (desde 2026-09-01)**: dentro de cada banda, as Fases 1-4 ocupam **0-49** e a
+  Fase 5 ocupa **50-99**. A Fase 4 cresce de `039` a `049` no backend, de `128` a `149` no web e de
+  `220` a `249` no mobile **sem tocar na Fase 5**. Regra completa em
+  [`../../AGENT.md`](../../AGENT.md) §Numeracao de sprint e de spec.
+  Antes disso a numeracao era sequencia unica atravessando as fases, e **toda sprint nova de Fase 4
+  renumerava sprints de Fase 5 que ninguem havia escrito** — oito recuos em quatro meses, cinco deles
+  num unico dia. As mencoes a "Nº recuo" nas linhas abaixo sao **historico**, nao regra viva.
 - Specs separados por projeto: backend (`0XX`), web (`1XX`), mobile (`2XX`) e **cross-repo (`3XX`)**.
   A faixa `3XX` nasceu em 2026-08-05 com a D-Sprint 1 e vale para sprint que entrega em mais de um
   repo com **um** criterio de aceite; os steps dela vivem em `steps-fase-4/cross-repo/`. Uma sprint
@@ -33,7 +40,10 @@ As tabelas usam a ordem recomendada de execucao.
 | 32 | [`032-sprint-32-adapters-celcoin-skeleton.md`](./032-sprint-32-adapters-celcoin-skeleton.md) | Skeleton dos adapters Celcoin/BaaS + WireMock (sem ativar) | 5 |
 | 33 | [`033-sprint-33-lockout-conformidade.md`](./033-sprint-33-lockout-conformidade.md) | Conformidade da politica de lockout (15/30 min) + `423` alcancavel — **correcao de defeito**; **MERGEADA develop+main** (PR #101/#102, 2026-07-29) | 4 |
 | 34 | [`034-sprint-34-followups-lockout-contrato.md`](./034-sprint-34-followups-lockout-contrato.md) | Follow-ups do lockout (observabilidade, `Retry-After`, invariante de config, evicção do registry) + divida de contrato OpenAPI (`knownGaps` da F-19) — **correcao de divida**; **concluida** (PR #103 develop / #104 main, 2026-08-03; 13 commits, 2220 testes, migration `V60`; gate de contrato no `sep-app` via PR #120/#121, `contract:check` de 29 lacunas para 1) | 7 |
-| 35 | [`035-sprint-35-divida-config-lockout-contrato.md`](./035-sprint-35-divida-config-lockout-contrato.md) | Allowlist de proxy (`forward-headers-strategy`), validacao de `LockoutProperties` no boot, `405` faltante, config e codigo morto, `Clock` injetavel e itens de contrato — **correcao de divida**; **planejada** (2026-08-05). Consome o numero 35, e o backend da Fase 5 renumerou para 36-39 | 7 |
+| 35 | [`035-sprint-35-divida-config-lockout-contrato.md`](./035-sprint-35-divida-config-lockout-contrato.md) | Allowlist de proxy (`forward-headers-strategy`), validacao de `LockoutProperties` no boot, `405` faltante, config e codigo morto, `Clock` injetavel e itens de contrato — **correcao de divida**; **planejada** (2026-08-05). Consome o numero 35, e o backend da Fase 5 renumerou para 36-39 — depois para 37-40 com a Sprint 36, depois para 38-41 com a Sprint 37 e 39-42 com a Sprint 38 — cadeia encerrada em 2026-09-01 pela faixa por fase, que fixa a Fase 5 em **50-99** | 7 |
+| 36 | [`036-sprint-36-codigos-erro-no-fio.md`](./036-sprint-36-codigos-erro-no-fio.md) | Publicar a taxonomia de codigos de erro no fio: campo `codigo` no `ErrorResponseDto`, propagacao no ponto unico `build()` e catalogo do **subconjunto apto** no OpenAPI, com **perimetro** sobre o que ainda nao pode ser publicado — **produto novo** (superficie de contrato nova); **planejada** (2026-09-01), **revisada no mesmo dia**. Recomendacao **P1** do [`DIAGNOSTICO-PRODUTO.md`](../../docs-sep/DIAGNOSTICO-PRODUTO.md): a taxonomia ja existe no dominio e e **descartada na fronteira HTTP** (`getCodigo()` tem zero consumidores em `src/main`). A revisao derrubou quatro numeros — a taxonomia e **~103 codigos em 12 prefixos**, nao 67 em 9; ha **12 codigos definidos duas vezes** com significados diferentes; as violacoes de formato sao **12**, nao 1; e as excecoes orfas de `DomainException` sao **3**, nao 1. Consome o numero 36 e provoca o **4o recuo** do backend da Fase 5. **Contradiz a Task 35.5**, que planeja remover `ContaBloqueadaException.CODIGO` como codigo morto | 7 |
+| 37 | [`037-sprint-37-normalizacao-taxonomia-erro.md`](./037-sprint-37-normalizacao-taxonomia-erro.md) | Normalizar a taxonomia: decidir **o que o prefixo significa** e **qual e a convencao de sufixo**, resolver as colisoes e re-prefixar `credores` — **correcao de divida**; **planejada** (2026-09-01). **Preve ADR**, ao contrario da 036: define convencao que vincula sprints futuras e atravessa os tres repos. Nao e sprint de rename — e sprint de decisao. Achados que a dimensionam: o prefixo **nao e identificador de modulo** (um modulo com dois prefixos, um prefixo em dois modulos, e nenhum registro em lugar nenhum); `credores` ocupa a faixa `CRD` com **35 codigos contra 10** do `credito`, que lhe da nome; das 12 colisoes, **2 nao sao colisao** (constante duplicada com mesmo significado, corrige por deduplicacao); e o `PIX` tem **28 sufixos semanticos contra 3 numericos**, entao e convencao paralela com dono, nao desvio. Consome o numero 37 e provoca o **5o recuo** do backend da Fase 5, para 38-41 | 8 |
+| 38 | [`038-sprint-38-modulo-notificacao-historico.md`](./038-sprint-38-modulo-notificacao-historico.md) | Modulo `notificacao` transversal, historico persistido (`V61`), canal `IN_APP` e **um** gatilho real (`PixTransferenciaConcluidaEvent` -> tomador) — **produto novo**; **planejada** (2026-09-01). **Preve ADR** (supersede parcial do 0014). Frente **A** do levantamento de notificacoes: medido, o `sep-api` tem **71 eventos de dominio e tres pontos de envio**, e os tres falam com o tomador em momento ruim (regua de cobranca, renegociacao, conta bloqueada) — o produto **so fala com o tomador para cobrar**. Ha **duas infra paralelas**: a completa presa dentro de `cobranca`, e a rasa (`shared.email.EmailService`, 1 consumidor) que e absorvida aqui. **Nao ha historico nem opt-out.** Consome o numero 38 e provoca o **6o recuo** do backend da Fase 5, para 39-42 | 8 |
 
 ## Web (`sep-app`)
 
@@ -49,6 +59,8 @@ As tabelas usam a ordem recomendada de execucao.
 | F-23 | [`123-fsprint-23-politica-lockout-web.md`](./123-fsprint-23-politica-lockout-web.md) | Consumir `GET /auth/politica-lockout` e o `Retry-After` — retomada da Task F-22.6 como sprint propria, **correcao de divida**; **MERGEADA develop+main** (PR #125/#126, 2026-08-05). Fecha o texto fixo de `/account-locked` e um caminho em que o token velho arrancava o usuario da pagina. **Esgota o recorte web da Fase 4**; smoke real contra `:8080` fica como gate declarado pendente | 7 |
 | F-24 | [`124-fsprint-24-divida-tecnica-web.md`](./124-fsprint-24-divida-tecnica-web.md) | Vetor do `errorInterceptor` na `/account-locked`, `/auth/totp/verify` com `Authorization` morto, `message: ""` apagando alerta, `NaNmin` no KPI do dashboard, descriptor e duplicacoes de teste — **correcao de divida**; **CONCLUIDA na branch** (2026-08-06), push e PR manuais pendentes. `contract:check` **1 lacuna -> 0** (primeira vez desde a F-19); Vitest 765/93 -> **802/94**; 36 mutacoes; helpers de teste **80 -> 2** definicoes | 7 |
 | F-25 | [`125-fsprint-25-aviso-cookies-privacidade-web.md`](./125-fsprint-25-aviso-cookies-privacidade-web.md) | Aviso de cookies dispensavel e pagina publica de politica de privacidade descrevendo o armazenamento que o web de fato usa — **produto novo**, primeira frente de produto no web desde que a Fase 4 esgotou o escopo sobre fake; **PLANEJADA** (2026-08-21). **Transparencia, nao consentimento**: o unico cookie (`sep-refresh`) e de autenticacao e nao ha rastreamento de terceiro, entao opt-in gatearia zero cookies. Texto entra marcado **PENDENTE revisao juridica** (precedente do `PLD.md`). Nao toca `sep-api` nem contrato: `contract:check` tem de fechar identico (85 operacoes / 0 lacunas) | 6 |
+| F-26 | [`126-fsprint-26-consumo-codigos-erro-web.md`](./126-fsprint-26-consumo-codigos-erro-web.md) | Consumir o `codigo` de erro publicado pela Sprint 36: helper `codigoDeErroDaApi()`, catalogo gateado no `contract:check` e discriminacao do `400` **colapsado** do `verify-totp` pelos codigos `MFA-400-002/003/004` — **produto novo**; **planejada** (2026-09-01). Lado web da recomendacao **P1**. **Depende da 036 em `develop`.** Os 3 literais duplicados que o `STATE.md` cita **ja foram fechados pela F-24** (viraram `copy-de-erro.ts`); o que sobrou e o **ramo**, nao a frase | 6 |
+| F-27 | [`127-fsprint-27-central-notificacao-web.md`](./127-fsprint-27-central-notificacao-web.md) | Primeira superficie de notificacao do `sep-app`: contador de nao-lidas no shell autenticado, lista paginada, marcar como lida e mock MSW fiel — **produto novo**; **planejada** (2026-09-01). Lado web da frente **A**. **Depende da 038 em `develop`**; independente da M-19 e da cadeia P1. **Sem polling e sem tempo real** por decisao: oferece `read your writes` no contador, nao `read others writes`. Nao provoca recuo (a Fase 5 nao tem sprint de web) | 6 |
 
 ## Mobile (`sep-mobile`)
 
@@ -59,6 +71,8 @@ As tabelas usam a ordem recomendada de execucao.
 | M-15 | [`215-msprint-15-biometria-nativa.md`](./215-msprint-15-biometria-nativa.md) | Biometria nativa (substitui stub PWA) + hardening | 6 |
 | M-16 | [`216-msprint-16-aporte-pix-avancado-mobile.md`](./216-msprint-16-aporte-pix-avancado-mobile.md) | Aporte/matching e chaves Pix na credora mobile — **concluida com escopo reduzido** (Gate M-16.0: so aportes owner-scoped; matching/aporte POST/chaves Pix adiados por exigirem `FINANCEIRO`) | 6 -> 3 |
 | M-17 | [`217-msprint-17-followups-lockout-a11y-mobile.md`](./217-msprint-17-followups-lockout-a11y-mobile.md) | Jornada de conta bloqueada alcancavel e testada, race de duplo toque em `consultarStatusPix` (2 componentes), landmark `main` duplicado dentro do `ion-content` e recuperacao do smoke `golden-path-mobile` — **correcao de divida**; **concluida** (PR #135 develop / #136 main, 2026-07-31; suite e2e a 41 verdes / 0 falhas, o smoke estava vermelho desde a M-4; Vitest 527/70) | 6 |
+| M-18 | [`218-msprint-18-consumo-codigos-erro-mobile.md`](./218-msprint-18-consumo-codigos-erro-mobile.md) | Criar o `core/api/api-error.ts` que o `sep-mobile` **nunca teve**, unificar os **9** casts inline de `as ApiErrorResponse` espalhados por 8 arquivos e trocar ramificacao por status por ramificacao por codigo — **produto novo**; **planejada** (2026-09-01). Lado mobile da recomendacao **P1**. **Depende da 036 em `develop`**; independente da F-26. Consome o numero M-18 e renumera o mobile da Fase 5 para **M-19/M-20** | 5 |
+| M-19 | [`219-msprint-19-central-notificacao-mobile.md`](./219-msprint-19-central-notificacao-mobile.md) | Central de notificacao no `sep-mobile`, com o contrato do `IN_APP` nascendo compativel com push **sem implementar push** — **produto novo**; **planejada** (2026-09-01). Lado mobile da frente **A**. **Depende da 038**; ordem preferida **apos a M-18**, que cria o `api-error.ts` (rodar antes faz o decimo cast inline). Nenhuma permissao de notificacao e solicitada — pedir antes de ter push queima a permissao uma vez so. Consome M-19 e provoca o **2o recuo** do mobile da Fase 5, para M-20/M-21 | 6 |
 
 ## Cross-repo (`sep-app` + `sep-mobile`)
 
@@ -114,6 +128,21 @@ As tabelas usam a ordem recomendada de execucao.
   - **Atencao na Sprint 35**: se a Task 35.7 mudar a forma dos enums no OpenAPI, ela **muda o
     snapshot que o `contract:check` do `sep-app` valida** e pode reabrir uma lacuna que a F-24 acabou
     de fechar. O Gate 35.0 mede isso antes de a task desenhar qualquer coisa.
+- **Cadeia P1 planejada em 2026-09-01 (36 -> F-26 / M-18)**: primeira frente aberta a partir do
+  [`DIAGNOSTICO-PRODUTO.md`](../../docs-sep/DIAGNOSTICO-PRODUTO.md). Publica no fio os 67 codigos de
+  erro que o dominio ja constroi e descarta na fronteira HTTP. **Nenhuma depende de API externa.**
+  - **36 depois da 35, obrigatoriamente**: as duas mexem em `ApiExceptionHandler.java`, e a 35
+    acrescenta o handler de `405`. A dependencia e de arquivo, nao de contrato.
+  - **Conflito a resolver antes de executar**: a **Task 35.5** planeja remover
+    `ContaBloqueadaException.CODIGO` como codigo morto; a **Task 36.4** lhe da consumidor. A 35.5 deve
+    manter apenas a metade do `countByIpAndJanela`. Se a 35 ja tiver removido, a 36.4 recria.
+  - **F-26 e M-18 exigem a 36 em `develop`** e sao independentes entre si — podem correr em paralelo.
+    E o mesmo par corretivo que a fase ja rodou tres vezes (33 -> F-21, 34 -> F-23, 31 -> M-16).
+  - **A F-26 exige tambem a F-25 em `develop`**, que na criacao destas specs seguia com push e PR
+    manuais pendentes.
+  - **Janela que fecha**: `CTR-422-CCB-001` e o unico dos 67 fora do padrao `MOD-STATUS-NNN`. Enquanto
+    nada consome, renomear e uma linha; depois de publicado vira mudanca de contrato. A Task 36.3
+    normaliza **antes** da exposicao por isso.
 - Gates externos (credenciais Celcoin, conta AWS, contas de loja) nao bloqueiam a implementacao
   destas sprints sobre fake; a ativacao real e a publicacao sao escopo da Fase 5
   ([`../../docs-sep/PRD-FASE-5.md`](../../docs-sep/PRD-FASE-5.md)).

@@ -11,20 +11,39 @@ O SEP hoje é forte em engenharia (DDD + hexagonal, mutation testing, `contract:
 2220 testes no backend, 833 no web) e fraco exatamente onde o livro foca: **o produto tem
 engenharia excelente a serviço de um usuário que nunca foi descrito**.
 
-Este documento registra o diagnóstico medido no código e as recomendações priorizadas. Não é plano
-de execução: nenhum recorte foi aberto como sprint.
+Este documento registra o diagnóstico medido no código e as recomendações priorizadas.
+
+_Atualizado em 2026-09-01: a **P1 foi aberta** como três sprints (uma por repo). As demais seguem sem
+recorte aberto. Ver §Encaminhamento._
 
 ---
 
 ## Diagnóstico — medido, não inferido
 
-### 1. 67 códigos de erro existem e nenhum chega ao cliente ⭐ maior alavancagem
+### 1. ~103 códigos de erro existem e nenhum chega ao cliente ⭐ maior alavancagem
 
-Medição:
+> **Correção de 2026-09-01**, na revisão das specs 036/126/218: este documento afirmava
+> **67 códigos em 9 prefixos**. O número estava errado — o `grep` filtrava por constantes
+> **chamadas** `CODIGO`, e o domínio tem ~30 constantes com outros nomes
+> (`CODIGO_HEADER_OBRIGATORIO`, `CODIGO_VALIDACAO`, `CODIGO_CPF_INVALIDO`...) carregando códigos do
+> mesmo formato. Medindo por formato: **~103 códigos em 12 prefixos** (entram `PIX`, `ASN`, `WHK`).
+> A conclusão da seção não muda — nenhum deles chega ao cliente. O que muda é o tamanho.
+> Lição registrada: **medir o fenômeno, não o nome que ele costuma ter.**
+>
+> A mesma revisão achou o que este documento não viu: **12 códigos definidos duas vezes com
+> significados diferentes** (`CRD-403-001` é `OwnershipProposta` E `OwnershipCredora`; 8 das 12
+> colisões vêm de `credores` reusando a faixa `CRD-*` de `credito`) e **12 violações de formato**
+> (não 1). Detalhe em [`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md) §Âncoras 6 e 7.
 
-- `grep -rh 'CODIGO = "'` no `sep-api` → **67 códigos**, 9 prefixos de módulo
-  (`CRD` 28, `CTR` 8, `COB` 8, `ONB` 5, `MFA` 5, `BOF` 5, `USR` 3, `AUTH` 3, `GOV` 2).
-  Ex.: `BOF-404-001`, `COB-409-002`, `CRD-...`.
+Medição (corrigida):
+
+```bash
+grep -rhoE '"[A-Z]{3,4}-[0-9]{3}-[A-Z0-9-]*[0-9]{3}"' sep-api/src/main/java --include=*.java | sort -u | wc -l
+```
+
+- **~103 códigos**, 12 prefixos (`CRD` 35, `ONB` 21, `CTR` 10, `COB` 8, `USR` 6, `MFA` 5, `BOF` 5,
+  `PIX` 3, `AUTH` 3, `ASN` 3, `WHK` 2, `GOV` 2). Ex.: `BOF-404-001`, `COB-409-002`.
+- O número é piso, não teto: a própria regex acima não captura `PIX-400-IDEMPOTENCY-KEY`.
 - `ErrorResponseDto` (`shared/exception/ErrorResponseDto.java`) tem
   `timestamp, status, error, message, path, traceId` — **nenhum campo de código**.
 - `ApiExceptionHandler.build()` (`:246-249`) é o **único** ponto que monta corpo de erro, e chama
@@ -137,18 +156,30 @@ Registrar isso importa tanto quanto o resto — o livro alerta contra o *streetl
 Ordenadas por (valor ao usuário ÷ custo), não por gravidade. Nenhuma exige API externa — todas são
 executáveis hoje, ao lado da Sprint 35 já planejada.
 
-### P1 — Publicar os 67 códigos de erro no fio
+### P1 — Publicar os códigos de erro no fio
 
 **Por quê primeiro**: é a única recomendação que fecha *seis* itens já abertos no `STATE.md` com uma
-mudança só, e o trabalho de taxonomia **já está feito** — os códigos existem, só não saem.
+mudança só.
+
+> **Correção de 2026-09-01**: esta seção dizia que "o trabalho de taxonomia **já está feito** — os
+> códigos existem, só não saem". A revisão das specs derrubou essa premissa: existem, mas com 12
+> colisões de significado e 12 violações de formato. Publicar como está tornaria os dois defeitos
+> contrato permanente. A Spec 036 passou a publicar **só o subconjunto apto** (sem colisão, formato
+> canônico, alcançável em runtime), com o resto explicitamente fora e listado com motivo — um
+> perímetro, no sentido do cap. 8 do livro: afrouxar depois é barato, renomear código publicado não é.
 
 Recorte:
 1. `codigo` em `ErrorResponseDto` (opcional, `@JsonInclude(NON_NULL)` já cobre o legado).
 2. `ApiExceptionHandler.build()` passa a receber e propagar `DomainException.getCodigo()`. É **um**
-   ponto de montagem (`:246-249`) — a mudança é local.
-3. Catálogo dos 67 códigos publicado no OpenAPI e versionado, virando gate do `contract:check`.
+   ponto de montagem (`:246-249`) — a mudança é local. **Ressalva**: três exceções com código não
+   herdam de `DomainException` (`AUTH-423-001`, `BOF-429-001`, `BOF-400-002`) e precisam de caminho
+   próprio; duas delas nem getter têm.
+3. Catálogo do **subconjunto apto** publicado no OpenAPI e versionado, virando gate do
+   `contract:check` — mais a lista do que ficou de fora, que dimensiona a sprint de normalização.
 4. Front troca ramificação por status por ramificação por código, começando pelos 3 literais
-   duplicados entre `login` e `verify-totp`.
+   duplicados entre `login` e `verify-totp`. **Ressalva**: medido em 2026-09-01, esses 3 literais
+   **já foram fechados pela F-24** (`features/public/login/copy-de-erro.ts`); o que sobrou é o ramo,
+   não a frase — que é o caso que a `126` ataca.
 
 **Não** fazer de uma vez os 78 pontos de ramificação. O `STATE.md` já avisa que varrer o resto exige
 antes decidir a regra para handlers compartilhados entre operações — decisão própria.
@@ -214,6 +245,71 @@ sem valor. "Propostas criadas" sobe sem ninguém pegar dinheiro emprestado.
 **Bloqueio a tratar antes de coletar**: evento de comportamento é dado pessoal sob LGPD. A política
 publicada já entrou marcada como pendente de revisão jurídica; essa revisão passa a ter um item a
 mais. Não coletar antes disso.
+
+---
+
+## Encaminhamento (2026-09-01)
+
+### P1 — aberta como três sprints, uma por repo
+
+| Spec | Sprint | Repo | Papel na cadeia |
+|---|---|---|---|
+| [`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md) | Sprint 36 | `sep-api` | Publica: `codigo` no `ErrorResponseDto`, propagação no `build()`, catálogo do subconjunto apto no OpenAPI + lista do excluído |
+| [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md) | F-Sprint 26 | `sep-app` | Consome: helper, gate no `contract:check`, `400` colapsado do `verify-totp` |
+| [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md) | M-Sprint 18 | `sep-mobile` | Consome: cria o `api-error.ts` inexistente, unifica 9 casts, ramifica por código |
+
+| [`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md) | Sprint 37 | `sep-api` | Normaliza o que ficou fora do perímetro: decide o significado do prefixo e a convenção de sufixo (**com ADR**), resolve colisões, re-prefixa `credores` |
+
+Ordem: `35 → 36 → {F-26, M-18}`, com a `37` em paralelo às duas de consumo ou logo após. As duas de
+consumo são independentes entre si.
+
+A `37` vem **depois** da `36` de propósito: o perímetro garante que código não publicado continua
+renomeável de graça, então adiar a normalização não custa nada — e assim a P1 entrega valor ao web e
+ao mobile sem esperar um ADR de convenção.
+
+**Cinco correções que a verificação de código impôs ao diagnóstico**, todas incorporadas nas specs:
+
+1. **`build()` cobre 16 handlers, não só o caminho de domínio** — inclusive o `handleLocked` do `423`,
+   que chama `build` e só depois acrescenta o `Retry-After`. A mudança é ainda mais local do que este
+   documento estimava.
+2. **Três exceções com código não são `DomainException`** — `ContaBloqueadaException`
+   (`AUTH-423-001`), `LimiteReprocessoExcedidoException` (`BOF-429-001`) e
+   `TipoReprocessoNaoSuportadoException` (`BOF-400-002`) estendem `RuntimeException` direto, e as
+   duas últimas **nem getter têm**. Nenhuma entra no `switch` selado.
+   *(Corrigido em 2026-09-01 — a primeira redação dizia que o `423` era o único.)*
+3. **Doze códigos quebram o padrão**, não um: `CTR-422-CCB-001` mais onze `PIX-*` com sufixo
+   semântico em vez de sequencial (`PIX-404-RECEBIMENTO`, `PIX-409-IDEMPOTENCIA`...). E **doze
+   códigos estão definidos duas vezes com significados diferentes** — `credores` reusou a faixa
+   `CRD-*` de `credito` em 8 dos 12 casos.
+   Como nada consome, corrigir é grátis **agora**; depois de publicado vira mudança de contrato. Isso
+   deixou de definir só a ordem interna da Sprint 36 e passou a definir o **escopo** dela: publicar
+   o subconjunto apto, com perímetro sobre o resto.
+   *(Corrigido em 2026-09-01 — a primeira redação media só uma violação e nenhuma colisão.)*
+4. **Os 3 literais duplicados entre `login` e `verify-totp` já foram fechados pela F-24** — viraram
+   `copy-de-erro.ts`. O que sobrou é o **ramo**, não a frase, e o próprio docblock desse arquivo
+   nomeia o alvo certo: o `400` do `verify-totp`, que colapsa três causas (`MFA-400-002`, `-003`,
+   `-004`) discrimináveis só pelo texto.
+5. **O mobile tem 9 casts inline, não 6** — em 8 arquivos, com duas assinaturas de tipo distintas
+   convivendo.
+
+**Conflito registrado**: a Task 35.5 da Sprint 35 planeja remover `ContaBloqueadaException.CODIGO`
+como código morto, e a Task 36.4 lhe dá consumidor. A 35.5 deve manter apenas a metade do
+`countByIpAndJanela`.
+
+**Custo de numeração**: a cadeia provoca o 4º **e o 5º** recuo do backend da Fase 5
+(36-39 → 37-40 pela Sprint 36 → **38-41** pela Sprint 37) e o 1º do mobile
+(M-18/M-19 → M-19/M-20), pelo mecanismo que o [`PRD-FASE-5.md`](./PRD-FASE-5.md) §46 já documenta.
+
+### P2 a P6 — sem recorte aberto
+
+- **P2 (personas)** e **P5 (guias de uso)**: entregável **pré-requisito** em `docs-sep/`, fora do
+  ciclo de sprint — não produzem código, e `docs-SEP` não tem branch, CI nem gate. P2 é pré-requisito
+  de P3 (define quais jornadas escrever) e de P4 (define o vocabulário).
+- **P3 (cenário por persona)**: bloqueada por P2.
+- **P4 (mensagens na ontologia do usuário)**: depende de P1 **e** P2. Inclui as 5 categorias do cap. 3,
+  que mudam a semântica dos códigos — a P1 só publica os que existem.
+- **P6 (telemetria própria)**: bloqueada pela revisão jurídica da política de privacidade publicada na
+  F-25, que já entrou marcada como pendente. Evento de comportamento é dado pessoal sob LGPD.
 
 ---
 
