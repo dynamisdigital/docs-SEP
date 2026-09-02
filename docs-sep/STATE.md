@@ -10,21 +10,32 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-01 (sessao de planejamento; nenhuma sprint fechada, nenhum codigo de app
-tocado)._
+_Atualizado em: 2026-09-02 (varredura de sincronizacao com os tres remotos; nenhuma sprint fechada,
+nenhum codigo de app tocado)._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). A Fase 5 segue **inteiramente gated** por
   acesso externo (Celcoin, AWS, contas de loja).
+- **Mudou em 2026-09-02**: a varredura dos tres remotos desmentiu registros deste arquivo e achou
+  **dois gates de CI vermelhos** que ninguem estava vendo. (a) A **F-Sprint 25 esta mergeada** desde
+  2026-08-21 (PR #136 e #137) — o registro de "push e PR ainda nao feitos" estava defasado por 12
+  dias, terceiro caso seguido do mesmo padrao (a F-24 ficou 15 dias defasada, a D-1 tambem). (b) O
+  `origin/develop` do `sep-app` **nao esta intacto**: tem **tres commits de 2026-08-26 sem PR**, de
+  outro autor, com mensagens que **nao descrevem o diff**, e um deles **reprova o `format:check`** —
+  gate que o `ci.yml:52` roda. (c) O `origin/develop` do `sep-mobile` esta **atras** do `main` e o
+  `npm audit` ali mede **6 high**, com o gate `--audit-level=high` **vermelho**. Detalhe em §Onde
+  estamos; acao em §Proximo passo item 1.
 - **Mudou em 2026-09-01**: o registro anterior dizia que "as frentes de produto da Fase 4 estao
   executadas". Isso continuava verdade **sobre o escopo planejado**, e deixou de ser a leitura util:
   o [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md) abriu **seis lacunas de produto medidas no
   codigo**, e duas delas viraram **sete specs novas**. Havia mais escopo executavel sem gate externo
   do que o documento registrava.
 - **Spec/step ativo**: a fila cresceu. Ordem recomendada:
-  1. **F-Sprint 25** — **CONCLUIDA na branch** `feature/fsprint-25-aviso-cookies` (2026-08-21, 7
-     commits); **push e PR sao manuais e ainda nao foram feitos**.
+  1. ~~**F-Sprint 25** — aviso de cookies e politica de privacidade.~~ **MERGEADA develop+main em
+     2026-08-21**: `develop` via PR **#136** (squash `b7cd3da`) e `main` via PR **#137** (`3cd6cb9`).
+     Conferido na varredura de 2026-09-02. **Antes da proxima sprint web, regularizar o `develop`** —
+     ver §Proximo passo item 1.
   2. **Sprint 35** — divida de config/lockout/contrato. Spec
      [`035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md), steps
      [`035`](../steps-fase-4/backend/035-sprint-35-steps.md). **E a proxima a executar**, e **comece
@@ -66,6 +77,63 @@ tocado)._
 
 ## Onde estamos
 
+- **Varredura de sincronizacao com os tres remotos em 2026-09-02** — **nenhuma sprint fechada,
+  nenhum codigo de app tocado**; so `git fetch` (read-only) e medicao local. Objetivo: por o
+  `STATE.md` de acordo com o que esta **na nuvem**, e nao com o que a ultima sessao registrou.
+  **Limitacao declarada**: o `gh` **nao esta autenticado** (`HTTP 401`), entao PRs abertos e status
+  real de CI **nao foram observados** — tudo abaixo vem de `git fetch` + gate rodado localmente.
+
+  **`sep-api` — limpo na nuvem, podre no checkout local.** `origin/develop` (`fd4b4b1`) e
+  `origin/main` (`550fed3`) sao **identicos por conteudo** (diff vazio), ambos de 2026-08-03; nenhum
+  commit novo, nenhuma branch do Dependabot. O remoto bate com o registro. **O checkout local nao**:
+  esta em `main` no commit `1f111e2` (**2026-07-08**, PR #92), **seis PRs / 216 arquivos / 14.579
+  linhas atras** de `origin/main`, e com **34 arquivos aparecendo como untracked** — todos
+  **byte-identicos** aos de `origin/main`, sobra de checkout, nenhum conteudo proprio a perder.
+  **Consequencia direta para o Gate 35.0**: qualquer medicao do backend feita hoje neste checkout
+  mede uma arvore de quase dois meses atras. **Sincronizar o local antes de abrir a Sprint 35.**
+
+  **`sep-app` — `develop` divergente e com gate vermelho.** A **F-25 esta mergeada** (PR #136
+  `b7cd3da` em `develop`, PR #137 `3cd6cb9` em `main`, ambos 2026-08-21). O PR **#132** (`39fe576`,
+  2026-08-10) entrou em `main` com **diff de conteudo vazio** — nao-op. Mas `origin/develop` tem
+  **tres commits que `main` nao tem**, de 2026-08-26, autor `Daniel Mollmann`, **push direto sem PR**:
+  `bf33e45`, `63248af` e `64b7b73`. **As mensagens nao descrevem o diff** — `test(logs): add
+  automated verification and integration suite` mexe **so** em `.gitignore` e no campo `version`;
+  `feat(shared): add new core features and logic` mexe **so** no `version`. O conteudo real dos tres
+  e: `.gitignore` **+37 linhas** de um bloco "Dynamis Control Center" com padroes **de projeto Python**
+  (`__pycache__`, `.venv`, `*.egg-info`, `*.spec` de PyInstaller) num repo Angular; `version`
+  `0.0.0 -> 0.1.2` em tres saltos; e **reformatacao de 6 union types** em
+  `src/app/core/api/api.models.ts`.
+  **Medido, nao suposto**: o `contract:check` fica **verde nas duas versoes** (85 operacoes, 0
+  lacunas) — a mudanca do `api.models.ts` e semanticamente inerte. O **`format:check` nao**: verde no
+  conteudo de `main`, **vermelho no de `develop`**, com `api.models.ts` como unico arquivo apontado.
+  Como o `ci.yml:52` roda `npm run format:check`, **o CI-APP esta reprovando em `develop` desde
+  2026-08-26**. O `.gitignore` novo tambem passaria a ignorar tres arquivos **hoje versionados**
+  (`.vscode/extensions.json`, `launch.json`, `tasks.json`), por causa do `**/.vscode/`.
+  O `npm audit` do `sep-app` segue **0 vulnerabilidades** e o gate verde — a correcao do Gate F-25.0
+  se manteve. Ha **4 branches do Dependabot** abertas (tres de 2026-08-25).
+
+  **`sep-mobile` — `develop` atras do `main`, e o audit subiu.** `origin/develop` (`280857e`) esta
+  **quatro commits atras** de `origin/main` (`deb5b72`), os dois de 2026-08-05: o `main` recebeu dois
+  PRs do Dependabot direto (**#147** angular group, **#141** `gradle/actions`) que **nunca voltaram**.
+  A divergencia e material, nao cosmetica: `main` tem `@angular/{forms,platform-browser,router,
+  compiler-cli,language-service}` em **`^20.3.27`** e `develop` ainda em **`^20.3.26`** — a mesma
+  correcao que a D-Sprint 1 aplicou. **Uma branch cortada de `develop` hoje nasce sem o patch**, e o
+  back-merge `main -> develop` esta pendente pela **segunda vez** (a D-1 ja teve de resolver um em
+  2026-08-05).
+  **`npm audit` medido em `develop`**: **10 vulnerabilidades — 1 low, 3 moderate, 6 high, 0
+  critical** — e o gate `--audit-level=high` **sai diferente de zero, ou seja, vermelho**. Os seis
+  `high` sao `@angular-devkit/build-angular`, `browserslist`, `image-size`, `js-yaml`, `less` e
+  `nanoid`. Isso **derruba dois registros**: o residual da D-1 anotado como "8 moderate, **0 high**",
+  e a estimativa de 2026-09-01 de "8 vulnerabilidades (3 moderate, 5 high)". Ha **10 branches do
+  Dependabot** abertas, a mais nova de **2026-09-02**, e algumas (js-yaml 4.3.1, angular group) atacam
+  exatamente esses `high`.
+
+  **O padrao, que ja e o terceiro**: em 2026-08-06 a F-24 estava mergeada e o documento dizia que nao;
+  em 2026-08-21 a D-1 estava na mesma situacao; agora a F-25. **Nas tres vezes o documento errou na
+  mesma direcao** — declarando pendente o que ja estava feito — enquanto errava na direcao oposta
+  sobre o que estava quebrado (gate vermelho dado como verde). O registro de 2026-09-01 de que "os
+  tres repos de codigo estao intactos" tambem cai: o `sep-app` ja tinha os tres commits ha cinco dias.
+
 - **Sessao de planejamento e diagnostico em 2026-09-01** — **nenhuma sprint fechada, nenhum codigo de
   app tocado**. Saiu do `docs-SEP` e do ambiente local; os tres repos de codigo estao intactos.
   **Entregas**: (a) [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md), leitura do SEP sob
@@ -91,11 +159,17 @@ tocado)._
   (3 moderate, 5 high)**; o `STATE.md` registra o residual da D-1 como **8 moderate, 0 high**. Subiu,
   e o gate `--audit-level=high` do CI provavelmente esta **vermelho em `develop`** — mesmo cenario
   que o Gate F-25.0 encontrou no `sep-app`. **Medir antes da Sprint 35.**
+  **MEDIDO em 2026-09-02, em `develop`**: sao **10 — 1 low, 3 moderate, 6 high, 0 critical** —, e o
+  gate **esta vermelho** (exit != 0), confirmado. **Os dois numeros anteriores estavam errados**, o
+  desta sessao inclusive. Ver o bloco da varredura no topo desta secao.
 
-- **F-Sprint 25 (web) CONCLUIDA na branch em 2026-08-21** — aviso de cookies e politica de
-  privacidade; **push e PR sao manuais e ainda NAO foram feitos**. 7 commits em
-  `feature/fsprint-25-aviso-cookies`, a partir de `develop` `b821496` (com a F-24 dentro;
-  `develop == main` por diff de conteudo). **Produto novo**: primeira frente de produto no web desde
+- **F-Sprint 25 (web) MERGEADA develop+main em 2026-08-21** — aviso de cookies e politica de
+  privacidade. Em `origin/develop` via PR **#136** (squash `b7cd3da`, 7 commits absorvidos) e
+  promovida a `main` via PR **#137** (`3cd6cb9`), a partir de `develop` `b821496` (com a F-24 dentro).
+  O merge foi conferido **por conteudo** na varredura de 2026-09-02 (19 arquivos, +1.004 linhas, de
+  `39fe576` para `3cd6cb9`). **Este registro dizia "push e PR ainda NAO foram feitos" e estava
+  defasado por 12 dias.** `develop` **nao** e igual a `main` hoje, mas por outro motivo — os tres
+  commits de 2026-08-26; ver o bloco da varredura acima. **Produto novo**: primeira frente de produto no web desde
   que a Fase 4 esgotou o escopo sobre fake. Nada mudou em `sep-api`/`sep-mobile`, e **nenhum contrato
   foi consumido** — `contract:check` fecha identico a abertura (85 operacoes / 0 lacunas), o que aqui
   e criterio, nao observacao.
@@ -497,16 +571,29 @@ tocado)._
 
 ## Proximo passo
 
-1. **Push e PR da F-Sprint 25** (manuais, dev humano). A branch `feature/fsprint-25-aviso-cookies`
-   esta pronta com 7 commits e todos os gates verdes; descricao em
-   [`SPRINT-F-25-PR.md`](../repos/sep-app/SPRINT-F-25-PR.md). Fluxo padrao:
-   `feature -> develop` (squash) e depois `develop -> main`.
-   As descricoes da **F-24** e da **D-1** ja foram removidas em 2026-08-21 — as duas sprints estao em
-   `develop`+`main` e as descricoes haviam sobrevivido ao ciclo padrao. O conteudo delas segue em
-   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) e no [`PRD-FASE-4.md`](./PRD-FASE-4.md) §36, que
-   **tambem ganhou a linha da F-24** — ela nunca havia sido registrada la.
-   **Depois do merge, revisar juridicamente o texto da politica** — ela entrou marcada como pendente,
-   com base legal, direitos do titular e contato do encarregado nomeados e nao preenchidos.
+1. **Regularizar as tres pontas antes de abrir qualquer sprint** (varredura de 2026-09-02). A
+   F-Sprint 25 **ja esta mergeada** (#136/#137) e este item deixou de ser "push e PR"; virou limpeza
+   do que a varredura achou. Ordem sugerida, do mais barato ao mais caro:
+   1. **`sep-api`: sincronizar o checkout local.** Esta em `main` de **2026-07-08**, seis PRs atras.
+      Os 34 untracked sao byte-identicos a `origin/main`, entao nada se perde ao alinhar. **Sem isso,
+      o Gate 35.0 mede a arvore errada.**
+   2. **`sep-mobile`: back-merge `main -> develop`.** O `develop` esta sem o patch
+      `@angular/* 20.3.27` que ja esta em `main`, e o `npm audit` em `develop` da **6 high** com o
+      gate **vermelho**. Depois do back-merge, **re-medir** — parte dos `high` cai com as branches do
+      Dependabot ja abertas (`js-yaml`, angular group).
+   3. **`sep-app`: decidir o que fazer com os tres commits de 2026-08-26** (`bf33e45`, `63248af`,
+      `64b7b73`), que entraram em `develop` **sem PR**, com mensagens que nao descrevem o diff, e
+      **deixaram o `format:check` vermelho**. O minimo para destravar o CI e rodar `npm run format`
+      no `api.models.ts` e commitar. **Decisao de quem manda no repo**, nao do agente: reverter,
+      normalizar por cima, ou aceitar e regularizar a mensagem. Vale conferir com o autor se o bloco
+      de `.gitignore` de projeto **Python** foi mesmo intencional neste repo.
+   **Independente disso**: **revisar juridicamente o texto da politica de privacidade** — ela entrou
+   em producao marcada como pendente, com base legal, direitos do titular e contato do encarregado
+   nomeados e nao preenchidos.
+   As descricoes da **F-24** e da **D-1** ja foram removidas em 2026-08-21; o conteudo delas segue em
+   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) e no [`PRD-FASE-4.md`](./PRD-FASE-4.md) §36. A
+   [`SPRINT-F-25-PR.md`](../repos/sep-app/SPRINT-F-25-PR.md) **segue no repo** e ja pode sair no ciclo
+   padrao, ao abrir a proxima sprint web.
 
 2. **Sprint 35** (`sep-api`): allowlist de proxy (hoje a origem do rate limit e escolhida pelo
    cliente), validacao de `LockoutProperties` no boot, `405` faltante, e codigo/config morto.
@@ -515,8 +602,9 @@ tocado)._
    **O registro anterior a chamava de "a unica sprint de divida restante e a unica frente executavel
    sem API externa". Isso caiu**: o diagnostico de 2026-09-01 abriu sete specs, todas executaveis sem
    gate externo. A 35 continua sendo a **proxima**, nao a ultima.
-   **Ainda antes dela**: medir o `npm audit` do `sep-mobile` em `develop` (§Onde estamos — 5 `high`
-   onde o registro diz 0).
+   **Ja medido em 2026-09-02** (era "ainda antes dela"): o `npm audit` do `sep-mobile` em `develop`
+   da **6 `high`** (10 no total) e o gate **esta vermelho**. O que resta e o item 1 acima, nao a
+   medicao.
    **Entrada nova para a 35**: o `@ApiResponses` de `BackofficeReprocessoController.java:56-61` nao
    publica o `400` do endpoint de webhook, alcancavel por `@PathVariable UUID` malformado — a F-24.5
    nao pode declarar o status por causa disso. Ver §Follow-ups.

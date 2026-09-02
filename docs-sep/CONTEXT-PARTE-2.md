@@ -2003,15 +2003,17 @@ desmentida pela medicao. A descricao de PR temporaria foi removida no ciclo padr
 F-25; o registro da sprint no [`PRD-FASE-4.md`](./PRD-FASE-4.md) §36 foi criado na mesma data,
 porque a tabela nunca havia recebido a linha da F-24.
 
-## F-Sprint 25 (web) — Aviso de cookies e politica de privacidade — CONCLUIDA na branch (2026-08-21)
+## F-Sprint 25 (web) — Aviso de cookies e politica de privacidade — MERGEADA develop+main (2026-08-21)
 
 **Produto novo** — primeira frente de produto no web desde que a Fase 4 esgotou o escopo sobre fake.
 O `sep-app` gravava dados no navegador do usuario desde a Sprint 5 e **nunca disse isso a ele**: nao
 havia aviso, pagina de politica, termos, nem mencao a tratamento de dados fora do rodape regulatorio
 da landing. Spec [`125`](../specs/fase-4/125-fsprint-25-aviso-cookies-privacidade-web.md) + steps
 [`125`](../steps-fase-4/web/125-fsprint-25-steps.md). Sem ADR. 7 commits em
-`feature/fsprint-25-aviso-cookies`; **push e PR manuais, ainda nao feitos**. Nada mudou em
-`sep-api`/`sep-mobile`.
+`feature/fsprint-25-aviso-cookies`, mergeados em `develop` via PR **#136** (squash `b7cd3da`) e
+promovidos a `main` via PR **#137** (`3cd6cb9`), ambos em 2026-08-21 — **conferido por conteudo na
+varredura de 2026-09-02**, porque o registro original ficou 12 dias dizendo "push e PR manuais, ainda
+nao feitos". Nada mudou em `sep-api`/`sep-mobile`.
 
 **Numeros**: Vitest **802/94 -> 833/97**; Playwright **39/11 -> 42/12**; `contract:check` **85
 operacoes / 0 lacunas, inalterado** (criterio, nao observacao: a sprint nao consome contrato nenhum);
@@ -2080,3 +2082,120 @@ enquanto os defaults deste ambiente sao `false`/`Lax`.
 `localStorage`**, legivel por qualquer script na origem. Escrever a politica honestamente torna a
 exposicao publica. Corrigir muda o contrato de autenticacao dos tres repos e **exige ADR** — a
 politica descreve o que existe, e nao promete o que nao existe.
+
+## Varredura de sincronizacao com os tres remotos (2026-09-02)
+
+**Nenhuma sprint fechada, nenhum codigo de app tocado.** So `git fetch` (read-only) nos tres repos e
+gates rodados localmente para medir. O objetivo era por o [`STATE.md`](./STATE.md) de acordo com o que
+esta **na nuvem**, e nao com o que a ultima sessao registrou. **Limitacao declarada**: o `gh` **nao
+esta autenticado** (`HTTP 401`), entao **PRs abertos e status real de CI nao foram observados** — o
+que segue vem de `git fetch` mais medicao local, e nao da API do GitHub.
+
+**O que motivou a varredura**: o padrao ja tinha se repetido duas vezes. Em 2026-08-06 a F-Sprint 24
+estava mergeada e o documento dizia que nao; em 2026-08-21 o mesmo valia para a D-Sprint 1. A terceira
+ocorrencia estava no proprio §Proximo passo, item 1.
+
+### `sep-api` — remoto fiel ao registro, checkout local nao
+
+`origin/develop` (`fd4b4b1`) e `origin/main` (`550fed3`) sao **identicos por conteudo** — diff vazio —,
+ambos parados em 2026-08-03, sem commit novo e sem nenhuma branch do Dependabot. O remoto **bate com o
+registro**, unico dos tres.
+
+O checkout local **nao**: esta em `main` no commit `1f111e2`, de **2026-07-08** (PR #92), **seis PRs /
+216 arquivos / 14.579 linhas atras** de `origin/main`. Os **34 arquivos** que aparecem como untracked
+(`AporteEscrowAdapter.java`, `PoliticaLockoutTest.java`, os mappings WireMock de escrow/onboarding/pix/
+assinatura, entre outros) foram conferidos um a um: **todos byte-identicos** aos de `origin/main`. Sao
+sobra de checkout, sem conteudo proprio a preservar.
+
+Consequencia direta: **qualquer medicao do backend feita hoje neste checkout mede uma arvore de quase
+dois meses atras**. Como a Sprint 35 abre pelo Gate 35.0, e como nas tres sprints de divida anteriores
+o Gate derrubou numero ou premissa da spec sem excecao, sincronizar o local **antes** de abrir a 35 e
+pre-requisito, nao higiene.
+
+### `sep-app` — F-25 mergeada; `develop` divergente e com gate vermelho
+
+**A F-Sprint 25 esta mergeada desde 2026-08-21**: `develop` via PR **#136** (squash `b7cd3da`) e `main`
+via PR **#137** (`3cd6cb9`). O merge foi conferido por conteudo — de `39fe576` para `3cd6cb9` sao 19
+arquivos e +1.004 linhas, com o `aviso-cookies.component`, o `aviso-cookies.service`, a
+`politica-privacidade-page` e o `e2e/aviso-cookies.spec.ts` todos presentes. O registro de "push e PR
+ainda NAO foram feitos" estava **defasado por 12 dias**.
+
+Conferido de passagem: o PR **#132** (`39fe576`, 2026-08-10) entrou em `main` com **diff de conteudo
+vazio** contra o #131. E um no-op; o corpo do commit lista o historico inteiro do repo, o que engana
+quem le so a mensagem.
+
+**O achado novo**: `origin/develop` tem **tres commits que `main` nao tem**, todos de **2026-08-26**,
+autor `Daniel Mollmann`, **push direto sem PR** — fora do fluxo `feature -> develop -> main` que o
+[`AGENT.md`](../AGENT.md) fixa.
+
+| Commit | Mensagem | Diff real |
+|---|---|---|
+| `bf33e45` | `test(logs): add automated verification and integration suite` | `.gitignore` (+37) e `version` `0.0.0 -> 0.0.2` |
+| `63248af` | `feat(shared): add new core features and logic` | `version` `0.0.2 -> 0.1.0` |
+| `64b7b73` | `chore(api): update project dependencies and manifest settings` | `version` `0.1.0 -> 0.1.2` e `api.models.ts` (41 linhas) |
+
+**Nenhuma das tres mensagens descreve o proprio diff.** Duas anunciam suite de teste e "core features"
+e mexem so em `.gitignore` e no campo `version`; a terceira anuncia dependencias e mexe num arquivo de
+**contrato**. As +37 linhas de `.gitignore` sao um bloco rotulado "Dynamis Control Center managed
+ignores" com padroes **de projeto Python** — `__pycache__`, `.venv`, `*.egg-info`, `*.spec` de
+PyInstaller, `**/evidences/` — num repositorio Angular. Nao ha commit de `docs-SEP`, spec ou step que
+os explique.
+
+**O que foi medido, e nao suposto:**
+
+- **`contract:check` verde nas duas versoes** — 85 operacoes, 0 lacunas. A mudanca do `api.models.ts` e
+  reformatacao de 6 union types para o estilo multi-linha com pipe a esquerda (`TipoDocumento`,
+  `StatusEnvelope`, `TipoChamadaProvider`, `StatusPixTransferencia`,
+  `StatusPixReferenciaRecebimento`, `StatusPixRecebimento`). Semanticamente inerte.
+- **`format:check` verde no conteudo de `main` e VERMELHO no de `develop`**, com `api.models.ts` como
+  **unico** arquivo apontado. Medido in-place no repo, com o `.prettierrc` do projeto (`printWidth:
+  100`) e o Prettier 3.9.6 instalado — a primeira tentativa, com os arquivos em `/tmp`, deu falso
+  positivo nos dois lados porque o Prettier resolve configuracao pelo caminho do arquivo. Como o
+  `ci.yml:52` roda `npm run format:check`, **o CI-APP reprova em `develop` desde 2026-08-26**.
+- O `.gitignore` novo passaria a ignorar **tres arquivos hoje versionados** — `.vscode/extensions.json`,
+  `.vscode/launch.json` e `.vscode/tasks.json` —, por causa do `**/.vscode/`. Arquivo ja versionado nao
+  e desversionado por `.gitignore`, entao o efeito pratico e sobre o que vier depois.
+- **`npm audit` do `sep-app`: 0 vulnerabilidades**, gate verde. A correcao do `nanoid` feita no Gate
+  F-25.0 se manteve.
+
+Ha **4 branches do Dependabot** abertas, tres delas de 2026-08-25.
+
+### `sep-mobile` — `develop` atras do `main`, e o audit subiu
+
+`origin/develop` (`280857e`) esta **quatro commits atras** de `origin/main` (`deb5b72`), os dois de
+2026-08-05. O `main` recebeu dois PRs do Dependabot direto — **#147** (angular group) e **#141**
+(`gradle/actions`) — que **nunca voltaram** para `develop`.
+
+A divergencia e **material, nao cosmetica**: `main` tem `@angular/forms`, `@angular/platform-browser`,
+`@angular/router`, `@angular/compiler-cli` e `@angular/language-service` em **`^20.3.27`**, e `develop`
+segue em **`^20.3.26`** — exatamente o patch que a D-Sprint 1 aplicou para zerar os `high`. **Uma
+branch cortada de `develop` hoje nasce sem ele.** O `ci.yml` tambem diverge
+(`gradle/actions/setup-gradle@v6` em `develop` contra `@v6.2.0` em `main`).
+
+**`npm audit` medido em `develop`**: **10 vulnerabilidades — 1 low, 3 moderate, 6 `high`, 0 critical**,
+e o gate `--audit-level=high` **sai com exit diferente de zero: vermelho**. Os seis `high` sao
+`@angular-devkit/build-angular`, `browserslist`, `image-size`, `js-yaml`, `less` e `nanoid`.
+
+Isso **derruba dois numeros de uma vez**: o residual da D-Sprint 1, anotado como "8 moderate, **0
+high**", e a estimativa da sessao de 2026-09-01, de "8 vulnerabilidades (3 moderate, 5 high)". Ha **10
+branches do Dependabot** abertas, a mais nova de **2026-09-02**, e pelo menos duas (`js-yaml@4.3.1` e o
+angular group) atacam esses `high` diretamente.
+
+O back-merge `main -> develop` esta pendente pela **segunda vez** — a D-Sprint 1 ja precisou resolver um
+em 2026-08-05, como pre-requisito dela propria.
+
+### O que a varredura ensina
+
+**O documento erra nas duas direcoes, e nao aleatoriamente.** Sobre trabalho concluido ele erra dizendo
+**pendente** — F-24, D-1 e agora F-25, tres vezes seguidas. Sobre saude de gate ele erra dizendo
+**verde** — o `npm audit` do `sep-app` ficou vermelho 18 dias sem ninguem ver na F-19, o do `sep-mobile`
+esta vermelho agora, e o `format:check` do `sep-app` esta vermelho ha uma semana. As duas direcoes tem
+a mesma causa: **o registro e escrito no fim da sprint e nunca mais confrontado com o remoto**.
+
+O corolario pratico e barato: **`git fetch` nos tres repos e os gates rodados localmente sao a primeira
+coisa a fazer numa sessao, nao a ultima**. A varredura inteira custou menos que qualquer Gate de sprint
+e desmentiu quatro afirmacoes.
+
+Alem disso, o registro de 2026-09-01 de que "os tres repos de codigo estao intactos" **nao era
+verdade quando foi escrito**: os tres commits do `sep-app` ja tinham cinco dias. Intacto **localmente**
+nao e intacto **no remoto**, e so o segundo importa para quem abre a proxima branch.
