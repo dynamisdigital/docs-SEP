@@ -2,7 +2,36 @@
 
 **Spec de origem**: [`035-sprint-35-divida-config-lockout-contrato.md`](../../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md)
 
-**Status**: **planejada** (criada em 2026-08-05). Nenhuma Task executada.
+**Status**: **CONCLUIDA e MERGEADA develop+main em 2026-09-02** (PR #105 squash `23004b9` / #106
+`8cabf2c`). As 8 Tasks executadas; 2262 testes / 0 falhas / 363 classes; 46 mutacoes, **cinco
+sobreviveram**. Descricao em [`SPRINT-35-PR.md`](../../repos/sep-api/SPRINT-35-PR.md); historico em
+[`CONTEXT-PARTE-2.md`](../../docs-sep/CONTEXT-PARTE-2.md) §Sprint 35.
+
+**O que este documento errou, para o proximo planejamento** — as duas vezes o teste mostrou antes do
+codigo:
+
+1. **Task 35.2 escopada em `application.yml` + teste.** Nao bastava: o `RemoteIpValve` **ignora** o
+   `X-Forwarded-For` do peer nao confiavel mas **nao o remove**, e o `RateLimitFilter.extrairIp` lia o
+   header direto. A config sozinha deixava o valor forjado chegar em `login_attempt.ip`.
+2. **Step 035.6.3 previa 4 literais de MDC e mandava o `grep 'MDC.get("'` sair vazio.** Eram **10** —
+   os outros seis sao `idempotencyKey` —, entao o proprio comando de aceite era impossivel de
+   satisfazer fechando so os 4 nomeados. E nem os 10 bastavam: o literal restante estava **fora do
+   Java**, no `logback-spring.xml`.
+
+Alem disso, a **contagem de `@ExceptionHandler` estava errada** (dizia 17, eram 16; a Task 35.3 fez
+17) e a Task **35.8** nao existia nesta spec — veio do `STATE.md`, aberta pela F-Sprint 24.
+
+**Revisao de 2026-09-02** — tres pontos envelheceram entre a criacao e hoje, todos medidos antes de
+alterar este arquivo:
+
+1. **Pre-requisito**: o checkout do `sep-api` foi conferido e **ja esta sincronizado**; o texto
+   anterior descrevia um estado que nao existe mais. Ver §Pre-requisitos.
+2. **Task 35.5 perdeu metade**: a Spec [`036`](../../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)
+   §Conflito **cancelou** a remocao de `ContaBloqueadaException.CODIGO` — a 36 lhe da consumidor. Resta
+   a metade do `countByIpAndJanela`.
+3. **Task 35.8 nova**: o `400` alcancavel por `@PathVariable UUID` malformado nao esta declarado no
+   `@ApiResponses` do endpoint de webhook, o que impede a F-24.5 de declarar o status. A medicao
+   mostrou que **nao e um endpoint so** — ver a Task.
 
 **Sprint irma**: nenhuma. E a **terceira** das tres sprints de divida planejadas em 2026-08-05:
 [`D-1`](../cross-repo/300-dsprint-1-steps.md) -> [`F-24`](../web/124-fsprint-24-steps.md) -> `35`.
@@ -11,7 +40,9 @@
 **Objetivo geral**: fechar os follow-ups tecnicos que as Sprints 33 e 34 registraram, deixando no
 backlog apenas o que exige ADR.
 
-**Esforco total estimado**: 2 dias de Dev Pleno Backend.
+**Esforco total estimado**: 2 dias de Dev Pleno Backend. A revisao de 2026-09-02 mexe pouco no total —
+a 35.5 caiu de 0,2 para 0,1 dia e a 35.8 nova pede 0,2 —, **desde que o perimetro do `400` continue
+minimo**. Se o Step 035.0.5 achar perimetro grande, e a 35.8 que se recorta, nao o prazo que estica.
 
 **Repos de destino**:
 
@@ -19,24 +50,48 @@ backlog apenas o que exige ADR.
   `identity/infrastructure/security/LockoutProperties.java`,
   `identity/infrastructure/security/RateLimitFilter.java`,
   `identity/application/service/LockoutService.java`,
-  `identity/application/exception/ContaBloqueadaException.java`,
+  `identity/application/exception/ContaBloqueadaException.java` (**so a 35.7**; a 35.5 nao toca mais —
+  ver Step 035.5.1),
   `identity/infrastructure/persistence/LoginAttemptRepository.java`,
+  `identity/infrastructure/security/JwtTokenProvider.java` e
+  `cobranca/application/listener/ParcelaAtrasouListener.java` (**35.6**; estavam ausentes desta lista e
+  nomeados na Task),
+  `backoffice/web/controller/BackofficeReprocessoController.java` (**35.8**),
   `shared/exception/ApiExceptionHandler.java`, + testes.
 - `docs-SEP`: este step, a spec 035, indices e PR description; **Git manual**.
 
 **Branch sugerida**: `feature/sprint-35-divida-config-lockout`, criada de `develop` atualizado.
 
-**Pre-requisitos**: nenhum externo. O repo estava em `fix/lockout-service-test-helper-duplicado`
-(`fd4b4b1`), **nao** em `develop` — conferir o checkout no Gate.
+**Pre-requisitos**: nenhum externo.
+
+**Checkout medido em 2026-09-02** (o registro anterior, de 2026-08-05, dizia que o repo estava em
+`fix/lockout-service-test-helper-duplicado` e que o checkout local estava seis PRs atras — **as duas
+coisas deixaram de valer**):
+
+```text
+HEAD          = 550fed3   (== origin/main; ahead/behind 0 0)
+origin/develop = fd4b4b1
+git diff --stat origin/develop origin/main  -> vazio  (develop == main por conteudo)
+git status --porcelain                      -> vazio  (0 untracked, 0 modificado)
+```
+
+O checkout ativo esta em `main`. Falta apenas `git switch develop` antes de cortar a branch — e isso
+e o Step 035.0.1, nao um pre-requisito. **Ainda assim, o Gate re-mede**: este bloco e um registro
+datado, nao dispensa a conferencia.
 
 **Skills obrigatorias durante a implementacao**: `coding-guidelines`, `clean-code`,
 `design-patterns-java`.
 
 ---
 
-## Estado atual verificado (2026-08-05)
+## Estado atual verificado (2026-08-05; revisto em 2026-09-02)
 
 Levantado antes de planejar. Qualquer divergencia encontrada no Gate 35.0 invalida o desenho abaixo.
+
+Os blocos abaixo sao de **2026-08-05**, salvo onde a data estiver dita. A revisao de 2026-09-02
+reconferiu na fonte apenas os pontos que mudou (`ContaBloqueadaException`, o `ApiExceptionHandler` e o
+`BackofficeReprocessoController`) — **os demais nao foram re-medidos**, e continuam sendo o que o Step
+035.0.3 confere antes de qualquer codigo.
 
 ### Configuracao
 
@@ -97,11 +152,36 @@ falhar. `APP_LOCKOUT_WINDOW_MINUTES=0` derruba os tres numeros da `/account-lock
 
 ### Codigo morto
 
-- `ContaBloqueadaException.java:13` — `public static final String CODIGO = "AUTH-423-001"`;
-  `:36-38` — `getCodigo()`. **Nenhum consumidor**: a unica outra ocorrencia de `getCodigo()` em
-  `src/main` e `DomainException:30`, classe diferente.
+- ~~`ContaBloqueadaException.java:13` — `public static final String CODIGO = "AUTH-423-001"`;
+  `:36-38` — `getCodigo()`.~~ **CANCELADO em 2026-09-02 pela Spec 036** (ver §Conflito da 036, e a
+  Task 35.5 abaixo). O levantamento estava correto no fato — nao havia consumidor em 2026-08-05, e
+  reconferido em 2026-09-02 as ancoras `:13` e `:36-38` seguem exatas — mas a conclusao "remover"
+  caducou: a Sprint 36 publica `AUTH-423-001` no corpo do `423` e **precisa** da constante e do getter.
+  Codigo sem consumidor **hoje** nao e o mesmo que codigo morto, quando ha spec publicada que lhe da
+  consumidor.
 - `LoginAttemptRepository.java:41` — `countByIpAndJanela(...)`. Unico chamador:
-  `LoginAttemptRepositoryTest:58`.
+  `LoginAttemptRepositoryTest:58`. **Segue valendo** — nenhuma spec publicada lhe da consumidor.
+
+### Contrato: o `400` nao declarado (medido em 2026-09-02, item novo)
+
+`ApiExceptionHandler.java:69-75` mapeia `MethodArgumentTypeMismatchException` para
+`HttpStatus.BAD_REQUEST`. Consequencia: **todo** `@PathVariable UUID` alcancavel devolve `400` quando o
+valor nao parseia — status real, produzido pelo handler, e nao hipotese.
+
+`BackofficeReprocessoController.java:56-61` (endpoint de webhook) declara `201`/`401`/`403`/`429` e
+**nao** declara o `400`. O endpoint **irmao, no mesmo arquivo**, declara: `:78-84` traz
+`@ApiResponse(responseCode = "400", description = "tipoChamada nao suportado.")`. A assimetria esta
+dentro de uma classe de 2 endpoints.
+
+**O perimetro real e maior que o STATE registra.** Varredura de `src/main/java/**/*Controller.java`:
+**19 arquivos** contem `@PathVariable UUID`, e tres nao declaram `400` em lugar nenhum do arquivo —
+`EmpresaCredoraOportunidadeController` (4 path vars / 0), `PixRecebimentoController` (2 / 0),
+`EmpresaCredoraController` (1 / 0).
+
+> **A contagem acima e por ARQUIVO, nao por operacao** — um `400` declarado numa operacao nao cobre a
+> vizinha. O numero de **operacoes** com `400` alcancavel e nao declarado **nao foi medido**, e o Step
+> 035.0.5 existe para medi-lo. Repetir aqui o erro que o `grep -rh 'CODIGO = "'` cometeu na Spec 036 —
+> medir o nome e nao o fenomeno — custaria a mesma revisao.
 
 ### `Clock` e `MDC`
 
@@ -151,6 +231,18 @@ falhar. `APP_LOCKOUT_WINDOW_MINUTES=0` derruba os tres numeros da `/account-lock
 6. **Codigo morto sai com prova, nao com memoria.** Cada remocao acompanhada de `grep` no checkpoint
    mostrando ausencia de consumidor.
 
+7. **"Sem consumidor hoje" nao e "morto"** (decisao de 2026-09-02). A Spec 036 cancelou metade da
+   35.5: `ContaBloqueadaException.CODIGO` nao tinha consumidor, e a 36 lhe da um. O `grep` do item 6
+   mede o presente; **antes de remover, conferir tambem as specs publicadas** — hoje, as sete abertas
+   pelo diagnostico de 2026-09-01. Esta e a unica adicao ao criterio de remocao, e vale para a 35.5 e
+   para a 35.4.
+
+8. **A 35.8 entra com perimetro declarado, nao com a promessa de fechar tudo.** O `400` nao declarado
+   e sistemico (19 controllers com `@PathVariable UUID`), e a sprint e de divida com 2 dias de
+   esforco. Fecha-se o que desbloqueia a **F-24.5** e o que o Gate provar barato; o resto sai como
+   inventario numerado. **Perimetro e o mesmo instrumento que a Spec 036 adotou** quando a taxonomia
+   se revelou maior que o medido — e pelo mesmo motivo.
+
 ---
 
 ## Protocolo obrigatorio por Task
@@ -182,10 +274,16 @@ falhar. `APP_LOCKOUT_WINDOW_MINUTES=0` derruba os tres numeros da `/account-lock
 | `forward-headers-strategy: native` + `internal-proxies` | 35.2 |
 | `HttpRequestMethodNotSupportedException` | 35.3 |
 | `resilience4j.ratelimiter.configs.default` morto | 35.4 |
-| `ContaBloqueadaException.CODIGO` + `countByIpAndJanela` | 35.5 |
+| ~~`ContaBloqueadaException.CODIGO`~~ + `countByIpAndJanela` | 35.5 (**metade cancelada** pela Spec 036) |
 | `Clock` injetavel + `MDC` por constante | 35.6 |
 | Enums por `$ref` + `message` do `423` | 35.7 |
+| **(fora da spec 035)** `400` nao declarado no `@ApiResponses` — desbloqueia a F-24.5 | 35.8 (**nova**, 2026-09-02) |
 | Baseline, gates e limitacoes | Gate 35.0 e Fechamento |
+
+**Nota de rastreabilidade**: a Task 35.8 **nao tem item correspondente na spec 035**, que e de
+2026-08-05. Ela vem do §Proximo passo do [`STATE.md`](../../docs-sep/STATE.md) ("Entrada nova para a
+35"), aberto pela **F-Sprint 24**. Ou a spec 035 ganha o item no mesmo ciclo desta sprint, ou a 35.8
+sai daqui e vira follow-up — **decisao do Gate 35.0**, nao deste documento.
 
 ---
 
@@ -198,16 +296,23 @@ Gate 35.0 (precheck + baseline)
                                                review manual ter margem]
   -> 35.3  HttpRequestMethodNotSupported     [independente]
   -> 35.4  remover resilience4j morto        [independente]
-  -> 35.5  remover codigo morto              [independente]
+  -> 35.5  remover countByIpAndJanela        [independente; metade CANCELADA pela Spec 036]
   -> 35.6  Clock + MDC por constante         [DEPOIS da 35.1: as duas tocam a familia
                                               LockoutProperties/LockoutService]
-  -> 35.7  contrato (enums + message do 423) [POR ULTIMO: depende do que o Gate apurar
-                                              sobre os enums e da decisao da 35.6 sobre o Clock]
+  -> 35.7  contrato (enums + message do 423) [depende do que o Gate apurar sobre os enums
+                                              e da decisao da 35.6 sobre o Clock]
+  -> 35.8  400 no @ApiResponses              [POR ULTIMO: depende do perimetro medido no
+                                              Step 035.0.5 e da 35.3, que muda quais status
+                                              o handler produz]
 Fechamento (gates completos + docs + PR description)
 ```
 
 A 35.2 vem cedo **por risco, nao por dependencia**: e a unica que muda como o servidor enxerga a
 origem de toda request, e review manual precoce vale mais que ordem tematica.
+
+A 35.8 vem por ultimo por **dois** motivos, e nenhum e tematico: ela consome o perimetro que o Step
+035.0.5 mede, e a **35.3 muda o conjunto de status que o handler produz** — declarar contrato antes
+de o handler estar estavel e declarar contrato duas vezes.
 
 ---
 
@@ -223,10 +328,12 @@ git diff --stat origin/main origin/develop   # esperado: vazio
 git checkout -b feature/sprint-35-divida-config-lockout
 ```
 
-O repo estava em `fix/lockout-service-test-helper-duplicado` (`fd4b4b1`) — **conferir o checkout, nao
-assumir**. Se `develop != main` por conteudo, parar e reportar: a Sprint 34 teve incidente de
-back-merge (`4a02fc1` duplicou um helper e quebrou `compileTestJava` no CI), e a invariante existe por
-causa disso.
+Em **2026-09-02** o checkout foi medido limpo e sincronizado, em `main` (`550fed3` == `origin/main`),
+com `develop` (`fd4b4b1`) **identico a `main` por conteudo** e zero untracked — ver §Pre-requisitos.
+**Conferir mesmo assim, nao assumir**: esse registro tem data, e o STATE.md ja descreveu este mesmo
+checkout como "seis PRs atras, 34 untracked" quando ele nao estava. Se `develop != main` por conteudo,
+parar e reportar: a Sprint 34 teve incidente de back-merge (`4a02fc1` duplicou um helper e quebrou
+`compileTestJava` no CI), e a invariante existe por causa disso.
 
 ### Step 035.0.2 - Baseline medida
 
@@ -252,12 +359,41 @@ Gerar o OpenAPI do runtime em perfil `dev` e conferir se os enums saem inline ou
 **quantos** sao. A spec registra esse item como *registrado pela Sprint 34, nao verificado* — a Task
 35.7 nao desenha nada antes desta medicao.
 
+### Step 035.0.5 - Medir o perimetro do `400` nao declarado (Task 35.8)
+
+O levantamento de 2026-09-02 mediu **por arquivo**, o que **nao** responde a pergunta da Task. Medir
+**por operacao**, contra o OpenAPI gerado no 035.0.4 — nao por `grep` no fonte:
+
+1. No documento OpenAPI, listar as operacoes cujo `path` contem parametro tipado como UUID.
+2. Dessas, listar as que **nao** declaram resposta `400`.
+3. Confrontar com o handler: `ApiExceptionHandler.java:69-75`
+   (`MethodArgumentTypeMismatchException` -> `BAD_REQUEST`) e conferir se o handler ainda esta la e
+   ainda devolve 400 — a 35.3 mexe neste arquivo.
+
+Sair com **tres numeros**: operacoes com UUID no path, quantas ja declaram `400`, quantas nao. O
+numero de "nao declaram" e o **perimetro** que a 35.8 recorta; ele nao precisa ser fechado inteiro,
+precisa ser **conhecido**.
+
+> **Por que por operacao e nao por arquivo**: um `400` declarado numa operacao nao cobre a vizinha, e
+> um arquivo pode ter `400` declarado em operacao **sem** path variable. Contar arquivos mede o nome
+> do fenomeno, nao o fenomeno — foi assim que o `grep -rh 'CODIGO = "'` errou por 36 codigos e o erro
+> atravessou o diagnostico e tres specs **porque vinha com comando anexo**.
+
+**Confirmar tambem a assimetria interna**, que e o caso mais barato de provar: no mesmo
+`BackofficeReprocessoController.java`, o endpoint de webhook (`:56-61`) nao declara `400` e o de
+provider (`:78-84`) declara.
+
 ### Definicao de pronto do Gate 35.0
 
 - [ ] Branch criada de `develop` atualizado; `develop == main` por conteudo.
 - [ ] Baseline anotada (total de testes, `clean build`, `spotlessCheck`).
 - [ ] Os pontos do 035.0.3 conferidos, ou a divergencia reportada antes de qualquer codigo.
 - [ ] Item de enums apurado com numero, ou a Task 35.7 reduzida ao item da `message`.
+- [ ] Perimetro do `400` medido **por operacao**, com os tres numeros do 035.0.5.
+- [ ] Cancelamento da metade `CODIGO` da 35.5 reconferido contra a Spec 036 §Conflito — se a 036
+      tiver mudado de encaminhamento, e a 35.5 que muda, nao a 036.
+- [ ] Decidido se a **35.8 fica nesta sprint** ou vira follow-up, e se a spec 035 ganha o item
+      (ver §Nota de rastreabilidade).
 
 ---
 
@@ -455,20 +591,35 @@ chore(config): remover configuracao de rate limiter sem consumidor
 
 ---
 
-## Task 35.5 - Remover codigo morto
+## Task 35.5 - Remover `countByIpAndJanela` (metade da Task original)
 
 **Objetivo**: menos superficie que parece contrato e nao e.
 **Pre-requisito**: Task 35.4 concluida e aprovada.
-**Esforco**: 0,2 dia.
-**Arquivos esperados**: `ContaBloqueadaException.java`, `LoginAttemptRepository.java`,
-`LoginAttemptRepositoryTest.java`.
+**Esforco**: 0,1 dia (era 0,2; a metade cancelada levou metade do esforco).
+**Arquivos esperados**: `LoginAttemptRepository.java`, `LoginAttemptRepositoryTest.java`.
+**`ContaBloqueadaException.java` saiu da lista** — ver o Step 035.5.1.
 
-### Step 035.5.1 - `ContaBloqueadaException.CODIGO` e `getCodigo()`
+### Step 035.5.1 - ~~`ContaBloqueadaException.CODIGO` e `getCodigo()`~~ — CANCELADO, registrar
 
-Remover `:13` e `:36-38`. **Antes**, `grep` por `CODIGO` e `getCodigo` em `src/main` **e** `src/test`.
-Se o `ApiExceptionHandler` usar o codigo no corpo do `423`, o item cai — ai nao e morto.
+**Nao remover.** A Spec [`036`](../../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md) §Conflito
+cancela esta metade explicitamente: a Sprint 36 publica `AUTH-423-001` no corpo do `423` (item 4 dos
+criterios de aceite da 036, Task **36.4**), e sem o getter o `build()` do handler nao teria de onde
+ler o codigo. Constante e getter **ficam**.
 
-### Step 035.5.2 - `countByIpAndJanela`
+O trabalho desta Task passa a ser **registrar o cancelamento**, nao remover:
+
+1. Confirmar no Gate que a Spec 036 mantem o encaminhamento (Step 035.0.5, ultimo item da definicao
+   de pronto). Se a 036 tiver mudado, e **esta** Task que muda.
+2. Anotar no `ContaBloqueadaException.java`, junto de `CODIGO`, **por que a constante existe sem
+   consumidor em `src/main`** — que a Sprint 36 e quem a consome. Sem essa nota o proximo
+   levantamento a classifica como morta de novo, que e exatamente o que aconteceu aqui.
+3. Registrar no PR description que a metade caiu, com o motivo. Nao deixar a spec 035 §5 dizendo
+   "remover" sem contraparte.
+
+**Licao que fica** (§Decisoes item 7): "sem consumidor hoje" nao e "morto" quando ha spec publicada
+que lhe da consumidor. O levantamento de 2026-08-05 estava **certo no fato** e errado na conclusao.
+
+### Step 035.5.2 - `countByIpAndJanela` — esta sim, remover
 
 Remover `LoginAttemptRepository.java:41` e o teste que so a exercita (`LoginAttemptRepositoryTest:58`).
 Remover a query e manter o teste nao compila; manter os dois e manter uma query viva por um teste que
@@ -485,14 +636,16 @@ para o fechamento nao parecer regressao.
 
 ### Definicao de pronto da Task 35.5
 
-- [ ] `grep` no checkpoint provando ausencia de consumidor para cada item removido.
+- [ ] `grep` no checkpoint provando ausencia de consumidor de `countByIpAndJanela` em `src/main` e
+      `src/test`, alem do teste que sai junto.
 - [ ] Queda de contagem de testes registrada com numero e razao.
-- [ ] Se algum item tiver consumidor, ele **nao** foi removido e a evidencia esta no checkpoint.
+- [ ] `ContaBloqueadaException.CODIGO` e `getCodigo()` **intactos**, com a nota do 035.5.1 no arquivo.
+- [ ] Cancelamento da metade registrado no PR description, com o ponteiro para a Spec 036 §Conflito.
 
 ### Commit sugerido
 
 ```text
-chore(identity): remover codigo sem consumidor do lockout
+chore(identity): remover query de login attempt sem consumidor
 ```
 
 ---
@@ -610,6 +763,103 @@ chore(contracts): publicar enums por $ref e alinhar a mensagem do 423
 
 ---
 
+## Task 35.8 - Declarar o `400` alcancavel no `@ApiResponses` (nova, 2026-09-02)
+
+**Objetivo**: o contrato publica um status que o servico ja devolve, para que o consumidor possa
+ramificar por ele. Desbloqueia a **F-24.5**, que hoje nao pode declarar o status porque o OpenAPI nao
+o traz.
+**Pre-requisito**: Task 35.7 concluida e aprovada, **e** o Step 035.0.5 medido.
+**Esforco**: 0,2 dia dentro do perimetro minimo; **reavaliar** se o Gate achar perimetro grande.
+**Arquivos esperados**: `backoffice/web/controller/BackofficeReprocessoController.java`, mais os
+controllers que o perimetro do Gate incluir, + teste.
+**Origem**: nao esta na spec 035 — vem do §Proximo passo do `STATE.md`, aberto pela F-Sprint 24. Ver
+§Nota de rastreabilidade.
+
+> **Esta Task nao inventa comportamento: ela documenta o que ja existe.** `ApiExceptionHandler.java:69-75`
+> ja devolve `400` para `@PathVariable` que nao parseia. Nenhum status novo, nenhum handler novo,
+> nenhuma mudanca de runtime. Se algum step aqui exigir mudar comportamento, ele saiu do escopo —
+> parar e reportar.
+
+### Step 035.8.1 - Recortar o perimetro com o numero do Gate
+
+Do resultado do Step 035.0.5, escolher **nesta ordem**:
+
+1. **Obrigatorio** — `BackofficeReprocessoController.java:56-61` (endpoint de webhook). E o unico item
+   que **desbloqueia outra sprint**; sem ele a Task cai por nao entregar o que a motivou.
+2. **Barato e provado** — as operacoes que o Gate mediu sem `400` **e** cujo path tem parametro UUID,
+   ate onde o esforco de 0,2 dia alcancar.
+3. **Fora** — o resto, como **inventario numerado** no PR description.
+
+O criterio de corte e explicito: **fechar tudo nao e objetivo desta Task**. O que nao vale e sair sem
+saber o tamanho do que ficou.
+
+### Step 035.8.2 - Declarar, copiando o vizinho que ja acerta
+
+`BackofficeReprocessoController.java:78-84` (endpoint de provider) **ja declara** o `400`. Usar a mesma
+forma e o mesmo lugar na lista de `@ApiResponse` — consistencia dentro do arquivo antes de
+consistencia global.
+
+A `description` descreve o que o usuario fez, nao o tipo Java: o `400` sai quando o identificador do
+path nao e um UUID valido. `ApiExceptionHandler:73` monta
+`"Path/query param '<nome>' invalido: nao eh <Tipo>"` — a descricao do contrato deve ser coerente com
+essa mensagem, senao o consumidor le duas historias diferentes do mesmo status.
+
+### Step 035.8.3 - Teste
+
+Request ao endpoint de webhook com `webhookEventId` que nao parseia como UUID -> `400`, com corpo de
+erro padronizado.
+
+**Mutacao obrigatoria**: **duas**, porque sao duas afirmacoes distintas e uma so nao cobre a outra.
+
+1. Remover o `@ApiResponse(responseCode = "400", ...)` recem-adicionado — a **verificacao de contrato**
+   deve reprovar. Se nao houver verificacao que reprove, a declaracao nao esta coberta por nada e o
+   teste do item 2 **nao a cobre**; registrar isso como limitacao em vez de fingir cobertura.
+2. Remover o handler de `MethodArgumentTypeMismatchException` (`ApiExceptionHandler:69-75`) — o teste
+   de runtime deve falhar. Reverter as duas.
+
+> **Por que a mutacao 1 importa mais que a 2**: o defeito desta Task e de **contrato**, nao de runtime.
+> Um teste que so exercita o `400` passa **hoje**, sem a Task, porque o `400` ja acontece — ele prova
+> o handler, nao a declaracao. A Sprint 34 pegou dois testes exatamente assim, e a F-25 reescreveu
+> tres pelo mesmo motivo.
+
+### Step 035.8.4 - Registrar o efeito no `sep-app`
+
+Acrescentar `400` ao OpenAPI **muda o snapshot que o `contract:check` do `sep-app` valida**. Mesma
+mecanica do Step 035.7.1: medir antes, registrar o resultado mesmo que nulo, e se reabrir lacuna la, o
+gate de contrato do `sep-app` entra no fechamento desta sprint, no padrao dos PRs #120/#121 da
+Sprint 34.
+
+Aqui ha um ganho, nao so um custo: a **F-24.5** esta bloqueada esperando este status. Nomear no PR
+description que ela destrava.
+
+### Verificacao da Task 35.8
+
+```bash
+./gradlew test; echo "EXIT=$?"
+./gradlew clean build; echo "EXIT=$?"
+./gradlew spotlessCheck; echo "EXIT=$?"
+```
+
+Regenerar o snapshot OpenAPI em perfil `dev` e rodar `contract:check` no `sep-app` contra ele.
+
+### Definicao de pronto da Task 35.8
+
+- [ ] `BackofficeReprocessoController.java:56-61` declara o `400`.
+- [ ] Perimetro recortado com o numero do Gate, e o que ficou de fora esta **numerado** no PR
+      description — nao descrito como "alguns casos".
+- [ ] As **duas** mutacoes aplicadas, vistas falhar, revertidas — ou a limitacao da mutacao 1
+      registrada, se nao houver verificacao de contrato que reprove.
+- [ ] Impacto no snapshot do `sep-app` medido e registrado, mesmo que nulo.
+- [ ] Nenhuma mudanca de comportamento de runtime no diff (`git diff` prova).
+
+### Commit sugerido
+
+```text
+docs(api): declarar o 400 de path variable invalido no contrato de reprocesso
+```
+
+---
+
 ## Fechamento
 
 ### Gates completos
@@ -629,9 +879,15 @@ e revertidas.
 - `repos/sep-api/SPRINT-35-PR.md`, no formato dos anteriores (regra fixa do
   [`AGENT.md`](../../AGENT.md) §Git e checkpoints). Apagar o(s) `SPRINT-*-PR.md` da sprint anterior ao
   **iniciar** esta.
-- `STATE.md` sobrescrito e entrada apendada em `CONTEXT-PARTE-2.md`.
+- `STATE.md` sobrescrito e entrada apendada em `CONTEXT-PARTE-2.md`. **Corrigir tambem o item 1 do
+  §Proximo passo**, que manda sincronizar o checkout do `sep-api` — ele ja estava sincronizado em
+  2026-09-02, e esse registro foi o quinto caso seguido de documento desmentido pelo repo.
 - Linha de status em [`specs/fase-4/README.md`](../../specs/fase-4/README.md).
-- Se a 35.7 mudou o OpenAPI: gate de contrato no `sep-app`, no padrao dos PRs #120/#121 da Sprint 34.
+- **Spec 035**: o §5 ainda manda remover `ContaBloqueadaException.CODIGO`, e a 35.8 nao tem item la.
+  Alinhar a spec ao que a sprint fez — ou registrar por que nao. Documento que sai da sprint dizendo o
+  contrario do codigo e o defeito que esta revisao existiu para corrigir.
+- Se a 35.7 **ou a 35.8** mudou o OpenAPI: gate de contrato no `sep-app`, no padrao dos PRs #120/#121
+  da Sprint 34.
 
 ### Riscos a declarar como pendencia, nao simular
 
@@ -642,3 +898,20 @@ e revertidas.
   resolucao manual. Conferir a arvore de `develop` byte-identica a da branch verificada, e nao so o
   CI verde.
 - Controle compensatorio contra brute force lento: **exige ADR**, segue aberto por decisao.
+- **Perimetro do `400` (35.8)**: o que ficou fora sai como **inventario numerado**, com os tres numeros
+  do Step 035.0.5. "Alguns endpoints ainda nao declaram" nao e registro — e a forma de o proximo
+  levantamento ter de medir tudo de novo.
+- **`ContaBloqueadaException.CODIGO` segue sem consumidor em `src/main` ate a Sprint 36 executar.**
+  Isso e estado conhecido e aceito, nao pendencia — a nota do Step 035.5.1 no proprio arquivo existe
+  para que a proxima varredura nao o classifique como morto pela terceira vez.
+
+### O que esta revisao mudou, para o review manual conferir
+
+| # | Onde | Antes | Depois |
+|---|---|---|---|
+| 1 | §Pre-requisitos, Step 035.0.1 | repo em `fix/lockout-service-test-helper-duplicado`, checkout atras | medido em 2026-09-02: `main` `550fed3`, limpo, `develop == main` |
+| 2 | Task 35.5 | remove `CODIGO` **e** `countByIpAndJanela` | so `countByIpAndJanela`; `CODIGO` preservado e anotado (Spec 036 §Conflito) |
+| 3 | Task 35.8, Step 035.0.5 | nao existiam | `400` declarado no contrato, com perimetro medido por operacao |
+
+Nenhuma outra Task teve escopo alterado. As Tasks 35.1, 35.2, 35.3, 35.4, 35.6 e 35.7 estao como
+foram escritas em 2026-08-05.

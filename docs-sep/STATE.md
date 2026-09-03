@@ -10,72 +10,83 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-02 (varredura de sincronizacao com os tres remotos; nenhuma sprint fechada,
-nenhum codigo de app tocado)._
+_Atualizado em: 2026-09-02 (fechamento da **Sprint 35**, mergeada em develop+main)._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). A Fase 5 segue **inteiramente gated** por
   acesso externo (Celcoin, AWS, contas de loja).
-- **Mudou em 2026-09-02**: a varredura dos tres remotos desmentiu registros deste arquivo e achou
-  **dois gates de CI vermelhos** que ninguem estava vendo. (a) A **F-Sprint 25 esta mergeada** desde
-  2026-08-21 (PR #136 e #137) — o registro de "push e PR ainda nao feitos" estava defasado por 12
-  dias, terceiro caso seguido do mesmo padrao (a F-24 ficou 15 dias defasada, a D-1 tambem). (b) O
-  `origin/develop` do `sep-app` **nao esta intacto**: tem **tres commits de 2026-08-26 sem PR**, de
-  outro autor, com mensagens que **nao descrevem o diff**, e um deles **reprova o `format:check`** —
-  gate que o `ci.yml:52` roda. (c) O `origin/develop` do `sep-mobile` esta **atras** do `main` e o
-  `npm audit` ali mede **6 high**, com o gate `--audit-level=high` **vermelho**. Detalhe em §Onde
-  estamos; acao em §Proximo passo item 1.
-- **Mudou em 2026-09-01**: o registro anterior dizia que "as frentes de produto da Fase 4 estao
-  executadas". Isso continuava verdade **sobre o escopo planejado**, e deixou de ser a leitura util:
-  o [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md) abriu **seis lacunas de produto medidas no
-  codigo**, e duas delas viraram **sete specs novas**. Havia mais escopo executavel sem gate externo
-  do que o documento registrava.
-- **Spec/step ativo**: a fila cresceu. Ordem recomendada:
-  1. ~~**F-Sprint 25** — aviso de cookies e politica de privacidade.~~ **MERGEADA develop+main em
-     2026-08-21**: `develop` via PR **#136** (squash `b7cd3da`) e `main` via PR **#137** (`3cd6cb9`).
-     Conferido na varredura de 2026-09-02. **Antes da proxima sprint web, regularizar o `develop`** —
-     ver §Proximo passo item 1.
-  2. **Sprint 35** — divida de config/lockout/contrato. Spec
-     [`035`](../specs/fase-4/035-sprint-35-divida-config-lockout-contrato.md), steps
-     [`035`](../steps-fase-4/backend/035-sprint-35-steps.md). **E a proxima a executar**, e **comece
-     pelo Gate 35.0**. **Conflito conhecido**: a Task 35.5 planeja remover
-     `ContaBloqueadaException.CODIGO` como codigo morto, e a Sprint 36 lhe da consumidor — manter so
-     a metade do `countByIpAndJanela`.
-  3. **Cadeia P1 (codigos de erro no fio)** — [`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)
+- **Mudou em 2026-09-02**: a **Sprint 35 fechou e esta mergeada** em `develop` (PR **#105**, squash
+  `23004b9`, back-merge `17bd72d`) e `main` (PR **#106**, `8cabf2c`). Conferido **por conteudo**:
+  `develop` == `main` com diff vazio e a arvore de `origin/develop` byte-identica a da branch que
+  passou nos gates, **inclusive depois do back-merge** — que e onde a Sprint 34 quebrou. Suite
+  **2220 -> 2262**, 0 falhas, 363 classes; `contract:check` do `sep-app` em 85 operacoes / 0 lacunas.
+  Descricao em [`SPRINT-35-PR.md`](../repos/sep-api/SPRINT-35-PR.md).
+- **Spec/step ativo**: a fila da Fase 4 continua. Ordem recomendada:
+  1. ~~**Sprint 35** — divida de config/lockout/contrato.~~ **MERGEADA develop+main em 2026-09-02.**
+  2. **Cadeia P1 (codigos de erro no fio)** — [`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)
      publica, [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md) e
      [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md) consomem. Depois,
      [`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md) normaliza o que a 036
-     deixou fora do perimetro (**preve ADR**).
-  4. **Frente A de notificacao** — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
+     deixou fora do perimetro (**preve ADR**). **A 036 e a proxima a executar.**
+     **Pre-requisito ja satisfeito pela 35**: `ContaBloqueadaException.CODIGO` e `getCodigo()` foram
+     **preservados** (a Task 35.5 cancelou a remocao) e ganharam teste que lhes da consumidor; e os
+     handlers do `ApiExceptionHandler` sao **17**, como a 036 §Escopo ja previa.
+  3. **Frente A de notificacao** — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
      (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
      e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). **Corre em paralelo com
      a cadeia P1** — a 038 nao toca `ApiExceptionHandler`.
-  Steps das sete novas **nao existem** — just-in-time, ao aprovar cada uma.
-- **Regra nova, obrigatoria**: **faixa de numeracao por fase** — Fases 1-4 em **0-49**, Fase 5 em
-  **50-99**, dentro da banda por repo. Documentada em [`../AGENT.md`](../AGENT.md) §Numeracao de
-  sprint e de spec. Encerra o mecanismo de recuo que produziu **oito renumeracoes da Fase 5 em quatro
-  meses, cinco delas num unico dia**.
-- **Aprendizado de 2026-09-01**: **medir o fenomeno, nao o nome que ele costuma ter.** O
-  `grep -rh 'CODIGO = "'` parecia rigoroso — tinha comando, numero e distribuicao por prefixo — e
-  filtrava por **nome de constante** quando o fenomeno e **formato de string**. Errou por 36 codigos
-  (67 medidos, ~103 reais) e o erro atravessou o diagnostico e tres specs sem ninguem questionar,
-  **porque vinha com evidencia anexa**. Medicao com comando ao lado nao e medicao correta; e medicao
-  reproduzivel, que e outra coisa.
-- **Aprendizado que vale carregar**: **medir antes de blindar**. O Step 125.6.1 mandava rodar os 39
-  Playwright *antes* de aplicar qualquer contorno, e foi essa ordem que transformou uma quebra de
-  suite em achado de produto: a faixa de cookies interceptava o clique no botao "Iniciar onboarding",
-  e **o remedio que os proprios steps prescreviam (`storageState`) teria escondido o defeito e
-  entregado a faixa quebrada**. Prescricao escrita antes da medicao nao vale mais que a medicao.
-- **Regra que a sprint deixou**: **teste de falha de storage nao se escreve com
-  `vi.spyOn(Storage.prototype, ...)`**. No happy-dom o `localStorage` e um Proxy e o spy de prototipo
-  nao intercepta — o `catch` nunca roda e o teste passa provando nada. Injetar `DOCUMENT` falso. Ja
-  registrado na skill `sep-web-mutation-verified-testing`. Mais amplo: **tres testes desta sprint
-  sobreviveram a mutacao**, e nenhum foi pego por leitura — so pela mutacao. Guarda com busca global
-  (`screen`) quando existe elemento homonimo fora do escopo, e "teste de regressao" que aponta para
-  elemento que nao reproduz o defeito, sao as duas outras formas.
+  Steps das seis restantes **nao existem** — just-in-time, ao aprovar cada uma.
+- **Regra vigente**: **faixa de numeracao por fase** — Fases 1-4 em **0-49**, Fase 5 em **50-99**,
+  dentro da banda por repo. Documentada em [`../AGENT.md`](../AGENT.md) §Numeracao de sprint e de spec.
+- **Aprendizado da Sprint 35, o que mais se paga**: **mutacao que sobrevive e o achado, nao o
+  ruido.** Foram 46 aplicadas e **cinco sobreviveram** — e as cinco viraram trabalho que nao estava
+  no plano. Duas merecem nome proprio: consolidar os call sites de MDC no Java deixava o defeito vivo
+  porque o literal restante estava **fora do Java** (`logback-spring.xml`); e um bean de
+  `ModelResolver` sem `openapi31` apagava **21 `description` e 17 `example`** do OpenAPI passando
+  verde em 2258 testes. Nos dois casos a leitura do codigo aprovava; so a mutacao reprovou.
+- **Aprendizado sobre diagnostico**: no conserto do segundo caso, a edicao apagou o bean
+  `sepOpenAPI()` e derrubou o `securitySchemes`. O teste `apiDocsExpoeSchemasESecurity` **acusou
+  exatamente isso**, e a causa foi atribuida a outra coisa — tres documentos gerados para "isolar"
+  antes de simplesmente contar os `@Bean` do arquivo. **Teste vermelho e evidencia, nao ponto de
+  partida para uma teoria.**
+- **Aprendizado que a 35.2 deixou**: **prescricao escrita antes da medicao nao vale mais que a
+  medicao.** Os steps escopavam a Task em `application.yml`; aplicar so a config e rodar o teste
+  exigido mostrou que o bypass continuava aberto. A mudanca de codigo entrou porque o teste reprovou,
+  nao porque pareceu melhor.
 
 ## Onde estamos
+
+- **Sprint 35 (backend) MERGEADA develop+main em 2026-09-02** — divida de configuracao, lockout e
+  contrato (sprint de divida; **sem tela, endpoint, DTO, migration, ADR ou regra nova**). Em
+  `origin/develop` via PR **#105** (squash `23004b9`), back-merge `17bd72d`, e promovida a `main` via
+  PR **#106** (`8cabf2c`). **`develop` == `main` conferido por diff de conteudo** (vazio), e a arvore
+  de `origin/develop` conferida **byte-identica** a da branch que passou nos gates — a conferencia foi
+  feita **depois** do back-merge, que e onde a Sprint 34 quebrou. **2262 testes / 0 falhas / 363
+  classes** (partida 2220/355), `spotlessCheck` verde, `contract:check` do `sep-app` em 85 operacoes /
+  0 lacunas. 16 commits.
+  **A unica queda de contagem da sprint foi de −1**, na Task 35.5, e era esperada: a query
+  `countByIpAndJanela` saiu com o teste que so a exercitava.
+  **Os steps erraram o escopo em duas Tasks, e as duas vezes o teste mostrou antes do codigo.** Na
+  35.2 a spec escopava em `application.yml`; aplicar so a config e rodar o teste exigido deixou o
+  valor forjado `203.0.113.7` chegando em `login_attempt.ip`, porque o `RemoteIpValve` **ignora** o
+  header do peer nao confiavel mas **nao o remove** e o `extrairIp` lia o header direto — o javadoc
+  daquele metodo afirmava que fechar o bypass era "configuracao, nao codigo"; era das duas. Na 35.6 os
+  steps previam 4 literais de MDC e o fenomeno era de **10**, com o comando de aceite da propria spec
+  (`grep 'MDC.get("'` sair vazio) impossivel de satisfazer sem os outros seis.
+  **`enumsAsRef` derrubou uma previsao minha e depois cobrou caro**: eu recomendei nao fechar os enums
+  por raio de alcance, e medido o `contract:check` passa **identico** contra os dois documentos — ele
+  dereferencia `$ref` antes de comparar. Mas o bean de `ModelResolver` entrou **sem `openapi31`**, e um
+  resolver em modo 3.0 dentro de um documento 3.1 apagou **21 `description` e 17 `example`** em
+  silencio, oito deles em propriedades que documentavam **nulidade**. Achado bloqueante do code review.
+  A correcao e **nao substituir o resolver**: `enumsAsRef` e lido durante a resolucao, entao um
+  `@PostConstruct` basta.
+  **Segundo bloqueante**: a nota que justificava alinhar a `message` do `423` dizia que nenhum
+  consumidor a exibe. Falso — o `verify-totp` do `sep-app` mostra o corpo **verbatim** e nem le o
+  `Retry-After`. Alinhar **melhorou uma tela em producao**, e o registro dizia o contrario.
+  **46 mutacoes**, das quais **cinco sobreviveram** e viraram trabalho. Detalhe em
+  [`SPRINT-35-PR.md`](../repos/sep-api/SPRINT-35-PR.md); historico em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Sprint 35. Nada mudou em `sep-app`/`sep-mobile`.
 
 - **Varredura de sincronizacao com os tres remotos em 2026-09-02** — **nenhuma sprint fechada,
   nenhum codigo de app tocado**; so `git fetch` (read-only) e medicao local. Objetivo: por o
@@ -351,9 +362,8 @@ nenhum codigo de app tocado)._
   `develop` -> `main`. **O squash da feature entrou correto** (2 definicoes); foi o back-merge que
   virou 3, num arquivo que `main` nao havia alterado desde a base comum — resolucao manual, nao
   merge automatico. Corrigido em `fd4b4b1` (-8 linhas), com a arvore de `develop` voltando a ser
-  byte-identica a da branch verificada. Detalhe em
-  [`SPRINT-34-PR.md`](../repos/sep-api/SPRINT-34-PR.md); historico em
-  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Sprint 34.
+  byte-identica a da branch verificada. A descricao de PR temporaria foi removida no ciclo padrao ao
+  fechar a Sprint 35; historico em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Sprint 34.
 
 - **Gate de contrato no `sep-app` MERGEADO develop+main em 2026-08-03** — unico toque da Sprint 34
   fora do `sep-api`, restrito a `contracts/`. Em `origin/develop` via PR #120 (`83681e2`) e promovido
@@ -571,139 +581,77 @@ nenhum codigo de app tocado)._
 
 ## Proximo passo
 
-1. **Regularizar as tres pontas antes de abrir qualquer sprint** (varredura de 2026-09-02). A
-   F-Sprint 25 **ja esta mergeada** (#136/#137) e este item deixou de ser "push e PR"; virou limpeza
-   do que a varredura achou. Ordem sugerida, do mais barato ao mais caro:
-   1. **`sep-api`: sincronizar o checkout local.** Esta em `main` de **2026-07-08**, seis PRs atras.
-      Os 34 untracked sao byte-identicos a `origin/main`, entao nada se perde ao alinhar. **Sem isso,
-      o Gate 35.0 mede a arvore errada.**
-   2. **`sep-mobile`: back-merge `main -> develop`.** O `develop` esta sem o patch
-      `@angular/* 20.3.27` que ja esta em `main`, e o `npm audit` em `develop` da **6 high** com o
-      gate **vermelho**. Depois do back-merge, **re-medir** — parte dos `high` cai com as branches do
-      Dependabot ja abertas (`js-yaml`, angular group).
-   3. **`sep-app`: decidir o que fazer com os tres commits de 2026-08-26** (`bf33e45`, `63248af`,
+1. **Sprint 36 — codigos de erro no fio** ([`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)).
+   E a proxima. **Comece pelo Gate 36.0**, e nas cinco sprints de divida anteriores o Gate derrubou
+   numero ou premissa da spec **sem excecao**.
+   **Dois pre-requisitos ja satisfeitos pela Sprint 35**: `ContaBloqueadaException.CODIGO` e
+   `getCodigo()` foram **preservados** (a 35.5 cancelou a remocao, conforme a §Conflito da propria
+   036) e ganharam teste que lhes da consumidor — nao ha o que recriar; e os `@ExceptionHandler` do
+   `ApiExceptionHandler` sao **17** apos a Task 35.3, exatamente como a 036 §Escopo item 2 previa.
+   **Entrada nova para o Gate 36.0**: a Sprint 35 fechou o `400` de path variable por
+   `OperationCustomizer`, e a mesma mecanica serve para publicar `codigo` — vale conferir se a 36
+   quer o mesmo caminho em vez de anotacao por endpoint.
+
+2. **Frente A de notificacao**, em paralelo — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
+   (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
+   e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). Nao toca
+   `ApiExceptionHandler`, entao nao colide com a cadeia P1.
+
+3. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
+   de `sep-api`):
+   1. **`sep-mobile`: back-merge `main -> develop`.** O `develop` esta sem o patch
+      `@angular/* 20.3.27` que ja esta em `main`, e o `npm audit` ali da **6 high** com o gate
+      **vermelho**. Depois do back-merge, **re-medir**.
+   2. **`sep-app`: decidir o que fazer com os tres commits de 2026-08-26** (`bf33e45`, `63248af`,
       `64b7b73`), que entraram em `develop` **sem PR**, com mensagens que nao descrevem o diff, e
-      **deixaram o `format:check` vermelho**. O minimo para destravar o CI e rodar `npm run format`
-      no `api.models.ts` e commitar. **Decisao de quem manda no repo**, nao do agente: reverter,
-      normalizar por cima, ou aceitar e regularizar a mensagem. Vale conferir com o autor se o bloco
-      de `.gitignore` de projeto **Python** foi mesmo intencional neste repo.
-   **Independente disso**: **revisar juridicamente o texto da politica de privacidade** — ela entrou
-   em producao marcada como pendente, com base legal, direitos do titular e contato do encarregado
-   nomeados e nao preenchidos.
-   As descricoes da **F-24** e da **D-1** ja foram removidas em 2026-08-21; o conteudo delas segue em
-   [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) e no [`PRD-FASE-4.md`](./PRD-FASE-4.md) §36. A
-   [`SPRINT-F-25-PR.md`](../repos/sep-app/SPRINT-F-25-PR.md) **segue no repo** e ja pode sair no ciclo
-   padrao, ao abrir a proxima sprint web.
+      **deixaram o `format:check` vermelho**. **Decisao de quem manda no repo**, nao do agente.
 
-2. **Sprint 35** (`sep-api`): allowlist de proxy (hoje a origem do rate limit e escolhida pelo
-   cliente), validacao de `LockoutProperties` no boot, `405` faltante, e codigo/config morto.
-   **Comece pelo Gate 35.0** — nas tres sprints de divida anteriores o Gate derrubou numero ou
-   premissa da spec, sem excecao, **e em 2026-09-01 a revisao da Spec 036 derrubou quatro de uma vez**.
-   **O registro anterior a chamava de "a unica sprint de divida restante e a unica frente executavel
-   sem API externa". Isso caiu**: o diagnostico de 2026-09-01 abriu sete specs, todas executaveis sem
-   gate externo. A 35 continua sendo a **proxima**, nao a ultima.
-   **Ja medido em 2026-09-02** (era "ainda antes dela"): o `npm audit` do `sep-mobile` em `develop`
-   da **6 `high`** (10 no total) e o gate **esta vermelho**. O que resta e o item 1 acima, nao a
-   medicao.
-   **Entrada nova para a 35**: o `@ApiResponses` de `BackofficeReprocessoController.java:56-61` nao
-   publica o `400` do endpoint de webhook, alcancavel por `@PathVariable UUID` malformado — a F-24.5
-   nao pode declarar o status por causa disso. Ver §Follow-ups.
-   **`sep-api` segue fora do escopo de dependencias**: `build.gradle` nao tem plugin de scan nenhum,
-   entao medir exigiria adicionar tooling. Follow-up nomeado, candidato a sprint propria — e hoje o
-   backend **nao tem deteccao de vulnerabilidade de dependencia, nem manual nem em CI**.
+4. **Correcao de documento com o maior peso da lista**: o
+   [`ADR 0010`](../adr/0010-mfa-totp-com-biometria-mobile.md) §65-66 afirma "5 tentativas/min/IP" no
+   login e "5 tentativas/min/**usuario**" no TOTP. **Sao 10, e por IP nos dois**, desde a Sprint 33
+   (`APP_RATE_LIMIT_LOGIN:10`, `APP_RATE_LIMIT_TOTP_VERIFY:10`; `RateLimitFilter` chaveia por IP nos
+   dois casos). O `AGENT.md` poe **ADR acima de spec e steps**, entao um ADR errado propaga com peso
+   maior que qualquer outro documento defasado.
 
-3. **Decisao de rumo, depois das restantes.** Fechar a Fase 4 preenchendo o §41 do
-   [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com status, PRs, back-merges e as dividas
-   aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do Epic 14 (M-14/M-15) entram como
-   **adiados**, nao como pendencias em aberto. A Fase 5 so abre com acesso externo liberado.
-4. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
-   §Gates externos). Enquanto ele nao abre, avaliar o fallback por runner CI macOS (spec 214.3.4)
-   para validar o build iOS parcialmente sem hardware local; o smoke local segue obrigatorio pela
-   spec e permanece preso ao gate.
-5. **Opcional — `openapi.snapshot.meta.json` do `sep-app` referencia `f37ffc8`**, o tip da branch da
-   Sprint 34, que deixa de resolver quando a branch for apagada. As arvores de `f37ffc8`, do squash
-   `0d24602` e de `origin/develop` foram **conferidas identicas**, entao o snapshot continua fiel; e
-   so a referencia que envelhece. Trocar por `0d24602` num commit de documentacao, se valer o ciclo
-   de PR — o campo e documental e nenhum script o le.
-6. **Follow-ups tecnicos abertos** (nao bloqueiam).
-   **ABERTOS pela F-Sprint 25** (2026-08-21): (a) **`SEP_ACCESS_TOKEN` guarda JWT de acesso em
-   `localStorage`** (`auth.service.ts:9`), legivel por qualquer script na origem — a politica de
-   privacidade torna a exposicao publica, e corrigir **exige ADR** porque muda o contrato de
-   autenticacao dos tres repos; **candidato a sprint propria**; (b) **revisao juridica** do texto da
-   politica, com base legal, direitos do titular e contato do encarregado nomeados e nao preenchidos;
-   (c) **termos de uso** ausentes — documento distinto, nao deriva de medicao do codigo;
-   (d) **`sep-mobile` sem equivalente**: o nativo nao usa cookie, mas a build PWA tem a mesma lacuna;
-   (e) conferencia visual da faixa em <768px, onde ela quebra em duas linhas.
-   **A F-25 reforca a urgencia do `sep-api` sem scan de dependencia**: o gate de `npm audit` do front
-   existe desde a D-1 e mesmo assim ficou vermelho em `develop` sem ninguem notar; no backend nao ha
-   nem gate.
-   **FECHADOS pela F-Sprint 24** (2026-08-06): o vetor do `errorInterceptor` na `/account-locked`; o
-   `/auth/totp/verify` com `Authorization` morto; o `NaNmin`/`tempoMedioResolucao30d`; o
-   `message: ""` (e tambem o `"   "`, que o Gate mostrou ser a outra metade do defeito); os 3
-   literais `login`/`verify-totp`; e o `estabilizar()` duplicado — que o Gate mediu como **dois**
-   helpers, 38 `estabilizar` + 42 `flush`, hoje **2 definicoes** em `src/testing/estabilizar.ts`.
-   **ABERTOS pela F-Sprint 24**: (a) `handleTokenResponse` (`auth.service.ts:124-128`) nao limpa o
-   token no ramo `mfaRequired` — a isencao da F-24.2 neutraliza a consequencia, nao a causa, e o
-   remedio obvio deslogaria quem esta autenticado e abre a tela de login em outra aba, entao exige
-   analise propria; (b) `Validators.pattern` de UUID em `reprocessos-page.component.ts:45` e `:50-51`,
-   que **se feito primeiro dispensa** o item (c); (c) backend publicar `400` no `@ApiResponses` do
-   endpoint de webhook (Sprint 35); (d) os **quatro** pontos cegos do `contract-check.mjs`, todos
-   medidos — sem `kind` de gap para status, `varrerGapsObsoletos` reprovando gap nao consumido, check
-   unidirecional, e `declarado ⊆ documentado` em vez de `declarado = ramificado`; (e)
-   `CONTA_BLOQUEADA_FALLBACK` embute "30 minutos" fixo, mesmo defeito que a F-23 corrigiu na
-   `/account-locked`, agora barato porque ha uma constante so; (f) `404` do `/auth/totp/verify` cai no
-   `default:` (`VerificarTotpUseCase.java:92`), fora do OpenAPI e do descriptor; (g) `PT0S` esconde
-   falha de banco no dashboard — limitacao do backend, nao do web.
-   **Inventario, nao backlog**: 78 pontos de discriminacao por status no front (65 `if`, 10 `case` de
-   `switch`, 3 entradas de tabela), com 13 das 85 operacoes declarando `erros`. Varrer o resto exige
-   antes decidir a regra para handlers compartilhados entre operacoes.
-   **Segue recortado na Sprint 35**: o `forward-headers-strategy`, o `resilience4j` morto, o
-   `ApiExceptionHandler` sem `405`, os enums inline, a `message` do `423`, o
-   `ContaBloqueadaException.CODIGO`, o `countByIpAndJanela`, o `MDC.get` literal e o `Clock`
-   injetavel.
-   **Seguem fora de qualquer sprint planejada**: controle compensatorio contra brute force lento
-   (exige ADR), os 4 contratos ausentes da F-17, deteccao de `knownGap` obsoleto no
-   `contract-check.mjs`, o rotulo "Criar conta", `idCurto`/`formatarMoeda` duplicados, Playwright
-   fora do CI, e **todo o bloco mobile**. **Abertos pela Sprint 34**: `NaNmin` no KPI do
-   dashboard backoffice do `sep-app` (`backoffice-format.ts` faz `Math.round` sobre `"PT2H"`; o mock
-   MSW devolve `7200`, entao nenhum teste do front ve) e o `api.models.ts` declarando
-   `tempoMedioResolucao30d: number` onde deveria ser `string`; `forward-headers-strategy: native`
-   com `server.tomcat.remoteip.internal-proxies` no CIDR do balanceador (o allowlist de proxy que
-   falta — hoje a origem e escolhida pelo cliente nos dois caminhos);
-   `resilience4j.ratelimiter.configs.default` morto no `application.yml` (configura o registry do
-   starter, que nada usa); `ApiExceptionHandler` sem handler de
-   `HttpRequestMethodNotSupportedException`; enums saem inline no schema em vez de `$ref`; a
-   `message` do `423` anuncia "30 minutos" enquanto o `Retry-After` traz o restante.
-   **FECHADOS pela Sprint 34**: registrar tentativas `CONTA_BLOQUEADA`, tempo restante no `423`,
-   evicção do mapa de limitadores, validador de startup da invariante, assert do audit na
-   `LockoutLoginIT`, expor `lockout-minutes` no contrato e `X-Step-Up-Token` fora do OpenAPI.
-   **Seguem abertos**: controle compensatorio contra brute force lento (exige ADR);
-   `ContaBloqueadaException.CODIGO` morto; `countByIpAndJanela` sem consumidor; `MDC.get` literal no
-   `RateLimitFilter`; `Clock` injetavel no `LockoutService`; os 4 contratos ausentes da F-17;
-   deteccao de `knownGap` obsoleto no `contract-check.mjs`; rotulo "Criar conta" prometendo
-   formulario e entregando pagina informativa; `idCurto` e `formatarMoeda` duplicados em 6 arquivos
-   cada; Playwright fora do CI-APP. **Abertos pela F-Sprint 22** (web): `message: ""` apaga o alerta
-   em `login.component.ts` e em `core/api/api-error.ts`; 3 literais byte-identicos entre `login` e
-   `verify-totp`; `backoffice.reprocessarWebhook` ramifica `400` que o OpenAPI nao documenta; ~20
-   pontos de ramificacao por status ainda sem `erros`. **Abertos pela F-Sprint 23** (web): a `/account-locked` **ainda pode se autodestruir por outro
-   vetor** — a cadeia e `clientChannel -> auth -> stepUp -> error`, entao o `errorInterceptor` roda
-   antes do `catchError` do servico e um `401`/`403` na consulta da politica navega para fora **sem
-   depender de header nenhum** (web novo contra backend sem a Sprint 34 ja basta); as assercoes de
-   copy colada em `account-locked.component.spec.ts` quebram com reformatacao pura de template;
-   `/auth/totp/verify` e `permitAll` e **nao** esta isento no `authInterceptor`, entao leva
-   `Authorization` morto e o usuario perde o desafio de MFA; `ehUtilizavel` e tudo-ou-nada
-   (`windowMinutes = 0` derruba os tres numeros, e `LockoutProperties` nao tem `@Min`); no mock o
-   `Retry-After` coincide byte a byte com a `message`, entao "o header ganha do corpo" e inobservavel
-   offline; `estabilizar()` esta duplicado no repo (a F-23 registrou "terceira copia"; o Gate F-24.0
-   mediu **38** definicoes, com 3 corpos distintos, mais **42** do helper `flush()`).
-   **Abertos pela M-Sprint 17** (mobile):
-   `/session-expired` nao move foco; `onboarding-shell.iniciar()` sem guarda de reentrancia (e e
-   MUTACAO); `setup-biometric` sem `h1`; `home.page.html` orfa com `ion-header` dentro do
-   `ion-content`; `paginaAtiva`/`enableMsw` duplicados; nenhuma tela de desfecho tem `aria-live`;
-   `verify-totp` sem teste de `precisaRedefinirSenha` nem de duplo-submit; `resetAuthMockState()`
-   sem chamador. **Seguem abertos no mobile**: plugar o MSW no Vitest; `focusManagerPriority` global
-   (exige ADR); ausencia de `contract:check`; Playwright fora do `CI-MOBILE`; `README.md` dizendo
-   "Vitest 2" com o repo em Vitest 3; escopo adiado pelo Gate M-16.0.
+5. **Decisao de rumo, depois da cadeia P1 e da frente de notificacao.** Fechar a Fase 4 preenchendo o
+   §41 do [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com status, PRs, back-merges e as
+   dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do Epic 14 (M-14/M-15) entram
+   como **adiados**, nao como pendencias em aberto.
+
+6. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+   §Gates externos).
+
+7. **Follow-ups tecnicos abertos** (nao bloqueiam).
+   **ABERTOS pela Sprint 35** (2026-09-02): (a) **`415`/`406` caem em 500 em rota publica** —
+   `POST /auth/login` com `Content-Type: text/plain` devolve 500 e loga `ERROR unhandled_exception`;
+   e a mesma classe do defeito que a 35.3 fechou para o `405`, e e alcancavel **sem autenticacao**;
+   (b) **a suite backend nao e hermetica** — usa o `sep_dev` compartilhado
+   (`@AutoConfigureTestDatabase(replace = NONE)` + perfil `dev`), e residuo de uso manual produz
+   **~90 falsos vermelhos**, medido no Gate 35.0; (c) **relogio do lado da escrita** —
+   `LoginAttempt.registrar` e `AuditLogSeguranca.de` ainda carimbam `OffsetDateTime.now()` do sistema
+   (1 e 6 call sites), e enquanto nao unificar **um IT de expiracao de lockout e impossivel**;
+   (d) **`idx_login_attempt_ip_data` sem leitor** desde a remocao de `countByIpAndJanela` — schema
+   ficou fora do escopo por decisao da spec, e ha argumento legitimo para mante-lo (forense por IP);
+   (e) **`DEFAULT NOW()` morto** em `login_attempt.data_tentativa`, inalcancavel porque a coluna e
+   `nullable = false` e a factory sempre popula; (f) **snapshot OpenAPI do `sep-app` a renovar** — o
+   `contract:check` fica verde contra o documento novo, entao **e fidelidade e nao gate**, mas quem
+   regenerar depois vai produzir um diff de ~43 schemas junto com as proprias mudancas;
+   (g) **`CONTA_BLOQUEADA_FALLBACK`** (`sep-app/copy-de-erro.ts`) embute "30 minutos" fixo e agora
+   diverge mais, porque o backend passou a anunciar o restante; (h) **`login.component.ts:50-56`** do
+   `sep-app` justifica header-sobre-corpo com uma razao que deixou de valer.
+   **FECHADOS pela Sprint 35**: `forward-headers-strategy` sem allowlist; validacao de
+   `LockoutProperties` no boot; `ApiExceptionHandler` sem `405`; `resilience4j.ratelimiter` morto;
+   `countByIpAndJanela` sem consumidor; `MDC.get` literal (os **10**, nao os 4 registrados);
+   `Clock` injetavel no `LockoutService`; enums inline no schema; a `message` do `423` divergindo do
+   `Retry-After`; e o `400` de path variable ausente do contrato — que **desbloqueia a F-24.5**.
+   **Lacuna deliberada, nao pendencia**: o `405` que a 35.3 tornou real **nao** e publicado em
+   operacao nenhuma. Vale para todas as 106, e nenhum consumidor ramifica por ele.
+   **Segue aberto e exige ADR**: controle compensatorio contra brute force lento; expor `Retry-After`
+   e demais itens que cruzam os tres repos.
+   **Seguem abertos no web**: os 4 pontos cegos do `contract-check.mjs`; os 4 contratos ausentes da
+   F-17; o rotulo "Criar conta"; `idCurto`/`formatarMoeda` duplicados; Playwright fora do CI-APP.
+   **Seguem abertos no mobile**: plugar o MSW no Vitest; `focusManagerPriority` global (exige ADR);
+   ausencia de `contract:check`; Playwright fora do `CI-MOBILE`; escopo adiado pelo Gate M-16.0.
 
 ## Gates externos pendentes (nao bloqueiam a Fase 4 sobre fake)
 

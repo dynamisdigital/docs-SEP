@@ -87,11 +87,18 @@ que nao afeta nada e pior que ausente: sugere um controle que nao existe.
 
 ### 5. Codigo morto
 
-- `ContaBloqueadaException.java:13` — `public static final String CODIGO = "AUTH-423-001"`, e
-  `:36-38` `getCodigo()`. Nenhum consumidor: a unica outra ocorrencia de `getCodigo()` no `src/main` e
-  a de `DomainException:30`, classe diferente.
-- `LoginAttemptRepository.java:41` — `countByIpAndJanela(...)`. Unico chamador e
-  `LoginAttemptRepositoryTest:58`. Query mantida viva por um teste que so testa a query.
+- ~~`ContaBloqueadaException` — `CODIGO` e `getCodigo()`.~~ **NAO REMOVIDO.** O levantamento estava
+  **certo no fato** (nao havia consumidor em `src/main`) e **errado na conclusao**: a Spec
+  [`036`](./036-sprint-36-codigos-erro-no-fio.md) §Conflito cancelou a remocao, porque a Sprint 36
+  publica `AUTH-423-001` no corpo do `423` e le a constante daqui. Remover para recriar na sprint
+  seguinte paga dois ciclos de PR. Na Sprint 35 o par foi **preservado**, ganhou nota no arquivo
+  explicando por que existe sem consumidor, e ganhou teste que lhe da um de verdade — comentario
+  persuade, teste reprova o build.
+  **Criterio de remocao que fica**: sem consumidor **e** sem spec publicada que lhe de um. So o
+  primeiro nao basta.
+- `LoginAttemptRepository` — `countByIpAndJanela(...)`. **Removido na Task 35.5**, junto com o unico
+  chamador, que era o teste que so a exercitava. Query mantida viva por um teste que so testa a query.
+  Foi a **unica queda de contagem da sprint** (−1).
 
 ### 6. `Clock` nao injetavel e `MDC` literal
 
@@ -167,9 +174,14 @@ Os sete itens acima, um por Task.
 | `forward-headers-strategy: native` + `internal-proxies` | 35.2 |
 | `HttpRequestMethodNotSupportedException` | 35.3 |
 | `resilience4j.ratelimiter.configs.default` morto | 35.4 |
-| `ContaBloqueadaException.CODIGO` + `countByIpAndJanela` | 35.5 |
-| `Clock` injetavel + `MDC` por constante | 35.6 |
+| ~~`ContaBloqueadaException.CODIGO`~~ + `countByIpAndJanela` | 35.5 (**metade cancelada** pela Spec 036 — ver §5) |
+| `Clock` injetavel + `MDC` por constante | 35.6 (o fenomeno era de **10** literais, nao 4) |
 | Enums por `$ref` + `message` do `423` | 35.7 |
+| **(fora desta spec)** `400` de path variable no `@ApiResponses` — desbloqueia a F-24.5 | 35.8 |
 | Baseline, gates e limitacoes | Gate 35.0 e Fechamento |
+
+> **Item 35.8 acrescentado no fechamento (2026-09-02).** Nao constava desta spec, que e de
+> 2026-08-05; veio do §Proximo passo do [`STATE.md`](../../docs-sep/STATE.md), aberto pela F-Sprint 24,
+> e foi executado como oitava Task. Perimetro medido por operacao: **31 sem `400` antes, zero depois**.
 
 Steps em [`035-sprint-35-steps.md`](../../steps-fase-4/backend/035-sprint-35-steps.md).

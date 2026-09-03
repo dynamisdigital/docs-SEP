@@ -62,8 +62,17 @@ Adotar **MFA com 2 fatores adaptados por canal** (combinado com [ADR 0009 - Sepa
 - Cobrem cenario de perda do dispositivo TOTP
 
 #### 4. Rate limiting + Account lockout
-- Rate limit em `/auth/login`: 5 tentativas/min/IP (Resilience4j RateLimiter)
-- Rate limit em `/auth/totp/verify`: 5 tentativas/min/usuario
+- Rate limit em `/auth/login`: **10** tentativas/min/IP (`APP_RATE_LIMIT_LOGIN`)
+- Rate limit em `/auth/totp/verify`: **10** tentativas/min/**IP** (`APP_RATE_LIMIT_TOTP_VERIFY`)
+
+> **Corrigido em 2026-09-02 (fechamento da Sprint 35).** Este ADR dizia "5 tentativas/min" nos dois
+> e "por **usuario**" no TOTP. As duas afirmacoes estao erradas desde a **Sprint 33**, que subiu os
+> limites de 5 para 10 para preservar a invariante `rate-limit > lockout.max-attempts` — com ambos em
+> 5, o `429` mascarava o `423` e o usuario legitimo nunca sabia que a conta estava bloqueada. E o
+> `RateLimitFilter` chaveia por **IP** nos dois casos (`"login:" + ip` e `"totp-verify:" + ip`),
+> nunca por usuario. O `RateLimiter` do Resilience4j e instanciado pela fabrica estatica
+> `RateLimiter.of`, sem passar pelo registry do starter — a configuracao
+> `resilience4j.ratelimiter` foi removida como morta na Sprint 35 Task 35.4.
 - Account lockout: 5 tentativas falhas em 15 min → conta bloqueada por 30 min (com email de notificacao)
 - Lockout permanente apos N bloqueios temporarios sequenciais (configuracao operacional)
 

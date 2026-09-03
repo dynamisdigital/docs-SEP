@@ -1712,8 +1712,8 @@ Sprint de divida, nao de produto. Em `origin/develop` via PR #103 (squash `0d246
 na branch (7 de task, 6 de hotfix de code review), **2220 testes / 0 falhas** (partida 2173), migration
 `V60`, sem ADR, sem estado novo. O gate de contrato no `sep-app` saiu junto: PR #120 (`83681e2`) em
 `develop` e #121 (`ed9c816`) em `main`, restrito a `contracts/` — `contract:check` de **29 lacunas
-para 1**, `knownGaps` de 8 para 1, Vitest 745. Descricao completa em
-[`SPRINT-34-PR.md`](../repos/sep-api/SPRINT-34-PR.md).
+para 1**, `knownGaps` de 8 para 1, Vitest 745. A descricao de PR temporaria foi removida no ciclo
+padrao ao fechar a Sprint 35; o detalhe permanece nesta secao.
 
 **Observabilidade do bloqueio (34.1)** — ate a Sprint 33 nenhuma tentativa contra conta bloqueada
 deixava rastro: `verificar()` lanca antes de qualquer `registrar(...)`, entao uma conta sob ataque
@@ -2199,3 +2199,90 @@ e desmentiu quatro afirmacoes.
 Alem disso, o registro de 2026-09-01 de que "os tres repos de codigo estao intactos" **nao era
 verdade quando foi escrito**: os tres commits do `sep-app` ja tinham cinco dias. Intacto **localmente**
 nao e intacto **no remoto**, e so o segundo importa para quem abre a proxima branch.
+
+## Sprint 35 (backend) — Divida de configuracao, lockout e contrato — MERGEADA develop+main (2026-09-02)
+
+Terceira e ultima das tres sprints de divida planejadas em 2026-08-05 (`D-1` -> `F-24` -> `35`).
+Fecha os follow-ups tecnicos que as Sprints 33 e 34 registraram, deixando no backlog apenas o que
+exige ADR. **Sem tela, endpoint, DTO, migration, ADR ou regra de negocio nova.**
+
+Em `origin/develop` via PR **#105** (squash `23004b9`), back-merge `17bd72d`, e promovida a `main`
+via PR **#106** (`8cabf2c`). **`develop` == `main` por diff de conteudo** (vazio), e a arvore de
+`origin/develop` **byte-identica** a da branch que passou nos gates — conferido **depois** do
+back-merge, que e onde a Sprint 34 quebrou. **2262 testes / 0 falhas / 363 classes** (partida
+2220/355), `spotlessCheck` verde, `contract:check` do `sep-app` em 85 operacoes / 0 lacunas.
+16 commits, **46 mutacoes** aplicadas e revertidas.
+
+### O que entrou
+
+**35.1** — `@Validated` + `@Min(1)` em `LockoutProperties`. Declarativo e nao imperativo porque
+`@Validated` roda depois do bind e ja enxerga o relaxed binding. O motivo de os tres campos serem
+positivos nao esta no repo: e o `ehUtilizavel` do `sep-app`, que trata a politica como tudo-ou-nada.
+
+**35.2** — `forward-headers-strategy: native` com `internal-proxies` na mesma mudanca e default que
+nao confia em ninguem. **Os steps escopavam em `application.yml`; nao bastava** — o `RemoteIpValve`
+ignora o header do peer nao confiavel mas nao o remove, e o `RateLimitFilter.extrairIp` lia o header
+direto, entao o valor forjado continuava chegando em `login_attempt.ip`. O corte de tamanho saiu para
+`shared/web/OrigemDaRequest` ao ganhar segundo consumidor. `ProxyAllowlistValidator` derruba o boot em
+`prod` com allowlist vazio, porque atras de balanceador o app subiria e degradaria em silencio.
+
+**35.3** — `405` no lugar de `500` para verbo nao suportado, com `Allow` (RFC 9110). Medido: os
+`permitAll` de `/api/v1/**` fixam o metodo, entao verbo errado em rota publica para em `401` antes do
+dispatcher.
+
+**35.4 / 35.5** — `resilience4j.ratelimiter` morto removido (zero `@RateLimiter`, zero registry
+injetado); `countByIpAndJanela` removida com o teste que so a exercitava. **A metade do
+`ContaBloqueadaException.CODIGO` foi cancelada** pela Spec 036 §Conflito e a constante ganhou nota e
+teste que lhe da consumidor. **Criterio que fica**: sem consumidor **e** sem spec publicada que lhe de
+um.
+
+**35.6** — `Clock` injetado no `LockoutService`, viabilizando o teste em que o mesmo historico
+atravessa o fim do bloqueio movendo so o relogio. **Os steps previam 4 literais de MDC; eram 10** —
+os outros seis sao `idempotencyKey`, que **nao e campo de log** e sim o valor do header
+`Idempotency-Key` de saida.
+
+**35.7** — enums por `$ref` (88 inline -> 43 schemas nomeados) e a `message` do `423` anunciando o
+tempo **restante**, nao a duracao configurada. Com um numero so, `lockoutMinutes` saiu do construtor.
+
+**35.8** — `400` de path variable declarado por `OperationCustomizer`, e nao por 31 anotacoes: a
+regra deriva do handler, entao endpoint novo nasce declarado. **Perimetro 31 -> 0.** Desbloqueia a
+**F-24.5**.
+
+### Dois achados bloqueantes do code review, e um erro no conserto
+
+O bean de `ModelResolver` da 35.7 entrou **sem `openapi31`**. O springdoc emite 3.1 e substitui o
+resolver dele pelo nosso; em modo 3.0 dentro de um documento 3.1 ele apaga em silencio tudo que o 3.0
+proibe como irmao de `$ref` — **21 `description` e 17 `example`**, oito deles em propriedades que
+documentavam **nulidade**. A correcao e **nao substituir o resolver**: `enumsAsRef` e lido durante a
+resolucao, entao um `@PostConstruct` basta.
+
+O segundo: a nota que justificava alinhar a `message` do `423` afirmava que nenhum consumidor a
+exibe. **Falso** — o `verify-totp` do `sep-app` mostra o corpo verbatim e nem le o `Retry-After`.
+
+**Erro proprio, registrado porque a licao vale mais que o defeito**: a edicao que corrigia o primeiro
+bloqueante **apagou o bean `sepOpenAPI()`**, derrubando o `securitySchemes` e o botao Authorize da
+Swagger UI. O teste `apiDocsExpoeSchemasESecurity` acusou exatamente isso, e a causa foi atribuida a
+outra coisa — tres documentos gerados para "isolar" antes de simplesmente contar os `@Bean` do
+arquivo. **Teste vermelho e evidencia, nao ponto de partida para uma teoria.**
+
+### As cinco mutacoes que sobreviveram
+
+De 46 aplicadas, cinco passaram e viraram trabalho: `@Column(nullable = false)` sendo inerte com
+`ddl-auto: validate` (quem morde e `@NotNull`); `MDC_KEY` trocado passando a suite inteira porque o
+literal restante estava no `logback-spring.xml`; o bean de resolver sem `openapi31` apagando 21
+descriptions com 2258 testes verdes; e `contains("%X{" + MDC_KEY)` casando por **prefixo**.
+Em todos, a leitura do codigo aprovava. So a mutacao reprovou.
+
+### Fora de escopo, por decisao
+
+`405` nao declarado em operacao nenhuma (**lacuna deliberada**: vale para as 106, e ninguem ramifica
+por ele); literais de MDC em `src/test` (sao eles que fazem o rename ser detectado); relogio do lado
+da **escrita** — enquanto nao unificar, IT de expiracao de lockout e impossivel.
+
+### Follow-ups abertos
+
+`415`/`406` caindo em 500 em rota publica; suite backend nao hermetica (usa o `sep_dev` compartilhado
+e residuo produz ~90 falsos vermelhos); `idx_login_attempt_ip_data` sem leitor; `DEFAULT NOW()` morto
+em `login_attempt`; snapshot OpenAPI do `sep-app` a renovar (fidelidade, nao gate);
+`CONTA_BLOQUEADA_FALLBACK` divergindo mais; e o **ADR 0010 §65-66**, que diz 5/min e TOTP por usuario
+quando sao 10 e por IP desde a Sprint 33 — ADR prevalece sobre spec e steps, entao erra com peso maior.
