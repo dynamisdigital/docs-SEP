@@ -3,6 +3,9 @@
 > Descricao **temporaria** para montar o PR real. Removida ao iniciar a sprint seguinte
 > (regra do [`AGENT.md`](../../AGENT.md)).
 
+**Status**: **MERGEADA develop+main em 2026-09-08** — PR **#107** (squash `452a09f`, back-merge
+`a774aa4`) e PR **#108** (`042949b`). `develop` == `main` por conteudo, e a arvore dos dois
+byte-identica a da branch que passou nos gates (tree `89441ab`), conferida **depois** do back-merge.
 **Branch**: `feature/sprint-36-codigos-erro`, a partir de `develop` `17bd72d`
 **Spec**: [`036`](../../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md) ·
 **Steps**: [`036`](../../steps-fase-4/backend/036-sprint-36-steps.md)

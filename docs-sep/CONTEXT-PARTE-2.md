@@ -2287,10 +2287,13 @@ em `login_attempt`; snapshot OpenAPI do `sep-app` a renovar (fidelidade, nao gat
 `CONTA_BLOQUEADA_FALLBACK` divergindo mais; e o **ADR 0010 §65-66**, que diz 5/min e TOTP por usuario
 quando sao 10 e por IP desde a Sprint 33 — ADR prevalece sobre spec e steps, entao erra com peso maior.
 
-## Sprint 36 (backend) — Publicar a taxonomia de codigos de erro no fio — CONCLUIDA na branch (2026-09-08)
+## Sprint 36 (backend) — Publicar a taxonomia de codigos de erro no fio — MERGEADA develop+main (2026-09-08)
 
-Branch `feature/sprint-36-codigos-erro`, de `develop` `17bd72d`. **Push e PR pendentes** (manuais).
-9 commits, 12 arquivos, +1212/−46. **2262 -> 2297 testes / 0 falhas / 368 classes**; `clean build` e
+Em `origin/develop` via PR **#107** (squash `452a09f`), back-merge `a774aa4`, e promovida a `main`
+via PR **#108** (`042949b`), a partir de `develop` `17bd72d`. **`develop` == `main` conferido por
+diff de conteudo** (vazio), e a arvore dos dois **byte-identica** a da branch que passou nos gates —
+os tres apontam para o mesmo tree `89441ab`, conferido **depois** do back-merge, que e onde a
+Sprint 34 quebrou. 9 commits, 12 arquivos, +1176/−10. **2262 -> 2297 testes / 0 falhas / 368 classes**; `clean build` e
 `spotlessCheck` verdes. Sem endpoint, migration, evento, provider, regra nova ou ADR. Nada mudou em
 `sep-app`/`sep-mobile`. Spec [`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md), steps
 [`036`](../steps-fase-4/backend/036-sprint-36-steps.md).

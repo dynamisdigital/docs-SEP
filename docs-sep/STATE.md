@@ -10,26 +10,29 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-08 (fechamento da **Sprint 36** na branch; push e PR pendentes, manuais)._
+_Atualizado em: 2026-09-08 (fechamento da **Sprint 36**, mergeada em develop+main)._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). A Fase 5 segue **inteiramente gated** por
   acesso externo (Celcoin, AWS, contas de loja).
-- **Mudou em 2026-09-08**: a **Sprint 36 esta concluida na branch** `feature/sprint-36-codigos-erro`,
-  a partir de `develop` `17bd72d`. **Push e PR nao foram feitos** — sao manuais. 9 commits, 12
-  arquivos, +1212/−46. Suite **2262 -> 2297**, 0 falhas, 368 classes; `clean build` e
-  `spotlessCheck` verdes; `contract:check` do `sep-app` em 85 operacoes / 0 lacunas contra o
-  documento novo, **sem tocar em nenhum arquivo do web**. Descricao em
+- **Mudou em 2026-09-08**: a **Sprint 36 fechou e esta mergeada** em `develop` (PR **#107**, squash
+  `452a09f`, back-merge `a774aa4`) e `main` (PR **#108**, `042949b`). Conferido **por conteudo**:
+  `develop` == `main` com diff vazio, e a arvore dos dois **byte-identica** a da branch que passou
+  nos gates — os tres apontam para o mesmo tree `89441ab`. A conferencia foi feita **depois** do
+  back-merge, que e onde a Sprint 34 quebrou. 9 commits, 12 arquivos, +1176/−10 no squash. Suite
+  **2262 -> 2297**, 0 falhas, 368 classes; `contract:check` do `sep-app` em 85 operacoes / 0 lacunas,
+  **sem tocar em nenhum arquivo do web**. Descricao em
   [`SPRINT-36-PR.md`](../repos/sep-api/SPRINT-36-PR.md); catalogo e perimetro em
   [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md).
 - **Spec/step ativo**: a fila da Fase 4 continua. Ordem recomendada:
   1. ~~**Sprint 35** — divida de config/lockout/contrato.~~ **MERGEADA develop+main em 2026-09-02.**
-  2. ~~**Sprint 36** — codigos de erro no fio.~~ **CONCLUIDA na branch em 2026-09-08; merge pendente.**
-  3. **Consumo dos codigos**, agora desbloqueado: [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md)
+  2. ~~**Sprint 36** — codigos de erro no fio.~~ **MERGEADA develop+main em 2026-09-08.**
+  3. **Consumo dos codigos**, **desbloqueado agora**: [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md)
      (F-26, web) e [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md) (M-18,
-     mobile). **So comecam depois da 36 integrada em `develop`.** Os tres `MFA-400-002/003/004` que a
-     126 consome estao publicados — conferido no Gate 36.0.
+     mobile). A pre-condicao ("36 integrada em `develop`") **esta satisfeita**. Os tres
+     `MFA-400-002/003/004` que a 126 consome estao publicados — conferido no Gate 36.0 e mantido apos
+     o corte de sete codigos no code review.
   4. **[`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md)** normaliza o que a 036
      deixou fora do perimetro (**preve ADR**). A lista dos **53 excluidos**, codigo a codigo com
      classe dona e motivo, esta em [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md) — e o
@@ -76,12 +79,14 @@ _Atualizado em: 2026-09-08 (fechamento da **Sprint 36** na branch; push e PR pen
 
 ## Onde estamos
 
-- **Sprint 36 (backend) CONCLUIDA na branch em 2026-09-08 — push e PR pendentes** — publicacao da
-  taxonomia de codigos de erro no fio (Fase 4, produto novo na superficie de contrato; **sem
-  endpoint, migration, evento, provider, regra de negocio ou ADR**). Branch
-  `feature/sprint-36-codigos-erro`, de `develop` `17bd72d`. **2262 -> 2297 testes / 0 falhas / 368
-  classes**, `clean build` e `spotlessCheck` verdes. 9 commits, 12 arquivos, +1212/−46. Nada mudou em
-  `sep-app`/`sep-mobile`.
+- **Sprint 36 (backend) MERGEADA develop+main em 2026-09-08** — publicacao da taxonomia de codigos
+  de erro no fio (Fase 4, produto novo na superficie de contrato; **sem endpoint, migration, evento,
+  provider, regra de negocio ou ADR**). Em `origin/develop` via PR **#107** (squash `452a09f`),
+  back-merge `a774aa4`, e promovida a `main` via PR **#108** (`042949b`). **Conferido por conteudo**:
+  `develop` == `main` com diff vazio, e a arvore dos dois **byte-identica** a da branch que passou nos
+  gates — os tres apontam para o mesmo tree `89441ab`, e a conferencia foi feita **depois** do
+  back-merge. **2262 -> 2297 testes / 0 falhas / 368 classes**, `clean build` e `spotlessCheck`
+  verdes. 9 commits, 12 arquivos, +1176/−10. Nada mudou em `sep-app`/`sep-mobile`.
   O corpo de erro ganha campo **`codigo` opcional**; **80 dos 133** codigos medidos passam a ser
   contrato, publicados uma vez em `components/schemas/ErrorResponseDto` por `OpenApiCustomizer`. Ate
   aqui a taxonomia era construida no dominio e **descartada na fronteira HTTP** — `getCodigo()` tinha
@@ -644,25 +649,21 @@ _Atualizado em: 2026-09-08 (fechamento da **Sprint 36** na branch; push e PR pen
 
 ## Proximo passo
 
-1. **Integrar a Sprint 36.** Ela esta **concluida na branch** `feature/sprint-36-codigos-erro` e
-   **push e PR seguem pendentes**, porque sao manuais. Nada mais a implementar nela.
-   **Ao conferir o merge, conferir por conteudo e depois do back-merge** — foi ali que a Sprint 34
-   quebrou e a 35 passou. Descricao pronta em [`SPRINT-36-PR.md`](../repos/sep-api/SPRINT-36-PR.md).
-
-2. **F-Sprint 26 (web) e M-Sprint 18 (mobile)**, que consomem os codigos —
+1. **F-Sprint 26 (web) e M-Sprint 18 (mobile)**, que consomem os codigos publicados pela Sprint 36 —
    [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md) e
-   [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md). **So comecam depois da 36
-   integrada em `develop`**, conforme a propria 036.
+   [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md). A dependencia
+   ("36 integrada em `develop`") **esta satisfeita desde 2026-09-08**. Os steps das duas **nao
+   existem** — criados just-in-time ao aprovar cada uma.
    **Entrada medida para as duas**: o `contract:check` do `sep-app` fica **verde e cego** ao campo
    novo — ele valida `declarado ⊆ documentado`, e o web nao declara nada sobre `codigo`. As tres
    ocorrencias de `"codigo"` em `consumed-contracts.json` sao o **codigo TOTP de seis digitos**,
    coisa diferente. Declarar o campo e trabalho da F-26, e o `contract:check` so passa a proteger
    depois disso.
    **Segunda entrada**: o snapshot `contracts/openapi.snapshot.json` do `sep-app` **nao foi
-   renovado** pela 36 — renovar produz diff de ~43 schemas por conta do follow-up antigo, e
-   misturar esconderia a mudanca. Quem fizer a F-26 renova e paga o diff de uma vez.
+   renovado** pela 36 — renovar produz diff de ~43 schemas por conta do follow-up antigo, e misturar
+   esconderia a mudanca. Quem fizer a F-26 renova e paga o diff de uma vez.
 
-3. **Sprint 37 — normalizacao da taxonomia** ([`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md),
+2. **Sprint 37 — normalizacao da taxonomia** ([`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md),
    **preve ADR**). Ela sai de estimativa para **escopo medido**: a lista dos 53 excluidos, codigo a
    codigo com classe dona, modulo e motivo, esta em
    [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md). Sao **30 de formato** e **23 de
@@ -672,12 +673,12 @@ _Atualizado em: 2026-09-08 (fechamento da **Sprint 36** na branch; push e PR pen
    excluidos nao estao publicados, entao a 037 ainda os renumera de graca — essa janela fecha se
    alguem os publicar antes.
 
-4. **Frente A de notificacao**, em paralelo — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
+3. **Frente A de notificacao**, em paralelo — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
    (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
    e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). Nao toca
    `ApiExceptionHandler`, entao nao colide com a cadeia P1.
 
-5. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
+4. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
    de `sep-api`):
    1. **`sep-mobile`: back-merge `main -> develop`.** O `develop` esta sem o patch
       `@angular/* 20.3.27` que ja esta em `main`, e o `npm audit` ali da **6 high** com o gate
@@ -686,22 +687,22 @@ _Atualizado em: 2026-09-08 (fechamento da **Sprint 36** na branch; push e PR pen
       `64b7b73`), que entraram em `develop` **sem PR**, com mensagens que nao descrevem o diff, e
       **deixaram o `format:check` vermelho**. **Decisao de quem manda no repo**, nao do agente.
 
-6. **Correcao de documento com o maior peso da lista**: o
+5. **Correcao de documento com o maior peso da lista**: o
    [`ADR 0010`](../adr/0010-mfa-totp-com-biometria-mobile.md) §65-66 afirma "5 tentativas/min/IP" no
    login e "5 tentativas/min/**usuario**" no TOTP. **Sao 10, e por IP nos dois**, desde a Sprint 33
    (`APP_RATE_LIMIT_LOGIN:10`, `APP_RATE_LIMIT_TOTP_VERIFY:10`; `RateLimitFilter` chaveia por IP nos
    dois casos). O `AGENT.md` poe **ADR acima de spec e steps**, entao um ADR errado propaga com peso
    maior que qualquer outro documento defasado.
 
-7. **Decisao de rumo, depois da cadeia P1 e da frente de notificacao.** Fechar a Fase 4 preenchendo o
+6. **Decisao de rumo, depois da cadeia P1 e da frente de notificacao.** Fechar a Fase 4 preenchendo o
    §41 do [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com status, PRs, back-merges e as
    dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do Epic 14 (M-14/M-15) entram
    como **adiados**, nao como pendencias em aberto.
 
-8. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+7. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos).
 
-9. **Follow-ups tecnicos abertos** (nao bloqueiam).
+8. **Follow-ups tecnicos abertos** (nao bloqueiam).
    **ABERTOS pela Sprint 36** (2026-09-08): (i) **os quatro corpos de erro fora do handler** —
    `ApiAccessDeniedHandler`, `ApiAuthenticationEntryPoint`, `RateLimitFilter` e
    `PasswordResetEnforcementFilter` montam `ErrorResponseDto` direto na response e nunca passam pelo
@@ -717,7 +718,7 @@ _Atualizado em: 2026-09-08 (fechamento da **Sprint 36** na branch; push e PR pen
    [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md) no lado backend — **`getCodigo()` com zero
    consumidores em `src/main`**, a taxonomia write-only. Fecha de vez quando a F-26 e a M-18
    consumirem. O item **(f)** da lista da 35 (snapshot OpenAPI do `sep-app` a renovar) **segue
-   aberto** e passou a ter dono natural: a F-26 (ver §Proximo passo item 2).
+   aberto** e passou a ter dono natural: a F-26 (ver §Proximo passo item 1).
    **ABERTOS pela Sprint 35** (2026-09-02): (a) **`415`/`406` caem em 500 em rota publica** —
    `POST /auth/login` com `Content-Type: text/plain` devolve 500 e loga `ERROR unhandled_exception`;
    e a mesma classe do defeito que a 35.3 fechou para o `405`, e e alcancavel **sem autenticacao**;

@@ -9,8 +9,9 @@
 - **Revisada em**: 2026-09-01, sob a lente de produto (cap. 3 de *The Product-Minded Engineer*). A
   revisao derrubou quatro numeros e a premissa central; ver §Ancoras 1, 5, 6, 7 e §Decisao tecnica
   principal
-- **Status**: **CONCLUIDA na branch** `feature/sprint-36-codigos-erro` em **2026-09-08**; push e PR
-  pendentes (manuais). Criada em 2026-09-01. Contagens finais na §Medicao do Gate 36.0, que
+- **Status**: **MERGEADA develop+main** em **2026-09-08** — PR **#107** (squash `452a09f`,
+  back-merge `a774aa4`) e PR **#108** (`042949b`); `develop` == `main` por conteudo e arvore
+  byte-identica a da branch. Criada em 2026-09-01. Contagens finais na §Medicao do Gate 36.0, que
   **substitui** as das Ancoras
 - **Fase do produto**: Fase 4 - produto novo (superficie de contrato nova); sem endpoint, migration,
   evento, provider ou regra de negocio nova. **Sem ADR previsto**
