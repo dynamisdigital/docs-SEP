@@ -2388,3 +2388,85 @@ guarda excluia mais sete codigos legitimos, todos overloads de construtor.
 o proxy sobreviveu as 24 mutacoes porque elas testavam o **mecanismo** da guarda, nao a **adequacao
 do criterio**. Mutacao valida implementacao; nao valida definicao. Foi preciso um leitor humano
 perguntando "esse codigo significa mesmo uma coisa so?" para achar.
+
+## F-Sprint 26 (web) — Consumir o codigo de erro no fio — CONCLUIDA na branch (2026-09-08)
+
+Lado web da recomendacao **P1** do `DIAGNOSTICO-PRODUTO.md`; consome o campo `codigo` publicado pela
+Sprint 36. Branch `feature/fsprint-26-codigos-erro` a partir de `develop` `53cc6f6`, 5 commits, 10
+arquivos, **+969/−458** (descontado o snapshot: 8 arquivos, +429/−22). **Push e PR manuais
+pendentes.** Sem tela, endpoint, DTO, migration, regra nova ou ADR. Nada mudou em
+`sep-api`/`sep-mobile`.
+
+**O que muda para quem usa.** O `400` do `verify-totp` era um desfecho so — erro inline com o
+formulario de pe. Quem caia em desafio expirado (`MFA-400-004`) ou conta sem TOTP ativo
+(`MFA-400-003`) redigitava codigo contra algo que nunca aceitaria. Os dois passam a abrir o bloco
+terminal, que esconde o formulario e oferece o link de login. `MFA-400-002` fica de fora **de
+proposito**: ali o desafio segue vivo e tentar de novo e a acao certa. Codigo ausente ou desconhecido
+cai no legado por status, o que cobre backend pre-36, os 53 codigos fora do perimetro e o que a
+Sprint 37 vier a criar.
+
+**A regra**: o codigo escolhe o RAMO, o corpo continua escolhendo a FRASE. Nenhum dicionario local de
+copy por codigo; `CODIGOS_DE_DESFECHO_TERMINAL` e conjunto de ramo, sem frase dentro.
+
+**Gates**: Vitest **833 -> 855 / 97**, Playwright **42**, `contract:check` **85 operacoes / 0
+lacunas**, `lint`, `lint:scss`, `format:check`, `build` e `audit` verdes — rodados depois dos commits
+e apos `npm ci` limpo, porque o `lint-staged` reescreve arquivos.
+
+**A baseline reprovava, e o Step 126.0.3 proibe absorver.** O Gate F-26.0 achou `develop` com
+**dois** gates vermelhos: `format:check` desde 2026-08-26 (portanto **CI-APP reprovando** por 13
+dias) por causa dos tres commits diretos sem PR, e `npm audit` com `fast-uri` **high** e `qs`
+moderate — divida **nova**, nao a residual registrada, e **quarta vez** que o audit do `sep-app`
+volta de zero (F-19, D-1, F-25, agora). Foram para PR proprio (#143, `53cc6f6`), fora da branch da
+sprint. A correcao do `api.models.ts` devolve o arquivo **byte-identico ao de `origin/main`**.
+
+**A Task 126.3 nao foi executada, por bloqueio estrutural provado.** O `contract-check.mjs` (a)
+nao tem onde declarar corpo de erro — `verificarCorpoDaResposta` itera **so `operacao.sucesso`**, e
+`erros` e lista de status conferida por existencia; e (b) `verificarEnum` exige **igualdade de
+conjunto**, nao pertinencia — sonda com 2 dos 4 valores de `role` reprovou em 4 operacoes, enquanto o
+Step 126.3.1 manda declarar so os tres MFA. **Sao o quinto e o sexto pontos cegos**, alem dos quatro
+que a F-24 mapeou. O contorno de declarar `400` em `sucesso` foi rejeitado: corromperia a semantica
+documentada no `$comment` do contrato. **Consequencia declarada**: o catalogo fica sem gate
+automatico; se o backend parar de publicar `MFA-400-003`/`004`, nada no CI do web reprova.
+
+**Smoke real contra `:8080` executado** — gate declarado pendente desde a F-21. `POST
+/auth/totp/verify` com challenge invalido devolve `"codigo":"MFA-400-004"` e a mensagem bate byte a
+byte com o fixture do spec. **E derrubou a §Ancora 2 da spec**: codigo em branco NAO produz
+`MFA-400-002`; volta `"codigo não deve estar em branco"` **sem campo `codigo`**, porque e bean
+validation (`@NotBlank`) na fronteira do controller e cai num dos 13 handlers sem taxonomia. Ordem
+real: bean validation -> challenge (`004`) -> usuario/secret (`003`) -> codigo (`002`). Nao muda a
+implementacao (os dois casos tem o mesmo desfecho e teste), mas **vale para a M-18**.
+
+**Mutacao: 14 distintas, 12 mortas.** Os dois sobreviventes tem causa medida e nao foram contornados.
+(i) Tornar `codigo` obrigatorio nao mata nada porque **nada em `src/main` constroi** um
+`ApiErrorResponse` — os tres leitores usam `?.` ou `Partial<>` — e **specs nao sao typechecados**:
+sonda com erro de tipo deliberado num spec passou por `vitest`, `lint` e `build`, ja que
+`tsconfig.app.json` exclui `src/**/*.spec.ts` e nao ha `tsc --noEmit` em gate nenhum. Em runtime tipos
+sao apagados, entao nenhum teste de comportamento pode mata-lo. (ii) Retirar `codigo` do snapshot
+depende da 126.3.
+
+**A licao que fica**: *no checkpoint da 126.1 eu previ que fixtures tipados matariam as mutacoes de
+tipo, e estava errado* — quem mata e leitor de **producao** mais `npm run build`, nunca o spec. A
+sonda custou um comando e derrubou a previsao antes que ela virasse desenho. Irma da licao da 35
+("prescricao escrita antes da medicao nao vale mais que a medicao"), aplicada desta vez a uma
+prescricao **minha**.
+
+**Segundo incidente proprio, registrado**: o primeiro `sed` de mutacao nao tinha ancora e atingiu
+**quatro** campos `codigo` do `api.models.ts`; a reversao tornou opcionais tres campos que eram
+obrigatorios. A prova que eu mesmo imprimi mostrava as 4 linhas. Restaurado por `git checkout HEAD --`
+e refeito por endereco de linha; efeito liquido no commit: zero. Reforca a memoria "mutacao precisa
+provar que aplicou" — **imprimir a prova nao basta, e preciso le-la**.
+
+**Tres comentarios que a sprint tornou falsos, corrigidos no mesmo ciclo** (familia que a F-23 pagou
+em hotfix): o docblock de `mensagemDeErroDeTotp` e o comentario do teste do `400`, ambos afirmando
+que o `ErrorResponseDto` nao serializa o codigo; e o topo de `copy-de-erro.ts`, que dizia ser o
+`message` o unico discriminador. Um quarto foi preventivo: o docblock novo de `api.models.ts` cravava
+"80 dos 133" — numero que a Sprint 37 invalida —, trocado por ponteiro para `CODIGOS-DE-ERRO.md` num
+hotfix de code review.
+
+**Fora de escopo, declarado**: cenarios ficaram no spec via `server.use`, e nao em `mocks/handlers.ts`,
+que documenta em `:82-84` por que nao tem rotas de `/auth/totp/*` — logo o **dev-offline segue sem a
+jornada de MFA**, como ja era. O mapa de ramo e **3 -> 2**: `003` e `004` compartilham desfecho porque
+a proxima acao do usuario e identica, e inventar um terceiro ramo seria copy sem verdade por tras.
+Os 78 pontos de ramificacao por status seguem intactos.
+
+Detalhe em [`SPRINT-F-26-PR.md`](../repos/sep-app/SPRINT-F-26-PR.md).

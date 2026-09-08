@@ -5,7 +5,8 @@
 - **ID da Spec**: 126
 - **Titulo**: F-Sprint 26 - Trocar ramificacao por status por ramificacao por codigo no `sep-app`,
   comecando pelo `400` colapsado do `verify-totp`, e gatear o catalogo no `contract:check`
-- **Status**: **planejada** (criada em 2026-09-01)
+- **Status**: **CONCLUIDA na branch** em 2026-09-08 (`feature/fsprint-26-codigos-erro`, 5 commits;
+  push e PR manuais pendentes). Resultado medido no fim deste arquivo
 - **Fase do produto**: Fase 4 - produto novo (consome superficie de contrato nova); sem tela,
   endpoint, DTO, migration ou regra nova. **Sem ADR previsto**
 - **Trilha**: Web (`sep-app`)
@@ -60,9 +61,19 @@ propria F-24 declarou indiscriminavel — com a 036 ele deixa de ser.
 
 `VerificarTotpUseCase.java` lanca tres excecoes distintas que viram o mesmo `400`:
 
+> **CORRIGIDO em 2026-09-08 pelo smoke real da propria sprint.** A primeira linha da tabela estava
+> errada: **codigo em branco NAO produz `MFA-400-002`**. Medido contra `:8080`, ele volta
+> `{"message":"codigo não deve estar em branco"}` **sem campo `codigo`** — e bean validation
+> (`@NotBlank`) na fronteira do controller, que nunca chega ao `VerificarTotpUseCase:87-88` e cai num
+> dos **13 handlers sem taxonomia**. `MFA-400-002` so e alcancavel com challenge **valido** e codigo
+> errado. Ordem real de avaliacao: bean validation -> challenge (`004`) -> usuario/secret (`003`) ->
+> codigo (`002`). Nao muda a implementacao — `MFA-400-002` e o `400` sem codigo tem o mesmo desfecho,
+> e ha teste para os dois —, mas **vale para a [`218`](./218-msprint-18-consumo-codigos-erro-mobile.md)**,
+> que consome os mesmos tres codigos.
+
 | Causa | Excecao | Codigo | Linha |
 |---|---|---|---|
-| Codigo ausente/em branco, ou codigo errado | `TotpInvalidoException` | `MFA-400-002` | `:88`, `:117` |
+| Codigo **errado**, com challenge valido | `TotpInvalidoException` | `MFA-400-002` | `:88`, `:117` |
 | MFA nao habilitado para o usuario | `MfaNaoHabilitadoException` | `MFA-400-003` | `:98` |
 | Challenge invalido ou expirado | `MfaChallengeInvalidoException` | `MFA-400-004` | — |
 
@@ -176,5 +187,41 @@ Fecha, ao lado da [`036`](./036-sprint-36-codigos-erro-no-fio.md) e da
 [`218`](./218-msprint-18-consumo-codigos-erro-mobile.md), a recomendacao **P1** do
 [`DIAGNOSTICO-PRODUTO.md`](../../docs-sep/DIAGNOSTICO-PRODUTO.md).
 
-Steps criados just-in-time em `steps-fase-4/web/126-fsprint-26-steps.md` quando a sprint for aprovada
-para execucao.
+Steps em [`steps-fase-4/web/126-fsprint-26-steps.md`](../../steps-fase-4/web/126-fsprint-26-steps.md),
+criados em 2026-09-08.
+
+## Resultado medido (2026-09-08)
+
+**Entregue**: 126.1, 126.2, 126.4, 126.5 e 126.6. **126.3 NAO executada** — ver abaixo.
+Vitest **833 -> 855 / 97**, Playwright **42**, `contract:check` **85 operacoes / 0 lacunas**, `lint`,
+`lint:scss`, `format:check`, `build` e `audit` verdes. **14 mutacoes distintas, 12 mortas.**
+
+### O que a medicao derrubou desta spec
+
+1. **§Ancora 2, primeira linha** — codigo em branco nao produz `MFA-400-002`. Ver o bloco corrigido
+   acima; achado pelo smoke real, nao por leitura.
+2. **§Escopo item 3 (catalogo no `contract:check`) e inexequivel hoje.** Dois bloqueios provados no
+   `scripts/contract-check.mjs`: `verificarCorpoDaResposta` (`:206-217`) itera **so
+   `operacao.sucesso`**, e nao ha chave de operacao que ligue um `$type` a resposta de erro (`erros`
+   e lista de status conferida por existencia, `:168-175`); e `verificarEnum` (`:347-352`) exige
+   **igualdade de conjunto**, nao pertinencia — sonda declarando 2 dos 4 valores de `role` reprovou
+   em 4 operacoes, enquanto o Step 126.3.1 manda declarar **so os tres MFA**. Sao o **quinto e o
+   sexto pontos cegos** do check, alem dos quatro que a §Fora ja listava. Decisao do responsavel pelo
+   repo: pular a Task. **O catalogo fica sem gate automatico**, declarado.
+3. **O criterio de aceite 4 nao se aplica a 126.1.** As tres mutacoes previstas ali sobrevivem porque
+   nao ha leitor ainda; duas passam a morrer na 126.2, e a terceira depende da 126.3.
+4. **Fixture tipado nao gateia nada neste repo.** `tsconfig.app.json` exclui `src/**/*.spec.ts` e nao
+   ha `tsc --noEmit` em script nem no CI — sonda com erro de tipo deliberado num spec passou por
+   `vitest`, `lint` e `build`. Quem mata mutacao de tipo e **leitor de producao** mais `npm run
+   build`. `tsc -p tsconfig.spec.json --noEmit` acusa **11 erros preexistentes**.
+
+### Desvios declarados
+
+- **Mapa de ramo 3 -> 2**: `MFA-400-003` e `MFA-400-004` compartilham desfecho porque a proxima acao
+  do usuario e identica (voltar ao login). Os tres desfechos **observaveis** seguem distintos, ja que
+  a frase vem do corpo. Inventar um terceiro ramo seria copy sem verdade por tras.
+- **Cenarios no spec via `server.use`**, nao em `mocks/handlers.ts`, que documenta em `:82-84` por que
+  nao tem rotas de `/auth/totp/*`. O dev-offline segue sem a jornada de MFA, como ja era.
+- **Baseline exigiu PR proprio** (#143): `format:check` e `npm audit` estavam vermelhos em `develop`.
+
+Descricao completa em [`SPRINT-F-26-PR.md`](../../repos/sep-app/SPRINT-F-26-PR.md).
