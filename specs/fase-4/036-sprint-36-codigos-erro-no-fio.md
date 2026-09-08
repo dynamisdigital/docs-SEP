@@ -9,7 +9,9 @@
 - **Revisada em**: 2026-09-01, sob a lente de produto (cap. 3 de *The Product-Minded Engineer*). A
   revisao derrubou quatro numeros e a premissa central; ver §Ancoras 1, 5, 6, 7 e §Decisao tecnica
   principal
-- **Status**: **planejada** (criada em 2026-09-01)
+- **Status**: **CONCLUIDA na branch** `feature/sprint-36-codigos-erro` em **2026-09-08**; push e PR
+  pendentes (manuais). Criada em 2026-09-01. Contagens finais na §Medicao do Gate 36.0, que
+  **substitui** as das Ancoras
 - **Fase do produto**: Fase 4 - produto novo (superficie de contrato nova); sem endpoint, migration,
   evento, provider ou regra de negocio nova. **Sem ADR previsto**
 - **Trilha**: Backend (`sep-api`)
@@ -58,6 +60,98 @@ tornaria os dois defeitos contrato permanente.
 A formulacao correta: esta sprint continua **nao inventando codigo nenhum**, e passa a publicar
 **so o que ja esta apto** — deixando o resto explicitamente fora, com motivo registrado. Ver
 §Decisao tecnica principal.
+
+## Medicao do Gate 36.0 (2026-09-08) — substitui as contagens das Ancoras
+
+Executado em `feature/sprint-36-codigos-erro`, a partir de `develop` `17bd72d` (Sprint 35 dentro).
+Inventario por **duas vias** (literal com forma de codigo; constante cujo nome indica codigo),
+unidas e deduplicadas; script reproduzivel guardado com a sprint. Baseline: **2262 testes / 0 falhas
+/ 363 classes**, `clean build` e `spotlessCheck` EXIT=0.
+
+As Ancoras abaixo ficam como **registro historico**. Onde divergirem, vale esta secao.
+
+| Item | Ancora dizia | Gate 36.0 mediu |
+|---|---|---|
+| Codigos unicos | ~103 | **133** |
+| Prefixos | 12 | **13** — entra `OF` (1 codigo) |
+| Ponto unico de montagem (§4) | `build()` e o unico | **falso: 5 construcoes** |
+| Colisoes (§7) | 12 | **16** |
+| Violacoes de formato (§6) | 12 | **31** |
+| Codigos `private` (§8) | 12 | **26** |
+| Handlers sem codigo | 10 de 16 | **13 de 17** |
+| Orfaos `BOF-*` (§5) | possivelmente inalcancaveis | **alcancaveis** — `CODIGO` publico + `@ExceptionHandler` dedicado |
+
+**A §Ancora 4 cai, e e o achado com consequencia de escopo.** `ErrorResponseDto.of(...)` tem
+**cinco** call sites em `src/main`: o `build()` do `ApiExceptionHandler` (por onde passam os 17
+handlers) e **quatro fora dele** — `ApiAccessDeniedHandler:35`, `ApiAuthenticationEntryPoint:35`,
+`RateLimitFilter:181` e `PasswordResetEnforcementFilter:106`. Sao filtros e entry points da cadeia
+do Spring Security: escrevem o corpo direto na response e **nunca passam pelo
+`@RestControllerAdvice`**. Consequencia declarada: `401`, `403` e `429` originados na cadeia de
+seguranca **continuam sem `codigo`** depois desta sprint. Ficam **fora do escopo** — nenhum deles
+carrega codigo canonico, e dar-lhes um cai na proibicao de inventar taxonomia (§Fora).
+
+**O caso que prova a demanda**: `PasswordResetEnforcementFilter:109` concatena
+`AUTH-403-PASSWORD_RESET_REQUIRED` **dentro da `message`**. O codigo ja chega ao cliente hoje, por
+contorno, porque nao existe campo para ele. O valor nao e canonico e fica em `excluidos/formato`.
+
+### Particao medida
+
+```text
+133 unicos = 83 publicaveis + 50 excluidos        intersecao = 0
+excluidos: 31 formato · 16 colisao · 3 inalcancavel
+```
+
+Os 3 `inalcancavel` sao exatamente os orfaos da §Ancora 5 (`AUTH-423-001`, `BOF-429-001`,
+`BOF-400-002`), que a Task 36.4 resolve. Com a 36.3 normalizando `CTR-422-CCB-001` para
+**`CTR-422-004`** (faixa `001..003` ocupada, `004` livre), a particao de fechamento projetada e
+**80 publicados + 53 excluidos = 133**.
+
+> **Fechamento em 2026-09-08: a projecao se confirmou.** A particao final e
+> **80 publicados + 53 excluidos = 133**, intersecao 0, sem nenhum `inalcancavel` restante — 30 por
+> formato e 23 por colisao. **Nao e numero escrito aqui**: `ParticaoDeCodigosErroTest` varre
+> `src/main/java` do zero a cada `./gradlew build` e reprova se o catalogo divergir do codigo-fonte.
+>
+> A decomposicao das 16 colisoes, medida ao escrever a Task 36.7, e **9 de faixa compartilhada +
+> 2 de deduplicacao + 5 de colisao intra-modulo** — a §Ancora 7 dizia 8/2/6.
+
+**`MFA-400-002`, `MFA-400-003` e `MFA-400-004` estao em `publicaveis`** — a
+[`126`](./126-fsprint-26-consumo-codigos-erro-web.md) nao perde o caso de uso.
+
+### Colisoes: 16, e uma reclassificacao
+
+As 12 da §Ancora 7 se confirmam. Somam-se **quatro** que nenhuma versao registrava:
+
+| Codigo | Classes donas |
+|---|---|
+| `CRD-400-001` | `PropostaInvalidaException` (credito) x `AssociarOperacaoFinanciadaUseCase` (credores) |
+| `CRD-400-002` | `StatusPropostaInvalidoException` (credito) x `RegistrarAporteCredoraUseCase` (credores) |
+| `USR-400-002` | `GerenciarRolesUsuarioUseCase` ("ultima role") x `CriarUsuarioUseCase` ("criacao direta com role") |
+| `ONB-404-001` | `OnboardingNaoEncontradoException` x `CriarPropostaCreditoUseCase` |
+
+E a §Ancora 7 **erra na classificacao de `ONB-400-007`**: ela o trata como duplicata de significado
+identico, corrigivel por deduplicacao. Sao **tres** sites, nao dois — os dois
+`CODIGO_ARQUIVO_INVALIDO` mais um terceiro em `IniciarOnboardingEmpresaUseCase:86`, que o usa para
+**"campo obrigatorio"**. E colisao real. Renumerar, e nao deduplicar.
+
+`ONB-404-001` e `ONB-400-008` sao o caso oposto — mesma condicao escrita duas vezes. Ficam em
+`excluidos/colisao` mesmo assim, por criterio conservador: o criterio de particao conta **classe
+dona**, e publicar identificador com dois donos e o que a §Decisao tecnica principal proibe.
+Registrados como candidatos a **deduplicacao** e nao a renumeracao, insumo da
+[`037`](./037-sprint-37-normalizacao-taxonomia-erro.md).
+
+### Decisao do Step 036.0.6 — como o catalogo chega ao OpenAPI
+
+**`OpenApiCustomizer` global**, provado contra o documento runtime antes de qualquer Task: escreve o
+catalogo **uma vez** em `components/schemas/ErrorResponseDto/properties/codigo`, preservando OpenAPI
+3.1, `securitySchemes`, as **795** `description` e os **137** `example` do documento. O
+`OperationCustomizer` foi descartado: opera por operacao, e o criterio exige publicacao unica em
+`components`. **O `ModelResolver` nao e substituido** — licao da Sprint 35 Task 35.7.
+
+**Limitacao da "fonte unica", declarada e nao contornada**: **46 dos 133** codigos sao literais
+inline sem constante, e **19 dos 83 publicaveis** sao `private` (os tres `MFA` inclusive). O catalogo
+nao tem como referenciar as constantes sem alargar visibilidade, o que a §Fora proibe. Ele e,
+portanto, **lista literal**, e a nao-divergencia em relacao ao codigo-fonte fica garantida pelo
+script de inventario versionado da Task 36.7 — por verificacao executavel, nao pelo compilador.
 
 ## Ancoras verificadas (2026-09-01)
 

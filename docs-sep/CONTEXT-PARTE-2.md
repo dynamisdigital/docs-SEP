@@ -2286,3 +2286,102 @@ e residuo produz ~90 falsos vermelhos); `idx_login_attempt_ip_data` sem leitor; 
 em `login_attempt`; snapshot OpenAPI do `sep-app` a renovar (fidelidade, nao gate);
 `CONTA_BLOQUEADA_FALLBACK` divergindo mais; e o **ADR 0010 §65-66**, que diz 5/min e TOTP por usuario
 quando sao 10 e por IP desde a Sprint 33 — ADR prevalece sobre spec e steps, entao erra com peso maior.
+
+## Sprint 36 (backend) — Publicar a taxonomia de codigos de erro no fio — CONCLUIDA na branch (2026-09-08)
+
+Branch `feature/sprint-36-codigos-erro`, de `develop` `17bd72d`. **Push e PR pendentes** (manuais).
+9 commits, 12 arquivos, +1212/−46. **2262 -> 2297 testes / 0 falhas / 368 classes**; `clean build` e
+`spotlessCheck` verdes. Sem endpoint, migration, evento, provider, regra nova ou ADR. Nada mudou em
+`sep-app`/`sep-mobile`. Spec [`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md), steps
+[`036`](../steps-fase-4/backend/036-sprint-36-steps.md).
+
+O corpo de erro ganhou campo **`codigo` opcional** e **80 dos 133** codigos medidos viraram contrato,
+publicados uma vez em `components/schemas/ErrorResponseDto` por `OpenApiCustomizer`. Ate aqui a
+taxonomia era construida no dominio e **descartada na fronteira HTTP**: `getCodigo()` tinha zero
+consumidores em `src/main`. Fecha o lado backend da recomendacao **P1** do `DIAGNOSTICO-PRODUTO.md`.
+
+**O Gate 36.0 derrubou sete numeros ou premissas da spec** — sexta sprint de divida seguida em que
+isso acontece. A taxonomia nao e ~103 e sim **133**; prefixos 12 -> **13** (entra `OF`); colisoes
+12 -> **16**; violacoes de formato 12 -> **31**; codigos `private` 12 -> **26**; handlers sem codigo
+10 de 16 -> **13 de 17**; e os dois orfaos `BOF-*` **nao** eram inalcancaveis — cada um tem `CODIGO`
+publico e `@ExceptionHandler` dedicado.
+
+A queda com consequencia de escopo foi a **§Ancora 4**: `build()` **nao** e o ponto unico de montagem.
+`ErrorResponseDto` e construido em **cinco** lugares, e os outros quatro sao filtros e entry points do
+Spring Security (`ApiAccessDeniedHandler`, `ApiAuthenticationEntryPoint`, `RateLimitFilter`,
+`PasswordResetEnforcementFilter`) que escrevem direto na response. **`401`, `403` e `429` da cadeia de
+seguranca seguem sem codigo.** Ficou fora do escopo por decisao: nenhum carrega codigo canonico.
+
+**A sprint achou um defeito nela mesma.** A coluna "catalogada/excluida" da matriz consolidada da
+Task 36.6 revelou que a Task 36.2 vazava codigos **fora do perimetro** para o fio.
+`OwnershipPropostaException` carrega `CRD-403-001`, excluido por colisao — significa "proposta de
+outro tomador" no `credito` e "credora de outro dono" no `credores` —, herda de
+`AcessoNegadoException` e chegava ao `handleDomain` normalmente. O corpo saia com um valor **fora do
+`enum` de 87 declarado no OpenAPI**: a resposta violava o proprio schema publicado e entregava
+identificador ambiguo como se fosse estavel. Corrigido por `somenteSePublicado` no `build`, o que fez
+o `CatalogoCodigosErro` governar **documento e fio**. Efeito colateral util: os fixtures da matriz da
+36.2 usavam `USR-400-001`, `ONB-404-001` e `CRD-403-001`, os tres excluidos — o filtro expos isso.
+
+**24 mutacoes aplicadas, 24 mortas, 0 sobreviventes.** Duas licoes:
+
+1. **Mutacao que nao aplica produz verde falso.** A primeira tentativa de mutar o `build()` nao casou
+   o padrao, porque o `spotlessApply` havia reflowado a chamada para uma linha; a suite ficou verde e
+   quase foi lida como mutante sobrevivente. Desde entao toda mutacao imprime `git diff --numstat` ou
+   tem `assert` no patch antes de rodar. E o irmao do aprendizado da 35 — la o risco era ignorar o
+   mutante que sobrevive; aqui, aceitar a mutacao que **nao existiu**.
+2. **Mutante pode sobreviver por tautologia.** "Catalogo publicado == fonte unica" nao mata "retirar
+   um codigo do catalogo", porque documento e expectativa derivam da mesma lista. So um spot-check
+   independente pegou. A fraqueza foi **registrada no checkpoint da 36.5** e fechou na 36.6, quando o
+   catalogo virou gate de runtime e nao so de documento.
+
+**Contrato**: documento OpenAPI antes -> depois com `description` **795 -> 796**, `example`
+**137 -> 138**, schemas **152 -> 152**, `securitySchemes` intacto e 3.1 preservado — o crescimento e
+exatamente a propriedade nova, e nada foi apagado. O `ModelResolver` **nao** foi tocado, ao contrario
+da 35.7: o `OpenApiCustomizer` edita o documento ja pronto. `contract:check` do `sep-app` verde nas
+duas fontes (85 operacoes / 0 lacunas) **sem tocar em nenhum arquivo do web** — mas o verde **nao
+prova que o web enxerga o campo**: medido, as tres ocorrencias de `"codigo"` em
+`consumed-contracts.json` sao o codigo TOTP de seis digitos, e o check valida
+`declarado ⊆ documentado`.
+
+**Perimetro**: `80 publicados + 53 excluidos = 133`, intersecao 0, recalculado a cada
+`./gradlew build` por `ParticaoDeCodigosErroTest` — que varre `src/main/java` do zero e nao le numero
+de documento nenhum. Os 53 sao **30 de formato** (28 do `pix`, onde o sufixo semantico e majoritario
+28/31, mais `AUTH-403-PASSWORD_RESET_REQUIRED` e `OF-400-001`) e **23 de colisao**: **16 entre
+classes** — decompostas em **9** de faixa compartilhada `credito` x `credores`, **2** de duplicacao
+com significado identico e **5** de colisao intra-modulo — mais **7 dentro da mesma classe**, achados
+no code review de fechamento. A §Ancora 7 da spec dizia 8/2/6 e classificava `ONB-400-007` como
+duplicacao benigna — sao tres sites, e o terceiro usa o valor para outra condicao. Lista completa em
+[`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md).
+
+**Tres desvios dos steps, declarados**: o doc operacional foi para `CODIGOS-DE-ERRO.md` e nao
+`CONTRATOS.md` (que documenta o modulo `contratos` — formalizacao e CCB, assunto e audiencia
+diferentes); a verificacao de particao virou **teste dentro do build** e nao script avulso, porque
+verificacao que so roda quando alguem lembra de invocar nao guarda nada; e o commit da 36.6 e `fix` e
+nao `test`, porque a Task deixou de ser so teste ao achar o vazamento.
+
+**Divida que a sprint EXPOE e nao corrige**: `AUTH-403-PASSWORD_RESET_REQUIRED` ja chegava ao cliente
+concatenado **dentro da `message`** em `PasswordResetEnforcementFilter:109` — contorno anterior a esta
+sprint, e a prova de que a demanda por codigo no fio existia antes de existir o campo.
+
+**Code review de fechamento — sete codigos ambiguos publicados.** O review humano achou o que
+nenhuma guarda da sprint pegava: `ONB-400-004`, publicado como identificador estavel, representa
+duas condicoes na **mesma classe** — `EnviarDocumentoUseCase:52` o lanca para "conteudo do documento
+e obrigatorio" e `:62` para "documento excede o tamanho maximo", com a constante batizada
+`CODIGO_TAMANHO_EXCEDIDO`. A causa nao e o caso isolado: a `ParticaoDeCodigosErroTest` media
+unicidade por **classe dona**, e duas condicoes no mesmo arquivo colapsavam num dono so.
+
+Medida a classe inteira do defeito, eram **sete** (`ASN-400-001`, `ONB-400-002`, `ONB-400-004`,
+`ONB-400-014`, `ONB-400-015`, `PIX-400-002`, `WHK-400-002`) — quatro deles familias de webhook em que
+o mesmo codigo cobre "body ausente", "body nao e JSON" e "header ausente", condicoes com acoes
+diferentes do lado do cliente. Catalogo **87 -> 80**, excluidos **46 -> 53**.
+
+A correcao trocou o criterio por **assinatura de condicao**, com uma distincao semantica que a
+primeira versao nao fazia: dentro de uma classe de excecao os `super(CODIGO, ...)` sobrecarregados
+sao variantes de mensagem da mesma condicao (a classe a nomeia), enquanto um literal inline em use
+case ou controller nao nomeia nada e ali cada mensagem distinta e uma condicao. Sem essa distincao a
+guarda excluia mais sete codigos legitimos, todos overloads de construtor.
+
+**A licao que fica**: a guarda usava um **proxy** (nome do arquivo) para uma propriedade semantica, e
+o proxy sobreviveu as 24 mutacoes porque elas testavam o **mecanismo** da guarda, nao a **adequacao
+do criterio**. Mutacao valida implementacao; nao valida definicao. Foi preciso um leitor humano
+perguntando "esse codigo significa mesmo uma coisa so?" para achar.

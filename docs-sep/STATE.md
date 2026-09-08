@@ -10,33 +10,52 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-02 (fechamento da **Sprint 35**, mergeada em develop+main)._
+_Atualizado em: 2026-09-08 (fechamento da **Sprint 36** na branch; push e PR pendentes, manuais)._
 
 ## Leia agora
 
 - **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). A Fase 5 segue **inteiramente gated** por
   acesso externo (Celcoin, AWS, contas de loja).
-- **Mudou em 2026-09-02**: a **Sprint 35 fechou e esta mergeada** em `develop` (PR **#105**, squash
-  `23004b9`, back-merge `17bd72d`) e `main` (PR **#106**, `8cabf2c`). Conferido **por conteudo**:
-  `develop` == `main` com diff vazio e a arvore de `origin/develop` byte-identica a da branch que
-  passou nos gates, **inclusive depois do back-merge** — que e onde a Sprint 34 quebrou. Suite
-  **2220 -> 2262**, 0 falhas, 363 classes; `contract:check` do `sep-app` em 85 operacoes / 0 lacunas.
-  Descricao em [`SPRINT-35-PR.md`](../repos/sep-api/SPRINT-35-PR.md).
+- **Mudou em 2026-09-08**: a **Sprint 36 esta concluida na branch** `feature/sprint-36-codigos-erro`,
+  a partir de `develop` `17bd72d`. **Push e PR nao foram feitos** — sao manuais. 9 commits, 12
+  arquivos, +1212/−46. Suite **2262 -> 2297**, 0 falhas, 368 classes; `clean build` e
+  `spotlessCheck` verdes; `contract:check` do `sep-app` em 85 operacoes / 0 lacunas contra o
+  documento novo, **sem tocar em nenhum arquivo do web**. Descricao em
+  [`SPRINT-36-PR.md`](../repos/sep-api/SPRINT-36-PR.md); catalogo e perimetro em
+  [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md).
 - **Spec/step ativo**: a fila da Fase 4 continua. Ordem recomendada:
   1. ~~**Sprint 35** — divida de config/lockout/contrato.~~ **MERGEADA develop+main em 2026-09-02.**
-  2. **Cadeia P1 (codigos de erro no fio)** — [`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)
-     publica, [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md) e
-     [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md) consomem. Depois,
-     [`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md) normaliza o que a 036
-     deixou fora do perimetro (**preve ADR**). **A 036 e a proxima a executar.**
-     **Pre-requisito ja satisfeito pela 35**: `ContaBloqueadaException.CODIGO` e `getCodigo()` foram
-     **preservados** (a Task 35.5 cancelou a remocao) e ganharam teste que lhes da consumidor; e os
-     handlers do `ApiExceptionHandler` sao **17**, como a 036 §Escopo ja previa.
-  3. **Frente A de notificacao** — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
+  2. ~~**Sprint 36** — codigos de erro no fio.~~ **CONCLUIDA na branch em 2026-09-08; merge pendente.**
+  3. **Consumo dos codigos**, agora desbloqueado: [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md)
+     (F-26, web) e [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md) (M-18,
+     mobile). **So comecam depois da 36 integrada em `develop`.** Os tres `MFA-400-002/003/004` que a
+     126 consome estao publicados — conferido no Gate 36.0.
+  4. **[`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md)** normaliza o que a 036
+     deixou fora do perimetro (**preve ADR**). A lista dos **53 excluidos**, codigo a codigo com
+     classe dona e motivo, esta em [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md) — e o
+     insumo que dimensiona a 037, e ela sai de estimativa para escopo medido.
+  5. **Frente A de notificacao** — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
      (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
-     e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). **Corre em paralelo com
-     a cadeia P1** — a 038 nao toca `ApiExceptionHandler`.
-  Steps das seis restantes **nao existem** — just-in-time, ao aprovar cada uma.
+     e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). **Corre em paralelo** —
+     a 038 nao toca `ApiExceptionHandler`.
+  Steps das cinco restantes **nao existem** — just-in-time, ao aprovar cada uma.
+- **O code review de fechamento achou 7 codigos ambiguos ja publicados**, e a licao vale mais que o
+  conserto: a particao media unicidade por **classe dona**, um **proxy** para a propriedade que
+  interessa (identidade de condicao). `ONB-400-004` — constante `CODIGO_TAMANHO_EXCEDIDO` — era
+  lancado tambem para "conteudo do documento e obrigatorio", duas condicoes no mesmo arquivo, e o
+  proxy nao via. Catalogo **87 -> 80**. **Mutacao valida implementacao, nao valida definicao**: as 24
+  mutacoes passaram porque testavam o mecanismo da guarda, e nao se o criterio media a coisa certa.
+- **Aprendizado da Sprint 36, o que mais se paga**: **mutacao que nao aplica produz verde falso.** A
+  primeira tentativa de mutar o `build()` nao casou o padrao, porque o `spotlessApply` havia
+  reflowado a chamada para uma linha; a suite ficou verde e o resultado quase foi lido como mutante
+  sobrevivente. Desde entao toda mutacao imprime `git diff --numstat` ou tem `assert` no patch antes
+  de rodar. Irmao do aprendizado da 35 ("mutacao que sobrevive e o achado"): aqui o risco e o
+  inverso, a mutacao que **nao existiu** passando por prova.
+- **Segundo aprendizado**: **mutante pode sobreviver por tautologia.** O teste "catalogo publicado ==
+  fonte unica" nao mata "retirar um codigo do catalogo", porque documento e expectativa derivam da
+  mesma lista. So um spot-check independente pegou. A fraqueza fechou quando o catalogo virou gate de
+  **runtime**, e nao so de documento — mas foi preciso registrar a limitacao antes de conseguir
+  fecha-la.
 - **Regra vigente**: **faixa de numeracao por fase** — Fases 1-4 em **0-49**, Fase 5 em **50-99**,
   dentro da banda por repo. Documentada em [`../AGENT.md`](../AGENT.md) §Numeracao de sprint e de spec.
 - **Aprendizado da Sprint 35, o que mais se paga**: **mutacao que sobrevive e o achado, nao o
@@ -56,6 +75,50 @@ _Atualizado em: 2026-09-02 (fechamento da **Sprint 35**, mergeada em develop+mai
   nao porque pareceu melhor.
 
 ## Onde estamos
+
+- **Sprint 36 (backend) CONCLUIDA na branch em 2026-09-08 — push e PR pendentes** — publicacao da
+  taxonomia de codigos de erro no fio (Fase 4, produto novo na superficie de contrato; **sem
+  endpoint, migration, evento, provider, regra de negocio ou ADR**). Branch
+  `feature/sprint-36-codigos-erro`, de `develop` `17bd72d`. **2262 -> 2297 testes / 0 falhas / 368
+  classes**, `clean build` e `spotlessCheck` verdes. 9 commits, 12 arquivos, +1212/−46. Nada mudou em
+  `sep-app`/`sep-mobile`.
+  O corpo de erro ganha campo **`codigo` opcional**; **80 dos 133** codigos medidos passam a ser
+  contrato, publicados uma vez em `components/schemas/ErrorResponseDto` por `OpenApiCustomizer`. Ate
+  aqui a taxonomia era construida no dominio e **descartada na fronteira HTTP** — `getCodigo()` tinha
+  zero consumidores em `src/main`.
+  **O Gate 36.0 derrubou sete numeros ou premissas da spec**, e o padrao das cinco sprints de divida
+  anteriores se manteve: a taxonomia nao e ~103 e sim **133**; as colisoes nao sao 12 e sim **16**; as
+  violacoes de formato nao sao 12 e sim **31**; os codigos `private` nao sao 12 e sim **26**; os
+  handlers sem codigo nao sao 10 de 16 e sim **13 de 17**; os dois orfaos `BOF-*` **nao** eram
+  inalcancaveis; e a §Ancora 4 caiu — **`build()` nao e o ponto unico de montagem**. Sao **cinco**
+  construcoes de `ErrorResponseDto`, e as outras quatro sao filtros e entry points do Spring Security
+  que escrevem direto na response. **`401`, `403` e `429` da cadeia de seguranca seguem sem codigo**,
+  por decisao declarada.
+  **A sprint achou um defeito nela mesma.** A matriz consolidada da Task 36.6 revelou que a Task 36.2
+  vazava codigos **fora do perimetro** para o fio: `OwnershipPropostaException` carrega
+  `CRD-403-001`, excluido por colisao, e o `ex.getCodigo()` o emitia — corpo com valor fora do `enum`
+  publicado, ou seja, resposta violando o proprio schema. Corrigido por `somenteSePublicado` no
+  `build`, o que fez o catalogo governar **documento e fio**. Efeito colateral util: os fixtures da
+  matriz da 36.2 usavam tres codigos excluidos, e o filtro expos isso.
+  **26 mutacoes aplicadas, 26 mortas, 0 sobreviventes**, cada uma com prova de que entrou no arquivo.
+  Documento OpenAPI antes -> depois: `description` **795 -> 796**, `example` **137 -> 138**, schemas
+  **152 -> 152**, `securitySchemes` intacto, 3.1 preservado — o crescimento e exatamente a
+  propriedade nova, e **nada foi apagado** (o resolver **nao** foi tocado, ao contrario da 35.7).
+  **Perimetro**: `80 publicados + 53 excluidos = 133`, intersecao 0, recalculado a cada
+  `./gradlew build` por `ParticaoDeCodigosErroTest` — nao lido de documento. Os 53 sao **30 de
+  formato** (28 do `pix`, onde o sufixo semantico e majoritario 28/31, mais
+  `AUTH-403-PASSWORD_RESET_REQUIRED` e `OF-400-001`) e **23 de colisao**, sendo **16 entre classes**
+  (9 de faixa compartilhada `credito` x `credores`, 2 de duplicacao com significado identico, 5 de
+  colisao intra-modulo) e **7 dentro da mesma classe** — os sete que o code review de fechamento
+  achou no catalogo publicado e obrigou a retirar.
+  **Tres desvios dos steps, declarados**: o doc operacional foi para
+  [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md) e nao `CONTRATOS.md` (que e o doc do
+  modulo `contratos`); a verificacao de particao virou **teste** e nao script avulso; e o commit da
+  36.6 e `fix` e nao `test`, porque a Task deixou de ser so teste.
+  **Divida que a sprint EXPOE e nao corrige**: `AUTH-403-PASSWORD_RESET_REQUIRED` ja chega ao cliente
+  hoje concatenado **dentro da `message`** em `PasswordResetEnforcementFilter:109` — contorno
+  anterior a esta sprint, e a prova de que a demanda existia antes do campo. Descricao em
+  [`SPRINT-36-PR.md`](../repos/sep-api/SPRINT-36-PR.md).
 
 - **Sprint 35 (backend) MERGEADA develop+main em 2026-09-02** — divida de configuracao, lockout e
   contrato (sprint de divida; **sem tela, endpoint, DTO, migration, ADR ou regra nova**). Em
@@ -581,23 +644,40 @@ _Atualizado em: 2026-09-02 (fechamento da **Sprint 35**, mergeada em develop+mai
 
 ## Proximo passo
 
-1. **Sprint 36 — codigos de erro no fio** ([`036`](../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)).
-   E a proxima. **Comece pelo Gate 36.0**, e nas cinco sprints de divida anteriores o Gate derrubou
-   numero ou premissa da spec **sem excecao**.
-   **Dois pre-requisitos ja satisfeitos pela Sprint 35**: `ContaBloqueadaException.CODIGO` e
-   `getCodigo()` foram **preservados** (a 35.5 cancelou a remocao, conforme a §Conflito da propria
-   036) e ganharam teste que lhes da consumidor — nao ha o que recriar; e os `@ExceptionHandler` do
-   `ApiExceptionHandler` sao **17** apos a Task 35.3, exatamente como a 036 §Escopo item 2 previa.
-   **Entrada nova para o Gate 36.0**: a Sprint 35 fechou o `400` de path variable por
-   `OperationCustomizer`, e a mesma mecanica serve para publicar `codigo` — vale conferir se a 36
-   quer o mesmo caminho em vez de anotacao por endpoint.
+1. **Integrar a Sprint 36.** Ela esta **concluida na branch** `feature/sprint-36-codigos-erro` e
+   **push e PR seguem pendentes**, porque sao manuais. Nada mais a implementar nela.
+   **Ao conferir o merge, conferir por conteudo e depois do back-merge** — foi ali que a Sprint 34
+   quebrou e a 35 passou. Descricao pronta em [`SPRINT-36-PR.md`](../repos/sep-api/SPRINT-36-PR.md).
 
-2. **Frente A de notificacao**, em paralelo — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
+2. **F-Sprint 26 (web) e M-Sprint 18 (mobile)**, que consomem os codigos —
+   [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md) e
+   [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md). **So comecam depois da 36
+   integrada em `develop`**, conforme a propria 036.
+   **Entrada medida para as duas**: o `contract:check` do `sep-app` fica **verde e cego** ao campo
+   novo — ele valida `declarado ⊆ documentado`, e o web nao declara nada sobre `codigo`. As tres
+   ocorrencias de `"codigo"` em `consumed-contracts.json` sao o **codigo TOTP de seis digitos**,
+   coisa diferente. Declarar o campo e trabalho da F-26, e o `contract:check` so passa a proteger
+   depois disso.
+   **Segunda entrada**: o snapshot `contracts/openapi.snapshot.json` do `sep-app` **nao foi
+   renovado** pela 36 — renovar produz diff de ~43 schemas por conta do follow-up antigo, e
+   misturar esconderia a mudanca. Quem fizer a F-26 renova e paga o diff de uma vez.
+
+3. **Sprint 37 — normalizacao da taxonomia** ([`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md),
+   **preve ADR**). Ela sai de estimativa para **escopo medido**: a lista dos 53 excluidos, codigo a
+   codigo com classe dona, modulo e motivo, esta em
+   [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md). Sao **30 de formato** e **23 de
+   colisao**, e as 16 se decompoem em 9 de faixa compartilhada, 2 de deduplicacao e 5 de colisao
+   intra-modulo — **decomposicao medida, nao a da §Ancora 7 da spec 036**, que dizia 8/2/6.
+   **Cuidado que a 36 comprou**: renomear codigo **ja publicado** agora e mudanca de contrato. Os 46
+   excluidos nao estao publicados, entao a 037 ainda os renumera de graca — essa janela fecha se
+   alguem os publicar antes.
+
+4. **Frente A de notificacao**, em paralelo — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
    (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
    e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). Nao toca
    `ApiExceptionHandler`, entao nao colide com a cadeia P1.
 
-3. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
+5. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
    de `sep-api`):
    1. **`sep-mobile`: back-merge `main -> develop`.** O `develop` esta sem o patch
       `@angular/* 20.3.27` que ja esta em `main`, e o `npm audit` ali da **6 high** com o gate
@@ -606,22 +686,38 @@ _Atualizado em: 2026-09-02 (fechamento da **Sprint 35**, mergeada em develop+mai
       `64b7b73`), que entraram em `develop` **sem PR**, com mensagens que nao descrevem o diff, e
       **deixaram o `format:check` vermelho**. **Decisao de quem manda no repo**, nao do agente.
 
-4. **Correcao de documento com o maior peso da lista**: o
+6. **Correcao de documento com o maior peso da lista**: o
    [`ADR 0010`](../adr/0010-mfa-totp-com-biometria-mobile.md) §65-66 afirma "5 tentativas/min/IP" no
    login e "5 tentativas/min/**usuario**" no TOTP. **Sao 10, e por IP nos dois**, desde a Sprint 33
    (`APP_RATE_LIMIT_LOGIN:10`, `APP_RATE_LIMIT_TOTP_VERIFY:10`; `RateLimitFilter` chaveia por IP nos
    dois casos). O `AGENT.md` poe **ADR acima de spec e steps**, entao um ADR errado propaga com peso
    maior que qualquer outro documento defasado.
 
-5. **Decisao de rumo, depois da cadeia P1 e da frente de notificacao.** Fechar a Fase 4 preenchendo o
+7. **Decisao de rumo, depois da cadeia P1 e da frente de notificacao.** Fechar a Fase 4 preenchendo o
    §41 do [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com status, PRs, back-merges e as
    dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do Epic 14 (M-14/M-15) entram
    como **adiados**, nao como pendencias em aberto.
 
-6. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
+8. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos).
 
-7. **Follow-ups tecnicos abertos** (nao bloqueiam).
+9. **Follow-ups tecnicos abertos** (nao bloqueiam).
+   **ABERTOS pela Sprint 36** (2026-09-08): (i) **os quatro corpos de erro fora do handler** —
+   `ApiAccessDeniedHandler`, `ApiAuthenticationEntryPoint`, `RateLimitFilter` e
+   `PasswordResetEnforcementFilter` montam `ErrorResponseDto` direto na response e nunca passam pelo
+   `@RestControllerAdvice`, entao `401`/`403`/`429` da cadeia de seguranca **nunca terao `codigo`**
+   enquanto isso valer; (j) **`AUTH-403-PASSWORD_RESET_REQUIRED` embutido na `message`**
+   (`PasswordResetEnforcementFilter:109`) — contorno que agora tem alternativa, mas o codigo e nao
+   canonico e depende da 037; (k) **13 dos 17 handlers seguem sem taxonomia**, medido e listado em
+   [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md); criar codigo para eles e decisao de
+   produto e depende das personas, que nao existem; (l) **o catalogo e lista literal** — 46 dos 133
+   codigos so existem como literal inline e 19 publicados sao `private`, entao a ligacao com o
+   codigo-fonte e garantida por `ParticaoDeCodigosErroTest` e nao pelo compilador.
+   **FECHADO pela Sprint 36**: a recomendacao **P1** do
+   [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md) no lado backend — **`getCodigo()` com zero
+   consumidores em `src/main`**, a taxonomia write-only. Fecha de vez quando a F-26 e a M-18
+   consumirem. O item **(f)** da lista da 35 (snapshot OpenAPI do `sep-app` a renovar) **segue
+   aberto** e passou a ter dono natural: a F-26 (ver §Proximo passo item 2).
    **ABERTOS pela Sprint 35** (2026-09-02): (a) **`415`/`406` caem em 500 em rota publica** —
    `POST /auth/login` com `Content-Type: text/plain` devolve 500 e loga `ERROR unhandled_exception`;
    e a mesma classe do defeito que a 35.3 fechou para o `405`, e e alcancavel **sem autenticacao**;
