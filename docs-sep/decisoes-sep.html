@@ -1,0 +1,1064 @@
+<title>Decisões Pendentes do SEP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@500;700&display=swap">
+
+<style>
+:root {
+  --ground: #FAFAFB;
+  --surface: #F1F2F5;
+  --surface-2: #E9EBF0;
+  --ink: #171A1F;
+  --ink-soft: #59616E;
+  --ink-faint: #858D9A;
+  --accent: #1E3A5F;
+  --accent-soft: #E3E9F1;
+  --critical: #A0342A;
+  --critical-soft: #F6E7E4;
+  --advice: #8A6224;
+  --advice-soft: #F7EFE0;
+  --rule: #DFE2E8;
+  --rule-strong: #C6CBD4;
+
+  --f-display: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --f-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+:root:not([data-theme="light"]) {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #13151A;
+    --surface: #1C1F26;
+    --surface-2: #232730;
+    --ink: #E7E9EE;
+    --ink-soft: #98A1AF;
+    --ink-faint: #737C8A;
+    --accent: #84A9D8;
+    --accent-soft: #1D2735;
+    --critical: #E29288;
+    --critical-soft: #2E1E1C;
+    --advice: #D8AC5C;
+    --advice-soft: #2B2318;
+    --rule: #2A2F38;
+    --rule-strong: #3B424E;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #13151A;
+  --surface: #1C1F26;
+  --surface-2: #232730;
+  --ink: #E7E9EE;
+  --ink-soft: #98A1AF;
+  --ink-faint: #737C8A;
+  --accent: #84A9D8;
+  --accent-soft: #1D2735;
+  --critical: #E29288;
+  --critical-soft: #2E1E1C;
+  --advice: #D8AC5C;
+  --advice-soft: #2B2318;
+  --rule: #2A2F38;
+  --rule-strong: #3B424E;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  gap: 0;
+  max-width: 1180px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+/* ---------- rail ---------- */
+
+.rail {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding: 40px 28px 40px 32px;
+  border-right: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.rail-mark {
+  font-family: var(--f-mono);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.tally { display: flex; flex-direction: column; gap: 6px; }
+
+.tally-row {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.tally-n { font-weight: 700; font-size: 19px; color: var(--ink); min-width: 2ch; }
+.tally-n.is-critical { color: var(--critical); }
+
+nav.parts { display: flex; flex-direction: column; gap: 2px; }
+
+nav.parts a {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 7px 10px;
+  margin-left: -10px;
+  border-radius: 3px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-family: var(--f-display);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+nav.parts a:hover { background: var(--surface); color: var(--ink); }
+nav.parts a .rn {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}
+
+.filter {
+  border-top: 1px solid var(--rule);
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.filter label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+  font-family: var(--f-display);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.filter input { margin: 3px 0 0; accent-color: var(--critical); width: 15px; height: 15px; flex: none; }
+.filter p { margin: 0; font-size: 12.5px; color: var(--ink-faint); font-family: var(--f-display); line-height: 1.45; }
+
+.rail-foot {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--f-display);
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+
+/* ---------- main ---------- */
+
+main { padding: 40px 44px 96px; min-width: 0; }
+.wrap { max-width: 68ch; }
+
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 14px;
+}
+
+h1 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(30px, 4.4vw, 43px);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  margin: 0 0 16px;
+  text-wrap: balance;
+}
+
+.standfirst {
+  font-size: 19px;
+  color: var(--ink-soft);
+  margin: 0 0 30px;
+  line-height: 1.55;
+}
+
+h2 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 25px;
+  line-height: 1.2;
+  letter-spacing: -0.014em;
+  margin: 0 0 6px;
+  text-wrap: balance;
+}
+
+h3 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 16.5px;
+  line-height: 1.3;
+  margin: 34px 0 14px;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+p { margin: 0 0 15px; }
+p:last-child { margin-bottom: 0; }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+strong { font-weight: 600; }
+em { font-style: italic; color: var(--ink-soft); }
+
+code {
+  font-family: var(--f-mono);
+  font-size: 0.855em;
+  background: var(--surface);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+/* ---------- part sections ---------- */
+
+.part { margin-top: 60px; scroll-margin-top: 24px; }
+
+.part-head {
+  border-top: 2px solid var(--ink);
+  padding-top: 16px;
+  margin-bottom: 26px;
+}
+
+.part-n {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--ink-faint);
+  display: block;
+  margin-bottom: 9px;
+}
+
+.part-lede { color: var(--ink-soft); font-size: 16px; margin: 12px 0 0; }
+
+/* ---------- question ---------- */
+
+.q {
+  position: relative;
+  padding: 3px 0 3px 20px;
+  border-left: 2px solid var(--rule-strong);
+  margin: 26px 0;
+  scroll-margin-top: 24px;
+}
+
+.q--block { border-left-color: var(--critical); }
+
+.q-id {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.q--block .q-id { color: var(--critical); }
+
+.tag-block {
+  font-family: var(--f-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--critical-soft);
+  color: var(--critical);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.q-ask { font-size: 17.5px; margin: 0 0 10px; }
+
+.changes {
+  font-size: 15.5px;
+  color: var(--ink-soft);
+  margin: 10px 0 0;
+}
+
+.changes b {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.advice {
+  margin: 14px 0 0;
+  padding: 13px 16px;
+  background: var(--advice-soft);
+  border-left: 2px solid var(--advice);
+  font-size: 15.5px;
+  color: var(--ink);
+  border-radius: 0 3px 3px 0;
+}
+
+.advice b {
+  font-family: var(--f-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--advice);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ---------- callouts ---------- */
+
+.note {
+  padding: 16px 18px;
+  border-radius: 3px;
+  font-size: 15.5px;
+  margin: 22px 0;
+  background: var(--surface);
+  border-left: 2px solid var(--rule-strong);
+}
+
+.note--warn { background: var(--critical-soft); border-left-color: var(--critical); }
+.note--good { background: var(--accent-soft); border-left-color: var(--accent); }
+.note p { margin-bottom: 9px; }
+
+.note b.note-label {
+  font-family: var(--f-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 5px;
+  color: var(--critical);
+}
+
+/* ---------- priority strip ---------- */
+
+.priority {
+  margin: 30px 0 0;
+  padding: 18px 20px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--surface);
+}
+
+.priority h4 {
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  color: var(--ink-soft);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.chip {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--ground);
+  background: var(--accent);
+  padding: 5px 11px;
+  border-radius: 3px;
+}
+
+.chip:hover { opacity: 0.85; }
+.priority p { font-size: 14.5px; color: var(--ink-soft); margin: 12px 0 0; }
+
+/* ---------- lists ---------- */
+
+ul.plain { margin: 0 0 15px; padding-left: 20px; }
+ul.plain li { margin-bottom: 7px; }
+
+ol.steps { margin: 0 0 15px; padding-left: 22px; }
+ol.steps li { margin-bottom: 11px; }
+
+ul.checklist { list-style: none; margin: 14px 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+
+ul.checklist li {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-radius: 3px;
+  font-family: var(--f-display);
+  font-size: 15px;
+}
+
+ul.checklist li::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: 2px;
+  flex: none;
+}
+
+/* ---------- tables ---------- */
+
+.tw { overflow-x: auto; margin: 18px 0; border: 1px solid var(--rule); border-radius: 3px; }
+
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; font-family: var(--f-display); }
+
+th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+td { padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.5; }
+tr:last-child td { border-bottom: none; }
+td.opt { font-family: var(--f-mono); font-weight: 700; color: var(--accent); white-space: nowrap; }
+table code { font-size: 12px; background: transparent; padding: 0; }
+
+/* ---------- appendix ---------- */
+
+.appendix { margin-top: 66px; padding-top: 26px; border-top: 2px solid var(--ink); }
+.appendix h2 { font-size: 21px; }
+.appendix, .appendix p, .appendix li { font-size: 15px; }
+.appendix .tw table { font-size: 13.5px; }
+.appendix ul.plain li { margin-bottom: 13px; color: var(--ink-soft); }
+.appendix ul.plain li strong { color: var(--ink); }
+
+/* ---------- filter state ---------- */
+
+body.only-blockers .q:not(.q--block) { display: none; }
+body.only-blockers [data-optional] { display: none; }
+
+.filter-live {
+  display: none;
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  color: var(--critical);
+  font-weight: 700;
+}
+
+body.only-blockers .filter-live { display: block; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+  .rail {
+    position: static;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 26px 22px;
+  }
+  nav.parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2px; }
+  main { padding: 30px 22px 70px; }
+  body { font-size: 16.5px; }
+  .rail-foot { margin-top: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .rail { display: none; }
+  .shell { display: block; max-width: none; }
+  main { padding: 0; }
+  .wrap { max-width: none; }
+  body { font-size: 11pt; background: #fff; color: #000; }
+  .q, .part, .note, .advice { break-inside: avoid; }
+  .part { margin-top: 30px; }
+}
+</style>
+
+<div class="shell">
+
+  <aside class="rail">
+    <div class="rail-mark">SEP · 2026-09-03</div>
+
+    <div class="tally">
+      <div class="tally-row"><span class="tally-n">38</span><span>perguntas</span></div>
+      <div class="tally-row"><span class="tally-n is-critical">20</span><span>travam o trabalho</span></div>
+      <div class="tally-row"><span class="tally-n">5</span><span>partes</span></div>
+    </div>
+
+    <nav class="parts" aria-label="Partes do documento">
+      <a href="#uso"><span class="rn">—</span><span>Como usar</span></a>
+      <a href="#parte-1"><span class="rn">I</span><span>Qual é o nosso negócio</span></a>
+      <a href="#parte-2"><span class="rn">II</span><span>Que empréstimos oferecer</span></a>
+      <a href="#parte-3"><span class="rn">III</span><span>Consignado</span></a>
+      <a href="#parte-4"><span class="rn">IV</span><span>Limite regulatório</span></a>
+      <a href="#parte-5"><span class="rn">V</span><span>A página pública</span></a>
+      <a href="#parado"><span class="rn">—</span><span>O que está parado</span></a>
+      <a href="#apendice"><span class="rn">—</span><span>Apêndice técnico</span></a>
+    </nav>
+
+    <div class="filter">
+      <label>
+        <input type="checkbox" id="blockToggle">
+        <span>Mostrar só as que travam</span>
+      </label>
+      <p>Esconde as 18 que moldam o desenho mas não param a equipe.</p>
+      <div class="filter-live" role="status">FILTRO ATIVO · 20 de 38</div>
+    </div>
+
+    <div class="rail-foot">
+      Preparado pela equipe técnica.<br>
+      Leitura de normas por engenharia — não é parecer jurídico.
+    </div>
+  </aside>
+
+  <main>
+    <div class="wrap">
+
+      <p class="eyebrow">Documento de decisão · Direção</p>
+      <h1>Decisões pendentes do SEP</h1>
+      <p class="standfirst">Trinta e oito perguntas que precisam de resposta da direção antes de a equipe construir mais alguma coisa. Vinte delas travam trabalho hoje.</p>
+
+      <section id="uso" class="part" style="margin-top:34px">
+        <div class="part-head">
+          <span class="part-n">COMO USAR</span>
+          <h2>Três direções novas, nenhuma fechada</h2>
+        </div>
+
+        <p>Nas últimas conversas apareceram três mudanças de rumo, e nenhuma delas está confirmada:</p>
+        <ol class="steps">
+          <li>a plataforma seria <strong>implementada para terceiros</strong>, com o SEP atuando como <strong>conciliante</strong>;</li>
+          <li>o produto ofereceria <strong>consignado</strong>, possivelmente como única modalidade;</li>
+          <li>o consignado seria <strong>apenas para funcionários de empresas que já emprestam na plataforma</strong>.</li>
+        </ol>
+        <p>As três se afetam. Antes de construir qualquer coisa, precisamos confirmar o que foi entendido e fechar as decisões que só a direção pode tomar.</p>
+        <p>As perguntas marcadas <strong>TRAVA</strong> impedem a equipe de avançar — sem resposta, ou ficamos parados nessa frente, ou construímos algo que pode ser descartado. Onde existe risco jurídico, trabalhista ou de privacidade, a pergunta vem com uma <strong>opinião da equipe técnica</strong>. É sugestão, não conclusão.</p>
+
+        <div class="priority">
+          <h4>Se o tempo da reunião for curto</h4>
+          <div class="chips">
+            <a class="chip" href="#p1">P1</a>
+            <a class="chip" href="#p3">P3</a>
+            <a class="chip" href="#p4">P4</a>
+            <a class="chip" href="#p12">P12</a>
+            <a class="chip" href="#p37">P37</a>
+          </div>
+          <p>São as cinco que mais destravam trabalho. Não são as mais graves — a mais grave é a <a href="#p25">P25</a>, o funcionário que sai da empresa com o empréstimo em aberto.</p>
+        </div>
+
+        <div class="note note--warn">
+          <b class="note-label">Ressalva</b>
+          <p>Este documento contém leitura de normas feita pela equipe técnica. <strong>Não é parecer jurídico.</strong> Os pontos marcados TRAVA nas partes I e III deveriam passar por advogado antes de virarem decisão.</p>
+        </div>
+      </section>
+
+      <!-- ============ PARTE I ============ -->
+      <section id="parte-1" class="part">
+        <div class="part-head">
+          <span class="part-n">PARTE I · P1–P11</span>
+          <h2>Qual é o nosso negócio</h2>
+          <p class="part-lede">Esta parte é nova e passou à frente das demais. A frase <em>“a plataforma será implementada para terceiros, seremos os conciliantes”</em> admite leituras muito diferentes — e a diferença entre elas não é de detalhe, é de empresa.</p>
+        </div>
+
+        <h3>Somos instituição financeira, ou fornecedor de software?</h3>
+
+        <div class="q q--block" id="p1">
+          <div class="q-id">P1 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Qual destas descreve o negócio?</p>
+          <div class="tw">
+            <table>
+              <thead><tr><th></th><th>Modelo</th><th>O que somos</th><th>Autorização do BC</th></tr></thead>
+              <tbody>
+                <tr><td class="opt">A</td><td>Nós operamos o SEP; terceiros participam como credores</td><td>Instituição financeira</td><td>Nós</td></tr>
+                <tr><td class="opt">B</td><td>Licenciamos o sistema; cada terceiro opera o próprio SEP</td><td>Fornecedor de software</td><td>Cada cliente</td></tr>
+                <tr><td class="opt">C</td><td>Uma plataforma só, vários terceiros operando dentro, isolados</td><td>Instituição <em>e</em> fornecedor</td><td>A definir — ver P2</td></tr>
+                <tr><td class="opt">D</td><td>Nós operamos, terceiros trazem clientes (originação)</td><td>Instituição financeira</td><td>Nós</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="changes"><b>O que muda</b>Tudo. Produto, time, custo, prazo, risco e licença. Em <strong>B</strong> não precisamos de autorização e nosso cliente é uma empresa de tecnologia comprando software. Em <strong>A</strong> e <strong>D</strong> somos a instituição e respondemos pela operação inteira. <strong>C</strong> é os dois ao mesmo tempo, e é o mais caro de todos.</p>
+        </div>
+
+        <div class="q q--block" id="p2">
+          <div class="q-id">P2 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Operar uma SEP exige <strong>autorização do Banco Central</strong>. Se terceiros vão operar na nossa plataforma: eles serão SEPs autorizados por conta própria, ou operarão sob a nossa autorização?</p>
+          <p class="changes"><b>O que muda</b>Se operarem sob a nossa, respondemos perante o regulador por tudo o que fizerem — inclusive pelo crédito que concederem e pelo tratamento que derem aos clientes deles. Se cada um tiver a própria, somos fornecedor e a relação é contratual, não regulatória.</p>
+        </div>
+
+        <div class="q q--block" id="p3">
+          <div class="q-id">P3 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">O que exatamente significa <strong>“seremos os conciliantes”</strong>? Encontramos dois sentidos possíveis, e não são a mesma coisa:</p>
+          <ul class="plain">
+            <li><strong>Conciliação financeira</strong> — nós operamos a rotina de casar pagamentos recebidos com parcelas em aberto, para os terceiros. É serviço operacional.</li>
+            <li><strong>Intermediação</strong> — nós somos a parte que fica no meio entre quem empresta e quem toma, que é o papel que a norma atribui à SEP. É papel institucional.</li>
+          </ul>
+          <p class="changes"><b>O que muda</b>O primeiro é um serviço que podemos prestar mesmo sendo fornecedor de software. O segundo só existe se formos a instituição autorizada. Se a intenção é os dois, precisamos saber — a conta é diferente.</p>
+        </div>
+
+        <h3>Se houver terceiros dentro da mesma plataforma</h3>
+        <p data-optional>Responder só se a P1 for <strong>C</strong> ou <strong>D</strong>.</p>
+
+        <div class="q q--block" id="p4">
+          <div class="q-id">P4 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Os dados de um terceiro podem ser vistos por outro? Clientes, propostas, carteira, inadimplência.</p>
+          <p class="changes"><b>O que muda</b>Isolamento entre terceiros <strong>não existe hoje</strong> no sistema — nada nele foi construído sabendo que existiria mais de um operador. Não é uma tela nova: é uma mudança que atravessa todos os módulos, todas as consultas e todas as tabelas.</p>
+          <div class="advice">
+            <b>Opinião da equipe técnica</b>
+            Esta é a pergunta mais cara do documento. Se a resposta exigir isolamento, é um programa de trabalho e não uma sprint — e deveria ser decidido <strong>antes</strong> de construir mais qualquer funcionalidade, porque tudo que for feito até lá terá de ser revisitado. Adaptar depois custa muito mais do que nascer assim.
+          </div>
+        </div>
+
+        <div class="q" id="p5">
+          <div class="q-id">P5</div>
+          <p class="q-ask">Cada terceiro tem a <strong>própria conta escrow</strong> (conta segregada onde o dinheiro fica), ou todos compartilham a nossa?</p>
+          <p class="changes"><b>O que muda</b>Hoje a configuração aponta para <strong>uma única</strong> conta e um único conjunto de credenciais. Uma conta por terceiro é mudança estrutural; conta compartilhada levanta a questão de segregação patrimonial entre operadores diferentes.</p>
+        </div>
+
+        <div class="q" id="p6">
+          <div class="q-id">P6</div>
+          <p class="q-ask">Cada terceiro define os <strong>próprios limites, taxas e regras de crédito</strong>, ou vale a mesma regra para todos?</p>
+          <p class="changes"><b>O que muda</b>Parâmetros por operador exigem que toda decisão de crédito passe a perguntar “de quem é esta operação” antes de decidir.</p>
+        </div>
+
+        <div class="q" id="p7">
+          <div class="q-id">P7</div>
+          <p class="q-ask">Cada terceiro aparece com a <strong>própria marca</strong> para o cliente final, ou todo mundo é SEP?</p>
+          <p class="changes"><b>O que muda</b>Marca própria significa domínio, e-mail, contrato, aparência e loja de aplicativos por terceiro. É um produto diferente do que existe hoje.</p>
+        </div>
+
+        <div class="q" id="p8">
+          <div class="q-id">P8</div>
+          <p class="q-ask">O limite de <strong>R$ 15.000</strong> que a norma impõe vale “por credor, por devedor, <strong>na mesma SEP</strong>”. Se cada terceiro for uma SEP distinta, o limite conta separado por terceiro. Se todos estiverem sob a nossa, o limite é somado. Qual dos dois?</p>
+          <p class="changes"><b>O que muda</b>Muda o tamanho máximo do que cada cliente final consegue tomar.</p>
+        </div>
+
+        <h3>Dinheiro</h3>
+
+        <div class="q" id="p9">
+          <div class="q-id">P9</div>
+          <p class="q-ask">Como cobramos do terceiro — mensalidade, taxa por operação, percentual do volume, implantação, ou combinação?</p>
+          <p class="changes"><b>O que muda</b>Define o que precisa ser medido e cobrado. Hoje <strong>não existe nada</strong> de faturamento no sistema.</p>
+        </div>
+
+        <div class="q" id="p10">
+          <div class="q-id">P10</div>
+          <p class="q-ask">Quem responde pelo <strong>prejuízo de um calote</strong> — o terceiro, o credor final, ou nós?</p>
+        </div>
+
+        <div class="q" id="p11">
+          <div class="q-id">P11</div>
+          <p class="q-ask">Existe algum terceiro <strong>já definido</strong>, ou é um plano ainda sem cliente?</p>
+          <p class="changes"><b>O que muda</b>Se já há cliente concreto, as necessidades dele valem mais que qualquer suposição nossa, e o certo é desenhar com ele. Se não há, estamos construindo flexibilidade para um cliente imaginário — que é o jeito mais comum de gastar caro e errar.</p>
+          <div class="advice">
+            <b>Opinião da equipe técnica</b>
+            Só construiríamos suporte a múltiplos terceiros com pelo menos <strong>três interessados concretos</strong>, ou um contrato assinado. Antes disso, o mesmo esforço rende muito mais aplicado ao produto que já existe. Flexibilidade construída cedo demais costuma não servir ao primeiro cliente real quando ele aparece.
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PARTE II ============ -->
+      <section id="parte-2" class="part">
+        <div class="part-head">
+          <span class="part-n">PARTE II · P12–P17</span>
+          <h2>Que empréstimos vamos oferecer</h2>
+          <p class="part-lede">Hoje o sistema reconhece <strong>dois</strong> tipos de operação: capital de giro para empresa e um empréstimo pessoal genérico. Todo o resto — consignado, antecipação de recebíveis, financiamento com garantia — está explicitamente marcado no código como fora de escopo.</p>
+        </div>
+
+        <div class="q q--block" id="p12">
+          <div class="q-id">P12 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Qual é a lista de produtos que se pretende oferecer? Não a de longo prazo — a dos <strong>próximos 12 meses</strong>.</p>
+          <ul class="checklist">
+            <li>Capital de giro para empresa</li>
+            <li>Empréstimo pessoal sem garantia</li>
+            <li>Consignado (INSS / servidor público / CLT)</li>
+            <li>Antecipação de recebíveis</li>
+            <li>Financiamento com garantia</li>
+            <li>Outro: ______________________</li>
+          </ul>
+          <p class="changes"><b>O que muda</b>Cada modalidade tem regra própria, garantia própria, forma de cobrança própria e norma própria. Não são variações de um mesmo produto — são produtos. Uma lista de cinco itens é um plano de anos, não de meses.</p>
+        </div>
+
+        <div class="q q--block" id="p13">
+          <div class="q-id">P13 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Qual vem primeiro, e por quê?</p>
+          <p class="changes"><b>O que muda</b>Precisamos de um só para começar. Construir dois em paralelo com a equipe atual atrasa os dois.</p>
+        </div>
+
+        <div class="q" id="p14">
+          <div class="q-id">P14</div>
+          <p class="q-ask">O <strong>capital de giro para empresa</strong>, que já está construído, continua sendo produto?</p>
+          <p class="changes"><b>O que muda</b>É o que existe hoje pronto. Se sai de cena, há trabalho concluído que deixa de ser usado — e é bom que essa decisão seja consciente, não um efeito colateral.</p>
+        </div>
+
+        <div class="q" id="p15">
+          <div class="q-id">P15</div>
+          <p class="q-ask">As modalidades convivem <strong>para o mesmo cliente</strong>? Um tomador poderia ter consignado e capital de giro ao mesmo tempo?</p>
+          <p class="changes"><b>O que muda</b>Se sim, o limite de R$ 15.000 por credor precisa somar as duas — e hoje não soma nada, porque não existe.</p>
+        </div>
+
+        <div class="q" id="p16">
+          <div class="q-id">P16</div>
+          <p class="q-ask">Quem define o catálogo de produtos: <strong>nós</strong>, ou cada terceiro escolhe o que quer oferecer?</p>
+          <p class="changes"><b>O que muda</b>Ligado à P6. Catálogo por terceiro multiplica a complexidade de novo.</p>
+        </div>
+
+        <div class="q" id="p17">
+          <div class="q-id">P17</div>
+          <p class="q-ask">Existe alguma modalidade <strong>fora de questão</strong> por decisão de negócio? Saber o que <em>não</em> faremos ajuda tanto quanto saber o que faremos.</p>
+        </div>
+      </section>
+
+      <!-- ============ PARTE III ============ -->
+      <section id="parte-3" class="part">
+        <div class="part-head">
+          <span class="part-n">PARTE III · P18–P34</span>
+          <h2>Consignado</h2>
+          <p class="part-lede">Responder se o consignado entrar na lista da P12.</p>
+        </div>
+
+        <h3>Confirme o entendimento</h3>
+        <p>Entendemos que os tomadores seriam <strong>funcionários de empresas que já participam da plataforma como credoras</strong> — o patrão coloca o dinheiro, o funcionário toma emprestado, e a parcela sai da folha.</p>
+
+        <div class="q q--block" id="p18">
+          <div class="q-id">P18 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">O patrão é o <strong>credor</strong> do empréstimo do próprio funcionário (o dinheiro é dele e ele recebe de volta), ou é apenas quem <strong>desconta em folha e repassa</strong> a outros credores?</p>
+        </div>
+
+        <div class="q q--block" id="p19">
+          <div class="q-id">P19 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">“Apenas funcionários de empresas que emprestam” restringe <strong>quem pode tomar</strong> (só empregados de empresas participantes são elegíveis, mas qualquer credora financia), ou <strong>quem financia</strong> (cada funcionário só é financiado pelo próprio patrão)?</p>
+        </div>
+
+        <div class="note note--good" data-optional>
+          <p><strong>O que este modelo resolve bem</strong> — vale registrar, porque a direção acertou em pontos relevantes:</p>
+          <ol class="steps" style="margin-bottom:0">
+            <li><strong>Resolve o maior obstáculo técnico do consignado.</strong> Consignado normalmente exige convênio de averbação com INSS ou empregadores — integração externa, lenta, fora do nosso alcance hoje. Com o empregador já na plataforma, o desconto em folha é nativo.</li>
+            <li><strong>O risco de calote cai muito.</strong> Desconto na origem é a melhor garantia que existe em crédito pessoal.</li>
+            <li><strong>Resolve a aquisição de clientes.</strong> Vender para <em>um</em> empregador traz <em>N</em> tomadores. Incomparavelmente mais barato que atrair um a um pela internet.</li>
+            <li><strong>Encaixa no que já está construído.</strong> Hoje cada operação já tem exatamente uma empresa credora, e o pagamento de parcela já não é iniciado pelo tomador — é registrado por operador interno. O modelo do patrão-credor combina com os dois. Economiza meses.</li>
+          </ol>
+        </div>
+
+        <h3>Enquadramento</h3>
+
+        <div class="q q--block" id="p20">
+          <div class="q-id">P20 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Entra <strong>dentro do programa federal “Crédito do Trabalhador”</strong> (consignado CLT com desconto via eSocial), ou é <strong>convênio privado</strong> direto com cada empregador?</p>
+          <div class="tw">
+            <table>
+              <thead><tr><th></th><th>Dentro do programa</th><th>Convênio privado</th></tr></thead>
+              <tbody>
+                <tr><td class="opt">Averbação</td><td>via eSocial, padronizada</td><td>acordo empresa a empresa</td></tr>
+                <tr><td class="opt">Margem</td><td>35% da remuneração disponível</td><td>a definir por nós</td></tr>
+                <tr><td class="opt">Garantias</td><td>até 10% do FGTS + 100% da multa de 40%</td><td>nenhuma</td></tr>
+                <tr><td class="opt">Portabilidade</td><td><strong>o funcionário pode levar a dívida para outro banco</strong></td><td>não se aplica</td></tr>
+                <tr><td class="opt">Integração</td><td>alta (eSocial)</td><td>baixa por empresa, mas repete a cada empresa</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="advice">
+            <b>Opinião da equipe técnica</b>
+            Atenção à portabilidade. Dentro do programa, um banco grande pode oferecer taxa menor e puxar a operação — o patrão perde o ativo que acabou de financiar. Isso precisa estar claro <strong>antes</strong> da escolha.
+          </div>
+        </div>
+
+        <div class="q q--block" id="p21">
+          <div class="q-id">P21 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Se for convênio privado: <strong>quem produz o instrumento que autoriza o desconto?</strong> O art. 462 da CLT proíbe desconto no salário, com exceções — entre elas o valor expressamente autorizado pelo trabalhador. Empréstimo do empregador ao empregado exige previsão em regulamento interno, acordo individual ou norma coletiva.</p>
+          <p class="changes"><b>O que muda</b>Sem esse instrumento o desconto é contestável na Justiça do Trabalho, e a parcela pode ser devolvida ao funcionário com a dívida seguindo em aberto.</p>
+          <div class="advice">
+            <b>Opinião da equipe técnica</b>
+            Se o SEP fornecer o modelo do instrumento, assume parte do risco trabalhista de contratos que não controla. Vale exigir que cada empregador apresente o próprio, como condição de entrada, guardando a evidência na plataforma.
+          </div>
+        </div>
+
+        <div class="q q--block" id="p22">
+          <div class="q-id">P22 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Qual teto de juros se aplica? O sistema usa <strong>2% ao mês</strong> como padrão. Esse número não é universal — o consignado do INSS tem teto de <strong>1,85% ao mês</strong> em 2026, abaixo do nosso padrão.</p>
+          <p class="changes"><b>O que muda</b>Se houver teto abaixo de 2%, o valor configurado precisa mudar antes de qualquer operação real, e a margem entre o que se cobra e o que se paga ao credor fica menor do que se imagina.</p>
+        </div>
+
+        <h3>Relação de trabalho</h3>
+        <p data-optional>Riscos que provavelmente não apareceram na reunião. Nenhum é técnico.</p>
+
+        <div class="q q--block" id="p23">
+          <div class="q-id">P23 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Como fica demonstrado que o funcionário aderiu <strong>voluntariamente</strong>?</p>
+          <p class="changes"><b>O que muda</b>Patrão como credor do empregado é relação assimétrica. Se alguém alegar pressão, precisamos de evidência do contrário.</p>
+          <div class="advice">
+            <b>Opinião da equipe técnica</b>
+            Resolve-se barato agora e caro no tribunal. Registrar o aceite do funcionário de forma independente do patrão — data, hora, trilha própria — custa pouco hoje.
+          </div>
+        </div>
+
+        <div class="q q--block" id="p24">
+          <div class="q-id">P24 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">O patrão <strong>escolhe qual funcionário</strong> recebe, ou qualquer elegível solicita e o sistema decide?</p>
+          <p class="changes"><b>O que muda</b>Se o patrão escolhe, concede a uns e nega a outros por critério próprio — abre discussão de favorecimento e discriminação. Se o sistema decide, o patrão põe dinheiro sem controlar o destino.</p>
+        </div>
+
+        <div class="q q--block" id="p25">
+          <div class="q-id">P25 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">O funcionário sai da empresa com o empréstimo em aberto. O que acontece?</p>
+          <p>É a pergunta operacional central, e vai acontecer em toda carteira, sempre:</p>
+          <ul class="plain">
+            <li>o saldo é descontado das verbas rescisórias? Até que limite?</li>
+            <li>sobrando saldo, quem cobra o ex-funcionário — o ex-patrão ou o SEP?</li>
+            <li>a dívida continua na plataforma depois de encerrado o vínculo?</li>
+          </ul>
+          <p class="changes"><b>O que muda</b>É a diferença entre risco quase zero e uma carteira de ex-funcionários inadimplentes que ninguém desenhou para administrar.</p>
+        </div>
+
+        <div class="q q--block" id="p26">
+          <div class="q-id">P26 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">E se <strong>a empresa</strong> quebrar, atrasar salários ou sair da plataforma com empréstimos ativos? O funcionário continua devendo — a quem?</p>
+        </div>
+
+        <h3>Privacidade do funcionário</h3>
+        <p data-optional>Hoje a plataforma <strong>esconde de propósito</strong> quem é o tomador de quem coloca o dinheiro: a credora vê valor, prazo, taxa e status, e nada que identifique a pessoa. No modelo novo isso se inverte — a credora é o patrão e sabe exatamente de quem se trata.</p>
+
+        <div class="q q--block" id="p27">
+          <div class="q-id">P27 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">O patrão vê a <strong>análise de crédito</strong> do funcionário — pontuação, situação financeira, resultado da checagem de prevenção à lavagem de dinheiro?</p>
+        </div>
+
+        <div class="q q--block" id="p28">
+          <div class="q-id">P28 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Se o funcionário for <strong>reprovado</strong>, o patrão fica sabendo?</p>
+          <p class="changes"><b>O que muda</b>O patrão descobriria, pelo sistema, que um empregado tem restrição de crédito. É informação pessoal sensível que ele não teria de outra forma.</p>
+        </div>
+
+        <div class="q q--block" id="p29">
+          <div class="q-id">P29 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">O patrão acompanha a <strong>inadimplência</strong> do funcionário no dia a dia?</p>
+          <div class="advice">
+            <b>Opinião da equipe técnica</b>
+            Recomendamos como padrão <strong>não mostrar nada além do necessário para operar</strong> — valor, parcelas, saldo. Pontuação, motivo de recusa e resultado de checagem ficam fora da visão do empregador. É fácil abrir depois e difícil fechar depois, e a alternativa expõe a empresa e o SEP juntos.
+          </div>
+        </div>
+
+        <h3>Dinheiro</h3>
+
+        <div class="q" id="p30">
+          <div class="q-id">P30</div>
+          <p class="q-ask">Quem define a <strong>taxa</strong> — o patrão, o SEP, ou é tabelada?</p>
+        </div>
+
+        <div class="q" id="p31">
+          <div class="q-id">P31</div>
+          <p class="q-ask">Quando o patrão desconta a parcela da folha, <strong>o dinheiro chega a se mover?</strong> Se o patrão é o credor, ele desconta e o valor fica com ele — não há transferência.</p>
+          <p class="changes"><b>O que muda</b>Consequência técnica grande. Toda a cobrança hoje pressupõe um pagamento real a conciliar. Se vira lançamento contábil sem movimento, a baixa da parcela precisa funcionar de outro jeito.</p>
+        </div>
+
+        <div class="q" id="p32">
+          <div class="q-id">P32</div>
+          <p class="q-ask">O dinheiro do empréstimo continua passando pela <strong>conta escrow</strong> na saída para o funcionário?</p>
+        </div>
+
+        <h3>Escala</h3>
+
+        <div class="q" id="p33">
+          <div class="q-id">P33</div>
+          <p class="q-ask">Qual o <strong>porte de empregador</strong> que se pretende atender, e quantos para o negócio fechar?</p>
+        </div>
+
+        <div class="q" id="p34">
+          <div class="q-id">P34</div>
+          <p class="q-ask">Quem cadastra os funcionários: <strong>RH em lote</strong>, ou cada funcionário sozinho?</p>
+          <p class="changes"><b>O que muda</b>Cadastro em lote não existe e precisa ser construído, com toda a verificação de identidade que a norma exige. Autosserviço reaproveita o que já temos.</p>
+        </div>
+      </section>
+
+      <!-- ============ PARTE IV ============ -->
+      <section id="parte-4" class="part">
+        <div class="part-head">
+          <span class="part-n">PARTE IV · P35–P36</span>
+          <h2>Limite regulatório que vale em qualquer cenário</h2>
+        </div>
+
+        <div class="q q--block" id="p35">
+          <div class="q-id">P35 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">A norma que rege a SEP limita a <strong>R$ 15.000 o total que um mesmo credor pode emprestar a um mesmo devedor</strong> na mesma plataforma. Como hoje cada operação tem um único credor, na prática <strong>esse é o teto por cliente</strong>. Confirma que o produto é desenhado para esse teto?</p>
+          <p class="changes"><b>O que muda</b>Se a direção espera tickets maiores, é preciso permitir que <strong>vários credores financiem o mesmo empréstimo</strong> — mudança estrutural de plataforma, não ajuste. Vale para qualquer modalidade da P12, não só consignado.</p>
+        </div>
+
+        <div class="q" id="p36">
+          <div class="q-id">P36</div>
+          <p class="q-ask">A norma abre exceção para credores que sejam <strong>investidores qualificados</strong>. Isso faz parte do plano?</p>
+          <p class="changes"><b>O que muda</b>Se sim, precisamos registrar e comprovar essa condição — hoje não existe no sistema.</p>
+        </div>
+      </section>
+
+      <!-- ============ PARTE V ============ -->
+      <section id="parte-5" class="part">
+        <div class="part-head">
+          <span class="part-n">PARTE V · P37–P38</span>
+          <h2>A página pública</h2>
+        </div>
+
+        <div class="q q--block" id="p37">
+          <div class="q-id">P37 <span class="tag-block">Trava</span></div>
+          <p class="q-ask">Para <strong>quem</strong> a página pública do site precisa falar?</p>
+          <div class="tw">
+            <table>
+              <thead><tr><th>Se o negócio for…</th><th>A página vende para…</th></tr></thead>
+              <tbody>
+                <tr><td>P1 = B ou C — plataforma para terceiros</td><td><strong>empresas que querem operar crédito</strong></td></tr>
+                <tr><td>Consignado via patrão</td><td><strong>empregadores</strong></td></tr>
+                <tr><td>Capital de giro PJ</td><td><strong>empresas que precisam de crédito</strong></td></tr>
+                <tr><td>Vários ao mesmo tempo</td><td>provavelmente <strong>páginas diferentes</strong> — uma só não fala com todos</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="changes"><b>O que muda</b>É o motivo de este documento existir. A página está sendo redesenhada, e escrevê-la para o público errado joga a sprint fora. Hoje ela tenta falar com dois públicos ao mesmo tempo e não convence nenhum.</p>
+        </div>
+
+        <div class="q" id="p38">
+          <div class="q-id">P38</div>
+          <p class="q-ask">Existe expectativa de <strong>captar clientes pela internet</strong>, ou a venda é sempre feita por pessoa — reunião, indicação, parceria?</p>
+          <p class="changes"><b>O que muda</b>Se a venda é sempre por pessoa, a página é material de credibilidade e o esforço certo é pequeno. Se há expectativa de captar sozinha, é outro nível de investimento — e envolve decisões técnicas de indexação em buscadores que o site hoje não atende.</p>
+        </div>
+      </section>
+
+      <!-- ============ PARADO ============ -->
+      <section id="parado" class="part">
+        <div class="part-head">
+          <span class="part-n">CONSEQUÊNCIA</span>
+          <h2>O que está parado esperando resposta</h2>
+        </div>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Parado</th><th>Depende de</th></tr></thead>
+            <tbody>
+              <tr><td>Redesenho da página pública — texto, seções, simulador</td><td>P1, P12, P37, P38</td></tr>
+              <tr><td>Qualquer decisão de arquitetura de médio porte</td><td><strong>P1 e P4</strong> — construir sem saber se haverá isolamento entre terceiros é o risco mais caro em aberto</td></tr>
+              <tr><td>Correção do teto de valor no sistema</td><td>P35</td></tr>
+              <tr><td>Correção da taxa padrão</td><td>P22</td></tr>
+              <tr><td>Estimativa de prazo para consignado</td><td>P20</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Nada disso está bloqueado por falta de capacidade técnica. Está bloqueado por falta de definição.</p>
+      </section>
+
+      <!-- ============ APÊNDICE ============ -->
+      <section id="apendice" class="part appendix">
+        <div class="part-head" style="border-top:none;padding-top:0">
+          <span class="part-n">APÊNDICE TÉCNICO</span>
+          <h2>Evidência</h2>
+          <p class="part-lede">Para quem quiser conferir. Não é necessário para responder as perguntas.</p>
+        </div>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Afirmação</th><th>Onde</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Não existe isolamento entre operadores.</strong> A única menção a “tenant” nos três repositórios é um comentário hipotético</td><td><code>LockoutService.java:135</code></td></tr>
+              <tr><td><strong>Escrow é configuração única</strong> — um provedor, um conjunto de credenciais</td><td><code>application.yml:136-137, 236-239</code></td></tr>
+              <tr><td>Existem <strong>dois</strong> tipos de operação; o resto está fora de escopo</td><td><code>TipoOperacao.java:7</code></td></tr>
+              <tr><td>Existe um marcador de credora regulada, ainda sem uso</td><td><code>TipoCredora.java</code></td></tr>
+              <tr><td><strong>Nenhum</strong> conceito de funcionário, empregador, folha ou salário</td><td>busca sem resultado de domínio</td></tr>
+              <tr><td>Cada operação tem <strong>exatamente uma</strong> credora, vínculo imutável</td><td><code>OperacaoFinanciada.java:28-29</code></td></tr>
+              <tr><td>A credora <strong>não vê</strong> identidade do tomador</td><td><code>OportunidadeResponse.java</code></td></tr>
+              <tr><td>O tomador <strong>não paga</strong> pela plataforma</td><td><code>CobrancaTomadorController</code>, <code>PixTomadorController</code> — só <code>GET</code></td></tr>
+              <tr><td>Recebimento é registrado por <strong>operador interno</strong></td><td><code>CobrancaController.java:192-193</code></td></tr>
+              <tr><td>A credora <strong>não aporta sozinha</strong></td><td><code>AporteCredoraController.java:57</code></td></tr>
+              <tr><td>Taxa padrão 2% a.m.</td><td><code>ParametrosCobrancaProperties.java:58</code></td></tr>
+              <tr><td>Tetos configurados: R$ 50 mil PF / R$ 200 mil PJ; 12 e 24 meses</td><td><code>application.yml:249-252</code></td></tr>
+              <tr><td>O teto de R$ 15.000 <strong>não existe</strong> no código</td><td>busca por <code>15000</code> → só um <code>connection-timeout</code></td></tr>
+              <tr><td><strong>Não existe faturamento</strong> de nenhum tipo</td><td>nenhum módulo de cobrança de cliente da plataforma</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Fontes regulatórias consultadas</h3>
+        <ul class="plain">
+          <li><strong>Res. CMN 4.656/2018</strong> — teto de R$ 15.000 por par credor↔devedor na mesma SEP; exceção para investidores qualificados (CVM); SEP exige autorização do Banco Central. <a href="https://normativos.bcb.gov.br/Lists/Normativos/Attachments/50579/Res_4656_v1_O.pdf">BCB</a> · <a href="https://www.in.gov.br/materia/-/asset_publisher/Kujrw0TZC2Mb/content/id/12378952/do1-2018-04-30-resolucao-n-4-656-de-26-de-abril-de-2018-12378948">Imprensa Nacional</a></li>
+          <li><strong>Crédito do Trabalhador</strong> — consignado CLT federal, desconto via eSocial, margem 35% da remuneração disponível, garantia de até 10% do FGTS e 100% da multa de 40%, portabilidade ampla; virou lei, regras novas em vigor desde 26/06/2026. <a href="https://www.senior.com.br/blog/consignado-privado-clt">Senior</a> · <a href="https://bmcnews.com.br/economia/consignado-clt-veja-as-regras-do-credito-do-trabalhador-em-2026/">BM&amp;C News</a></li>
+          <li><strong>Art. 462 da CLT</strong> — desconto salarial vedado, com exceção para valor expressamente autorizado; empréstimo do empregador ao empregado exige previsão em regulamento interno, acordo individual ou norma coletiva. <a href="https://www.fortes.adv.br/2016/07/28/do-emprestimo-concedido-ao-empregado-da-validade-e-dos-limites-dos-descontos/">Teixeira Fortes</a> · <a href="https://www.hapnerkroetz.com.br/publicacoes/emprestimos-empregador-ao-empregado">Hapner Kroetz</a></li>
+          <li><strong>Lei 10.820/2003</strong> — consignado por instituição financeira; §5º do art. 3º responsabiliza o empregador que desconta e não repassa. <a href="https://www.migalhas.com.br/depeso/427867/consideracoes-acerca-do-emprestimo-consignado-clt">Migalhas</a></li>
+          <li><strong>Teto INSS 1,85% a.m. (2026)</strong> — não se aplica a consignado CLT privado, mas evidencia que 2% a.m. não é padrão universalmente válido. <a href="https://www.gov.br/inss/pt-br/noticias/conselho-decide-aumentar-o-teto-da-taxa-de-juros-do-emprestimo-consignado-do-inss">INSS/CNPS</a></li>
+        </ul>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var toggle = document.getElementById('blockToggle');
+  var groups = Array.prototype.slice.call(document.querySelectorAll('main h3'));
+
+  function syncGroups(on) {
+    groups.forEach(function (h) {
+      if (!on) { h.hidden = false; return; }
+      var anyBlock = false;
+      var node = h.nextElementSibling;
+      while (node && node.tagName !== 'H3' && !node.classList.contains('part-head')) {
+        if (node.classList.contains('q') && node.classList.contains('q--block')) { anyBlock = true; break; }
+        node = node.nextElementSibling;
+      }
+      h.hidden = !anyBlock;
+    });
+  }
+
+  toggle.addEventListener('change', function () {
+    var on = toggle.checked;
+    document.body.classList.toggle('only-blockers', on);
+    syncGroups(on);
+  });
+})();
+</script>
