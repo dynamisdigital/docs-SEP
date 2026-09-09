@@ -5,7 +5,15 @@
 - **ID da Spec**: 218
 - **Titulo**: M-Sprint 18 - Criar o helper de erro que o `sep-mobile` nunca teve, unificar os 9 casts
   inline e trocar ramificacao por status por ramificacao por codigo
-- **Status**: **planejada** (criada em 2026-09-01)
+- **Status**: **MERGEADA em `develop` e `main`** (2026-09-09). PR **#165** (squash `fe77544`,
+  back-merge `1efc58e`) e PR **#166** (`d62dd20`); as duas pontas na mesma arvore `ed20fae`,
+  conferido por conteudo. 6 commits.
+  Vitest **527/70 -> 575/72**, Playwright **41 -> 45**, format/lint/SCSS/build/cap sync/APK verdes.
+  **O `npm audit` foi zerado no recorte high** (commit `147508b`): 22 vulnerabilidades (1 low, 13
+  moderate, 8 high) -> **10 (0 low, 10 moderate, 0 high)**, por `npm audit fix` **sem `--force`** e
+  com `package.json` intacto. O gate `--audit-level=high` sai 0 e todos os criterios de aceite da
+  spec estao cumpridos. Descricao em
+  [`SPRINT-M-18-PR.md`](../../repos/sep-mobile/SPRINT-M-18-PR.md).
 - **Fase do produto**: Fase 4 - produto novo (consome superficie de contrato nova); sem jornada, rota,
   endpoint ou contrato novo. **Sem ADR previsto**
 - **Trilha**: Mobile (`sep-mobile`)
@@ -26,10 +34,25 @@
 
 ## Numeracao
 
-Consome o numero **218** (M-Sprint 18), seguindo a sequencia do mobile em `specs/fase-4/` (a M-17 usou
-o 217). [`PRD-FASE-5.md`](../../docs-sep/PRD-FASE-5.md) §46 reservava **M-18 e M-19** para a Frente C
-(publicacao em lojas); **o mobile da Fase 5 renumera para M-19 e M-20** no mesmo ciclo desta spec,
-pelo mesmo mecanismo que o backend ja aplicou quatro vezes.
+Consome **218** (M-Sprint 18). A faixa vigente por fase em AGENT.md fixa a Fase 5 em **50-99**;
+esta spec nao renumera a publicacao em lojas (M-50/M-51).
+
+## Medicao da preparacao (2026-09-09)
+
+Esta secao atualiza as estimativas historicas abaixo. Backend Sprint 36 integrado em develop;
+mobile em `d82caaa`, back-merge sem conflitos e com conteudo igual a `origin/main@deb5b72`.
+Baseline: **527/70 Vitest, 41 Playwright**, format/lint/SCSS/build PWA/cap sync/APK verdes;
+**audit 20 (1 low, 11 moderate, 8 high)**, impeditivo para declarar baseline verde.
+
+Os nove casts em oito arquivos continuam presentes. O ganho de discriminacao esta no TOTP:
+`MFA-400-003/004` encerram a tentativa e `MFA-400-002` permite redigitar. Login ja navega no
+`423`; adicionar ramo identico por `AUTH-423-001` nao agrega comportamento. O Gate pode
+manter esse ramo por status, sem inventar codigo para o `401`.
+
+**TOTP em branco** e recusado por bean validation **sem codigo**; nao e fixture valida de
+`MFA-400-002`. Sao **13 de 17 handlers** sem taxonomia (medicao da Sprint 36), nao os 10 da
+estimativa inicial. MSW nao tem `/auth/totp/verify`, e a cobertura browser exige fixture
+explicita e isolada; ela nao equivale a smoke real. Plano executavel e resultados nos steps.
 
 ## Objetivo
 
@@ -171,5 +194,24 @@ Fecha, ao lado da [`036`](./036-sprint-36-codigos-erro-no-fio.md) e da
 [`126`](./126-fsprint-26-consumo-codigos-erro-web.md), a recomendacao **P1** do
 [`DIAGNOSTICO-PRODUTO.md`](../../docs-sep/DIAGNOSTICO-PRODUTO.md).
 
-Steps criados just-in-time em `steps-fase-4/mobile/218-msprint-18-steps.md` quando a sprint for
-aprovada para execucao.
+Steps criados em 2026-09-09: [`218-msprint-18-steps.md`](../../steps-fase-4/mobile/218-msprint-18-steps.md).
+As cinco Tasks foram executadas em 2026-09-09.
+
+## Execucao — o que a sprint mediu e a spec nao previa
+
+1. **Os nove casts eram nove mesmo** (8 arquivos), confirmando a §Ancora 2 contra a estimativa
+   inicial de seis.
+2. **O smoke real contra `:8080` FOI executado** — primeira vez numa sprint mobile desde a M-13,
+   contrariando o risco declarado na spec. Confirmou `MFA-400-004` no fio e, sobretudo, que **codigo
+   em branco volta SEM campo `codigo`** (bean validation `@NotBlank`), como a §Medicao ja corrigia.
+   O `401` de credencial tambem volta sem codigo, o que validou o mock.
+3. **O ramo do login ficou por status**, conforme a §Dependencia condicional previa: o `423` ja
+   navega e `AUTH-423-001` nao mudaria acao. A Task 218.3 encolheu, como o Gate autorizava.
+4. **Achado fora do plano**: a normalizacao de mensagem em branco no helper fecha um defeito latente
+   de UI — `erro.set('')` com template `@if (erro(); as msg)` deixava a **tela muda** depois de um
+   erro. Nao era o objetivo da sprint; caiu junto.
+5. **Duas descobertas de ambiente**: `ion-button` com `routerLink` renderiza como **link**, nao
+   button; e nenhum spec deste repo renderizava `ion-input`, cujo `connectedCallback` quebra no
+   happy-dom por falta de `observe` em `MutationObserver`/`IntersectionObserver`.
+6. **10 mutacoes, 10 mortas**, sendo **duas mortas somente pelo Playwright** — a prova concreta de
+   que, sem MSW no Vitest, nenhum teste unitario cobre `handlers.ts`.

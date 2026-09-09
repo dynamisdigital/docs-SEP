@@ -2389,12 +2389,13 @@ o proxy sobreviveu as 24 mutacoes porque elas testavam o **mecanismo** da guarda
 do criterio**. Mutacao valida implementacao; nao valida definicao. Foi preciso um leitor humano
 perguntando "esse codigo significa mesmo uma coisa so?" para achar.
 
-## F-Sprint 26 (web) — Consumir o codigo de erro no fio — CONCLUIDA na branch (2026-09-08)
+## F-Sprint 26 (web) — Consumir o codigo de erro no fio — MERGEADA develop+main (2026-09-08; PR #145/#146 em 2026-09-09)
 
 Lado web da recomendacao **P1** do `DIAGNOSTICO-PRODUTO.md`; consome o campo `codigo` publicado pela
 Sprint 36. Branch `feature/fsprint-26-codigos-erro` a partir de `develop` `53cc6f6`, 5 commits, 10
-arquivos, **+969/−458** (descontado o snapshot: 8 arquivos, +429/−22). **Push e PR manuais
-pendentes.** Sem tela, endpoint, DTO, migration, regra nova ou ADR. Nada mudou em
+arquivos, **+969/−458** (descontado o snapshot: 8 arquivos, +429/−22). Em `origin/develop` via PR
+**#145** (`9e4aa02`, back-merge `11bd729`) e em `main` via PR **#146** (`d0841db`), conferidos por
+conteudo em 2026-09-09. Sem tela, endpoint, DTO, migration, regra nova ou ADR. Nada mudou em
 `sep-api`/`sep-mobile`.
 
 **O que muda para quem usa.** O `400` do `verify-totp` era um desfecho so — erro inline com o
@@ -2470,3 +2471,112 @@ a proxima acao do usuario e identica, e inventar um terceiro ramo seria copy sem
 Os 78 pontos de ramificacao por status seguem intactos.
 
 Detalhe em [`SPRINT-F-26-PR.md`](../repos/sep-app/SPRINT-F-26-PR.md).
+
+## M-Sprint 18 (mobile) — Consumir o codigo de erro no mobile — MERGEADA develop+main (2026-09-09)
+
+Lado mobile da recomendacao **P1** do `DIAGNOSTICO-PRODUTO.md`, e o terceiro e ultimo repo da cadeia
+(Sprint 36 publica, F-26 e M-18 consomem). Branch `feature/msprint-18-codigos-erro` a partir do
+back-merge local `d82caaa`; **6 commits** — 5 de escopo (19 arquivos, +897/−47) mais `147508b`, que
+zera o audit. Em `origin/develop` via PR **#165** (squash `fe77544`, back-merge `1efc58e`) e em
+`main` via PR **#166** (`d62dd20`). Sem rota, endpoint, contrato backend, migration, regra nova ou
+ADR. Nada mudou em `sep-api`/`sep-app`.
+
+**O que muda para quem usa.** Mesmo defeito que a F-26 fechou no web, com uma diferenca de superficie:
+aqui o `400` do `/auth/totp/verify` produzia um **toast de tres segundos** e o formulario continuava
+de pe. Quem caia em desafio expirado (`MFA-400-004`) ou conta sem TOTP ativo (`MFA-400-003`)
+redigitava codigo contra algo que nunca aceitaria — e, pior que no web, a explicacao **sumia da tela**
+em tres segundos. Os dois passam a encerrar a tentativa, com a frase do backend persistente e o
+retorno ao login. `MFA-400-002` mantem o formulario: o `VerificarTotpUseCase` chama
+`challengeService.devolver(...)` antes de lancar, o desafio segue vivo e redigitar e a acao certa.
+
+**A regra e a mesma dos outros dois repos**: o codigo escolhe o RAMO, o corpo escolhe a FRASE.
+
+**A divida veio antes do consumo, e essa foi a decisao estruturante da sprint.** O mobile nao tinha
+helper de erro: cada tela fazia o proprio `err.error as ApiErrorResponse` — **nove casts em oito
+arquivos, com duas assinaturas de tipo diferentes** (`| null | undefined` e `| undefined`), sintoma de
+copia sem fonte unica. Ler `codigo` direto nos nove entregaria a feature e **dobraria** a duplicacao.
+E a conta que a F-Sprint 24 ja pagou com `estabilizar()`, medida em 38 definicoes de um helper e 42 de
+outro. Criado `core/api/api-error.ts`, com aceite verificado por `grep`: zero ocorrencias em producao
+fora dele.
+
+**Um defeito latente caiu junto, e nao era objetivo da sprint.** Os call sites fazem
+`erro.set(mensagemDaApi(err) ?? 'padrao')` e o template `@if (erro(); as msg)`. Uma `message` em
+branco vinda do backend deixava `erro('')`, o `@if` tratava como falsy, o no de erro nunca era criado
+e **a tela ficava muda depois do erro**. Nada no tipo do `sep-api` impede `""`: `DomainException` faz
+`super(mensagem)` sem validar e o `@JsonInclude(NON_NULL)` suprime so `null`.
+
+**`AuthService.descartarDesafioMfa()` e novo, e existe separado de `clearSession()`.** Quem esta na
+verificacao TOTP nao tem sessao a derrubar; o unico estado obsoleto e o `mfaChallengeId`. Sem
+descarta-lo, o `hydratePendingMfa` de uma reentrada na rota ressuscitaria o desafio morto do storage e
+a tela ofereceria o formulario de novo — a mesma armadilha, por outro caminho. As guardas em
+`submit()` e `tentarBiometria()` **barram o envio**, nao apenas escondem controles: o template para de
+renderizar os elementos, mas os metodos seguem alcancaveis.
+
+**O login NAO ganhou ramo por codigo, e isso foi medido antes de decidir.** O `423` ja navega para
+`/account-locked` desde a M-Sprint 5, e `AUTH-423-001` nao mudaria acao nenhuma — seria consumidor
+decorativo, que os steps proibiam. A Task 218.3 encolheu, como o Gate M-18.0 autorizava.
+
+**O smoke real contra `:8080` foi executado — primeira vez numa sprint mobile desde a M-13**, e
+derruba o risco que a spec 218 declarava como permanente. No fio: desafio invalido devolve
+`"codigo":"MFA-400-004"` com a frase `"Desafio MFA invalido ou expirado. Refaca o login."`, a que o
+fixture do e2e foi alinhado **byte a byte**; **codigo em branco volta SEM campo `codigo`**, porque e
+bean validation (`@NotBlank`) na fronteira do controller; e o **`401` de credencial tambem vem sem
+codigo**, o que valida o mock nao inventar um. **Nao provado no fio, declarado**: `AUTH-423-001`
+exigiria travar conta real e deixar residuo em `login_attempt` no `sep_dev` **compartilhado** — a
+suite backend nao e hermetica —, e `MFA-400-002`/`003` exigem conta com TOTP ativo; os tres conferidos
+na fonte.
+
+**Gates**: Vitest **527/70 -> 575/72**, Playwright **41 -> 45**, `format:check`, `lint`, `lint:scss`,
+`build`, `cap sync` e `assembleDebug` verdes (APK 5,17 MB), rodados depois dos commits e apos
+`npm ci --legacy-peer-deps`, porque o `lint-staged` reescreve arquivos.
+
+**10 mutacoes, 10 mortas, 0 sobreviventes**, cada uma conferida no disco depois de gravada e revertida
+com MD5 batendo o backup. **Duas so morrem no Playwright** — parar de publicar `AUTH-423-001` e
+inventar codigo no `401` —, e essa e a medida concreta do follow-up "MSW nao plugado no Vitest":
+nenhum teste unitario cobre `handlers.ts`.
+
+**O gate de audit reprovou no CI da branch ja pushada, e foi quitado aqui.** 22 vulnerabilidades
+(1 low, 13 moderate, 8 high) -> **10 (0 low, 10 moderate, 0 high)**, por `npm audit fix` **sem
+`--force`**, com **`package.json` intacto** — so o lock mudou (+540/−384). Angular 20.3.27, Ionic
+8.8.11, Capacitor 8.4.0, TypeScript 5.9.3 e vitest 3.2.7 conferidos **depois** da correcao,
+inalterados; ADR 0018 e 0019 preservados. Tres majors transitivos, todos build-time e nenhum em
+`dependencies`: `copy-anything` 2->3 e `is-what` 3->4 sob o `less`, `make-dir` 2->5 sob o
+`istanbul-lib-report`. O `image-size` sumiu porque o `less` foi de 4.4.0 a **4.9.0** e trocou a
+biblioteca de dimensao por `probe-image-size` — dai `lint:scss`, `build` e `test:coverage` terem
+entrado na verificacao. O APK sai com o **mesmo tamanho de antes**: o bundle de runtime nao foi
+tocado. **O gate morde**, provado: `--audit-level=moderate` sai 1 e `--audit-level=high` sai 0.
+**Correcao de estimativa registrada**: a sessao havia calculado que tres dos 8 high so sairiam com
+major do `@analogjs/vite-plugin-angular`, e recomendado sprint propria. A base de advisories mudou
+entre a medicao e a esteira, e a estimativa caiu — mesmo padrao das sprints de divida anteriores,
+**numero de registro perde para medicao fresca**.
+
+**A conferencia do merge vale como exemplo de por que hash nao serve.** `origin/main` **nao contem**
+o squash `fe77544` por ancestralidade, porque o #166 tambem foi squash; quem conferisse por hash
+concluiria que o conteudo se perdeu. Por conteudo, `git diff origin/develop origin/main` sai **vazio**
+e as duas pontas apontam para a **mesma arvore** `ed20fae`. Contra a branch verificada `147508b`,
+**nenhum arquivo de `src/`, `e2e/` ou `android/` difere**; a unica diferenca e o `package-lock.json`
+(+87/−65), e ela nao reverte nada — quatro copias aninhadas de `@angular-devkit/architect` 0.2003.33 e
+`@angular-devkit/core` 20.3.33 **adicionadas**. Os gates foram **re-rodados na ponta mergeada**, nao
+herdados da branch, com `npm audit` em `origin/develop` dando **0 high**. O squash mostra 22 arquivos
+e nao 20 porque absorveu o back-merge `d82caaa`; os extras sao `ci.yml` e `package.json`, vindos de
+`main`.
+
+**Tres aprendizados de ambiente, os tres custaram menos de um comando cada.** (a) O `STATE.md` dizia
+que os steps da 218 **nao existiam** e mandava cria-los just-in-time; ja estavam no disco — **oitavo
+caso** do padrao. Pior, o arquivo foi **reescrito por outra sessao depois da leitura de abertura**, e
+so uma ancora de edicao que falhou expos a troca; sem ela, o registro da outra sessao teria sido
+sobrescrito. (b) Um `grep` rodado do diretorio errado imprimiu `No such file or directory` seguido de
+"vazio", e o vazio parecia aceite da Task 218.2 — **saida vazia nao e prova**; irmao da licao da 36
+sobre exit code mascarado por pipe. (c) **Nenhum spec deste repo renderizava `ion-input`**: o
+happy-dom entrega `MutationObserver` e `IntersectionObserver` como funcoes cujas instancias nao tem
+`observe`, e o `connectedCallback` quebra com `TypeError: n.observe is not a function`. O polyfill
+ficou **escopado ao spec**, nao no `test-setup.ts` global — promover mudaria o ambiente de 72 arquivos
+para servir a um.
+
+**Fora de escopo, declarado**: portar o `contract:check` para o mobile e plugar o MSW no Vitest
+seguem follow-ups abertos; o mock continua sem `/auth/totp/verify`, entao o dev-offline segue sem a
+jornada de MFA e o e2e do ramo TOTP usa fixture `page.route` explicita, declarada no proprio arquivo
+como **fixture e nao prova de backend**. O escopo adiado pelo Gate M-16.0 (matching, aporte `POST`,
+chaves Pix) continua exigindo a persona `FINANCEIRO`, que o mobile nao tem.
+
+Detalhe em [`SPRINT-M-18-PR.md`](../repos/sep-mobile/SPRINT-M-18-PR.md).

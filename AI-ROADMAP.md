@@ -137,7 +137,11 @@ Leitura base para qualquer agente:
 > fronteira HTTP** (`getCodigo()` tem zero consumidores em `src/main`). Uma sprint por repo:
 > **Sprint 36** (spec [`036`](specs/fase-4/036-sprint-36-codigos-erro-no-fio.md)) publica;
 > **F-Sprint 26** (spec [`126`](specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md)) e
-> **M-Sprint 18** (spec [`218`](specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md)) consomem.
+> **M-Sprint 18** (spec [`218`](specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md),
+> [steps](steps-fase-4/mobile/218-msprint-18-steps.md)) consomem. **A cadeia esta fechada**: as tres
+> mergeadas em `develop`+`main` — a M-18 em 2026-09-09 (PR #165/#166; 6 commits, Vitest 575/72,
+> Playwright 45, `npm audit` sem nenhum high). Com ela a recomendacao **P1** do
+> `DIAGNOSTICO-PRODUTO.md` fecha nos tres repos.
 > Ordem `35 -> 36 -> {F-26, M-18}`; as duas de consumo sao independentes entre si. **A 36 depende da 35
 > por arquivo, nao por contrato** — as duas mexem em `ApiExceptionHandler.java`. **Conflito a resolver
 > antes**: a Task 35.5 planeja remover `ContaBloqueadaException.CODIGO` como codigo morto e a Task 36.4
