@@ -10,10 +10,38 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-09 (fechamento da **M-Sprint 18**, MERGEADA em `develop` e `main`)._
+_Atualizado em: 2026-09-10 (**F-Sprint 28 MERGEADA develop+main**, PR #151/#152; fix `sep-app` #149/#150 MERGEADO)._
 
 ## Leia agora
 
+- **A F-Sprint 28 esta MERGEADA em `develop` e `main`** (2026-09-10): PR **#151** em `develop` (squash
+  `15ed341`, arvore identica a da branch verificada) e **#152** em `main` (`49f568a`, identico por
+  conteudo), sem back-merge. Branch `feature/fsprint-28-contract-check-typecheck` (**10 commits, 13
+  arquivos, +374/−30**;
+  review humano de fim de sprint aprovado). Fecha os itens 2 e 3 do §Proximo passo anterior e os
+  follow-ups **(m)** e **(n)** da F-26: o `contract-check.mjs` ganha `errorResponses` (corpo de erro
+  por status) e `enumSubset` (pertinencia opt-in; `enum` segue exigindo igualdade), o `400` de
+  `mfa.totpVerify` declara os **dois** codigos que o `verify-totp` ramifica (`MFA-400-003/004`), e
+  `typecheck:spec` entra no CI — os 11 erros de tipo corrigidos antes, e os specs do Playwright
+  incluidos. Vitest **855/97 -> 875/97**, Playwright **42**, `contract:check` **85/0**, **24 mutacoes
+  mortas**. Descricao em [`SPRINT-F-28-PR.md`](../repos/sep-app/SPRINT-F-28-PR.md).
+- **Limite que precisa ficar claro**: o gate do catalogo morde **na renovacao do snapshot**, nao no
+  instante em que o backend muda — o CI roda contra o snapshot versionado. O checkpoint da Task 128.5
+  afirmou o contrario e o review pegou; o `contracts/README.md` ficou com a garantia real. Follow-up:
+  job que rode o check do web contra o OpenAPI de `develop`.
+- **Antes da F-28, o fix `sep-app` #149/#150 esta MERGEADO develop+main (2026-09-10)**: removeu os dois
+  testes duplicados pelo back-merge `11bd729` — `git diff-tree --cc` provou ser o **unico** arquivo
+  afetado, e nenhum gate pega esse evil merge — e zerou o high do `npm audit` (`js-yaml` 4.3.1 ->
+  4.3.2, so lock), a **quinta** volta do audit do web sem deteccao. Back-merge `4baf7b1` conferido
+  limpo por `--cc`.
+- **Correcoes de registro desta sessao**: o item 7 do §Proximo passo anterior (ADR 0010) **ja estava
+  corrigido e commitado desde 2026-09-02** — **decimo caso** do padrao "o STATE declara pendente o que
+  esta feito"; o item 6.1 mandava fazer push de um back-merge (`d82caaa`) que o squash do #165 ja
+  absorvera; e o item 4 falava em "46 excluidos" onde a particao medida e **80 + 53**.
+- **Aprendizado da F-28, o que mais se paga**: os tres hotfixes do checker vieram do review e **os tres
+  fechavam caminho de gate silencioso** — chave desconhecida no descriptor era ignorada, `null` em
+  `errorResponses` lancava `TypeError`, e a declaracao do catalogo podia ser apagada com o CI verde.
+  **Gate que pode ser desligado por dado precisa de teste que prenda o dado.**
 - **A M-Sprint 18 esta MERGEADA em `develop` e `main`** (2026-09-09). Em `origin/develop` via PR
   **#165** (squash `fe77544`, 22 arquivos — os 20 da sprint mais `ci.yml` e `package.json`, que vieram
   do back-merge `d82caaa` absorvido pelo squash), back-merge **`1efc58e`**; promovida a `main` via PR
@@ -159,6 +187,18 @@ _Atualizado em: 2026-09-09 (fechamento da **M-Sprint 18**, MERGEADA em `develop`
   `ModelResolver` sem `openapi31` apagando 21 `description` e 17 `example` em silencio).
 
 ## Onde estamos
+
+- **F-Sprint 28 (web) MERGEADA develop+main em 2026-09-10** (PR #151/#152, conferida por conteudo) — gate de corpo de erro no `contract:check`
+  e typecheck dos specs (Fase 4, divida de tooling e contrato; **sem tela, endpoint, DTO, migration,
+  regra nova ou ADR**). Branch `feature/fsprint-28-contract-check-typecheck` de `develop` `4baf7b1`;
+  10 commits, squash `15ed341` em `develop` e `49f568a` em `main`. Nada mudou em `sep-api`/`sep-mobile`.
+  **O ganho**: o catalogo de codigos que o web consome passa a ter gate — renovar o snapshot sem
+  `MFA-400-003` ou `004` reprova o CI, e testes contra o descriptor real impedem que a declaracao
+  suma. **Controle medido**: sem a declaracao, a mesma perda sai exit 0 — o estado pre-sprint.
+  **"Obrigatorio de um lado so" sobrevive** a `contract:check`, `typecheck:spec` e `build`: nao
+  verificavel, declarado. O risco "`TS2322` de ambiente" da spec **nao se confirmou** (alias local).
+  Detalhe em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §F-Sprint 28 e na spec
+  [`128`](../specs/fase-4/128-fsprint-28-contract-check-erro-typecheck-web.md) §Resultado medido.
 
 - **M-Sprint 18 (mobile) MERGEADA develop+main em 2026-09-09** — consumo do `codigo` de erro publicado
   pela Sprint 36 (Fase 4, produto novo sobre superficie de contrato existente; **sem rota, endpoint,
@@ -801,51 +841,34 @@ _Atualizado em: 2026-09-09 (fechamento da **M-Sprint 18**, MERGEADA em `develop`
 
 ## Proximo passo
 
-1. **A cadeia P1 esta FECHADA nos tres repos.** Sprint 36 (backend, #107/#108), F-Sprint 26 (web,
-   #145/#146) e M-Sprint 18 (mobile, #165/#166) estao todas em `develop` e `main`. **Nao ha sobra da
-   M-18**: o back-merge `d82caaa` foi absorvido pelo squash do #165 e o audit do `sep-mobile` foi
-   zerado no recorte high dentro da propria sprint.
+1. ~~F-Sprint 28: push, PR e merge~~ **MERGEADA develop+main em 2026-09-10** (PR #151 squash `15ed341`,
+   #152 `49f568a`), conferida por conteudo: arvore de `develop` identica a da branch verificada,
+   `main` identico a `develop`, nenhum back-merge a conferir.
 
-   **Resta um item do lado web, fora da M-18, e o registro anterior sobre ele estava ERRADO.** Este
-   arquivo dizia que a remocao dos dois testes duplicados de login "ja existe no working tree da
-   branch local `fix/duplicatas-evil-merge-login-spec`, sem commit; preservada nesta sessao".
-   **Medido em 2026-09-09**: a branch esta em `11bd729`, **igual a `origin/develop`** por
-   `git rev-list --left-right --count` (`0 0`), working tree **limpo** e **zero stashes**. A remocao
-   nao existe em lugar nenhum — quem seguisse o registro iria procurar um trabalho que nao esta la.
-   As duplicatas **seguem em `origin/develop`**, em
-   `src/app/features/public/login/login.component.spec.ts`: `'423 com message vazia: cai no literal
-   local em vez de deixar a tela muda'` nas linhas **202 e 230**, e `'5xx com message so de espacos:
-   cai no literal local, sem alerta em branco'` nas linhas **217 e 245**. **Nao quebram o CI** —
-   nomes repetidos no Vitest apenas rodam duas vezes e passam —, entao ninguem e avisado; e divida de
-   ruido, nao de gate. Refazer a remocao do zero, num commit proprio.
+2. **Follow-ups da F-28, pequenos e sem sprint propria**: (u) job agendado, ou do lado do `sep-api`,
+   rodando o `contract:check` do web contra o OpenAPI de `develop` — sem ele o gate do catalogo so
+   morde na renovacao do snapshot; (v) bullet do `X-Step-Up-Token` desatualizado no
+   `contracts/README.md` (24 operacoes o documentam desde a Sprint 34; `knownGaps` vazio); (w)
+   `typecheck:spec` no `.husky/pre-push` (~5,4s); (x) `logarAdmin` em **3 copias byte-identicas** nos
+   specs de dashboard, profile e change-password; (y) `vitest/no-identical-title`
+   (`@vitest/eslint-plugin`), que teria pego o evil merge `11bd729`; (z) `scripts/*.mjs` nunca passou
+   por prettier.
 
-2. **Sprint dedicada aos pontos cegos do `contract-check.mjs`** — agora sao **seis**, nao quatro.
-   Os quatro da F-24 (sem `kind` de gap para status; `varrerGapsObsoletos` reprova gap nao consumido;
-   check unidirecional; valida `declarado ⊆ documentado` e nunca `declarado = ramificado`) mais os
-   **dois medidos na F-26**: (v) `verificarCorpoDaResposta` (`:206-217`) itera **so
-   `operacao.sucesso`**, e nao existe chave de operacao que ligue um `$type` a resposta de erro
-   (`erros`, `:168-175`, e so lista de status conferida por existencia); (vi) `verificarEnum`
-   (`:347-352`) exige **igualdade de conjunto**, nao pertinencia — provado por sonda: declarar 2 dos 4
-   valores de `role` reprova em 4 operacoes. Enquanto os dois valerem, **nenhum catalogo de codigo de
-   erro pode ser gateado**. Estimativa grosseira do (v)+(vi): `erroResponse: {$type}` iterando
-   `operacao.erros` (espelho do que ja existe) mais uma semantica de subconjunto — ~30-40 linhas mais
-   testes em `scripts/contract-check.spec.ts`.
+3. ~~Duplicatas do login, pontos cegos do `contract-check.mjs` e typecheck dos specs~~ **FEITOS**: as
+   duplicatas pelo fix #149/#150 (2026-09-10), os pontos cegos (v)+(vi) e o typecheck pela F-28. Os
+   pontos cegos (i), (iii) e (iv) seguem abertos por falta de cenario; (ii) e defesa da F-22, nao
+   defeito.
 
-3. **Divida de typecheck no `sep-app`, nova e medida.** Specs **nao sao typechecados**:
-   `tsconfig.app.json` exclui `src/**/*.spec.ts`, nao ha `tsc --noEmit` em script nem no CI, e uma
-   sonda com erro de tipo deliberado num spec passou por `vitest`, `lint` e `build`. Instalar o gate
-   nao e trivial: `tsc -p tsconfig.spec.json --noEmit` sai **2** hoje, com **11 erros preexistentes**
-   (6 `TS2345`, 2 `TS2339`, 2 `TS2314`, 1 `TS2322`). Candidata a entrar junto com o item 3.
-
-4. **Sprint 37 — normalizacao da taxonomia** ([`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md),
-   **preve ADR**). Ela sai de estimativa para **escopo medido**: a lista dos 53 excluidos, codigo a
-   codigo com classe dona, modulo e motivo, esta em
-   [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md). Sao **30 de formato** e **23 de
-   colisao**, e as 16 se decompoem em 9 de faixa compartilhada, 2 de deduplicacao e 5 de colisao
-   intra-modulo — **decomposicao medida, nao a da §Ancora 7 da spec 036**, que dizia 8/2/6.
-   **Cuidado que a 36 comprou**: renomear codigo **ja publicado** agora e mudanca de contrato. Os 46
-   excluidos nao estao publicados, entao a 037 ainda os renumera de graca — essa janela fecha se
-   alguem os publicar antes.
+4. **Sprint 37 — normalizacao da taxonomia**: **decidida em 2026-09-10, pronta para o Gate 37.0.**
+   [ADR 0020](../adr/0020-convencao-codigos-de-erro.md) + steps
+   [`037`](../steps-fase-4/backend/037-sprint-37-steps.md). Prefixo = area funcional, com o
+   **`credito` saindo de `CRD` para `PRP`**; **sufixo numerico**; **publicacao na propria sprint**.
+   **As duas recomendacoes da spec cairam na medicao**: os 26 `CRD` publicados sao todos do
+   `credores` (re-prefixa-lo mudaria contrato), e os 80 publicados sao todos numericos (sufixo
+   semantico renomearia os 80, incluindo `MFA-400-003`/`004`, gateados pela F-28). Tudo o que a
+   sprint renomeia esta fora do catalogo: **zero mudanca de contrato**. Publicar e obrigatorio porque
+   o `ParticaoDeCodigosErroTest` exige `aptos == catalogo`. Escopo ganhou os **7 codigos de tipo D**
+   (mais de uma condicao na mesma classe), achados pelo review da 036 depois da spec.
 
 5. **Frente A de notificacao**, em paralelo — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
    (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
@@ -854,18 +877,17 @@ _Atualizado em: 2026-09-09 (fechamento da **M-Sprint 18**, MERGEADA em `develop`
 
 6. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
    de `sep-api`):
-   1. **`sep-mobile`: back-merge feito localmente em 2026-09-09** (`d82caaa`), push manual
-      pendente. Baseline re-medida: **8 high**, gate vermelho; detalhes nos steps 218.
+   1. ~~`sep-mobile`: back-merge `d82caaa` pendente~~ **RESOLVIDO**: absorvido pelo squash do PR #165
+      (M-18), e o audit high zerado na propria M-18. Este item dizia push pendente e 8 high —
+      corrigido em 2026-09-10.
    2. **`sep-app`: decidir o que fazer com os tres commits de 2026-08-26** (`bf33e45`, `63248af`,
       `64b7b73`), que entraram em `develop` **sem PR**, com mensagens que nao descrevem o diff, e
       **deixaram o `format:check` vermelho**. **Decisao de quem manda no repo**, nao do agente.
 
-7. **Correcao de documento com o maior peso da lista**: o
-   [`ADR 0010`](../adr/0010-mfa-totp-com-biometria-mobile.md) §65-66 afirma "5 tentativas/min/IP" no
-   login e "5 tentativas/min/**usuario**" no TOTP. **Sao 10, e por IP nos dois**, desde a Sprint 33
-   (`APP_RATE_LIMIT_LOGIN:10`, `APP_RATE_LIMIT_TOTP_VERIFY:10`; `RateLimitFilter` chaveia por IP nos
-   dois casos). O `AGENT.md` poe **ADR acima de spec e steps**, entao um ADR errado propaga com peso
-   maior que qualquer outro documento defasado.
+7. ~~Corrigir o [`ADR 0010`](../adr/0010-mfa-totp-com-biometria-mobile.md) §65-66~~ **JA ESTAVA FEITO
+   desde 2026-09-02** (fechamento da Sprint 35), com nota datada no proprio ADR: **10** tentativas/min,
+   **por IP** no login e no TOTP. Este item seguia pendente — decimo caso do padrao "o STATE declara
+   pendente o que esta feito".
 
 8. **Decisao de rumo, depois da cadeia P1 e da frente de notificacao.** Fechar a Fase 4 preenchendo o
    §41 do [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com status, PRs, back-merges e as
@@ -876,6 +898,9 @@ _Atualizado em: 2026-09-09 (fechamento da **M-Sprint 18**, MERGEADA em `develop`
    §Gates externos).
 
 10. **Follow-ups tecnicos abertos** (nao bloqueiam).
+   **FECHADOS pela F-Sprint 28** (2026-09-10, web): (m) o catalogo de codigos de erro **tem gate** no web
+   — com a ressalva de que morde na renovacao do snapshot; (n) specs **sao** typechecados, no CI, e os
+   do Playwright tambem. Os abertos pela F-28 estao no item 2 desta lista.
    **ABERTOS pela M-Sprint 18** (2026-09-09, mobile): (q) **o `sep-mobile` nao tem `contract:check`**
    — nada gateia a divergencia entre `mocks/handlers.ts` e o backend a nao ser conferencia manual;
    com o item (m) do web, o catalogo de codigos fica **sem gate automatico nos dois repos de front**;

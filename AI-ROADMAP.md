@@ -161,7 +161,20 @@ Leitura base para qualquer agente:
 > ADR**: define o que o prefixo significa (hoje **nao e identificador de modulo**, e nao ha registro
 > dele em lugar nenhum) e qual e a convencao de sufixo (o modulo `PIX` tem **28 sufixos semanticos
 > contra 3 numericos** — e convencao paralela com dono, nao desvio). Depende da 036 **e da lista de
-> excluidos que a Task 36.7 entrega**, que e o que a dimensiona.
+> excluidos que a Task 36.7 entrega**, que e o que a dimensiona. **Decidida em 2026-09-10**
+> ([ADR 0020](adr/0020-convencao-codigos-de-erro.md), steps
+> [`037`](steps-fase-4/backend/037-sprint-37-steps.md)): prefixo = area funcional, o `credito` sai de
+> `CRD` para `PRP`, sufixo numerico, publicacao na propria sprint. As duas recomendacoes originais
+> cairam porque renomeariam codigos ja publicados; a escolhida tem **zero mudanca de contrato**.
+>
+> **F-Sprint 28** (spec [`128`](specs/fase-4/128-fsprint-28-contract-check-erro-typecheck-web.md) +
+> steps [`128`](steps-fase-4/web/128-fsprint-28-steps.md), **MERGEADA develop+main** em 2026-09-10,
+> PR #151/#152) fecha o que a F-26 deixou sem gate: o `contract-check.mjs` passa a
+> verificar **corpo de erro por status** (`errorResponses`) e **pertinencia de enum** (`enumSubset`,
+> opt-in — `enum` segue exigindo igualdade), a Task 126.3 e executada com os **dois** codigos que o
+> `verify-totp` ramifica, e os specs — inclusive os do Playwright — entram sob `tsc` no CI (11 erros
+> preexistentes corrigidos antes). O gate do catalogo morde **na renovacao do snapshot**, nao na
+> mudanca do backend. O fix que a bloqueava entrou por #149/#150.
 >
 > **Frente A de notificacao, planejada em 2026-09-01** — a unica das quatro frentes do levantamento
 > de notificacoes que **nao depende de acesso externo**. Medido: o `sep-api` tem **71 eventos de

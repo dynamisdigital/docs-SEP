@@ -2580,3 +2580,60 @@ como **fixture e nao prova de backend**. O escopo adiado pelo Gate M-16.0 (match
 chaves Pix) continua exigindo a persona `FINANCEIRO`, que o mobile nao tem.
 
 Detalhe em [`SPRINT-M-18-PR.md`](../repos/sep-mobile/SPRINT-M-18-PR.md).
+
+## F-Sprint 28 (web) — Corpo de erro no `contract:check` e typecheck dos specs — MERGEADA develop+main (2026-09-10)
+
+Fecha os itens 2 e 3 do §Proximo passo de 2026-09-09 e os follow-ups **(m)** e **(n)** da F-26.
+Branch `feature/fsprint-28-contract-check-typecheck` a partir de `develop` `4baf7b1`; **10 commits,
+13 arquivos, +374/−30**; em `develop` via PR **#151** (squash `15ed341`) e em `main` via **#152**
+(`49f568a`), conferidos por conteudo — arvore identica a da branch verificada, sem back-merge. Sem tela, endpoint, DTO, migration, regra nova
+ou ADR. Nada mudou em `sep-api`/`sep-mobile`.
+
+**Antes, um fix proprio (PR #149/#150).** O back-merge `11bd729` da F-26 duplicou dois `it(...)` em
+`login.component.spec.ts` — os dois pais tinham uma copia, o merge ficou com duas —, e `git diff-tree
+--cc 11bd729` provou que foi o **unico** arquivo afetado. Nenhum gate pega esse evil merge: TS aceita
+`it` repetido, Vitest roda os dois e passa. No mesmo PR, o `npm audit` do `sep-app` tinha voltado a
+**1 high** (`js-yaml` 4.3.1, via `eslint`/`stylelint`) — **quinta vez** que o audit do web volta de
+zero sem deteccao —, zerado com `npm audit fix` sem `--force`, so lock.
+
+**O ganho, em uma frase: o catalogo de codigos que o web consome passou a ter gate.** A F-26 fez o
+`verify-totp` encerrar a tentativa em `MFA-400-003`/`004`, mas o `contract-check.mjs` nao via corpo de
+erro nem pertinencia de enum. Agora ha `errorResponses` (corpo por status, espelho do
+`responseHeaders`: o status precisa estar em `erros` e ter schema JSON) e `enumSubset` (pertinencia
+opt-in; `enum` segue exigindo igualdade, que protege 71 campos de uniao fechada). O `400` de
+`mfa.totpVerify` declara **dois** codigos, nao tres: o componente so ramifica esses, e o
+`MFA-400-002` cai no ramo legado de proposito.
+
+**Limite que a propria sprint corrigiu no registro**: o CI roda contra o snapshot versionado, entao o
+gate morde **quando o snapshot e renovado**, nao no instante em que o backend muda. O checkpoint da
+Task 128.5 afirmou o contrario; o review da Task seguinte pegou, e o `contracts/README.md` ficou com a
+garantia real.
+
+**Typecheck dos specs**: os **11 erros** medidos na F-26 foram corrigidos so em specs, com o Vitest
+em 855/97 antes e depois, e o gate `typecheck:spec` entrou no CI. O hotfix `23e45e6` estendeu o gate
+aos 13 `.ts` do Playwright, que nao entravam em tsconfig nenhum. A sonda provou o desenho: erro de
+tipo num spec sai 2 no gate enquanto `vitest` e `build` saem 0. O risco "TS2322 de ambiente" que a
+spec declarava **nao se confirmou** — era um alias local `GuardResult` sem `RedirectCommand`.
+
+**Os tres hotfixes do checker vieram do review, e os tres fechavam caminho de gate silencioso**:
+chave desconhecida no descriptor era ignorada (`enumsubset` digitado errado desligaria o catalogo);
+`null` em `errorResponses` lancava `TypeError` dentro do check; e a declaracao do catalogo podia ser
+apagada com o CI verde — o experimento de controle da propria Task mediu exit 0 sem ela. O ultimo
+virou teste contra o descriptor real e o snapshot versionado.
+
+**Mutacao: 24 mortas, 2 sobreviventes esperados.** Os sobreviventes sao "obrigatorio de um lado so",
+no OpenAPI e no TS: passam por `contract:check`, `typecheck:spec` e `build`, porque o check nao olha
+`required` de response e nada no repo constroi um `ApiErrorResponse`. Declarado nao verificavel.
+**Tres armadilhas de mutacao registradas**: `grep -cF` conta ancora multi-linha linha a linha (a
+guarda abortou em vez de mutar); exit 1 por `SyntaxError` parecia morte com zero testes falhando; e um
+`return` removido sobrevivia a todos os testes de unidade e so o `contract:check` real o matava — a
+lacuna era de teste, fechada.
+
+**Gates finais**: Vitest **855/97 -> 875/97**, Playwright **42**, `contract:check` **85/0**,
+`typecheck:spec` novo e verde, demais verdes, `audit` 0 high / 4 moderate (cadeia `vitest`, ADR 0018).
+
+**Follow-ups**: job que rode o check do web contra o OpenAPI de `develop`; bullet do
+`X-Step-Up-Token` desatualizado no `contracts/README.md`; `typecheck:spec` no pre-push; `logarAdmin`
+em 3 copias byte-identicas; `vitest/no-identical-title`; `scripts/*.mjs` fora do prettier.
+
+Detalhe em [`SPRINT-F-28-PR.md`](../repos/sep-app/SPRINT-F-28-PR.md).

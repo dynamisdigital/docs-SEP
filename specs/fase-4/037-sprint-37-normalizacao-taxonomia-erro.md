@@ -6,7 +6,8 @@
 - **Titulo**: Sprint 37 - Decidir o que o prefixo significa e qual e a convencao de sufixo, resolver
   as colisoes de significado e re-prefixar o modulo `credores`, para que o restante da taxonomia
   fique publicavel
-- **Status**: **planejada** (criada em 2026-09-01)
+- **Status**: **planejada; decisoes tomadas em 2026-09-10** — [ADR 0020](../../adr/0020-convencao-codigos-de-erro.md);
+  steps em [`037`](../../steps-fase-4/backend/037-sprint-37-steps.md). Ver §Decidido em 2026-09-10
 - **Fase do produto**: Fase 4 - divida de contrato; sem endpoint, migration, evento, provider ou
   regra de negocio nova. **ADR previsto** — ver §Por que esta sprint exige ADR
 - **Trilha**: Backend (`sep-api`)
@@ -41,6 +42,27 @@ renomear:
 
 Enquanto as duas estiverem em aberto, qualquer rename e chute com sotaque tecnico — e caro, porque
 rename de codigo publicado nao volta.
+
+## Decidido em 2026-09-10 — as duas recomendacoes desta spec cairam
+
+Esta spec foi escrita **antes** da 036 publicar. A §Ancora 6 avisava que o publicado condicionaria
+tudo; medido em 2026-09-10 (`develop` `a774aa4`), condicionou:
+
+- os **26 `CRD` publicados sao todos do `credores`**, e os 9 do `credito` estao todos excluidos
+  — recomendar que o `credores` saia do `CRD` (§Decisao 1, (b)) renomearia 26 codigos de contrato;
+- os **80 publicados sao todos numericos** e os 29 semanticos estao todos excluidos — recomendar sufixo
+  semantico (§Decisao 2, (a)) renomearia os 80, incluindo `MFA-400-003`/`004`, ramificados por web e
+  mobile e gateados pela F-Sprint 28.
+
+**Decidido pelo responsavel pelo repo** ([ADR 0020](../../adr/0020-convencao-codigos-de-erro.md)):
+prefixo = area funcional com **o `credito` saindo do `CRD` para `PRP`**; **sufixo numerico**; e
+**publicacao na propria sprint** — o `ParticaoDeCodigosErroTest` exige `aptos == catalogo`, entao
+normalizar sem publicar e estruturalmente impossivel. Tudo o que a sprint renomeia esta fora do
+catalogo: **zero mudanca de contrato**.
+
+**Escopo acrescentado**: os **7 codigos de tipo D** — mais de uma condicao **na mesma classe** —, que o
+code review de fechamento da 036 retirou do catalogo depois desta spec ser escrita. As secoes abaixo
+sao o registro de 2026-09-01; onde divergirem, valem este bloco, o ADR e os steps.
 
 ## Ancoras verificadas (2026-09-01)
 
@@ -226,9 +248,9 @@ inteira atras de um ADR.
 
 ### Fora
 
-- **Publicar os codigos normalizados.** Segunda rodada de publicacao e sprint propria, ou extensao da
-  036 executada depois desta. Manter separado preserva a propriedade que tornou esta barata: enquanto
-  nao publica, renomeia de graca.
+- ~~**Publicar os codigos normalizados.**~~ **Revertido em 2026-09-10**: entra na sprint (Task 37.7).
+  O `ParticaoDeCodigosErroTest` exige `aptos == catalogo`, entao nao ha como normalizar sem publicar,
+  e a janela de rename gratuito existia para esperar o ADR, que agora decide a convencao.
 - **Criar codigos novos** para os 10 handlers sem codigo. Continua sendo escopo da sprint de
   personas (P2 do [`DIAGNOSTICO-PRODUTO.md`](../../docs-sep/DIAGNOSTICO-PRODUTO.md)).
 - **As 5 categorias do cap. 3** (System / User's Invalid Argument / Preconditions Not Met /
@@ -288,5 +310,5 @@ Fecha o escopo que a [`036`](./036-sprint-36-codigos-erro-no-fio.md) deixou fora
 prepara a segunda rodada de publicacao da recomendacao **P1** do
 [`DIAGNOSTICO-PRODUTO.md`](../../docs-sep/DIAGNOSTICO-PRODUTO.md).
 
-Steps criados just-in-time em `steps-fase-4/backend/037-sprint-37-steps.md` quando a sprint for
-aprovada para execucao.
+Steps em [`steps-fase-4/backend/037-sprint-37-steps.md`](../../steps-fase-4/backend/037-sprint-37-steps.md),
+criados em 2026-09-10 depois das decisoes do [ADR 0020](../../adr/0020-convencao-codigos-de-erro.md).
