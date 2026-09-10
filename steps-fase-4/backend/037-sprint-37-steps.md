@@ -214,10 +214,23 @@ contra a medicao do Gate e ajusta numero que tenha mudado. **Sem commit no `sep-
 | `CRD-422-001` | `PRP-422-001` | `OnboardingNaoAprovadoException` |
 | `CRD-422-002` | `PRP-422-002` | `OpenFinanceFluxoInvalidoException` |
 | `CRD-422-003` | `PRP-422-003` | `ConsentimentoNaoAutorizadoException` |
-| `OF-400-001` | proximo `PRP-400-NNN` livre | `CelcoinOpenFinanceWebhookController` |
+| `OF-400-001` | aposentado: `WHK-400-003`/`004`/`005` | `CelcoinOpenFinanceWebhookController` |
 
 Tabela medida em 2026-09-10; reconferir no Gate. Com o `credito` fora, o lado `credores` das 9 vira
 dono unico e **tambem** fica apto — os dois lados entram no catalogo no mesmo commit.
+
+**Corrigido na execucao (2026-09-10)**, pela medicao da Task:
+
+- `OF-400-001` identificava as quatro checagens de recepcao de webhook (dois headers, body vazio,
+  body nao-JSON) que a 37.3b consolidou em `WHK`. Renomea-lo para `PRP` daria dois codigos a mesma
+  condicao (ADR 0020 §3) e ainda deixaria o novo com quatro condicoes. O controller passa a lancar as
+  excecoes `WHK` e o codigo e aposentado.
+- `StatusPropostaInvalidoException` declarava `CRD-400-002` e nunca o usava: os construtores
+  chamavam o do pai, e a transicao invalida saia com `CRD-400-001`. Renomear sem corrigir publicaria
+  `PRP-400-001` com duas condicoes (dado invalido e status que recusa a operacao) e deixaria
+  `PRP-400-002` inalcancavel. A classe passa a emitir o proprio codigo, e o "novo parecer em proposta
+  em estado final" do `RegistrarParecerUseCase` — mesma condicao pelo criterio da acao do cliente —
+  sai por ela, com a mensagem identica.
 
 **Mutacao**: devolver um `PRP` a `CRD` — particao tem de acusar colisao.
 

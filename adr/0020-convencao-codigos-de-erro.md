@@ -38,8 +38,11 @@ publicado e mudanca de contrato.**
 - Os prefixos vivem num **registro unico no codigo**, com dono e significado. Prefixo fora do
   registro reprova o build.
 - **O `credito` sai da faixa `CRD` e passa a `PRP`** (proposta de credito). `CRD` fica com o
-  `credores`, que ja tem 26 codigos publicados nele. O Open Finance do `credito` (`OF-400-001`, fora
-  do formato por ter duas letras) entra em `PRP`.
+  `credores`, que ja tem 26 codigos publicados nele. O `OF-400-001` do webhook Open Finance do
+  `credito` (fora do formato por ter duas letras) **nao** vai para `PRP`: medido na Task 37.4, ele
+  identificava as quatro checagens de recepcao de webhook que a 37.3b consolidou em `WHK`, e o §3
+  proibe dar dois codigos a mesma condicao. O controller passa a lancar as excecoes `WHK` e o codigo
+  e aposentado.
 
 Registro inicial:
 
