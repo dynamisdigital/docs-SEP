@@ -933,9 +933,10 @@ _Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#1
    `resetLoginMockState()` no doc do `logarAdmin` (o mock guarda lockout por username entre testes do
    mesmo arquivo); ~~(ag) `applies-to: security-updates` no `dependabot.yml`~~ **FEITO** (app #162/#163,
    mobile #175/#176); ~~(ah) `jest-dom` 7 e o grupo minor/patch~~ **FEITO** (app #165/#166: trio subido;
-   o `jest-dom` 7 virou `ignore` por exigir Node 22); (ai) branch default dos repos para `develop`,
-   porque security updates ignoram `target-branch` e hoje abrem PR direto em `main` — decisao de quem
-   manda no repo; (aj) **promover `develop -> main` com merge commit**: com squash a base comum nao anda,
+   o `jest-dom` 7 virou `ignore` por exigir Node 22); ~~(ai) branch default dos repos para `develop`~~
+   **FEITO em 2026-09-11** (conferido pela API: `default_branch=develop` no `sep-app` e no `sep-mobile`),
+   o que tira a origem do problema: os PRs do Dependabot, inclusive os de seguranca, passam a nascer em
+   `develop`; (aj) **promover `develop -> main` com merge commit**: com squash a base comum nao anda,
    e todo PR do Dependabot mergeado direto na `main` precisa voltar a `develop` **antes** da promocao
    seguinte, senao e revertido — foi o ciclo do #164, fechado em #168/#169. Conferencia de back-merge:
    arvore igual a da `main`, nao "saiu sem conflito".
