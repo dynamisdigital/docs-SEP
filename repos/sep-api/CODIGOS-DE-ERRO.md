@@ -2,7 +2,10 @@
 
 Documento operacional do contrato de erro da API SEP. Criado pela **Sprint 36** (spec
 [`036`](../../specs/fase-4/036-sprint-36-codigos-erro-no-fio.md), steps
-[`036`](../../steps-fase-4/backend/036-sprint-36-steps.md)).
+[`036`](../../steps-fase-4/backend/036-sprint-36-steps.md)) e reescrito pela **Sprint 37** (spec
+[`037`](../../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md), steps
+[`037`](../../steps-fase-4/backend/037-sprint-37-steps.md), ADR
+[`0020`](../../adr/0020-convencao-codigos-de-erro.md)).
 
 > **Destino deste documento.** Os steps da Sprint 36 apontavam o catalogo para
 > [`CONTRATOS.md`](./CONTRATOS.md). Aquele arquivo e o doc operacional do **modulo `contratos`**
@@ -16,7 +19,13 @@ HTTP**: `getCodigo()` tinha zero consumidores em `src/main`. O cliente so tinha 
 discriminar, e por isso o `sep-app` acumulava ramificacao por status, mensagens byte-identicas entre
 telas e um `verify-totp` que acusava "codigo invalido" em bloqueio, rate limit, 5xx e queda de rede.
 
-A partir da Sprint 36 o corpo de erro carrega um campo **`codigo`** opcional.
+A **Sprint 36** pos no corpo de erro um campo **`codigo`** opcional e publicou 80 codigos, deixando
+53 fora do perimetro por formato ou colisao.
+
+A **Sprint 37** normalizou a taxonomia inteira sem mudar contrato: definiu o que o prefixo
+significa, converteu o sufixo semantico em numerico, separou e deduplicou as colisoes e instalou um
+gate no build. O catalogo foi de **80 para 143**, e os 80 anteriores continuam publicados com o mesmo
+valor e o mesmo dono.
 
 ## Forma do corpo
 
@@ -48,7 +57,7 @@ Sem codigo publicado — **a propriedade some, e nao vira `null`**:
 ```
 
 **Garantia de compatibilidade**: as seis propriedades anteriores nao mudaram de nome, tipo, ordem
-nem semantica. Consumidor que ignora o campo novo nao percebe a sprint. Consumidor que ramifica por
+nem semantica. Consumidor que ignora o campo novo nao percebe as sprints. Consumidor que ramifica por
 `'codigo' in body` funciona porque a ausencia e ausencia de chave, nao `null`
 (`@JsonInclude(NON_NULL)`).
 
@@ -62,177 +71,206 @@ nem semantica. Consumidor que ignora o campo novo nao percebe a sprint. Consumid
 Quem abre chamado reporta os dois: o `codigo` leva ao comportamento, o `traceId` a evidencia. Nenhum
 dos dois sozinho resolve — codigo sem trace nao localiza, trace sem codigo nao classifica.
 
-## Regra de nomenclatura
+## Regra de nomenclatura (ADR 0020)
 
 ```text
-MOD-STATUS-NNN
+MOD-STATUS-NNN          ^[A-Z]{3,4}-[0-9]{3}-[0-9]{3}$
 ```
 
-- **`MOD`** — prefixo de 3 ou 4 letras maiusculas identificando o modulo de origem.
-- **`STATUS`** — o status HTTP com que a condicao chega ao cliente, com 3 digitos.
-- **`NNN`** — sequencial de 3 digitos dentro do par modulo+status.
+- **`MOD`** — prefixo de 3 ou 4 letras que identifica uma **area funcional**, com **um** modulo dono.
+  Um modulo pode ter mais de um prefixo (`identity`: `AUTH` e `MFA`); **o mesmo prefixo nunca aparece
+  em dois modulos**. Os prefixos vivem no registro `shared/exception/PrefixoCodigoErro`.
+- **`STATUS`** — o status HTTP com que a condicao chega ao cliente, com 3 digitos. E informativo; o
+  status autoritativo e o da resposta.
+- **`NNN`** — sequencial de 3 digitos dentro do par prefixo + status. **Numero retirado nao volta ao
+  uso.**
 
-Regex canonica, aplicada no carregamento de `CatalogoCodigosErro`:
+Registro de prefixos:
 
-```text
-^[A-Z]{3,4}-[0-9]{3}-[0-9]{3}$
-```
+| Prefixo | Modulo dono | Area |
+|---|---|---|
+| `ASN` | `contratos` | assinatura digital |
+| `AUTH` | `identity` | autenticacao e sessao |
+| `BOF` | `backoffice` | fila e operacao de backoffice |
+| `COB` | `cobranca` | cobranca e renegociacao |
+| `CRD` | `credores` | credora: cadastro, oportunidade, interesse e aporte |
+| `CTR` | `contratos` | formalizacao contratual |
+| `GOV` | `governanca` | parametros e papeis |
+| `MFA` | `identity` | segundo fator |
+| `ONB` | `onboarding` | KYC, KYB e PLD |
+| `PIX` | `pix` | desembolso, recebimento e chaves |
+| `PRP` | `credito` | proposta de credito e Open Finance |
+| `USR` | `usuarios` | cadastro e senha de usuario |
+| `WHK` | `shared` | recepcao de webhooks |
 
-**Acrescentar codigo ao catalogo e mudanca compativel. Renomear codigo ja publicado nao e** — depois
-de publicado, o par `codigo + traceId` e o identificador que o usuario reporta, e o valor esta no
-`enum` do OpenAPI consumido pelo `contract:check` do `sep-app`.
+> **`CRD` significa "credora"**, embora a leitura natural seja "credito". Mudar custaria renomear
+> codigos publicados; o `credito` usa `PRP` desde a Sprint 37.
 
-## O perimetro: por que nem todo codigo esta aqui
+Regras de identidade:
 
-O Gate 36.0 mediu **133 codigos unicos** em `src/main`. Um codigo so entra no contrato se satisfizer
-os **tres** criterios:
+- **Um codigo identifica uma condicao e tem um dono** — a classe de excecao que nomeia a condicao,
+  ou um unico ponto de lancamento inline.
+- **Mesma condicao = mesma acao do cliente.** Se o cliente faz a mesma coisa para se recuperar, e a
+  mesma condicao e recebe uma excecao nomeada unica, nunca dois codigos. Foi assim que a validacao de
+  recepcao de webhook virou `WHK` nos sete controllers que a repetiam.
+- **Acrescentar codigo ao catalogo e compativel. Renomear, reutilizar ou mudar o significado de codigo
+  publicado nao e.**
+
+O build reprova codigo fora do formato, prefixo fora do registro, prefixo usado fora do modulo dono,
+numero aposentado de volta e ponto de lancamento que a particao nao consegue ler
+(`ConvencaoCodigosErroTest`).
+
+## O perimetro: o que entra no contrato
+
+Um codigo so entra no contrato se satisfizer os **tres** criterios:
 
 1. **formato canonico** — casa a regex acima;
-2. **uma condicao** — o valor identifica **uma** situacao, e nao um conjunto delas. Isso e mais forte
-   que "um unico dono": uma classe de excecao **nomeia** a condicao, entao seus construtores
-   sobrecarregados sao variantes de mensagem da mesma coisa; mas um literal solto num use case ou
-   controller nao nomeia nada, e ali cada mensagem distinta e uma condicao distinta. Foi por confundir
-   as duas que sete codigos ambiguos entraram no catalogo e tiveram de sair;
+2. **uma condicao** — o valor identifica **uma** situacao. Uma classe de excecao **nomeia** a
+   condicao, entao seus construtores e fabricas sao variantes de mensagem da mesma coisa; um literal
+   solto num use case ou controller nao nomeia nada, e ali cada mensagem distinta e uma condicao;
 3. **alcancavel** — existe caminho de runtime da excecao ate a montagem do corpo.
 
-Codigo que falha em qualquer um **simplesmente nao emite `codigo`**. O campo e opcional, entao a
-resposta continua valida e nada regride. O filtro vale **no fio, e nao so no documento**:
-`ApiExceptionHandler.somenteSePublicado` recusa qualquer valor fora do catalogo, para que a resposta
-nunca carregue algo que o `enum` publicado nao declara.
-
-A assimetria e o motivo do perimetro ser conservador: **publicar mais codigos depois nao quebra
-ninguem; renomear codigo ja publicado quebra.**
+Todo codigo apto e publicado (ADR 0020 §4). Codigo que falha em algum criterio **simplesmente nao
+emite `codigo`**. O filtro vale **no fio, e nao so no documento**: `ApiExceptionHandler.somenteSePublicado`
+recusa qualquer valor fora do catalogo, para que a resposta nunca carregue algo que o `enum`
+publicado nao declara.
 
 ## Particao
 
 ```text
-133 codigos unicos = 80 publicados + 53 excluidos      intersecao = 0
-excluidos: 30 por formato · 23 por colisao · 0 inalcancaveis
+Sprint 37:  144 codigos unicos = 143 publicados + 1 excluido     intersecao = 0
+            excluido: 1 inalcancavel · 0 formato · 0 colisao
+Sprint 36:  133 codigos unicos =  80 publicados + 53 excluidos
 ```
-
-As 23 colisoes sao de **dois tipos**, e o segundo so foi medido no code review de fechamento:
-
-- **16 entre classes** — o mesmo valor tem dono em dois arquivos diferentes;
-- **7 dentro da mesma classe** — o mesmo valor e lancado para condicoes diferentes no mesmo
-  arquivo. `ONB-400-004` e o caso que os nomeia: a constante chama-se `CODIGO_TAMANHO_EXCEDIDO` e e
-  lancada tambem para "Conteudo do documento e obrigatorio".
-
-A primeira versao da particao contava **classes donas**, e classe nao implica condicao. Esses sete
-passaram pelo criterio e chegaram a entrar no catalogo publicado; foram retirados.
 
 A particao **nao e um numero escrito aqui**: e recalculada a cada `./gradlew build` por
 `ParticaoDeCodigosErroTest`, que varre `src/main/java` do zero e reprova se o catalogo divergir do
 codigo-fonte em qualquer direcao.
 
-## Catalogo publicado (80)
+## Catalogo publicado (143)
 
-| Prefixo | Modulo | Qtd | Codigos |
-|---|---|---|---|
-| `ASN` | contratos (assinatura) | 2 | `ASN-400-002`, `ASN-400-003` |
-| `AUTH` | identity | 3 | `AUTH-400-101`, `AUTH-400-102`, `AUTH-423-001` |
-| `BOF` | backoffice | 5 | `BOF-400-001`, `BOF-400-002`, `BOF-404-001`, `BOF-409-001`, `BOF-429-001` |
-| `COB` | cobranca | 7 | `COB-400-001`, `COB-403-001`, `COB-404-001`, `COB-404-002`, `COB-404-003`, `COB-409-001`, `COB-409-003` |
-| `CRD` | credito + credores | 26 | `CRD-400-003`, `CRD-400-004`, `CRD-400-005`, `CRD-400-006`, `CRD-400-007`, `CRD-400-008`, `CRD-400-009`, `CRD-400-010`, `CRD-400-011`, `CRD-400-012`, `CRD-400-013`, `CRD-400-014`, `CRD-400-015`, `CRD-404-003`, `CRD-404-004`, `CRD-404-005`, `CRD-404-006`, `CRD-404-007`, `CRD-404-008`, `CRD-409-001`, `CRD-409-003`, `CRD-409-004`, `CRD-409-005`, `CRD-409-006`, `CRD-409-007`, `CRD-422-004` |
-| `CTR` | contratos | 10 | `CTR-400-001`, `CTR-403-001`, `CTR-404-001`, `CTR-409-001`, `CTR-409-002`, `CTR-409-003`, `CTR-422-001`, `CTR-422-002`, `CTR-422-003`, `CTR-422-004` |
-| `GOV` | governanca | 2 | `GOV-400-001`, `GOV-404-001` |
-| `MFA` | identity (MFA) | 5 | `MFA-400-001`, `MFA-400-002`, `MFA-400-003`, `MFA-400-004`, `MFA-409-001` |
-| `ONB` | onboarding | 13 | `ONB-400-001`, `ONB-400-003`, `ONB-400-005`, `ONB-400-009`, `ONB-400-010`, `ONB-400-011`, `ONB-400-012`, `ONB-400-013`, `ONB-400-016`, `ONB-400-018`, `ONB-404-002`, `ONB-409-001`, `ONB-409-002` |
-| `PIX` | pix | 2 | `PIX-400-001`, `PIX-404-001` |
-| `USR` | usuarios | 4 | `USR-403-001`, `USR-403-002`, `USR-404-001`, `USR-409-001` |
-| `WHK` | shared (webhooks) | 1 | `WHK-400-001` |
+Em **negrito**, os 80 publicados ate a Sprint 36. Os 143 estao congelados em
+`CodigosPublicadosNaoMudamTest`: codigo publicado nao se renomeia nem sai do catalogo, e a lista so
+cresce — cada sprint que publica acrescenta os seus no fechamento.
+
+| Prefixo | Modulo dono | Area | Qtd | Codigos |
+|---|---|---|---|---|
+| `ASN` | `contratos` | assinatura digital | 3 | `ASN-400-001`, **`ASN-400-002`**, **`ASN-400-003`** |
+| `AUTH` | `identity` | autenticacao e sessao | 3 | **`AUTH-400-101`**, **`AUTH-400-102`**, **`AUTH-423-001`** |
+| `BOF` | `backoffice` | fila e operacao de backoffice | 5 | **`BOF-400-001`**, **`BOF-400-002`**, **`BOF-404-001`**, **`BOF-409-001`**, **`BOF-429-001`** |
+| `COB` | `cobranca` | cobranca e renegociacao | 9 | **`COB-400-001`**, **`COB-403-001`**, **`COB-404-001`**, **`COB-404-002`**, **`COB-404-003`**, **`COB-409-001`**, `COB-409-002`, **`COB-409-003`**, `COB-409-004` |
+| `CRD` | `credores` | credora: cadastro, oportunidade, interesse e aporte | 35 | `CRD-400-001`, `CRD-400-002`, **`CRD-400-003`**, **`CRD-400-004`**, **`CRD-400-005`**, **`CRD-400-006`**, **`CRD-400-007`**, **`CRD-400-008`**, **`CRD-400-009`**, **`CRD-400-010`**, **`CRD-400-011`**, **`CRD-400-012`**, **`CRD-400-013`**, **`CRD-400-014`**, **`CRD-400-015`**, `CRD-403-001`, `CRD-404-001`, `CRD-404-002`, **`CRD-404-003`**, **`CRD-404-004`**, **`CRD-404-005`**, **`CRD-404-006`**, **`CRD-404-007`**, **`CRD-404-008`**, **`CRD-409-001`**, `CRD-409-002`, **`CRD-409-003`**, **`CRD-409-004`**, **`CRD-409-005`**, **`CRD-409-006`**, **`CRD-409-007`**, `CRD-422-001`, `CRD-422-002`, `CRD-422-003`, **`CRD-422-004`** |
+| `CTR` | `contratos` | formalizacao contratual | 10 | **`CTR-400-001`**, **`CTR-403-001`**, **`CTR-404-001`**, **`CTR-409-001`**, **`CTR-409-002`**, **`CTR-409-003`**, **`CTR-422-001`**, **`CTR-422-002`**, **`CTR-422-003`**, **`CTR-422-004`** |
+| `GOV` | `governanca` | parametros e papeis | 2 | **`GOV-400-001`**, **`GOV-404-001`** |
+| `MFA` | `identity` | segundo fator | 5 | **`MFA-400-001`**, **`MFA-400-002`**, **`MFA-400-003`**, **`MFA-400-004`**, **`MFA-409-001`** |
+| `ONB` | `onboarding` | KYC, KYB e PLD | 21 | **`ONB-400-001`**, `ONB-400-002`, **`ONB-400-003`**, `ONB-400-004`, **`ONB-400-005`**, `ONB-400-006`, `ONB-400-007`, `ONB-400-008`, **`ONB-400-009`**, **`ONB-400-010`**, **`ONB-400-011`**, **`ONB-400-012`**, **`ONB-400-013`**, **`ONB-400-016`**, `ONB-400-017`, **`ONB-400-018`**, `ONB-400-019`, `ONB-404-001`, **`ONB-404-002`**, **`ONB-409-001`**, **`ONB-409-002`** |
+| `PIX` | `pix` | desembolso, recebimento e chaves | 29 | **`PIX-400-001`**, `PIX-400-003`, `PIX-400-004`, `PIX-400-005`, `PIX-400-006`, `PIX-400-007`, `PIX-400-008`, `PIX-400-009`, `PIX-400-010`, **`PIX-404-001`**, `PIX-404-002`, `PIX-404-003`, `PIX-404-004`, `PIX-404-005`, `PIX-404-006`, `PIX-404-007`, `PIX-409-001`, `PIX-409-002`, `PIX-409-003`, `PIX-409-004`, `PIX-409-005`, `PIX-422-001`, `PIX-422-002`, `PIX-422-003`, `PIX-422-004`, `PIX-422-005`, `PIX-422-006`, `PIX-422-007`, `PIX-422-008` |
+| `PRP` | `credito` | proposta de credito e Open Finance | 9 | `PRP-400-001`, `PRP-400-002`, `PRP-403-001`, `PRP-404-001`, `PRP-404-002`, `PRP-409-002`, `PRP-422-001`, `PRP-422-002`, `PRP-422-003` |
+| `USR` | `usuarios` | cadastro e senha de usuario | 8 | `USR-400-001`, `USR-400-002`, `USR-400-003`, `USR-400-004`, **`USR-403-001`**, **`USR-403-002`**, **`USR-404-001`**, **`USR-409-001`** |
+| `WHK` | `shared` | recepcao de webhooks | 4 | **`WHK-400-001`**, `WHK-400-003`, `WHK-400-004`, `WHK-400-005` |
 
 Fonte unica: `shared/exception/CatalogoCodigosErro.java`. O `enum` do campo `codigo` em
 `components/schemas/ErrorResponseDto` do OpenAPI deriva dela por `OpenApiCustomizer`, publicado uma
 vez e nao por operacao.
 
-## Excluidos (53) — o que ficou fora e por que
+## Excluido (1)
 
-Motivos possiveis: `formato`, `colisao`, `inalcancavel`.
+| Codigo | Dono | Motivo | Por que |
+|---|---|---|---|
+| `AUTH-403-001` | `PasswordResetEnforcementFilter` | `inalcancavel` | o filtro escreve o 403 direto na response, na cadeia do Spring Security, e nunca chega ao `ApiExceptionHandler`; o codigo so aparece **dentro do texto da `message`** (`"AUTH-403-001: redefinicao de senha obrigatoria antes de continuar."`) e o campo `codigo` sai ausente |
 
-| Codigo | Classes donas | Modulo | Motivo | Observacao |
-|---|---|---|---|---|
-| `ASN-400-001` | AssinaturaWebhookController | `contratos` | `colisao` | **mais de uma condicao na mesma classe** — separar na Sprint 37 |
-| `AUTH-403-PASSWORD_RESET_REQUIRED` | PasswordResetEnforcementFilter | `identity` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `COB-409-002` | ChaveIdempotenciaConflitanteException, RenegociacaoConflitanteException | `cobranca` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-400-001` | AssociarOperacaoFinanciadaUseCase, PropostaInvalidaException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-400-002` | RegistrarAporteCredoraUseCase, StatusPropostaInvalidoException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-403-001` | OwnershipCredoraException, OwnershipPropostaException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-404-001` | EmpresaCredoraNaoEncontradaException, PropostaNaoEncontradaException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-404-002` | ConsentimentoNaoEncontradoException, OportunidadeNaoEncontradaException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-409-002` | ConsentimentoAtivoException, InteresseDuplicadoException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-422-001` | OnboardingInvalidoParaCredoraException, OnboardingNaoAprovadoException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-422-002` | CredoraNaoElegivelException, OpenFinanceFluxoInvalidoException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `CRD-422-003` | ConsentimentoNaoAutorizadoException, OportunidadeIndisponivelException | `credito, credores` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `OF-400-001` | CelcoinOpenFinanceWebhookController | `credito` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `ONB-400-002` | IniciarOnboardingPessoaUseCase | `onboarding` | `colisao` | **mais de uma condicao na mesma classe** — separar na Sprint 37 |
-| `ONB-400-004` | EnviarDocumentoUseCase | `onboarding` | `colisao` | **mais de uma condicao na mesma classe** — separar na Sprint 37 |
-| `ONB-400-006` | CelcoinKycWebhookController, IniciarOnboardingEmpresaUseCase | `onboarding` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `ONB-400-007` | IniciarOnboardingEmpresaUseCase, OnboardingEmpresaController, OnboardingPessoaController | `onboarding` | `colisao` | 3 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `ONB-400-008` | ConsultarStatusOnboardingEmpresaUseCase, IniciarVerificacaoKybUseCase | `onboarding` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `ONB-400-014` | CelcoinKybWebhookController | `onboarding` | `colisao` | **mais de uma condicao na mesma classe** — separar na Sprint 37 |
-| `ONB-400-015` | CelcoinPldWebhookController | `onboarding` | `colisao` | **mais de uma condicao na mesma classe** — separar na Sprint 37 |
-| `ONB-404-001` | CriarPropostaCreditoUseCase, OnboardingNaoEncontradoException | `credito, onboarding` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `PIX-400-002` | PixWebhookController | `pix` | `colisao` | **mais de uma condicao na mesma classe** — separar na Sprint 37 |
-| `PIX-400-CHAVE` | NormalizadorChavePix, SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-400-CHAVE-TIPO` | NormalizadorChavePix | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-400-CONTRATO` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-400-IDEMPOTENCY-KEY` | CadastrarChavePixUseCase, SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-400-IDEMPOTENCY-KEY-TAMANHO` | CadastrarChavePixUseCase, SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-400-PARCELA` | GerarReferenciaRecebimentoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-400-VALOR` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-400-VALOR-ESCALA` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-404-CHAVE` | RemoverChavePixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-404-CONTRATO` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-404-PARCELA` | GerarReferenciaRecebimentoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-404-RECEBIMENTO` | ConsultarRecebimentoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-404-REFERENCIA` | ConsultarReferenciaRecebimentoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-404-TRANSFERENCIA` | ConsultarStatusDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-409-CHAVE-ATIVA` | CadastrarChavePixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-409-CONFLITO-CONCORRENTE` | DesembolsoTransacaoService | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-409-DESEMBOLSO-DUPLICADO` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-409-IDEMPOTENCIA` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-409-IDEMPOTENCIA-CHAVE` | CadastrarChavePixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-409-REFERENCIA-CONCORRENTE` | GerarReferenciaRecebimentoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-422-AGENDA-INEXISTENTE` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-422-CONTA-OPERACIONAL` | CadastrarChavePixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-422-CONTRATO-NAO-ASSINADO` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-422-ESCROW-INOPERANTE` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-422-PARCELA-NAO-RECEBIVEL` | GerarReferenciaRecebimentoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-422-PARCELA-SEM-SALDO` | GerarReferenciaRecebimentoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-422-VALOR-DIVERGENTE` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `PIX-422-VALOR-INDISPONIVEL` | SolicitarDesembolsoPixUseCase | `pix` | `formato` | sufixo semantico; convencao a decidir na Sprint 37 |
-| `USR-400-001` | AlterarRoleUsuarioUseCase, SenhaAtualIncorretaException | `usuarios` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `USR-400-002` | CriarUsuarioUseCase, GerenciarRolesUsuarioUseCase | `usuarios` | `colisao` | 2 classes donas — renumerar ou deduplicar na Sprint 37 |
-| `WHK-400-002` | WebhookController | `shared` | `colisao` | **mais de uma condicao na mesma classe** — separar na Sprint 37 |
+Levar esse codigo ao campo exigiria o filtro montar o corpo pelo mesmo caminho do handler — mudanca
+da cadeia de seguranca, fora do escopo da normalizacao.
 
-**Os 30 de `formato`** sao 28 do modulo `pix` mais `AUTH-403-PASSWORD_RESET_REQUIRED` e
-`OF-400-001`. No `pix` o sufixo semantico e **majoritario** — 28 dos 31 codigos do modulo —, entao
-chamar isso de desvio inverte os papeis: dentro do `pix`, quem foge da convencao local sao os tres
-numericos. Escolher entre as duas convencoes e decisao de taxonomia e pertence a **Sprint 37**, que
-preve ADR. O `OF-400-001` falha por outro motivo: prefixo de duas letras.
+## Aposentados
 
-**Das 23 de `colisao`, as 16 entre classes** sao de tres tipos, medidos e nao estimados, e o
-tratamento difere:
+Numeros que ja identificaram uma condicao e sairam de uso. Nao voltam
+(`ConvencaoCodigosErroTest.nenhumNumeroAposentadoVoltaAoUso`).
 
-- **9 de faixa compartilhada** (`credito` x `credores`) — o modulo `credores` foi construido
-  reusando a faixa `CRD-*` do `credito`: `CRD-400-001`, `CRD-400-002`, `CRD-403-001`, `CRD-404-001`,
-  `CRD-404-002`, `CRD-409-002`, `CRD-422-001`, `CRD-422-002` e `CRD-422-003`. Exige re-prefixar um
-  modulo inteiro, e e `credores` quem ocupa `CRD` majoritariamente.
-- **2 de duplicacao com significado identico** — `ONB-404-001` (a mesma condicao "solicitacao de
-  onboarding nao encontrada" escrita em `OnboardingNaoEncontradoException` e reescrita inline em
-  `CriarPropostaCreditoUseCase`) e `ONB-400-008` (a mesma frase "Solicitacao nao e do tipo EMPRESA"
-  em dois use cases). Corrigem-se por **deduplicacao**, nao por renumeracao: renumerar criaria dois
-  codigos onde deve haver um.
-- **5 de colisao real intra-modulo** — `COB-409-002`, `ONB-400-006`, `ONB-400-007`, `USR-400-001` e
-  `USR-400-002`. Renumerar um dos lados.
+| Codigo | Aposentado em | Condicao passou para |
+|---|---|---|
+| `ONB-400-014` | 37.3b | validacao do webhook KYB -> `WHK-400-003`/`004`/`005` |
+| `ONB-400-015` | 37.3b | validacao do webhook PLD -> `WHK-400-003`/`004`/`005` |
+| `PIX-400-002` | 37.3b | validacao do webhook Pix -> `WHK-400-003`/`004` |
+| `WHK-400-002` | 37.3b | validacao do webhook generico -> `WHK-400-003`/`004` |
+| `OF-400-001` | 37.4 | validacao do webhook Open Finance -> `WHK-400-003`/`004`/`005` |
+| `PIX-409-IDEMPOTENCIA-CHAVE` | 37.5 | absorvido por `PIX-409-004` (reuso conflitante de Idempotency-Key) |
 
-> `ONB-400-007` merece nota: a §Ancora 7 da spec 036 o classificava como duplicacao benigna. Sao
-> **tres** sites, nao dois — os dois `CODIGO_ARQUIVO_INVALIDO` mais um terceiro em
-> `IniciarOnboardingEmpresaUseCase:86`, que o usa para "campo obrigatorio". E colisao real.
+Os dois ultimos, e os 28 semanticos convertidos na 37.5, ja reprovam pelo formato.
 
-**Caso que merece nome**: `AUTH-403-PASSWORD_RESET_REQUIRED` ja chega ao cliente hoje, concatenado
-**dentro da `message`** em `PasswordResetEnforcementFilter`. E um contorno anterior a esta sprint, e
-a prova de que a demanda por codigo no fio existia antes do campo.
+## Mapa antes -> depois da Sprint 37
+
+Nenhum dos 80 publicados antes da sprint mudou. Tudo abaixo estava **fora** do contrato.
+
+**37.2 — deduplicacao (mesma condicao, dois donos)**
+
+| Antes | Depois |
+|---|---|
+| `ONB-400-008` em `ConsultarStatusOnboardingEmpresaUseCase` e `IniciarVerificacaoKybUseCase` | `ONB-400-008` em `SolicitacaoNaoEmpresaException` |
+| `ONB-404-001` inline em `CriarPropostaCreditoUseCase` | o `credito` lanca `OnboardingNaoEncontradoException` (`ONB-404-001`) |
+
+**37.3a — colisoes separadas**
+
+| Antes | Depois |
+|---|---|
+| `COB-409-002` em `ChaveIdempotenciaConflitanteException` | `COB-409-004` (`RenegociacaoConflitanteException` fica com `COB-409-002`) |
+| `USR-400-001` em `AlterarRoleUsuarioUseCase` (role invalida) | `USR-400-003` (`SenhaAtualIncorretaException` fica com `USR-400-001`) |
+| `USR-400-002` em `CriarUsuarioUseCase` | `USR-400-004` (`GerenciarRolesUsuarioUseCase` fica com `USR-400-002`) |
+| `ONB-400-002` inline em `IniciarOnboardingPessoaUseCase` | `CpfInvalidoException` (`ONB-400-002`) |
+| `ONB-400-006` inline em `IniciarOnboardingEmpresaUseCase` | `CnpjInvalidoException` (`ONB-400-006`) |
+| `ONB-400-004` para "conteudo/arquivo do documento obrigatorio" | `DocumentoSemConteudoException` (`ONB-400-017`); `ONB-400-004` fica com "tamanho excedido" |
+| `ONB-400-007` nos controllers de onboarding (arquivo ilegivel) | `ArquivoIlegivelException` (`ONB-400-007`) |
+| `ONB-400-007` em `IniciarOnboardingEmpresaUseCase` (campo obrigatorio) | `ONB-400-019` |
+
+**37.3b — validacao de recepcao de webhook consolidada em `WHK`**
+
+| Antes | Depois |
+|---|---|
+| `ASN-400-001` (header/body), `ONB-400-006` (KYC), `ONB-400-014` (KYB), `ONB-400-015` (PLD), `PIX-400-002` (Pix), `WHK-400-002` (generico) | `WHK-400-003` header obrigatorio · `WHK-400-004` body obrigatorio · `WHK-400-005` body nao-JSON |
+| `ASN-400-001` | fica so com "path param `{provider}` obrigatorio" |
+
+**37.4 — `credito` de `CRD` para `PRP`** (status e numero preservados)
+
+| Antes | Depois | Classe |
+|---|---|---|
+| `CRD-400-001` | `PRP-400-001` | `PropostaInvalidaException` (dado invalido) |
+| `CRD-400-002` | `PRP-400-002` | `StatusPropostaInvalidoException` (status recusa a operacao; antes saia com o codigo do pai) |
+| `CRD-403-001` | `PRP-403-001` | `OwnershipPropostaException` |
+| `CRD-404-001` / `002` | `PRP-404-001` / `002` | `PropostaNaoEncontradaException` / `ConsentimentoNaoEncontradoException` |
+| `CRD-409-002` | `PRP-409-002` | `ConsentimentoAtivoException` |
+| `CRD-422-001` / `002` / `003` | `PRP-422-001` / `002` / `003` | `OnboardingNaoAprovado` / `OpenFinanceFluxoInvalido` / `ConsentimentoNaoAutorizado` |
+| `OF-400-001` | aposentado -> `WHK-400-003`/`004`/`005` | `CelcoinOpenFinanceWebhookController` |
+
+Com o `credito` fora, os mesmos nove numeros `CRD` do `credores` ganharam dono unico e foram
+publicados.
+
+**37.5 — sufixo semantico para numerico** (proximo `NNN` livre, ordem alfabetica do codigo antigo)
+
+| Antes | Depois |
+|---|---|
+| `PIX-400-CHAVE` · `-CHAVE-TIPO` · `-CONTRATO` · `-IDEMPOTENCY-KEY` · `-IDEMPOTENCY-KEY-TAMANHO` · `-PARCELA` · `-VALOR` · `-VALOR-ESCALA` | `PIX-400-003` (`ChavePixInvalidaException`) · `004` · `005` · `006` (`IdempotencyKeyObrigatoriaException`) · `007` (`IdempotencyKeyMuitoLongaException`) · `008` · `009` · `010` |
+| `PIX-404-CHAVE` · `-CONTRATO` · `-PARCELA` · `-RECEBIMENTO` · `-REFERENCIA` · `-TRANSFERENCIA` | `PIX-404-002` · `003` · `004` · `005` · `006` · `007` |
+| `PIX-409-CHAVE-ATIVA` · `-CONFLITO-CONCORRENTE` · `-DESEMBOLSO-DUPLICADO` · `-IDEMPOTENCIA` (+ `-IDEMPOTENCIA-CHAVE`) · `-REFERENCIA-CONCORRENTE` | `PIX-409-001` · `002` · `003` · `004` (`IdempotencyKeyConflitanteException`) · `005` |
+| `PIX-422-AGENDA-INEXISTENTE` · `-CONTA-OPERACIONAL` · `-CONTRATO-NAO-ASSINADO` · `-ESCROW-INOPERANTE` · `-PARCELA-NAO-RECEBIVEL` · `-PARCELA-SEM-SALDO` · `-VALOR-DIVERGENTE` · `-VALOR-INDISPONIVEL` | `PIX-422-001` ... `008`, na mesma ordem |
+| `AUTH-403-PASSWORD_RESET_REQUIRED` | `AUTH-403-001` (segue excluido; so no texto da `message`) |
+
+## Duplicidade conhecida entre modulos
+
+A mesma condicao de Idempotency-Key tem codigos em tres modulos, e dois deles ja estavam publicados:
+
+| Condicao | `pix` | Outros modulos |
+|---|---|---|
+| Idempotency-Key obrigatoria | `PIX-400-006` | `CRD-400-003`; parte de `COB-400-001` |
+| Idempotency-Key acima de 100 caracteres | `PIX-400-007` | `CRD-400-004`; parte de `COB-400-001` |
+| Idempotency-Key reusada com outro payload | `PIX-409-004` | `COB-409-004` |
+
+O `COB-400-001` e mais largo que os outros: valida o header contra `[A-Za-z0-9._-]{1,100}` e junta
+num codigo so ausencia, tamanho e caractere invalido.
+
+Pelo ADR 0020 §3 cada condicao deveria ter um codigo so. Unificar exige renomear codigo publicado —
+mudanca de contrato — e fica para uma sprint dedicada, que decide tambem a granularidade (o recorte do
+`COB-400-001` ou o do `pix`/`credores`) e centraliza o limite de 100 caracteres, hoje escrito em cada
+modulo. Decisao da Sprint 37: unificar **dentro** do `pix` e registrar o resto.
 
 ## Handlers sem codigo (13 de 17)
 
@@ -251,27 +289,24 @@ condicoes: `handleValidation`, `handleUnreadableBody`, `handleMissingRequestHead
 `handleMethodNotSupported`, `handleAccessDenied`, `handleAuth`, `handleAssinaturaProvider`,
 `handlePixProvider` e `handleGeneric`.
 
-**Criar codigo para eles esta fora do escopo da Sprint 36.** Inventar taxonomia nova e decisao de
-produto — exige escolher nome, faixa e granularidade — e depende das personas, que o
+**Criar codigo para eles segue fora de escopo.** Inventar taxonomia nova e decisao de produto — exige
+escolher nome, faixa e granularidade — e depende das personas, que o
 [`DIAGNOSTICO-PRODUTO.md`](../../docs-sep/DIAGNOSTICO-PRODUTO.md) registra como inexistentes.
 
 ## Limitacao declarada: quatro corpos de erro nao passam pelo handler
 
-`ErrorResponseDto` e montado em **cinco** lugares, e nao so no `build()` do `ApiExceptionHandler`
-(a Spec 036 §Ancora 4 afirmava o contrario; o Gate 36.0 derrubou). Os outros quatro sao filtros e
-entry points da cadeia do Spring Security, que escrevem o corpo direto na response e nunca chegam ao
-`@RestControllerAdvice`:
+`ErrorResponseDto` e montado em **cinco** lugares, e nao so no `build()` do `ApiExceptionHandler`.
+Os outros quatro sao filtros e entry points da cadeia do Spring Security, que escrevem o corpo direto
+na response e nunca chegam ao `@RestControllerAdvice`:
 
-| Origem | Status |
-|---|---|
-| `ApiAccessDeniedHandler` | 403 |
-| `ApiAuthenticationEntryPoint` | 401 |
-| `RateLimitFilter` | 429 |
-| `PasswordResetEnforcementFilter` | 403 |
+| Origem | Status | Codigo |
+|---|---|---|
+| `ApiAccessDeniedHandler` | 403 | — |
+| `ApiAuthenticationEntryPoint` | 401 | — |
+| `RateLimitFilter` | 429 | — |
+| `PasswordResetEnforcementFilter` | 403 | `AUTH-403-001`, so no texto da `message` |
 
-**`401`, `403` e `429` originados na cadeia de seguranca continuam sem `codigo`.** Ficou fora do
-escopo por decisao: nenhum deles carrega codigo canonico hoje, e dar-lhes um cairia na proibicao de
-inventar taxonomia.
+**`401`, `403` e `429` originados na cadeia de seguranca continuam sem o campo `codigo`.**
 
 ## Como um consumidor deve tratar o campo
 
@@ -287,10 +322,13 @@ inventar taxonomia.
 
 | O que | Onde |
 |---|---|
-| Particao completa, disjunta, e catalogo == codigo-fonte | `ParticaoDeCodigosErroTest` |
-| Catalogo publicado no OpenAPI == fonte unica; campo opcional; 3.1 e `securitySchemes` intactos | `CatalogoCodigosErroContratoTest` |
+| Particao completa, disjunta, e catalogo == codigos aptos do fonte | `ParticaoDeCodigosErroTest` |
+| Formato, prefixo registrado, modulo dono, aposentados, ponto de lancamento legivel | `ConvencaoCodigosErroTest` |
+| Nenhum codigo ja publicado sai do catalogo (143 congelados; a lista so cresce) | `CodigosPublicadosNaoMudamTest` |
+| `enum` do OpenAPI == fonte unica; campo opcional; 3.1 e `securitySchemes` intactos | `CatalogoCodigosErroContratoTest` |
 | Matriz por handler: status, codigo, headers, pertencimento ao catalogo | `MatrizFinalDeErroTest` |
 | Cada subtipo selado emite o proprio codigo; matriz cobre todos os permitidos | `DomainExceptionCodigoNoCorpoTest` |
 | Serializacao com e sem codigo | `ErrorResponseDtoTest` |
 
-Todas rodam em `./gradlew build`. Nenhuma depende de numero registrado neste documento.
+Todas rodam em `./gradlew build`. Nenhuma depende de numero registrado neste documento, exceto a lista
+congelada dos 80, que e o contrato anterior a Sprint 37 por definicao.

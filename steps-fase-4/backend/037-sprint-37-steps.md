@@ -6,7 +6,9 @@
 **ADR**: [`0020`](../../adr/0020-convencao-codigos-de-erro.md) — prefixo por area funcional
 (`credito` sai de `CRD` para `PRP`), sufixo numerico, publicacao na propria sprint.
 
-**Status**: planejada; steps criados em 2026-09-10, depois das decisoes do responsavel pelo repo.
+**Status**: **MERGEADA develop+main em 2026-09-10** (PR #110/#111); resultado medido na spec
+[`037`](../../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md) §Resultado. Steps criados em
+2026-09-10, depois das decisoes do responsavel pelo repo; desvios de execucao registrados em cada Task.
 
 **Objetivo geral**: tornar apta toda a taxonomia de erro que a Sprint 36 deixou fora do perimetro,
 **sem renomear nenhum codigo publicado**, instalar o registro de prefixos e o gate de formato no build,
@@ -249,6 +251,21 @@ dono unico e **tambem** fica apto — os dois lados entram no catalogo no mesmo 
   entao depois de canonico continua **excluido por `inalcancavel`** — e isso e o esperado. Conferir que
   nenhum front le o valor antigo (medido em 2026-09-10: nenhum).
 
+**Medido e decidido na execucao (2026-09-10)**:
+
+- Tres dos 28 tinham mais de um dono. `PIX-400-CHAVE` (valor obrigatorio, invalida para o tipo,
+  destino obrigatorio) vira `ChavePixInvalidaException`, com variantes e mensagens preservadas —
+  mesmo desenho do `CpfInvalidoException` da 37.3a.
+- **Familia Idempotency-Key — decisao do responsavel pelo repo: unificar dentro do `pix`.** Tres
+  excecoes nomeadas no `pix`: obrigatoria (`PIX-400-006`), tamanho (`PIX-400-007`) e reuso
+  conflitante (`PIX-409-004`, que absorve o `PIX-409-IDEMPOTENCIA-CHAVE`, aposentado). A mesma
+  condicao segue publicada em outros modulos (`CRD-400-003`/`004`, `COB-409-004`); unificar entre
+  modulos exige renomear publicado e fica como follow-up de sprint de contrato.
+- `AUTH-403-001`: o filtro escreve o codigo so no texto da `message` (`codigo` nulo), entao o texto
+  muda; unico leitor medido e o `SmokeE2ETest`.
+- Numeracao: proximo `NNN` livre em ordem alfabetica do codigo antigo; `PIX-400` comeca em `003`
+  (`002` aposentado na 37.3b). Catalogo 116 -> 143.
+
 **Mutacao**: devolver um sufixo semantico — particao tem de classificar como `formato`.
 
 **Commit sugerido**: `refactor(erros): converter sufixos semanticos para numericos`
@@ -267,6 +284,17 @@ dono unico e **tambem** fica apto — os dois lados entram no catalogo no mesmo 
   3. todo prefixo aparece em **um** modulo so — o dono do registro.
 - **Provado que morde**: introduzir um codigo semantico sai 1; um prefixo nao registrado sai 1; um
   prefixo registrado usado em outro modulo sai 1; removidos, sai 0. Mesmo protocolo da D-Sprint 1.
+
+**Acrescentado na execucao (2026-09-10)**, vindo dos code reviews da 37.3b e da 37.4:
+
+4. **numero aposentado nao volta ao uso** (ADR 0020 §3): `ONB-400-014`, `ONB-400-015`,
+   `PIX-400-002`, `WHK-400-002`. Os aposentados fora do formato ja reprovam pelo item 1.
+5. **codigo de lancamento resolvivel no proprio arquivo**: `super(IDENT, ...)` ou
+   `new Tipo(IDENT, ...)` com constante herdada ou qualificada reprova — a particao le so as
+   constantes do arquivo, e a mutacao mP2 da 37.4 (subtipo emitindo o codigo do pai) passou por ela.
+
+Medido antes de escrever: os 13 prefixos do registro batem com o uso real, um modulo cada; nenhum
+literal fora do formato; nenhum ponto de lancamento com constante herdada ou qualificada.
 
 **Commit sugerido**: `test(erros): gatear formato e prefixo dos codigos no build`
 

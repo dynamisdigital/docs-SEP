@@ -10,10 +10,26 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-10 (**F-Sprint 28 MERGEADA develop+main**, PR #151/#152; fix `sep-app` #149/#150 MERGEADO)._
+_Atualizado em: 2026-09-10 (**Sprint 37 MERGEADA develop+main**, PR #110/#111; F-Sprint 28 MERGEADA develop+main, PR #151/#152)._
 
 ## Leia agora
 
+- **A Sprint 37 esta MERGEADA em `develop` e `main`** (2026-09-10): PR **#110** em `develop` (squash
+  `c8b98ae`; arvore identica a da branch `d4a1d72`, inclusive depois do back-merge `30c1f2b`, limpo por
+  `--cc`) e **#111** em `main` (`5fe83a1`, identico por conteudo). Branch
+  `feature/sprint-37-normalizacao-codigos-erro` (de `develop` `a774aa4`), **10 commits**. Normalizou a taxonomia de
+  codigos de erro **sem mudar contrato**: [ADR 0020](../adr/0020-convencao-codigos-de-erro.md)
+  (prefixo = area funcional, `credito` de `CRD` para `PRP`, sufixo numerico), registro
+  `PrefixoCodigoErro` e gate no build (`ConvencaoCodigosErroTest`). Particao **133 = 80 + 53 -> 144 =
+  143 + 1** — o unico excluido e `AUTH-403-001`, inalcancavel. Os 80 anteriores seguem com o mesmo
+  dono, e os 143 estao congelados. Testes **2297 -> 2318**. Descricao em
+  [`SPRINT-37-PR.md`](../repos/sep-api/SPRINT-37-PR.md); doc operacional
+  [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md) reescrito.
+- **Aprendizado da 37, o que mais se paga**: guarda estrutural verifica consistencia **no presente** e
+  nao lembra o passado — renomear um codigo publicado no fonte e no catalogo ao mesmo tempo passava
+  em particao, gate e `enum`; so a lista congelada pega. E **duas guardas com definicoes proprias da
+  mesma coisa divergem**: o gate e a particao discordavam sobre o que e constante, e um codigo novo
+  sairia do contrato sem nada reprovar. Os dois achados vieram do code review, provados por mutacao.
 - **A F-Sprint 28 esta MERGEADA em `develop` e `main`** (2026-09-10): PR **#151** em `develop` (squash
   `15ed341`, arvore identica a da branch verificada) e **#152** em `main` (`49f568a`, identico por
   conteudo), sem back-merge. Branch `feature/fsprint-28-contract-check-typecheck` (**10 commits, 13
@@ -859,16 +875,13 @@ _Atualizado em: 2026-09-10 (**F-Sprint 28 MERGEADA develop+main**, PR #151/#152;
    pontos cegos (i), (iii) e (iv) seguem abertos por falta de cenario; (ii) e defesa da F-22, nao
    defeito.
 
-4. **Sprint 37 — normalizacao da taxonomia**: **decidida em 2026-09-10, pronta para o Gate 37.0.**
-   [ADR 0020](../adr/0020-convencao-codigos-de-erro.md) + steps
-   [`037`](../steps-fase-4/backend/037-sprint-37-steps.md). Prefixo = area funcional, com o
-   **`credito` saindo de `CRD` para `PRP`**; **sufixo numerico**; **publicacao na propria sprint**.
-   **As duas recomendacoes da spec cairam na medicao**: os 26 `CRD` publicados sao todos do
-   `credores` (re-prefixa-lo mudaria contrato), e os 80 publicados sao todos numericos (sufixo
-   semantico renomearia os 80, incluindo `MFA-400-003`/`004`, gateados pela F-28). Tudo o que a
-   sprint renomeia esta fora do catalogo: **zero mudanca de contrato**. Publicar e obrigatorio porque
-   o `ParticaoDeCodigosErroTest` exige `aptos == catalogo`. Escopo ganhou os **7 codigos de tipo D**
-   (mais de uma condicao na mesma classe), achados pelo review da 036 depois da spec.
+4. **Sprint 37 — MERGEADA develop+main em 2026-09-10** (PR #110/#111, conferida por conteudo; ver
+   §Leia agora). O `CodigosPublicadosNaoMudamTest` passa a ser a memoria do contrato — cada
+   sprint que publicar codigo acrescenta os seus no fechamento. Follow-ups em
+   [`SPRINT-37-PR.md`](../repos/sep-api/SPRINT-37-PR.md): **Idempotency-Key com codigos em tres
+   modulos** (unificar exige renomear publicado — sprint de contrato) e `AUTH-403-001` no campo
+   `codigo`. `sep-app` e `sep-mobile` nao mudam: o snapshot do web cresce na proxima renovacao
+   (`enumSubset` tolera), e os fronts podem ramificar pelos codigos novos em sprints proprias.
 
 5. **Frente A de notificacao**, em paralelo — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
    (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)

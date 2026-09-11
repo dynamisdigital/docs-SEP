@@ -258,7 +258,7 @@ mais. Não coletar antes disso.
 | [`126`](../specs/fase-4/126-fsprint-26-consumo-codigos-erro-web.md) | F-Sprint 26 | `sep-app` | Consome: helper, gate no `contract:check`, `400` colapsado do `verify-totp` |
 | [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md) | M-Sprint 18 | `sep-mobile` | Consome: cria o `api-error.ts` inexistente, unifica 9 casts, ramifica por código |
 
-| [`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md) | Sprint 37 | `sep-api` | Normaliza o que ficou fora do perímetro: decide o significado do prefixo e a convenção de sufixo (**com ADR**), resolve colisões, re-prefixa `credores` |
+| [`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md) | Sprint 37 | `sep-api` | Normaliza o que ficou fora do perímetro: decide o significado do prefixo e a convenção de sufixo (**ADR 0020**), resolve colisões, re-prefixa o `credito` (`CRD` → `PRP`) — **MERGEADA** em 2026-09-10 (#110/#111), catálogo de 80 para 143 |
 
 Ordem: `35 → 36 → {F-26, M-18}`, com a `37` em paralelo às duas de consumo ou logo após. As duas de
 consumo são independentes entre si.

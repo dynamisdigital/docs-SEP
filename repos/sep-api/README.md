@@ -15,9 +15,10 @@ Documentacao especifica do backend/API SEP.
   endpoints REST e auditoria.
 - [CONTRATOS.md](CONTRATOS.md) - modulo `contratos` (Sprint 10): geracao textual,
   versionamento, hash, aceite com step-up, cancelamento pre-aceite e auditoria.
-- [CODIGOS-DE-ERRO.md](CODIGOS-DE-ERRO.md) - contrato de erro da API (Sprint 36): campo `codigo`,
-  regra `MOD-STATUS-NNN`, catalogo publicado (80), lista completa dos excluidos com motivo (53),
-  handlers sem taxonomia e como o consumidor deve tratar o campo.
+- [CODIGOS-DE-ERRO.md](CODIGOS-DE-ERRO.md) - contrato de erro da API (Sprints 36 e 37): campo
+  `codigo`, regra `MOD-STATUS-NNN` e registro de prefixos (ADR 0020), catalogo publicado (143), o
+  unico excluido e o motivo, aposentados, mapa antes -> depois da Sprint 37, handlers sem taxonomia e
+  como o consumidor deve tratar o campo.
 - [INTEGRACOES-PROVIDERS.md](INTEGRACOES-PROVIDERS.md) - providers externos (Sprint 32):
   inventario/matriz das 6 capacidades, feature flags por ambiente (ADR 0017), politica de
   retry, fixtures WireMock, smoke `local-wiremock` e ativacao gated da Fase 5.

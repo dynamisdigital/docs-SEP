@@ -166,6 +166,9 @@ Leitura base para qualquer agente:
 > [`037`](steps-fase-4/backend/037-sprint-37-steps.md)): prefixo = area funcional, o `credito` sai de
 > `CRD` para `PRP`, sufixo numerico, publicacao na propria sprint. As duas recomendacoes originais
 > cairam porque renomeariam codigos ja publicados; a escolhida tem **zero mudanca de contrato**.
+> **MERGEADA develop+main em 2026-09-10** (PR #110/#111, 10 commits): catalogo de **80 para 143**, um unico
+> excluido (`AUTH-403-001`, inalcancavel), registro de prefixos e gate de convencao no build, e os
+> 143 congelados contra rename. Os code reviews pegaram duas falhas silenciosas das proprias guardas.
 >
 > **F-Sprint 28** (spec [`128`](specs/fase-4/128-fsprint-28-contract-check-erro-typecheck-web.md) +
 > steps [`128`](steps-fase-4/web/128-fsprint-28-steps.md), **MERGEADA develop+main** em 2026-09-10,

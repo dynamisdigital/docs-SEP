@@ -6,8 +6,9 @@
 - **Titulo**: Sprint 37 - Decidir o que o prefixo significa e qual e a convencao de sufixo, resolver
   as colisoes de significado e re-prefixar o modulo `credores`, para que o restante da taxonomia
   fique publicavel
-- **Status**: **planejada; decisoes tomadas em 2026-09-10** — [ADR 0020](../../adr/0020-convencao-codigos-de-erro.md);
-  steps em [`037`](../../steps-fase-4/backend/037-sprint-37-steps.md). Ver §Decidido em 2026-09-10
+- **Status**: **MERGEADA develop+main em 2026-09-10** — PR #110 (squash `c8b98ae`) em `develop` e
+  #111 (`5fe83a1`) em `main`, conferidos por conteudo — [ADR 0020](../../adr/0020-convencao-codigos-de-erro.md); steps em
+  [`037`](../../steps-fase-4/backend/037-sprint-37-steps.md). Ver §Decidido em 2026-09-10 e §Resultado
 - **Fase do produto**: Fase 4 - divida de contrato; sem endpoint, migration, evento, provider ou
   regra de negocio nova. **ADR previsto** — ver §Por que esta sprint exige ADR
 - **Trilha**: Backend (`sep-api`)
@@ -312,3 +313,61 @@ prepara a segunda rodada de publicacao da recomendacao **P1** do
 
 Steps em [`steps-fase-4/backend/037-sprint-37-steps.md`](../../steps-fase-4/backend/037-sprint-37-steps.md),
 criados em 2026-09-10 depois das decisoes do [ADR 0020](../../adr/0020-convencao-codigos-de-erro.md).
+
+## Resultado (medido em 2026-09-10)
+
+Branch `feature/sprint-37-normalizacao-codigos-erro` (de `develop` `a774aa4`), **10 commits**,
+mergeada em `develop` (#110, `c8b98ae`) e `main` (#111, `5fe83a1`). Descricao em [`SPRINT-37-PR.md`](../../repos/sep-api/SPRINT-37-PR.md); doc operacional
+[`CODIGOS-DE-ERRO.md`](../../repos/sep-api/CODIGOS-DE-ERRO.md) reescrito.
+
+| Criterio | Resultado |
+|---|---|
+| 1. ADR com as duas decisoes, custo e imutabilidade | **Atendido** — ADR 0020: prefixo = area funcional com o `credito` em `PRP`; sufixo numerico; §3 unicidade e imutabilidade; §4 todo codigo apto e publicado |
+| 2. Registro de prefixos como fonte unica, com todo prefixo em uso | **Atendido** — `PrefixoCodigoErro`, 13 prefixos, conferidos contra o uso real antes de escrever |
+| 3. Nenhum codigo com dois significados; tipo B por deduplicacao | **Atendido** — particao final sem colisao; `ONB-400-008` e `ONB-404-001` com um dono cada (37.2), provado por mutacao |
+| 4. Formato vazio no repo inteiro | **Atendido** — nenhum literal fora de `MOD-STATUS-NNN` em `src/main` |
+| 5. Gate reprova formato e prefixo, provado que morde | **Atendido no build, e nao como script de CI**: `ConvencaoCodigosErroTest` roda em todo `./gradlew build`; 8 mutacoes na 37.6 e 3 no hotfix, cada uma morta por teste nomeado |
+| 6. Testes >= baseline, 0 falhas | **2297 -> 2318**, 0 falhas; `clean build` e `spotlessCheck` verdes |
+| 7. Mutacao sobre o gate e a deduplicacao | **Atendido** — toda Task com mutacao nomeada e morta |
+| 8. Nenhum codigo publicado pela 036 renomeado | **Atendido** — os 80 continuam publicados, cada um com o mesmo dono de `a774aa4` (medido codigo a codigo); congelados junto com os 63 novos em `CodigosPublicadosNaoMudamTest` |
+
+**Particao**: `133 = 80 + 53` no Gate 37.0 -> **`144 = 143 publicados + 1 excluido`**. O excluido e
+`AUTH-403-001`, `inalcancavel`: o `PasswordResetEnforcementFilter` escreve o 403 direto na response.
+
+### Decisoes tomadas durante a execucao
+
+Do responsavel pelo repo:
+
+- `ONB-404-001`: o `credito` reusa `OnboardingNaoEncontradoException` (37.2).
+- Criterio de identidade: **mesma acao do cliente = mesma condicao** (37.3).
+- Validacao de recepcao de webhook consolidada em `WHK` (37.3b).
+- Familia Idempotency-Key unificada **dentro** do `pix`; entre modulos fica follow-up (37.5).
+
+Impostas pela medicao, registradas no ADR e nos steps:
+
+- `OF-400-001` nao foi para `PRP`: identificava as quatro checagens de webhook que a 37.3b ja
+  consolidara em `WHK`, e foi aposentado (37.4).
+- `StatusPropostaInvalidoException` declarava `CRD-400-002` e nunca o usava — a transicao saia com o
+  codigo do pai. Passa a emitir `PRP-400-002`, e o parecer em proposta final sai por ela (37.4).
+- O gate ganhou numero aposentado e "ponto de lancamento legivel pela particao" (37.6), vindos dos
+  reviews da 37.3b e da 37.4.
+
+### O que os code reviews pegaram
+
+- **37.3b**: quatro checagens de body vazio e o `ASN-400-001` sem teste de comportamento — hotfix.
+- **37.4**: a particao nao ve constante herdada; subtipo com o codigo do pai passava — virou regra do gate.
+- **37.6**: constante de codigo sem `COD` no nome passava no gate e saia inalcancavel na particao — um
+  codigo novo nunca seria publicado, sem nada reprovar. Provado por mutacao; hotfix.
+- **37.7**: a lista congelada protegia 80 dos 143; rename consistente de um codigo novo passou em 257
+  testes. Hotfix congelando os 143.
+- `RegistrarParecerUseCaseTest` era um arquivo vazio desde a Sprint 8.
+
+### Follow-ups
+
+- Unificar Idempotency-Key entre `pix`, `credores` e `cobranca` (dois lados publicados) e centralizar
+  o limite de 100 caracteres — sprint de contrato.
+- Levar `AUTH-403-001` ao campo `codigo`: o filtro teria de montar o corpo pelo caminho do handler.
+- Opcional: ligar `PrefixoCodigoErro` ao `CatalogoCodigosErro.validar`, para falhar tambem no boot.
+- A regra de `super(` do gate depende do sufixo `Exception.java` no nome do arquivo.
+- Construtor de dois argumentos sem chamador em `StatusPropostaInvalidoException`; testes de
+  controller do `pix` montando excecao com literal em vez da classe nomeada.

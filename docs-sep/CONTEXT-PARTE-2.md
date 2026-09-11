@@ -2637,3 +2637,46 @@ lacuna era de teste, fechada.
 em 3 copias byte-identicas; `vitest/no-identical-title`; `scripts/*.mjs` fora do prettier.
 
 Detalhe em [`SPRINT-F-28-PR.md`](../repos/sep-app/SPRINT-F-28-PR.md).
+
+## Sprint 37 (backend) — Normalizar a taxonomia de codigos de erro — MERGEADA develop+main (2026-09-10)
+
+Fecha o item 4 do §Proximo passo de 2026-09-10. Branch `feature/sprint-37-normalizacao-codigos-erro`
+a partir de `develop` `a774aa4`; **10 commits**; [ADR 0020](../adr/0020-convencao-codigos-de-erro.md).
+Em `develop` via PR **#110** (squash `c8b98ae`) e em `main` via **#111** (`5fe83a1`), conferidos por
+conteudo: arvore de `develop` identica a da branch `d4a1d72` mesmo depois do back-merge `30c1f2b`
+(limpo por `--cc`), e `main` identica a `develop`.
+Sem tela, endpoint, migration ou regra de negocio. Nada mudou em `sep-app`/`sep-mobile`.
+
+**O ganho, em uma frase: toda a taxonomia de erro ficou apta e publicada sem mudar contrato.**
+Particao `133 = 80 + 53` -> **`144 = 143 + 1`**; o unico excluido e `AUTH-403-001`, inalcancavel — o
+`PasswordResetEnforcementFilter` escreve o 403 direto na response. Os 80 publicados antes seguem com o
+mesmo valor e o **mesmo dono** de `a774aa4`, medido codigo a codigo.
+
+**A convencao**, decidida pelo responsavel pelo repo: prefixo = area funcional com um modulo dono (o
+`credito` sai de `CRD`, que fica com o `credores`, para `PRP`); sufixo numerico; numero retirado nao
+volta; **mesma acao do cliente = mesma condicao = um codigo**; validacao de recepcao de webhook em
+`WHK`; Idempotency-Key unificada **dentro** do `pix`. As duas recomendacoes originais da spec cairam
+na medicao, porque renomeariam codigos publicados.
+
+**O que a medicao mudou durante a execucao**: `OF-400-001` eram as quatro checagens de webhook ja
+consolidadas em `WHK` — aposentado, e nao levado a `PRP`; `StatusPropostaInvalidoException` declarava
+um codigo que nunca usava, e toda transicao invalida saia com o codigo do pai; tres codigos do `pix`
+tinham mais de um dono; `RegistrarParecerUseCaseTest` era um arquivo vazio desde a Sprint 8.
+
+**Os code reviews pegaram quatro falhas, e duas estavam nas proprias guardas**: checagens de body
+vazio sem teste de comportamento (37.3b); a particao nao via constante herdada, entao um subtipo
+podia emitir o codigo do pai (37.4, virou regra do gate); o gate e a particao tinham definicoes
+proprias de "constante", e um codigo novo em constante sem `COD` no nome sairia do contrato sem nada
+reprovar (37.6); e a lista congelada protegia 80 dos 143 — o rename consistente de um codigo novo
+passou em 257 testes (37.7). As duas ultimas foram provadas por mutacao antes do conserto.
+**Aprendizado**: guarda estrutural verifica consistencia no presente e nao lembra o passado; e duas
+guardas que definem a mesma coisa cada uma a seu modo divergem.
+
+**Gates finais**: `clean build` **2297 -> 2318 / 0**, `spotlessCheck` verde; mutacao por Task, cada
+mutante conferido no diff e morto por teste nomeado.
+
+**Follow-ups**: Idempotency-Key com codigos em `pix`, `credores` e `cobranca` e o limite de 100 em
+cada um (sprint de contrato); `AUTH-403-001` no campo `codigo`; ligar `PrefixoCodigoErro` ao
+`CatalogoCodigosErro.validar`; regra de `super(` do gate presa ao sufixo `Exception.java`.
+
+Detalhe em [`SPRINT-37-PR.md`](../repos/sep-api/SPRINT-37-PR.md).
