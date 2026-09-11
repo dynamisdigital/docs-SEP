@@ -2730,3 +2730,44 @@ errado; o detector da F-26 nao pega. Pega `git diff <branch-verificada> origin/d
 enquanto as pontas sao identicas (hoje limpo, avanca a base de `49f568a` para `1412617`);
 `scripts/**/*.ts` no `lintFilePatterns`; `CONTRACT-DRIFT` disparando em branch nova do dependabot; PRs
 do dependabot reprovando no CI-APP desde 2026-09-11 10:50, preexistente e nao investigado.
+
+## Correcao GHSA-hh8m (web + mobile) e a causa do CI-APP vermelho nos PRs do Dependabot — MERGEADA develop+main (2026-09-11)
+
+Nasceu de investigar os PRs do Dependabot que reprovavam no CI-APP, follow-up (ae) acima. Os **10**
+runs vermelhos desde 2026-08-25 quebravam todos no mesmo step, `npm ci`, e todos os PRs tinham
+`base=main`. Reproduzido localmente com o npm 10.8.2 do CI — o npm local e 9.2.0 e nao vale como
+prova — em copias limpas so com `package.json` e lock, com `develop` como controle verde.
+
+**Tres causas, nenhuma de codigo**: (1) security updates sobem **um** `@angular/*` por PR, e os
+pacotes exigem os irmaos na mesma versao exata — `ERESOLVE` (#153-#155; o grupo #138 sobe o runtime e
+deixa `animations`/`platform-browser-dynamic` para tras); (2) o Dependabot gerou lock sem as tres
+entradas aninhadas de `chokidar@5` sob o `angular-eslint` — `EUSAGE` (#140, #142; com o lock
+regenerado localmente, resolvem limpo); (3) o #148 e security update do `vitest` que so existe em
+major, barrado pelo ADR 0018. **Causa estrutural, na documentacao oficial**: grupos sem
+`applies-to: security-updates` valem so para version updates, e security updates ignoram
+`target-branch` e vao para a branch **default** do repo, que e `main` — a memoria do projeto dizia
+`develop`.
+
+**O que estava escondido**: GHSA-hh8m-fm6v-7cvg (sanitization bypass via host bindings,
+`@angular/core <20.3.28`), moderate, ativa em `develop` nos **dois** fronts e invisivel no gate de
+audit, que olha `high`. A correcao foi provada em rascunho antes de virar branch: o conjunto sobe no
+manifesto **e** as entradas `@angular/*` de topo saem do lock — so o manifesto ainda da `ERESOLVE`,
+porque o lock antigo prende 20.3.27. **`sep-app`** `ddb576e` -> #160/#161: 20.3.31, build/cli
+20.3.37, audit 13 -> 4, Vitest 875/97, Playwright 42/42; a unica carona e `@modelcontextprotocol/sdk`
+1.30.0, versao exata do `@angular/cli` 20.3.37. **`sep-mobile`** `0c9a5da` -> #172/#173: variante
+minima, com poda so dos 10 pacotes que sobem, para a `@angular/cli` 21 e o `build-angular` nao
+subirem junto; audit 19 -> 10 (os residuais da M-18), Vitest 575/72, Playwright 45/45 e o job
+Android verde sob Node 22. As quatro pontas conferidas por conteudo, com arvores identicas as
+branches verificadas.
+
+**Medido contra `develop` em copia limpa, nao contra registro**: o `npm ls` do mobile **perde 7
+conflitos de peer** que o `--legacy-peer-deps` mascarava — o `platform-browser-dynamic` 20.3.26
+exigia os irmaos em 20.3.26 exato, com 20.3.27 instalado — e nao ganha nenhum. O APK do checkout
+local sai ~249 KB maior, mas esses bytes ficam fora de qualquer entrada do zip; o conteudo difere em
++3.028 bytes, o chunk do Angular. **Os PRs substituidos foram fechados**: app #138, #140, #142, #148 e
+#153-#155; mobile #167 e #169-#171.
+
+**Follow-ups**: `applies-to: security-updates` no `dependabot.yml` dos dois fronts (em execucao);
+branch default para `develop` (decisao do responsavel pelo repo); `jest-dom` 7 e o grupo minor/patch
+refeitos por nos ou repropostos pelo Dependabot; ler a saida do audit, e nao so o exit code, a cada
+sprint de dependencias.

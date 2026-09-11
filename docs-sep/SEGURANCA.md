@@ -874,3 +874,32 @@ medicao manual de 2026-08-03, 18 dias depois. Nao houve regressao de codigo: a c
 em `develop` intocada, entao foi deriva por advisory novo publicado contra dependencia existente.
 E exatamente contra isso que o gate acima existe — remediar sem instalar o gate reproduziria a mesma
 condicao.
+
+### Advisory do Angular fechada fora do gate (2026-09-11)
+
+**GHSA-hh8m-fm6v-7cvg** — *sanitization bypass via directive host bindings on concrete host
+elements*, em `@angular/core`/`@angular/compiler` `>=20.0.0 <20.3.28`, **moderate**. Os dois fronts
+estavam em `20.3.27`, e o gate acima **nao** a via: o limiar e `high`. Quem a expos foi a
+investigacao dos PRs do Dependabot que reprovavam no `npm ci` desde 2026-08-25 — as security updates
+sobem **um** `@angular/*` por PR, e os pacotes exigem os irmaos na mesma versao exata (`ERESOLVE`).
+
+A correcao sobe o conjunto `@angular/*` junto para `20.3.31` (no `sep-app`, `@angular/build` e
+`@angular/cli` para `20.3.37`), dentro do Angular 20, e retira do lock as entradas `@angular/*` de
+topo antes de regenerar — so editar o manifesto nao basta, o lock antigo prende `20.3.27`. No
+`sep-mobile` saem do lock **so** os 10 pacotes que sobem, para que a `@angular/cli` 21 e o
+`@angular-devkit/build-angular` nao subam de carona. `sep-app` PR #160/#161 e `sep-mobile` #172/#173.
+Nenhum binding de host em producao usa contexto sanitizado: no web ha um, so com `class` e
+atributos `data-*`; no mobile, nenhum.
+
+| Repo | moderate antes | moderate depois | Residuais — todos so corrigem em major (ADR 0018) |
+|---|---|---|---|
+| `sep-app` | 13 | **4** | `@angular/build`, `vitest`, `@vitest/mocker`, `@vitest/coverage-v8` |
+| `sep-mobile` | 19 | **10** | `@angular-devkit/build-angular`, `@angular-devkit/build-webpack`, `@angular/build`, `vitest`, `@vitest/mocker`, `@vitest/coverage-v8`, `qs`, `sockjs`, `uuid`, `webpack-dev-server` |
+
+O advisory do `vitest` e o GHSA-82fw-gwwq-j7x9 (path traversal via mock redirect do
+`@vitest/mocker`), corrigido so no `vitest` 4.1.11+ — major, barrado.
+
+**Licao**: o limiar `high` do gate e deliberado, pelos motivos acima, mas deixa `moderate` de
+**runtime** sem dono. A cada sprint de dependencias, ler a saida do `npm audit`, e nao so o exit
+code. E os grupos do `dependabot.yml` sem `applies-to: security-updates` valem so para version
+updates — foi isso que manteve a correcao presa em PRs que nunca instalavam.

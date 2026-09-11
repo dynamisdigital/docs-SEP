@@ -10,10 +10,19 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-11 (**follow-ups da F-28 MERGEADOS develop+main**, PR #156/#158 e #157/#159; Sprint 37 MERGEADA develop+main, PR #110/#111)._
+_Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#161 e #172/#173; follow-ups da F-28 MERGEADOS develop+main, PR #156/#158 e #157/#159)._
 
 ## Leia agora
 
+- **A advisory GHSA-hh8m do Angular esta FECHADA no `sep-app` e no `sep-mobile`** (2026-09-11), em
+  `develop` e `main`: app #160/#161 (`ddb576e`), mobile #172/#173 (`0c9a5da`), conferidos por
+  conteudo. Sanitization bypass via host bindings em `@angular/core <20.3.28`, **moderate** — o gate
+  de audit, que olha `high`, nao a via. Veio de investigar o CI-APP vermelho nos PRs do Dependabot:
+  as security updates sobem um `@angular/*` por vez e nunca instalam, por causa do peer exato. Audit
+  web 13 -> 4, mobile 19 -> 10; suites e e2e inalterados. **Causa estrutural** (docs oficiais): grupos
+  sem `applies-to: security-updates`, e security updates indo para a branch default, `main`. Detalhe
+  em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Correcao GHSA-hh8m e em
+  [`SEGURANCA.md`](./SEGURANCA.md) §18.
 - **Os follow-ups (u)-(z) da F-28 estao MERGEADOS em `develop` e `main`** (2026-09-11): PR **#156**
   em `develop` (squash `3c822ad`), fix **#158** (`53c0632`) e **#157**/**#159** em `main` (`cebc480`;
   o #159 e no-op de conteudo). Conferido por conteudo: as duas pontas com arvore identica a da
@@ -220,6 +229,11 @@ _Atualizado em: 2026-09-11 (**follow-ups da F-28 MERGEADOS develop+main**, PR #1
   `ModelResolver` sem `openapi31` apagando 21 `description` e 17 `example` em silencio).
 
 ## Onde estamos
+
+- **Correcao GHSA-hh8m (web + mobile) MERGEADA develop+main em 2026-09-11** (app #160/#161, mobile
+  #172/#173, conferidos por conteudo) — bump do conjunto `@angular/*` para 20.3.31, dentro do
+  Angular 20 (ADR 0018); **sem tela, endpoint, contrato, migration ou regra nova**. Nada mudou em
+  `sep-api`. Detalhe em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Correcao GHSA-hh8m.
 
 - **Follow-ups da F-28 (web) MERGEADOS develop+main em 2026-09-11** (PR #156/#158 em `develop`,
   #157/#159 em `main`, conferidos por conteudo) — itens (u)-(z) do §Proximo passo de 2026-09-10,
@@ -899,10 +913,13 @@ _Atualizado em: 2026-09-11 (**follow-ups da F-28 MERGEADOS develop+main**, PR #1
    back-merge `main -> develop` enquanto as pontas sao identicas (hoje sai limpo); (ac)
    `scripts/**/*.ts` no `lintFilePatterns` — em `scripts/` a regra de titulo duplicado so morde no
    lint-staged, nao no CI; (ad) `CONTRACT-DRIFT` dispara tambem em branch nova do dependabot, pelo
-   `push.paths`; (ae) PRs do dependabot (Angular 20.3.28, `jest-dom` 7, grupos minor/patch)
-   **reprovando no CI-APP** desde 2026-09-11 — preexistente, nao investigado; (af) aviso de
+   `push.paths`; ~~(ae) PRs do dependabot reprovando no CI-APP~~ **investigado e resolvido em
+   2026-09-11** — escondia a GHSA-hh8m, fechada nos dois fronts (#160/#161, #172/#173); (af) aviso de
    `resetLoginMockState()` no doc do `logarAdmin` (o mock guarda lockout por username entre testes do
-   mesmo arquivo).
+   mesmo arquivo); (ag) `applies-to: security-updates` no `dependabot.yml` dos dois fronts — **em
+   execucao**; (ah) `jest-dom` 7 e o grupo minor/patch (#140/#142 fechados) — refazer por conta propria
+   ou esperar o Dependabot repropor; (ai) branch default dos repos para `develop`, porque security
+   updates ignoram `target-branch` e hoje abrem PR direto em `main` — decisao de quem manda no repo.
 
 3. ~~Duplicatas do login, pontos cegos do `contract-check.mjs` e typecheck dos specs~~ **FEITOS**: as
    duplicatas pelo fix #149/#150 (2026-09-10), os pontos cegos (v)+(vi) e o typecheck pela F-28. Os
