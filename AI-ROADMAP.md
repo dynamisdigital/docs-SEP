@@ -185,7 +185,8 @@ Leitura base para qualquer agente:
 > renegociacao, conta bloqueada) — **o produto so fala com o tomador para cobrar divida ou avisar que
 > ele perdeu o acesso**. Ha **duas infra paralelas** (a completa presa dentro de `cobranca`; a rasa em
 > `shared.email`), **nenhum historico** e **nenhum opt-out**.
-> **Sprint 38** (spec [`038`](specs/fase-4/038-sprint-38-modulo-notificacao-historico.md), **ADR
+> **Sprint 38** (spec [`038`](specs/fase-4/038-sprint-38-modulo-notificacao-historico.md),
+> steps [`038`](steps-fase-4/backend/038-sprint-38-steps.md), criados em 2026-09-11; **ADR
 > previsto**, migration `V61`) cria o modulo transversal, o historico e o canal `IN_APP`, e prova o
 > pipeline com **um** gatilho (`PixTransferenciaConcluidaEvent` -> tomador, que ja carrega o
 > `tomadorId`). **F-Sprint 27** (spec [`127`](specs/fase-4/127-fsprint-27-central-notificacao-web.md))

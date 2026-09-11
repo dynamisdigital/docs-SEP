@@ -254,5 +254,6 @@ Abre a frente **A** do levantamento de notificacoes, ao lado da
 [`127`](./127-fsprint-27-central-notificacao-web.md) e da
 [`219`](./219-msprint-19-central-notificacao-mobile.md).
 
-Steps criados just-in-time em `steps-fase-4/backend/038-sprint-38-steps.md` quando a sprint for
-aprovada para execucao.
+Steps de execucao criados em 2026-09-11:
+[`038-sprint-38-steps.md`](../../steps-fase-4/backend/038-sprint-38-steps.md).
+Implementacao ainda nao iniciada; decisoes do ADR ficam na Task 38.1.
