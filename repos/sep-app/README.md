@@ -612,6 +612,11 @@ Fase 3. Spec [`119`](../../specs/fase-4/119-fsprint-19-hardening-tooling-contrat
   frontend nao envia falha o check), assim como parametros de path e tipos ausentes/quebrados.
 - Resultado da F-19: **zero divergencia real** — nenhum tipo de borda precisou mudar.
 - CI (`CI-APP`): step `contract:check` entre `format:check` e `lint`, offline e deterministico.
+- Workflow `CONTRACT-DRIFT` (`.github/workflows/contract-drift.yml`, follow-ups da F-28, 2026-09-11):
+  roda o mesmo check todo dia, e sob demanda, contra o runtime do `sep-api` `develop` — sobe o
+  backend com Postgres, exporta o `/v3/api-docs` e usa `SEP_OPENAPI_SCHEMA`. Cobre a janela em que o
+  `CI-APP` so reprova na renovacao do snapshot: detecta em ate um dia depois do merge no backend, nao
+  impede o merge.
 
 ### Tooling (Angular 20 endurecido)
 

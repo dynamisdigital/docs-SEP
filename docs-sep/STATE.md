@@ -10,10 +10,27 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-10 (**Sprint 37 MERGEADA develop+main**, PR #110/#111; F-Sprint 28 MERGEADA develop+main, PR #151/#152)._
+_Atualizado em: 2026-09-11 (**follow-ups da F-28 MERGEADOS develop+main**, PR #156/#158 e #157/#159; Sprint 37 MERGEADA develop+main, PR #110/#111)._
 
 ## Leia agora
 
+- **Os follow-ups (u)-(z) da F-28 estao MERGEADOS em `develop` e `main`** (2026-09-11): PR **#156**
+  em `develop` (squash `3c822ad`), fix **#158** (`53c0632`) e **#157**/**#159** em `main` (`cebc480`;
+  o #159 e no-op de conteudo). Conferido por conteudo: as duas pontas com arvore identica a da
+  branch verificada `18a9ac7`, e a `main` nunca recebeu a arvore quebrada. Branch
+  `feature/followups-fsprint-28`, 7 commits, sem spec/steps. **O ganho**: o workflow `CONTRACT-DRIFT`
+  roda o `contract:check` todo dia contra o runtime do `sep-api` `develop` — fecha a janela em que o
+  gate do catalogo so mordia na renovacao do snapshot (detecta em ate um dia; nao impede merge) —, e
+  entram `vitest/no-identical-title`, `typecheck:spec` no pre-push, `scripts/**` no prettier e
+  `logarAdmin` compartilhado. Vitest **875/97** inalterado. Detalhe em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Follow-ups da F-Sprint 28.
+- **O incidente do merge, e a decisao que ele pede**: o back-merge `759e25b` (main -> develop)
+  resolveu conflitos aceitando os dois lados e deixou `develop` com `SyntaxError` no
+  `contract-check.mjs` (fix #158). **Causa estrutural medida**: os PRs `develop -> main` estao
+  entrando por **squash** (#146, #150, #152, #157, #159, todos com um pai), contra o fluxo acordado de
+  merge commit; a base comum fica para tras e cada back-merge conflita. **Decisao do responsavel pelo
+  repo**: passar a mergear `develop -> main` com merge commit. Enquanto isso, um back-merge **agora**
+  sai limpo (`merge-tree` exit 0, arvore = `develop`) e avanca a base de `49f568a` para `1412617`.
 - **A Sprint 37 esta MERGEADA em `develop` e `main`** (2026-09-10): PR **#110** em `develop` (squash
   `c8b98ae`; arvore identica a da branch `d4a1d72`, inclusive depois do back-merge `30c1f2b`, limpo por
   `--cc`) e **#111** em `main` (`5fe83a1`, identico por conteudo). Branch
@@ -183,9 +200,9 @@ _Atualizado em: 2026-09-10 (**Sprint 37 MERGEADA develop+main**, PR #110/#111; F
      conferencia em 2026-09-09, com duplicacao de testes pendente de correcao.
   4. ~~**[`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md)** (M-18, mobile).~~
      **MERGEADA develop+main em 2026-09-09**, PR #165/#166. Fecha a cadeia P1 nos tres repos.
-  5. **[`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md)** normaliza os 53
-     excluidos (**preve ADR**). Lista codigo a codigo em
-     [`CODIGOS-DE-ERRO.md`](../repos/sep-api/CODIGOS-DE-ERRO.md).
+  5. ~~**[`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md)** normaliza os 53
+     excluidos.~~ **MERGEADA develop+main em 2026-09-10**, PR #110/#111 (ADR 0020). Este item seguia
+     como pendente — decimo primeiro caso do padrao "o STATE declara pendente o que esta feito".
   6. **Frente A de notificacao** — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
      (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
      e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). **Corre em paralelo.**
@@ -203,6 +220,20 @@ _Atualizado em: 2026-09-10 (**Sprint 37 MERGEADA develop+main**, PR #110/#111; F
   `ModelResolver` sem `openapi31` apagando 21 `description` e 17 `example` em silencio).
 
 ## Onde estamos
+
+- **Follow-ups da F-28 (web) MERGEADOS develop+main em 2026-09-11** (PR #156/#158 em `develop`,
+  #157/#159 em `main`, conferidos por conteudo) — itens (u)-(z) do §Proximo passo de 2026-09-10,
+  divida de tooling e contrato; **sem tela, endpoint, DTO, migration ou regra nova**. Nada mudou em
+  `sep-api`/`sep-mobile`. Workflow `CONTRACT-DRIFT` novo (verde no GitHub na branch e em `develop`) e
+  cinco guardas de tooling, cada uma provada por mutacao. Detalhe em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Follow-ups da F-Sprint 28.
+
+- **Sprint 37 (backend) MERGEADA develop+main em 2026-09-10** (PR #110/#111, conferida por conteudo) —
+  normalizacao da taxonomia de codigos de erro **sem mudar contrato**
+  ([ADR 0020](../adr/0020-convencao-codigos-de-erro.md)); particao `144 = 143 + 1`, os 143 congelados
+  por `CodigosPublicadosNaoMudamTest`. Testes **2297 -> 2318**. Nada mudou em `sep-app`/`sep-mobile`.
+  Este bloco faltava aqui desde o fechamento. Detalhe em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Sprint 37.
 
 - **F-Sprint 28 (web) MERGEADA develop+main em 2026-09-10** (PR #151/#152, conferida por conteudo) — gate de corpo de erro no `contract:check`
   e typecheck dos specs (Fase 4, divida de tooling e contrato; **sem tela, endpoint, DTO, migration,
@@ -861,14 +892,17 @@ _Atualizado em: 2026-09-10 (**Sprint 37 MERGEADA develop+main**, PR #110/#111; F
    #152 `49f568a`), conferida por conteudo: arvore de `develop` identica a da branch verificada,
    `main` identico a `develop`, nenhum back-merge a conferir.
 
-2. **Follow-ups da F-28, pequenos e sem sprint propria**: (u) job agendado, ou do lado do `sep-api`,
-   rodando o `contract:check` do web contra o OpenAPI de `develop` — sem ele o gate do catalogo so
-   morde na renovacao do snapshot; (v) bullet do `X-Step-Up-Token` desatualizado no
-   `contracts/README.md` (24 operacoes o documentam desde a Sprint 34; `knownGaps` vazio); (w)
-   `typecheck:spec` no `.husky/pre-push` (~5,4s); (x) `logarAdmin` em **3 copias byte-identicas** nos
-   specs de dashboard, profile e change-password; (y) `vitest/no-identical-title`
-   (`@vitest/eslint-plugin`), que teria pego o evil merge `11bd729`; (z) `scripts/*.mjs` nunca passou
-   por prettier.
+2. ~~Follow-ups (u)-(z) da F-28~~ **MERGEADOS develop+main em 2026-09-11** (PR #156/#158, #157/#159).
+   (u) virou o workflow `CONTRACT-DRIFT` no `sep-app` (decisao do usuario: do lado do consumidor, nao
+   do `sep-api`). **Abertos a partir deles, pequenos**: (aa) **PRs `develop -> main` por merge commit,
+   nao squash** — causa do evil merge `759e25b` e do `11bd729`; decisao de quem manda no repo; (ab)
+   back-merge `main -> develop` enquanto as pontas sao identicas (hoje sai limpo); (ac)
+   `scripts/**/*.ts` no `lintFilePatterns` — em `scripts/` a regra de titulo duplicado so morde no
+   lint-staged, nao no CI; (ad) `CONTRACT-DRIFT` dispara tambem em branch nova do dependabot, pelo
+   `push.paths`; (ae) PRs do dependabot (Angular 20.3.28, `jest-dom` 7, grupos minor/patch)
+   **reprovando no CI-APP** desde 2026-09-11 — preexistente, nao investigado; (af) aviso de
+   `resetLoginMockState()` no doc do `logarAdmin` (o mock guarda lockout por username entre testes do
+   mesmo arquivo).
 
 3. ~~Duplicatas do login, pontos cegos do `contract-check.mjs` e typecheck dos specs~~ **FEITOS**: as
    duplicatas pelo fix #149/#150 (2026-09-10), os pontos cegos (v)+(vi) e o typecheck pela F-28. Os

@@ -2680,3 +2680,53 @@ cada um (sprint de contrato); `AUTH-403-001` no campo `codigo`; ligar `PrefixoCo
 `CatalogoCodigosErro.validar`; regra de `super(` do gate presa ao sufixo `Exception.java`.
 
 Detalhe em [`SPRINT-37-PR.md`](../repos/sep-api/SPRINT-37-PR.md).
+
+## Follow-ups da F-Sprint 28 (web) — `CONTRACT-DRIFT` e guardas de tooling — MERGEADOS develop+main (2026-09-11)
+
+Fecha o item 2 do §Proximo passo de 2026-09-10 (follow-ups (u)-(z) da F-28), sem spec nem steps:
+itens pequenos, sem sprint propria. Branch `feature/followups-fsprint-28` a partir de `develop`
+`15ed341`; **7 commits, 11 arquivos, +437/−92**; em `develop` via PR **#156** (squash `3c822ad`) mais o
+fix **#158** (`53c0632`, abaixo), e em `main` via **#157** (`cebc480`) e **#159** (`1412617`, no-op de
+conteudo). Conferido por conteudo: as duas pontas com arvore identica a da branch verificada `18a9ac7`;
+a `main` nunca recebeu a arvore quebrada. Sem tela, endpoint, DTO, migration ou regra nova. Nada mudou
+em `sep-api`/`sep-mobile`.
+
+**O ganho, em uma frase: o catalogo de codigos do web passa a ser checado contra o backend de verdade,
+nao so contra o snapshot.** O workflow `CONTRACT-DRIFT` sobe o `sep-api@develop` (repo publico,
+checkout sem secret), exporta o `/v3/api-docs` e roda o mesmo `contract:check`, todo dia e sob
+demanda. A decisao do usuario foi pelo lado do consumidor, no `sep-app`, e nao no CI do `sep-api`:
+detecta em ate um dia depois do merge no backend e nao impede o merge. Provado executando os proprios
+blocos `run:` do YAML contra banco vazio — `develop` `30c1f2b` passa 85/0, runtime sem `MFA-400-003`
+reprova, banco inexistente falha em 8 s — e depois no GitHub, verde na branch e em `develop`. O
+hotfix do review trocou tentativas por prazo de relogio com `curl --max-time`: sem ele, um backend que
+aceita a conexao e nao responde prendia o job ate o timeout de 20 min, provado com um servidor que
+aceita e nunca responde.
+
+**As outras cinco guardas, cada uma provada por mutacao**: `vitest/no-identical-title` (a duplicata do
+`11bd729` reinjetada passa no Vitest e no config antigo, e reprova no novo); `typecheck:spec` no
+pre-push (erro de tipo em spec: hook antigo sai 0, novo sai 2); `scripts/**` no `format:check` e no
+lint-staged (reflow do checker com AST identica); `logarAdmin` extraido para `src/testing/` (senha
+errada no helper derruba exatamente os 6 usos); e a lacuna ja fechada do `X-Step-Up-Token` retirada do
+`contracts/README.md`.
+
+**O incidente do merge vale mais que as guardas.** O squash #156 entrou identico a branch verificada,
+com CI verde. O back-merge `759e25b` (main -> develop), 4 min depois, resolveu os conflitos aceitando
+os dois lados: o `contract-check.mjs` ficou com duas declaracoes de `verificarCorpoDeErro`
+(`SyntaxError`) e tres specs recuperaram um import orfao. O CI mostrou so o `format:check`, porque o
+job para no primeiro step; rodando todos os gates, `node --check`, `contract:check`, `lint` e Vitest
+tambem reprovavam. O fix #158 devolveu os 4 arquivos a `18a9ac7`: arvore identica, 9 gates verdes.
+**A causa e estrutural**: os PRs `develop -> main` estao entrando por **squash** (#146, #150, #152,
+#157 e #159, todos com um pai), contra o fluxo acordado de merge commit. A `main` nunca contem os
+commits de `develop`, a base comum so anda por back-merge, e cada squash deixa na `main` uma copia
+antiga do que `develop` mudou — `git merge-tree` refez o `759e25b` e parou em conflito em 6 arquivos.
+`diff-tree --cc` sai **vazio** neste caso, porque nenhuma linha foi inventada, so escolhido o lado
+errado; o detector da F-26 nao pega. Pega `git diff <branch-verificada> origin/develop`.
+
+**Gates finais**: Vitest **875/97** (inalterado), `contract:check` **85/0**, `lint`, `lint:scss`,
+`format:check`, `typecheck:spec`, `build` e `audit` (0 high, 13 moderate preexistentes) verdes;
+`CONTRACT-DRIFT` verde no GitHub.
+
+**Follow-ups**: PRs `develop -> main` por merge commit (decisao do responsavel pelo repo); back-merge
+enquanto as pontas sao identicas (hoje limpo, avanca a base de `49f568a` para `1412617`);
+`scripts/**/*.ts` no `lintFilePatterns`; `CONTRACT-DRIFT` disparando em branch nova do dependabot; PRs
+do dependabot reprovando no CI-APP desde 2026-09-11 10:50, preexistente e nao investigado.
