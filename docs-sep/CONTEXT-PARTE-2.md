@@ -2771,3 +2771,39 @@ local sai ~249 KB maior, mas esses bytes ficam fora de qualquer entrada do zip; 
 branch default para `develop` (decisao do responsavel pelo repo); `jest-dom` 7 e o grupo minor/patch
 refeitos por nos ou repropostos pelo Dependabot; ler a saida do audit, e nao so o exit code, a cada
 sprint de dependencias.
+
+## Itens 3 e 4 do follow-up do Dependabot, e o ciclo de reversao do `contract-drift.yml` — MERGEADOS develop+main (2026-09-11)
+
+Fecha os follow-ups **(ag)** e **(ah)**. **Item 3**: grupo `angular-security` com
+`applies-to: security-updates` nos dois fronts — `sep-app` PR #162/#163, `sep-mobile` #175/#176 —,
+validado contra o schema da SchemaStore, com mutacao provando que um `applies-to` invalido reprova. Sem
+ele, os grupos valiam so para version updates, e por isso cada correcao de seguranca do Angular chegava
+com um pacote por PR. **So passa a valer na branch default**, que e a `main`.
+
+**Item 4** (`sep-app`, PR #165/#166) refaz o que os PRs #140 e #142 do Dependabot nao conseguiam
+instalar: `@playwright/test` 1.63.0, `happy-dom` 20.14.3 e `typescript-eslint` 8.70.0, as mais novas de
+cada major, com `engines` conferido contra o Node 20 do CI. O lock encolhe ~800 linhas por deduplicacao
+da familia `@typescript-eslint` — conviviam a 8.66.0 no topo e copias 8.46.4 aninhadas —, sem nenhum
+pacote alheio mudando de versao. Audit inalterado (4 moderate), Vitest 875/97, Playwright 42/42.
+**O `jest-dom` 7 ficou de fora e virou regra de `ignore`**: declara `engines` `node >=22` enquanto o
+CI-APP roda em Node 20, mesma politica ja aplicada ao `@types/node`. O app usa dois matchers da
+biblioteca, entao a major nao traz ganho.
+
+**O ciclo de reversao e o achado que mais se paga.** O Dependabot mergeia direto na `main` (branch
+default); o back-merge `cc7133d` resolveu o conflito pelo lado de `develop` e **descartou** o #164
+(`setup-java` v5 e `setup-gradle` v6 no `contract-drift.yml`); a promocao por squash (#166) levou o v4
+para a `main` e **reverteu** o #164; o Dependabot reabriu como #167. **Nenhum gate pega**: o
+`diff-tree --cc` sai vazio, porque nenhuma linha foi inventada, e as duas versoes funcionam. Pior, o
+back-merge seguinte sairia **sem conflito mantendo o v4**, porque desde a base comum so `develop` mudou
+o arquivo — o ciclo nao termina sozinho. Corrigido por commit explicito (PR #168/#169) que copia o
+arquivo da `main`, com criterio de aceite `git diff origin/main` vazio. No `sep-mobile` o mesmo risco foi
+fechado antes de acontecer, com o back-merge do #177 (PR #178/#179).
+
+**A regra operacional que fica**: enquanto a branch default for `main` e a promocao for por squash, todo
+PR do Dependabot mergeado direto na `main` precisa voltar a `develop` **antes** da promocao seguinte, e a
+conferencia nao e "saiu sem conflito", e sim **arvore igual a da `main`** — `git merge-tree --write-tree`
+preve o resultado sem tocar no repo.
+
+**Estado final, conferido por conteudo**: `sep-app` develop `ac0e24a` == main `6a99521`; `sep-mobile`
+develop `ab3ae09` == main `c00901b`; CI verde nas quatro pontas. Nenhum PR do Dependabot aberto no app;
+cinco no mobile (majors de `vitest`, Ionic e jsdoc, o grupo minor/patch e o `fast-uri`).

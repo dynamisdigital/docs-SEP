@@ -10,10 +10,19 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#161 e #172/#173; follow-ups da F-28 MERGEADOS develop+main, PR #156/#158 e #157/#159)._
+_Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#161 e #172/#173; itens 3 e 4 do Dependabot fechados, PR #162-#169 no app e #175-#179 no mobile)._
 
 ## Leia agora
 
+- **Os follow-ups (ag) e (ah) do Dependabot estao FECHADOS** (2026-09-11): grupo `angular-security` com
+  `applies-to: security-updates` nos dois fronts (app #162/#163, mobile #175/#176) e a divida de deps do
+  web (app #165/#166 — `@playwright/test` 1.63.0, `happy-dom` 20.14.3, `typescript-eslint` 8.70.0; o
+  `jest-dom` 7 virou `ignore`, porque exige Node 22 e o CI-APP roda em Node 20). **E um ciclo de
+  reversao foi achado e fechado**: o Dependabot mergeia direto na `main`, o back-merge descartou o #164,
+  a promocao por squash reverteu a `main` e o Dependabot reabriu (#167) — **nenhum gate pega isso**, e o
+  back-merge seguinte manteria a perda. Corrigido por commit explicito (#168/#169). Conferido por
+  conteudo: app develop `ac0e24a` == main `6a99521`; mobile develop `ab3ae09` == main `c00901b`. Detalhe
+  em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Itens 3 e 4.
 - **A advisory GHSA-hh8m do Angular esta FECHADA no `sep-app` e no `sep-mobile`** (2026-09-11), em
   `develop` e `main`: app #160/#161 (`ddb576e`), mobile #172/#173 (`0c9a5da`), conferidos por
   conteudo. Sanitization bypass via host bindings em `@angular/core <20.3.28`, **moderate** — o gate
@@ -229,6 +238,12 @@ _Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#1
   `ModelResolver` sem `openapi31` apagando 21 `description` e 17 `example` em silencio).
 
 ## Onde estamos
+
+- **Itens 3 e 4 do follow-up do Dependabot MERGEADOS develop+main em 2026-09-11** (app #162/#163,
+  #165/#166 e #168/#169; mobile #175/#176 e #178/#179) — grupo de security update, divida de
+  dependencias do web e o fim do ciclo de reversao do `contract-drift.yml`; **sem tela, endpoint,
+  contrato ou regra nova**. Nada mudou em `sep-api`. Detalhe em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Itens 3 e 4.
 
 - **Correcao GHSA-hh8m (web + mobile) MERGEADA develop+main em 2026-09-11** (app #160/#161, mobile
   #172/#173, conferidos por conteudo) — bump do conjunto `@angular/*` para 20.3.31, dentro do
@@ -916,10 +931,14 @@ _Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#1
    `push.paths`; ~~(ae) PRs do dependabot reprovando no CI-APP~~ **investigado e resolvido em
    2026-09-11** — escondia a GHSA-hh8m, fechada nos dois fronts (#160/#161, #172/#173); (af) aviso de
    `resetLoginMockState()` no doc do `logarAdmin` (o mock guarda lockout por username entre testes do
-   mesmo arquivo); (ag) `applies-to: security-updates` no `dependabot.yml` dos dois fronts — **em
-   execucao**; (ah) `jest-dom` 7 e o grupo minor/patch (#140/#142 fechados) — refazer por conta propria
-   ou esperar o Dependabot repropor; (ai) branch default dos repos para `develop`, porque security
-   updates ignoram `target-branch` e hoje abrem PR direto em `main` — decisao de quem manda no repo.
+   mesmo arquivo); ~~(ag) `applies-to: security-updates` no `dependabot.yml`~~ **FEITO** (app #162/#163,
+   mobile #175/#176); ~~(ah) `jest-dom` 7 e o grupo minor/patch~~ **FEITO** (app #165/#166: trio subido;
+   o `jest-dom` 7 virou `ignore` por exigir Node 22); (ai) branch default dos repos para `develop`,
+   porque security updates ignoram `target-branch` e hoje abrem PR direto em `main` — decisao de quem
+   manda no repo; (aj) **promover `develop -> main` com merge commit**: com squash a base comum nao anda,
+   e todo PR do Dependabot mergeado direto na `main` precisa voltar a `develop` **antes** da promocao
+   seguinte, senao e revertido — foi o ciclo do #164, fechado em #168/#169. Conferencia de back-merge:
+   arvore igual a da `main`, nao "saiu sem conflito".
 
 3. ~~Duplicatas do login, pontos cegos do `contract-check.mjs` e typecheck dos specs~~ **FEITOS**: as
    duplicatas pelo fix #149/#150 (2026-09-10), os pontos cegos (v)+(vi) e o typecheck pela F-28. Os
