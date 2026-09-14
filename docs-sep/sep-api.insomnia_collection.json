@@ -64,7 +64,8 @@
     "parametroChave": "",
     "renegociacaoId": "",
     "cpfTeste": "",
-    "cnpjTeste": ""
+    "cnpjTeste": "",
+    "notificacaoId": ""
    },
    "color": null,
    "isPrivate": false,
@@ -171,6 +172,73 @@
    "parentId": "wrk_sep_api",
    "name": "Backoffice (Sprint 14)",
    "metaSortKey": -3.1
+  },
+  {
+   "_id": "fld_notificacoes",
+   "_type": "request_group",
+   "parentId": "wrk_sep_api",
+   "name": "Notificacoes (Sprint 38)",
+   "description": "Central de notificacoes do usuario autenticado (ADR 0021). Owner-scoped: o usuario vem do token, nunca de parametro. So canal IN_APP; e-mail enviado fica no historico, fora da central. Hoje o unico aviso e o desembolso Pix concluido.",
+   "metaSortKey": -1749999997000,
+   "environment": {}
+  },
+  {
+   "_id": "req_s38_get_notificacoes",
+   "_type": "request",
+   "parentId": "fld_notificacoes",
+   "name": "GET /notificacoes",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/notificacoes",
+   "parameters": [
+    {
+     "name": "page",
+     "value": "0"
+    },
+    {
+     "name": "size",
+     "value": "20"
+    }
+   ],
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "description": "Minhas notificacoes in-app, mais recente primeiro (desempate por id). size de 1 a 100, senao 400 NTF-400-001. Sem notificacao: pagina vazia, nao erro.",
+   "metaSortKey": -3
+  },
+  {
+   "_id": "req_s38_get_notificacoes_nao_lidas",
+   "_type": "request",
+   "parentId": "fld_notificacoes",
+   "name": "GET /notificacoes/nao-lidas/contagem",
+   "method": "GET",
+   "url": "{{ baseUrl }}/api/v1/notificacoes/nao-lidas/contagem",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "description": "Contador de nao lidas, mesmo recorte da listagem.",
+   "metaSortKey": -2
+  },
+  {
+   "_id": "req_s38_post_notificacao_leitura",
+   "_type": "request",
+   "parentId": "fld_notificacoes",
+   "name": "POST /notificacoes/{id}/leitura",
+   "method": "POST",
+   "url": "{{ baseUrl }}/api/v1/notificacoes/{{ notificacaoId }}/leitura",
+   "headers": [
+    {
+     "name": "Authorization",
+     "value": "Bearer {{ clienteAccessToken }}"
+    }
+   ],
+   "description": "Marca como lida. Idempotente: repetir devolve o lidaEm da primeira leitura. Notificacao inexistente, de outro usuario ou de e-mail: 404 NTF-404-001 neutro.",
+   "metaSortKey": -1
   },
   {
    "_id": "fld_actuator",

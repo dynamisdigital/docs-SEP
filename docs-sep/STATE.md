@@ -10,10 +10,39 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#161 e #172/#173; itens 3 e 4 do Dependabot fechados, PR #162-#169 no app e #175-#179 no mobile)._
+_Atualizado em: 2026-09-14 (**Sprint 38 MERGEADA develop+main**, PR #112/#113, conferida por conteudo — modulo `notificacao`, ADR 0021, `V61`; antes: GHSA-hh8m e itens 3 e 4 do Dependabot fechados em 2026-09-11)._
 
 ## Leia agora
 
+- **A Sprint 38 esta MERGEADA em `develop` e `main`** (2026-09-14): PR **#112** em `develop` (squash
+  `9703432`, back-merge `98d427c` limpo por `--cc`) e **#113** em `main` (`57b770b`, squash). **Conferido
+  por conteudo**: `develop`, `main` e a branch verificada `b54e692` apontam para a mesma arvore `6b3aab2`;
+  o proximo back-merge sai limpo (`merge-tree` exit 0, arvore = `develop`). Branch
+  `feature/sprint-38-notificacao-historico`, de `develop` `30c1f2b`, 8 commits. Abre a frente A de
+  notificacao: modulo `notificacao` com historico por usuario (`V61`), central owner-scoped
+  (`GET /api/v1/notificacoes`, `GET .../nao-lidas/contagem`, `POST .../{id}/leitura`, codigos
+  `NTF-400-001`/`NTF-404-001`), idempotencia por origem e dois gatilhos por evento: **Pix concluido
+  vira aviso `IN_APP` ao tomador** (primeiro momento positivo do produto) e **conta bloqueada vira e-mail
+  com historico** via `ContaBloqueadaEvent`. `shared.email` saiu; a regua de cobranca **nao** migrou.
+  [ADR 0021](../adr/0021-modulo-notificacao-transversal.md) aceito com quatro decisoes do responsavel
+  (retencao provisoria de 5 anos, central so `IN_APP`, gatilho por evento, dominio sem JPA). Testes
+  **2318 -> 2434**, 0 falhas; catalogo de codigos **143 -> 145**, congelados; smoke real contra `:8080`
+  **20/20**, dados apagados ao fim. Doc operacional [`NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md);
+  descricao do PR em [`SPRINT-38-PR.md`](../repos/sep-api/SPRINT-38-PR.md). A **F-27 (web) e a M-19 (mobile) estao
+  destravadas**. O #113 entrou na `main` de novo por **squash** (um pai) — ver decisao (aa)/(aj).
+- **Aprendizados da 38, o que mais se paga**: (1) **indice parcial com o valor do predicado passado como
+  parametro nao e usado** pelo plano generico do PostgreSQL — medido com 200 mil linhas, seq scan (custo
+  ~12.000) contra index only scan (39) com o literal; (2) **`nullable = true` e descartado pelo springdoc
+  em OpenAPI 3.1** — o documento inteiro tem zero marcas de nulidade, inclusive o `mensagemPublica` do Pix;
+  (3) **listener `REQUIRES_NEW` em `AFTER_COMMIT` segura duas conexoes** — com pool 5, oito publicacoes
+  simultaneas falham ja so com o audit do Pix da Sprint 20 (limite anterior, agora medido); (4) **ensaio de
+  migration por `DB_NAME` exige `./gradlew test --rerun`**, senao o Gradle da a task como em dia e o
+  "upgrade" sai verde sem rodar; (5) **mutacao em base com nome sem `sep_test` morre pela guarda de
+  ambiente dos ITs**, nao pelo comportamento.
+- **Decisoes pendentes do responsavel**: (a) `repos/sep-api/SPRINT-37-PR.md` **nao foi removido** — o PR
+  #110 foi mergeado com o corpo do template, entao o uso do arquivo no PR nao se confirmou; (b) o texto
+  exibido na central segue ASCII pela convencao do repo (`Desembolso concluido`), e a acentuacao e decisao
+  de produto em aberto; (c) review humano de fim de sprint da 38 (pode ser feito sobre `develop`).
 - **Os follow-ups (ag) e (ah) do Dependabot estao FECHADOS** (2026-09-11): grupo `angular-security` com
   `applies-to: security-updates` nos dois fronts (app #162/#163, mobile #175/#176) e a divida de deps do
   web (app #165/#166 — `@playwright/test` 1.63.0, `happy-dom` 20.14.3, `typescript-eslint` 8.70.0; o
@@ -238,6 +267,11 @@ _Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#1
   `ModelResolver` sem `openapi31` apagando 21 `description` e 17 `example` em silencio).
 
 ## Onde estamos
+
+- **Sprint 38 (backend) MERGEADA develop+main em 2026-09-14** (PR #112/#113, arvore `6b3aab2`, conferida por conteudo) — modulo de notificacao
+  transversal, historico e canal in-app (Fase 4, produto novo; migration `V61`, ADR 0021). Nada mudou em
+  `sep-app`/`sep-mobile`. Detalhe em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Sprint 38 e na spec
+  [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md) §Resultado medido.
 
 - **Itens 3 e 4 do follow-up do Dependabot MERGEADOS develop+main em 2026-09-11** (app #162/#163,
   #165/#166 e #168/#169; mobile #175/#176 e #178/#179) — grupo de security update, divida de
@@ -954,10 +988,13 @@ _Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#1
    `codigo`. `sep-app` e `sep-mobile` nao mudam: o snapshot do web cresce na proxima renovacao
    (`enumSubset` tolera), e os fronts podem ramificar pelos codigos novos em sprints proprias.
 
-5. **Frente A de notificacao**, em paralelo — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
-   (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
-   e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). Nao toca
-   `ApiExceptionHandler`, entao nao colide com a cadeia P1.
+5. **Frente A de notificacao** — ~~[`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)~~
+   **MERGEADA develop+main em 2026-09-14** (PR #112/#113, ADR 0021, `V61`), conferida por conteudo.
+   **Proximas, em paralelo e destravadas**:
+   [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md) (F-27, web) e
+   [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md) (M-19, mobile), que consomem o
+   contrato da secao "Contrato da central" do [`NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md) e
+   renovam os snapshots OpenAPI nas proprias sprints (3 rotas e 2 codigos novos).
 
 6. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
    de `sep-api`):
@@ -982,6 +1019,18 @@ _Atualizado em: 2026-09-11 (**GHSA-hh8m fechada no web e no mobile**, PR #160/#1
    §Gates externos).
 
 10. **Follow-ups tecnicos abertos** (nao bloqueiam).
+   **ABERTOS pela Sprint 38** (2026-09-14, backend): (aa38) **migrar a regua de cobranca** para o modulo
+   `notificacao` e remover o `CanalNotificacao` duplicado (sincronia hoje travada por
+   `CanalNotificacaoCompatibilidadeTest`); (ab38) **revisao juridica** da retencao provisoria de 5 anos e
+   do opt-out; (ac38) **pool de conexoes** — listener `REQUIRES_NEW` em `AFTER_COMMIT` segura duas conexoes
+   por requisicao; dimensionar o pool em >= 2x as requisicoes concorrentes com esse padrao ou tornar o
+   listener assincrono (exige rever o ADR 0021 §6); (ad38) **adapter real de e-mail** (Fase 5) com selecao
+   por `app.notificacoes.provider`, envio assincrono ou timeout curto e log de diagnostico sanitizado;
+   (ae38) **frente B** (quais eventos notificam, por persona) e **frente D** (push, gated); (af38)
+   **acentuacao** do texto exibido na central; (ag38) CHECKs da `V61` nao barram texto em branco, que o
+   dominio recusa; (ah38) `ContaBloqueadaEvent.toString()` carrega o e-mail; (ai38) `nullable` perdido no
+   OpenAPI 3.1 tambem no `mensagemPublica` do Pix (anterior a sprint); (aj38) os 4 ITs do modulo sobem 4
+   contextos Spring — padronizar os spies.
    **FECHADOS pela F-Sprint 28** (2026-09-10, web): (m) o catalogo de codigos de erro **tem gate** no web
    — com a ressalva de que morde na renovacao do snapshot; (n) specs **sao** typechecados, no CI, e os
    do Playwright tambem. Os abertos pela F-28 estao no item 2 desta lista.

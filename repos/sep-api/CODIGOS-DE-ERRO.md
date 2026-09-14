@@ -27,6 +27,12 @@ significa, converteu o sufixo semantico em numerico, separou e deduplicou as col
 gate no build. O catalogo foi de **80 para 143**, e os 80 anteriores continuam publicados com o mesmo
 valor e o mesmo dono.
 
+A **Sprint 38** (spec [`038`](../../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md), ADR
+[`0021`](../../adr/0021-modulo-notificacao-transversal.md)) foi a primeira a publicar codigo sob as
+regras da 37: prefixo novo **`NTF`**, dono `notificacao`, com `NTF-400-001` (paginacao invalida na
+central) e `NTF-404-001` (notificacao inexistente, de outro usuario ou fora do recorte `IN_APP`, o
+mesmo 404 neutro). Catalogo **143 -> 145**, lista congelada idem.
+
 ## Forma do corpo
 
 Com codigo publicado:
@@ -97,6 +103,7 @@ Registro de prefixos:
 | `CTR` | `contratos` | formalizacao contratual |
 | `GOV` | `governanca` | parametros e papeis |
 | `MFA` | `identity` | segundo fator |
+| `NTF` | `notificacao` | central de notificacoes do usuario |
 | `ONB` | `onboarding` | KYC, KYB e PLD |
 | `PIX` | `pix` | desembolso, recebimento e chaves |
 | `PRP` | `credito` | proposta de credito e Open Finance |
@@ -138,6 +145,8 @@ publicado nao declara.
 ## Particao
 
 ```text
+Sprint 38:  146 codigos unicos = 145 publicados + 1 excluido     intersecao = 0
+            (+2 publicados: NTF-400-001, NTF-404-001; o excluido segue AUTH-403-001)
 Sprint 37:  144 codigos unicos = 143 publicados + 1 excluido     intersecao = 0
             excluido: 1 inalcancavel · 0 formato · 0 colisao
 Sprint 36:  133 codigos unicos =  80 publicados + 53 excluidos
@@ -147,9 +156,9 @@ A particao **nao e um numero escrito aqui**: e recalculada a cada `./gradlew bui
 `ParticaoDeCodigosErroTest`, que varre `src/main/java` do zero e reprova se o catalogo divergir do
 codigo-fonte em qualquer direcao.
 
-## Catalogo publicado (143)
+## Catalogo publicado (145)
 
-Em **negrito**, os 80 publicados ate a Sprint 36. Os 143 estao congelados em
+Em **negrito**, os 80 publicados ate a Sprint 36. Os 145 estao congelados em
 `CodigosPublicadosNaoMudamTest`: codigo publicado nao se renomeia nem sai do catalogo, e a lista so
 cresce — cada sprint que publica acrescenta os seus no fechamento.
 
@@ -163,6 +172,7 @@ cresce — cada sprint que publica acrescenta os seus no fechamento.
 | `CTR` | `contratos` | formalizacao contratual | 10 | **`CTR-400-001`**, **`CTR-403-001`**, **`CTR-404-001`**, **`CTR-409-001`**, **`CTR-409-002`**, **`CTR-409-003`**, **`CTR-422-001`**, **`CTR-422-002`**, **`CTR-422-003`**, **`CTR-422-004`** |
 | `GOV` | `governanca` | parametros e papeis | 2 | **`GOV-400-001`**, **`GOV-404-001`** |
 | `MFA` | `identity` | segundo fator | 5 | **`MFA-400-001`**, **`MFA-400-002`**, **`MFA-400-003`**, **`MFA-400-004`**, **`MFA-409-001`** |
+| `NTF` | `notificacao` | central de notificacoes do usuario | 2 | `NTF-400-001`, `NTF-404-001` |
 | `ONB` | `onboarding` | KYC, KYB e PLD | 21 | **`ONB-400-001`**, `ONB-400-002`, **`ONB-400-003`**, `ONB-400-004`, **`ONB-400-005`**, `ONB-400-006`, `ONB-400-007`, `ONB-400-008`, **`ONB-400-009`**, **`ONB-400-010`**, **`ONB-400-011`**, **`ONB-400-012`**, **`ONB-400-013`**, **`ONB-400-016`**, `ONB-400-017`, **`ONB-400-018`**, `ONB-400-019`, `ONB-404-001`, **`ONB-404-002`**, **`ONB-409-001`**, **`ONB-409-002`** |
 | `PIX` | `pix` | desembolso, recebimento e chaves | 29 | **`PIX-400-001`**, `PIX-400-003`, `PIX-400-004`, `PIX-400-005`, `PIX-400-006`, `PIX-400-007`, `PIX-400-008`, `PIX-400-009`, `PIX-400-010`, **`PIX-404-001`**, `PIX-404-002`, `PIX-404-003`, `PIX-404-004`, `PIX-404-005`, `PIX-404-006`, `PIX-404-007`, `PIX-409-001`, `PIX-409-002`, `PIX-409-003`, `PIX-409-004`, `PIX-409-005`, `PIX-422-001`, `PIX-422-002`, `PIX-422-003`, `PIX-422-004`, `PIX-422-005`, `PIX-422-006`, `PIX-422-007`, `PIX-422-008` |
 | `PRP` | `credito` | proposta de credito e Open Finance | 9 | `PRP-400-001`, `PRP-400-002`, `PRP-403-001`, `PRP-404-001`, `PRP-404-002`, `PRP-409-002`, `PRP-422-001`, `PRP-422-002`, `PRP-422-003` |
@@ -324,7 +334,7 @@ na response e nunca chegam ao `@RestControllerAdvice`:
 |---|---|
 | Particao completa, disjunta, e catalogo == codigos aptos do fonte | `ParticaoDeCodigosErroTest` |
 | Formato, prefixo registrado, modulo dono, aposentados, ponto de lancamento legivel | `ConvencaoCodigosErroTest` |
-| Nenhum codigo ja publicado sai do catalogo (143 congelados; a lista so cresce) | `CodigosPublicadosNaoMudamTest` |
+| Nenhum codigo ja publicado sai do catalogo (145 congelados; a lista so cresce) | `CodigosPublicadosNaoMudamTest` |
 | `enum` do OpenAPI == fonte unica; campo opcional; 3.1 e `securitySchemes` intactos | `CatalogoCodigosErroContratoTest` |
 | Matriz por handler: status, codigo, headers, pertencimento ao catalogo | `MatrizFinalDeErroTest` |
 | Cada subtipo selado emite o proprio codigo; matriz cobre todos os permitidos | `DomainExceptionCodigoNoCorpoTest` |

@@ -162,6 +162,8 @@ A chave Pix destino **nunca** eh persistida em claro: `pix_transferencia` guarda
 
 ### Backoffice
 
+Conclusao de desembolso (`PixTransferenciaConcluidaEvent`) gera aviso `IN_APP` `DESEMBOLSO_PIX_CONCLUIDO` na central de notificacoes do **tomador** (Sprint 38, `notificacao.application.listener.DesembolsoPixConcluidoListener`, AFTER_COMMIT): origem = id da transferencia, referencia = contrato; o `externalId` nunca e lido. Falha ao gravar o aviso nao desfaz a conclusao nem o audit (detalhe em [`NOTIFICACOES.md`](NOTIFICACOES.md)).
+
 Falha de desembolso (`PixTransferenciaFalhouEvent`) gera item `DESEMBOLSO_PIX_FALHOU` na fila operacional (`DesembolsoPixFalhouListener`, AFTER_COMMIT). Reprocesso (`PixTransferenciaRetentativaStrategy`, `TipoChamadaProvider.PIX_TRANSFERENCIA`) eh **seguro**: apenas reconsulta status (nunca reenvia — chave nao persistida); provider indisponivel -> FALHA (sem falso sucesso). `BACKOFFICE` nao inicia desembolso novo. Detalhe do item resolvido por `PixTransferenciaObjetoOriginalAdapter` (status + mascara). Migration `V48` estende os CHECKs de backoffice.
 
 ## Recebimento e conciliacao (Sprint 21 — Epic 15 parte 3)

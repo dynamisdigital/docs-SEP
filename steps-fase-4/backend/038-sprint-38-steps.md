@@ -1,7 +1,7 @@
 # Steps - Sprint 38 - Modulo de notificacao, historico e canal in-app
 
 **Spec**: [038](../../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md).
-**Status**: steps criados em 2026-09-11; implementacao nao iniciada.
+**Status**: steps criados em 2026-09-11; **implementados em 2026-09-14 e MERGEADOS develop+main** (PR #112/#113, arvore `6b3aab2` conferida por conteudo).
 **Repositorio**: `sep-api`. **Fase**: 4. **Migration prevista**: `V61`.
 **ADR previsto**: proximo numero livre (0021 na leitura de 2026-09-11; confirmar antes de criar).
 
@@ -87,9 +87,51 @@ nao prova deduplicacao do listener novo.
 
 **Pronto quando**:
 
-- [ ] Base, branch, ambiente e baseline documentados; divergencias tratadas.
-- [ ] Inventario conferido, incluindo identidade do destinatario e transacoes efetivas.
-- [ ] Banco de ensaio, V61 e numero do ADR confirmados.
+- [x] Base, branch, ambiente e baseline documentados; divergencias tratadas.
+- [x] Inventario conferido, incluindo identidade do destinatario e transacoes efetivas.
+- [x] Banco de ensaio, V61 e numero do ADR confirmados.
+
+**Resultado medido (2026-09-14)**:
+
+- **Base**: `git fetch` exit 0. `origin/develop` `30c1f2b` e `origin/main` `5fe83a1` com a **mesma
+  arvore** `e4eae0e`, identica a da branch verificada da Sprint 37 (`d4a1d72`). Sprint 37 integrada,
+  conferida por arvore e nao por ancestralidade. `develop` local avancado por fast-forward; branch
+  `feature/sprint-38-notificacao-historico` criada de `30c1f2b`. Dois stashes antigos em `main`
+  (2026-09-02) preservados, sem relacao com a sprint.
+- **Descricao temporaria da Sprint 37 NAO removida**: o PR #110 foi mergeado com o corpo do template
+  (1201 caracteres, sem mencao a Sprint 37 nem ao ADR 0020), e o #111 idem. Uso no PR nao confirmado,
+  entao a regra do Step 038.0.1 manda manter `repos/sep-api/SPRINT-37-PR.md`. Decisao do responsavel.
+- **Ambiente**: `sep-postgres` (postgres 16) em `:5432`; `sep_dev` sem residuo
+  (`solicitacao_onboarding` = 0), Flyway em `V60`. ITs usam `sep_test` (perfil `test`). O banco
+  descartavel de ensaio da `V61` e criado na Task 38.2, fora das duas bases.
+- **Baseline**: `./gradlew clean build` exit 0 (6m12s); `./gradlew spotlessCheck` exit 0. XMLs:
+  **373 classes, 2318 testes, 0 falhas, 0 erros, 0 skipped** — igual ao registro da Sprint 37. Os 42
+  `*IT` entram no `build`.
+- **Inventario**:
+  - Eventos: **71** records `*Event`, igual a spec. Pontos de envio: **3**, iguais; o do lockout
+    mudou de `LockoutService:155` para `:175`.
+  - `shared.email`: `EmailService` + `LogEmailService` (so log, nunca lanca); consumidores
+    `LockoutService` e testes `LogEmailServiceTest`/`LockoutServiceTest`.
+  - `avaliarPosFalha` (`REQUIRES_NEW`): chamado por `AutenticarUsuarioUseCase:88` (usuario
+    inexistente, `usuarioId` nulo — status que nao conta falha, entao nunca bloqueia), `:95` e
+    `VerificarTotpUseCase:116`. Grava audit `LOCKOUT` e depois chama o e-mail na mesma transacao.
+  - `PixTransferenciaConcluidaEvent`: publicado em `SincronizadorStatusTransferencia:91`, via
+    `DesembolsoTransacaoService` (`REQUIRES_NEW`), `ProcessarWebhookPixUseCase:93` e
+    `ConsultarStatusDesembolsoPixUseCase:44` (`@Transactional`) — sempre com transacao ativa.
+  - **Destinatario**: `contrato.tomador_id REFERENCES usuario(id)` (`V20`) e
+    `ConsultarDesembolsoTomadorUseCase:37` compara `tomadorId` com `principal.id()`. `tomadorId` e o
+    id do usuario.
+  - Cobranca a preservar: `NotificationProvider`, `CanalNotificacao {EMAIL, SMS}`, adapters Log/Smtp/
+    Zenvia e testes `LogNotificationProviderTest`, `SmtpNotificationProviderTest`,
+    `ThymeleafTemplateNotificacaoEngineTest`, `ZenviaSmsNotificationProviderIT`,
+    `EscalarCobrancaUseCaseTest`, `InadimplenciaIT`, `EventoCobranca*Test`.
+  - Ultima migration `V60`; ADR livre **0021**; modulo `notificacao` inexistente.
+  - Padroes: principal `@AuthenticationPrincipal UsuarioAutenticado`; 404 neutro por subtipo de
+    `RecursoNaoEncontradoException` com codigo (Sprint 26); `Page<T>` serializado direto
+    (`CreditoController`, `BackofficeController`); criacao idempotente por unique parcial +
+    `REQUIRES_NEW` + captura de `DataIntegrityViolationException` (`CriarItemFilaOperacionalService`).
+- **Divergencia nova**: os 12 modulos com persistencia poem `@Entity` em `domain.model`, contra o
+  ADR 0007 e o `package-info` de cada `domain`. Decisao em 38.1: o `notificacao` segue o ADR.
 
 ## Task 38.1 - ADR da capacidade transversal
 
@@ -154,10 +196,46 @@ em eventual downgrade e conferir preservacao dos anteriores. Nao executar rollba
 
 **Pronto quando**:
 
-- [ ] Dominio/persistencia testados, inclusive repeticao concorrente da chave.
-- [ ] Aplicacao e reversao nos dois cenarios registradas com evidencias e limites.
+- [x] Dominio/persistencia testados, inclusive repeticao concorrente da chave.
+- [x] Aplicacao e reversao nos dois cenarios registradas com evidencias e limites.
 
 **Commit sugerido**: `feat(notificacao): persistir historico por usuario com idempotencia`
+
+**Resultado medido (2026-09-14)**:
+
+- **Modelo**: agregado `Notificacao` sem Spring/JPA (`OrigemNotificacao`, `ConteudoNotificacao`,
+  `Entrega`, leitura so em `IN_APP`); `NotificacaoJpaEntity` com mapeamento explicito; porta
+  `NotificacaoPort.registrarSeInedita` e adapter com `REQUIRES_NEW` que so trata como "ja notificado"
+  a violacao de `uq_notificacao_origem` (FK e CHECK propagam). `CanalNotificacao` criado aqui porque o
+  agregado depende dele; o teste de compatibilidade com o enum da cobranca fica na 38.3.
+- **Testes**: 43 novos (dominio 26, esquema 12, adapter 5). Suite `./gradlew clean build` exit 0:
+  **2361 testes, 0 falhas, 0 erros, 378 classes** (baseline 2318); `spotlessCheck` exit 0; JaCoCo
+  verde. Concorrencia: 8 threads com a mesma chave -> 1 `true`, 1 linha.
+- **Aplicacao do zero** (`sep_ensaio38_zero`, vazia): testes do modulo contra ela, V1..V61 com
+  `success = t`; `sep_dev` conferido intocado em V60 no mesmo momento.
+- **Upgrade com dados** (`sep_ensaio38_upgrade`, copia do `sep_dev` em V60 por `pg_dump`: 7551
+  `audit_log_seguranca`, 1787 `login_attempt`, 150 `conta_escrow`, 76 `item_fila_operacional`...):
+  V61 `success = t`; contagem de todas as tabelas antes/depois difere so em
+  `flyway_schema_history` (+1) e na tabela nova.
+- **Armadilha medida**: a primeira rodada do upgrade saiu `BUILD SUCCESSFUL in 1s` com a base ainda em
+  V60 — o Gradle deu a task `test` como em dia, porque variavel de ambiente nao e input dela. Refeito
+  com `--rerun`. Ensaio de migration por `DB_NAME=... ./gradlew test` **exige `--rerun`**.
+- **Reversao ensaiada** na base de upgrade, com uma notificacao gravada:
+  `BEGIN; DROP TABLE notificacao; DELETE FROM flyway_schema_history WHERE version = '61'; COMMIT;`
+  Schema pos-reversao identico ao pre-V61 (`pg_dump --schema-only`, diff so nas linhas `\restrict`,
+  token aleatorio do pg_dump 16.13); contagens identicas as pre-V61; V61 reaplica limpa depois.
+  **Limite declarado**: a reversao **apaga as notificacoes**; restore de backup e a alternativa quando
+  o historico precisar sobreviver. Nada foi executado no `sep_dev`; o Flyway nao tem undo.
+- **Mutacoes** (base descartavel recriada a cada uma, alvo conferido por diff, restauracao por `cmp`):
+  unique sem predicado `FALHOU` -> 2 testes reprovam; indice nao unico -> 3 reprovam (replay,
+  concorrencia, esquema); adapter tratando toda violacao como dedup -> `violacaoQueNaoEAChaveDeOrigem_propaga`
+  reprova. Nenhuma morte por compilacao.
+- **Code review do commit `c66041d`**: o ADR dizia que a frente B dispensa esquema novo, mas o
+  `chk_notificacao_tipo` fecha a lista — cada tipo novo e migration, como no `audit_log_seguranca`.
+  Corrigido no ADR. **Limite aceito**: os CHECKs da V61 nao barram texto em branco (`titulo`,
+  `mensagem`, `origem_id`, `motivo_falha`), que o dominio recusa; so escrita fora do agregado os
+  produziria. Endurecer exigiria alterar a V61 ja aplicada em `sep_dev`/`sep_test` (checksum do
+  Flyway) ou uma V62 so para isso.
 
 ## Task 38.3 - Canais e adapters
 
@@ -176,10 +254,35 @@ registrar corpo sensivel em logs nem tratar fake como comprovante de entrega.
 
 **Pronto quando**:
 
-- [ ] Compatibilidade dos enums testada; cobranca preservada.
-- [ ] `IN_APP` nao envia email/SMS; resultados respeitam o ADR.
+- [x] Compatibilidade dos enums testada; cobranca preservada.
+- [x] `IN_APP` nao envia email/SMS; resultados respeitam o ADR.
 
 **Commit sugerido**: `feat(notificacao): adicionar canal in-app e adapters de envio`
+
+**Resultado medido (2026-09-14)**:
+
+- **Entrega**: `NotificarUsuarioUseCase` com dois metodos de intencao — `disponibilizarNaCentral`
+  (grava `IN_APP`, zero I/O) e `enviarEmail` (grava `PENDENTE`, chama `EnvioEmailPort` fora de
+  transacao, grava `ENVIADA`/`SIMULADA`/`FALHOU` por `NotificacaoPort.atualizarEntrega`). Excecao do
+  provider vira `FALHOU` com o nome da classe e nao sobe; falha de persistencia sobe. `SMS` nao tem
+  caminho: nao ha metodo que o entregue.
+- **Adapter**: `LogEnvioEmailAdapter` devolve `SIMULADO` e loga sem destinatario, assunto nem corpo.
+  `EmailNotificacao.toString()` omite o conteudo.
+- **Desvio do plano, medido antes de rodar**: a primeira versao condicionava o adapter a
+  `app.notificacoes.provider=log`, como o `LogNotificationProvider`. O `ZenviaSmsNotificationProviderIT`
+  sobe contexto completo com `smtp-zenvia`, e sem nenhum `EnvioEmailPort` o contexto nao subiria —
+  nem o IT, nem um ambiente de homologacao. O adapter ficou incondicional, como o `LogEmailService`
+  que substitui; a diferenca e que a simulacao agora fica gravada como `SIMULADA`. A selecao por
+  provider entra com o adapter real (Fase 5).
+- **Enums**: `CanalNotificacaoCompatibilidadeTest` exige que os canais da cobranca estejam contidos no
+  modulo novo e que a diferenca seja exatamente `{IN_APP}`. Testes da cobranca inalterados e verdes.
+- **Testes**: 18 novos (use case 10, compatibilidade 2, e-mail 2, adapter de log 2, persistencia do
+  resultado 2). `./gradlew clean build` exit 0: **2379 testes, 0 falhas, 0 erros, 382 classes**;
+  `spotlessCheck` exit 0.
+- **Mutacoes** (7 aplicadas, 7 mortas por comportamento, 0 por compilacao, restauracao por `cmp`):
+  `IN_APP` chamando o provider; falha do provider propagando; motivo com a mensagem da excecao; sem
+  gravar o resultado; log com o destinatario; adapter de log declarando `ENVIADO`; `toString` padrao
+  do record.
 
 ## Task 38.4 - Endpoints das minhas notificacoes
 
@@ -199,10 +302,56 @@ formato `Page<T>` e repeticao de leitura.
 
 **Pronto quando**:
 
-- [ ] Owner comprovado nos tres endpoints e na persistencia.
-- [ ] Vazio e erro distintos; OpenAPI coincide com respostas reais.
+- [x] Owner comprovado nos tres endpoints e na persistencia.
+- [x] Vazio e erro distintos; OpenAPI coincide com respostas reais.
 
 **Commit sugerido**: `feat(notificacao): expor central restrita ao destinatario`
+
+**Resultado medido (2026-09-14)**:
+
+- **Contrato** (ADR 0021 §9), todos com `isAuthenticated()` e usuario vindo do principal:
+  `GET /api/v1/notificacoes?page&size` -> `Page<NotificacaoResponse>` (`criadaEm` desc, `id` desc;
+  `size` 1..100, senao `400 NTF-400-001`); `GET /api/v1/notificacoes/nao-lidas/contagem` ->
+  `{ "naoLidas": n }`; `POST /api/v1/notificacoes/{id}/leitura` -> `200 NotificacaoResponse`,
+  idempotente, `404 NTF-404-001` neutro para inexistente, alheia ou e-mail. `NotificacaoResponse`:
+  `id`, `tipo`, `titulo`, `mensagem`, `criadaEm` (obrigatorios) e `lidaEm`, `referencia { tipo, id }`
+  (sempre presentes, nulos quando vazios). Nao expoe usuario, origem, canal nem situacao.
+- **Owner**: o dono e o canal `IN_APP` entram nas tres consultas do `CentralNotificacoesPersistenceAdapter`,
+  inclusive na busca que antecede a marcacao (`PESSIMISTIC_WRITE`, que serializa marcacoes
+  concorrentes e preserva a primeira leitura).
+- **Codigos**: prefixo `NTF` registrado (`PrefixoCodigoErro`, dono `notificacao`) e `NTF-400-001`/
+  `NTF-404-001` publicados no `CatalogoCodigosErro`; particao, convencao e enum do OpenAPI verdes. A
+  lista congelada (`CodigosPublicadosNaoMudamTest`) e o `CODIGOS-DE-ERRO.md` recebem os dois no
+  fechamento, como a manutencao da Sprint 37 prescreve.
+- **Dois defeitos achados pelos testes, corrigidos no codigo, nao no teste**:
+  1. A primeira marcacao devolvia `lidaEm` com nanossegundos do relogio Java e a segunda o valor
+     relido do PostgreSQL (microssegundos): o mesmo instante com dois valores para o cliente. O
+     `CentralNotificacoesIT` reprovou; os casos de uso do modulo passam a truncar o relogio em
+     microssegundos.
+  2. Em OpenAPI 3.1 o springdoc descarta `nullable = true` — o documento inteiro tem **zero**
+     ocorrencias de `null`, e o precedente do Pix (`mensagemPublica`) perde a marca do mesmo jeito.
+     Declarar `lidaEm`/`referencia` como `required` publicaria "string nao nula" para campo que chega
+     nulo; os dois ficaram fora do `required`, com a nulidade na descricao.
+- **Guarda existente ajustada**: `CatalogoCodigosErroContratoTest` fixa a contagem exata de rotas;
+  98 -> 101, as tres da central, conferidas no documento de runtime.
+- **Testes**: 35 novos — `CentralNotificacoesIT` (8, JWT e banco reais: A/B com conferencia de
+  `lida_em` no banco, e-mail fora da central, vazio, paginacao, 404/400, 401 nos tres, OpenAPI x
+  resposta real), `CentralNotificacoesPersistenceAdapterTest` (6), `NotificacaoControllerTest` (8),
+  casos de uso (11), truncagem (2). `./gradlew clean build` exit 0: **2414 testes, 0 falhas, 0 erros,
+  387 classes**; `spotlessCheck` exit 0.
+- **Mutacoes** (8 aplicadas, 8 mortas por comportamento, 0 por compilacao, restauracao por `cmp`):
+  listar, contar e marcar sem dono (cada uma morta pelo IT A/B e pelo teste do adapter); limite de
+  pagina em 101; leitura sobrescrevendo a primeira; relogio sem truncar; resposta vazando `canal`;
+  `lidaEm` declarado obrigatorio no OpenAPI.
+- **Code review do commit `e8e6b02` — hotfix de desempenho**: as consultas derivadas passavam o canal
+  como parametro (`canal=?`), e os indices da V61 sao parciais em `canal = 'IN_APP'`. Medido com
+  200 mil notificacoes em transacao revertida: com `plan_cache_mode = force_generic_plan`, listagem e
+  contagem faziam `Parallel Seq Scan` (custo ~12.000); com o literal no SQL, `Index Only Scan` em
+  `idx_notificacao_central` (39 e 195) e `Index Scan` em `idx_notificacao_nao_lidas` (12). Consultas da
+  central passaram a JPQL com `CanalNotificacao.IN_APP` literal, e o SQL emitido foi conferido
+  (`canal='IN_APP'`). Guarda nova com `StatementInspector`
+  (`consultasDaCentral_chegamAoBancoComOCanalLiteral`); a mutacao que volta ao canal parametrizado so
+  morre nela. Suite: **2415 testes, 0 falhas**; `spotlessCheck` exit 0.
 
 ## Task 38.5 - Absorver email de lockout
 
@@ -222,10 +371,44 @@ do login nao pode apagar a trilha; apenas `verify(provider)` nao prova persisten
 
 **Pronto quando**:
 
-- [ ] Email acionado com historico; falha nao desfaz bloqueio/audit.
-- [ ] `shared.email` removido e cobranca intacta.
+- [x] Email acionado com historico; falha nao desfaz bloqueio/audit.
+- [x] `shared.email` removido e cobranca intacta.
 
 **Commit sugerido**: `refactor(identity): registrar notificacoes de lockout no modulo transversal`
+
+**Resultado medido (2026-09-14)**:
+
+- **Desenho (ADR 0021 §1)**: `LockoutService.avaliarPosFalha` grava o audit `LOCKOUT` e publica
+  `identity.domain.event.ContaBloqueadaEvent(usuarioId, username, bloqueadaEm, lockoutMinutes)`, sem
+  chamar e-mail. `notificacao.application.listener.ContaBloqueadaListener` consome em `AFTER_COMMIT`
+  e chama `NotificarUsuarioUseCase.enviarEmail` com a origem `CONTA_BLOQUEADA` + instante do bloqueio
+  em UTC. Assunto e corpo **identicos** aos do `EmailService` antigo. O `identity` nao depende do
+  `notificacao`.
+- **Desvio declarado dos steps**: o step pedia conectar o `LockoutService` "ao contrato novo"; o ADR
+  aceito trocou a chamada direta por evento. Com `usuarioId` nulo (username inexistente, status que
+  nao conta falha) o evento nao e publicado; o audit continua.
+- **`shared.email` removido** (`EmailService`, `LogEmailService`, `LogEmailServiceTest`) depois de
+  `grep` sem consumidor em `src/main`, `src/test` e `*.yml`. Cobranca intocada.
+- **Ambiente**: o `LockoutLoginIT.limpar()` faz `usuarioRepository.deleteAll()` no `sep_test`; com o
+  historico gravado, travaria na FK. Passa a apagar `notificacao` antes. Unico IT que provoca lockout.
+- **Provas**:
+  - `LockoutLoginIT` (adapter de log real): bloqueio real grava **uma** linha `CONTA_BLOQUEADA` /
+    `EMAIL` / `SIMULADA`, mesmo com as tentativas barradas seguintes.
+  - `ContaBloqueadaNotificacaoIT` (provider simulado): com o provider lancando, as 5 tentativas
+    respondem `401` (nao `500`), a 6a `423`, o audit `LOCKOUT` persiste e o historico registra
+    `FALHOU` com `java.lang.IllegalStateException`; mesmo bloqueio publicado duas vezes (inclusive em
+    outro fuso) gera uma linha e um envio; bloqueio 45 min depois gera a segunda; evento de transacao
+    revertida nao gera nada.
+  - `LockoutServiceTest`: evento publicado com os quatro campos; sem usuario, audit sim e evento nao.
+  - `ContaBloqueadaListenerTest`: conteudo byte a byte, origem independente de fuso, falha nao sobe e
+    log sem endereco nem mensagem.
+- **Suite**: `./gradlew clean build` exit 0: **2421 testes, 0 falhas, 0 erros, 388 classes** (+7 novos,
+  -1 removido); `spotlessCheck` exit 0.
+- **Mutacoes** (6 aplicadas, 6 mortas por comportamento, 0 por compilacao, restauracao por `cmp`):
+  listener em `AFTER_COMPLETION`; lockout sem publicar; origem com fuso local; lockout na central em vez
+  de e-mail; listener repassando a excecao; evento publicado sem usuario. **A do listener repassando a
+  excecao so morre no teste unitario**: o Spring ja descarta excecao de listener `AFTER_COMMIT`, entao o
+  `catch` e defesa redundante — nao muda a resposta do login, so garante o log sem dado pessoal.
 
 ## Task 38.6 - Pix concluido gera notificacao in-app
 
@@ -246,10 +429,39 @@ Excecao de provider de email fica coberta tambem na Task 38.5; declarar essa dis
 
 **Pronto quando**:
 
-- [ ] Evento produz item para tomador correto sem envio externo adicional.
-- [ ] Commit, rollback e falha exercitados com transacoes efetivas.
+- [x] Evento produz item para tomador correto sem envio externo adicional.
+- [x] Commit, rollback e falha exercitados com transacoes efetivas.
 
 **Commit sugerido**: `feat(notificacao): avisar tomador sobre desembolso Pix concluido`
+
+**Resultado medido (2026-09-14)**:
+
+- **Gatilho**: `DesembolsoPixConcluidoListener` consome `PixTransferenciaConcluidaEvent` em `AFTER_COMMIT` e
+  chama `disponibilizarNaCentral(tomadorId, origem = transferenciaId, conteudo)`. Titulo
+  "Desembolso concluido", mensagem "A transferencia Pix do desembolso do seu contrato foi concluida." —
+  afirma so o estado confirmado, sem prometer credito na conta. Referencia `CONTRATO` + `contratoId`;
+  `externalId` nunca e lido. Sem `tomadorId`, nao ha destinatario e nada e gravado.
+- **Transicao real** (`DesembolsoPixConcluidoNotificacaoIT`, `sep_test`, JWT real):
+  `ConsultarStatusDesembolsoPixUseCase` -> `FakePixProvider` (`CONCLUIDA`) -> `SincronizadorStatusTransferencia`
+  -> evento do Spring -> listener. Depois do commit, o tomador ve o item nao lido na central com a
+  referencia do contrato, o contador vai a 1, outra conta continua em 0, a linha e `IN_APP`/`DISPONIVEL`
+  e o `EnvioEmailPort` nunca e chamado.
+- **Rollback da origem**: a mesma consulta dentro de transacao revertida deixa a transferencia
+  `SOLICITADA` e nenhuma notificacao; a porta de gravacao nem e chamada.
+- **Falha da notificacao**: como `IN_APP` nao tem provider, a falha provocada e da **porta de gravacao**
+  (`NotificacaoPort.registrarSeInedita` lancando `DataAccessResourceFailureException`, via
+  `@MockitoSpyBean`). O desembolso fica `CONCLUIDA` no banco e o audit `PIX_TRANSFERENCIA_CONCLUIDA`
+  continua gravado. A falha de provider de e-mail esta coberta na 38.5.
+- **FK no `sep_test`, medida**: nenhum IT existente conclui transferencia pelo sincronizador — os que
+  precisam de `CONCLUIDA` semeiam direto no dominio, sem evento. Na suite inteira o log "nao registrada"
+  so aparece nos tres testes que provocam a falha de proposito.
+- **Suite**: `./gradlew clean build` exit 0: **2429 testes, 0 falhas, 0 erros, 390 classes** (+8);
+  `spotlessCheck` exit 0.
+- **Mutacoes** (5 aplicadas, 5 mortas por comportamento, 0 por compilacao, restauracao por `cmp`):
+  gatilho por `EMAIL` em vez de `IN_APP` (mutacao obrigatoria da spec: morre no IT, pelo canal e pelo
+  envio); listener em `AFTER_COMPLETION`; listener repassando a excecao; origem pelo `externalId`;
+  destinatario trocado pelo contrato. A do listener repassando a excecao **so morre no unitario**, e agora
+  isso esta medido tambem no Pix: com a porta lancando, o `executar` do desembolso nao ve a excecao.
 
 ## Task 38.7 - Replay, minimizacao e mutacao
 
@@ -288,10 +500,53 @@ protecao real. Investigar sobreviventes ou justificar equivalencia; nao ocultar 
 
 **Pronto quando**:
 
-- [ ] Replay, concorrencia e payload comprovados; mutacoes obrigatorias mortas.
-- [ ] Matriz registra comandos, resultados, sobreviventes e restauracao.
+- [x] Replay, concorrencia e payload comprovados; mutacoes obrigatorias mortas.
+- [x] Matriz registra comandos, resultados, sobreviventes e restauracao.
 
 **Commit sugerido**: `test(notificacao): provar isolamento replay e minimizacao`
+
+**Resultado medido (2026-09-14)** — `NotificacaoReplayEMinimizacaoIT` (5 testes, `sep_test`, JWT real):
+
+- **Replay pelo publisher**: o mesmo `PixTransferenciaConcluidaEvent` publicado duas vezes, cada uma em
+  transacao confirmada, gera **uma** linha e `naoLidas = 1` pela API. A guarda do sincronizador nao
+  participa. Mesma origem para outro destinatario e outra origem para o mesmo destinatario sao
+  notificadas (A = 2, B = 1).
+- **Concorrencia**: duas publicacoes simultaneas do mesmo evento geram uma linha. **Limite medido, e
+  anterior a sprint**: cada publicacao segura a conexao da transacao de origem durante o `AFTER_COMMIT`
+  e pede outra para o `REQUIRES_NEW`. Com o pool de 5 do perfil `test` (timeout 15 s), oito threads
+  falham (`CannotCreateTransactionException`, 3 de 8) **tambem so com o listener de audit do Pix da
+  Sprint 20** (15,1 s); com audit e notificacao, 30,0 s; com duas threads, 0 falhas em 70 ms. A corrida
+  na constraint com oito threads segue provada sem transacao externa no
+  `NotificacaoPersistenceAdapterTest`. Follow-up: dimensionar pool >= 2x as requisicoes concorrentes que
+  publicam evento com listener `REQUIRES_NEW`, ou listener assincrono (exige rever ADR 0021 §6).
+- **Minimizacao por valor**: `externalId` com CPF (com e sem mascara), CNPJ, chave Pix e token Bearer;
+  username com CPF; excecao do provider com endereco, CPF e token. Nenhum desses valores aparece no
+  `row_to_json` da linha, na resposta HTTP da central nem nos logs do pacote `notificacao`. Allowlist
+  por tipo conferida coluna a coluna: Pix = texto fixo + origem `transferenciaId` + `CONTRATO`; lockout
+  = texto fixo + origem pelo instante UTC, sem referencia, `motivo_falha = java.lang.IllegalStateException`.
+
+**Matriz de mutacoes** (codigo de `1a6c72a`, um mutante por vez, ancora conferida por contagem unica,
+`./gradlew test --tests 'com.dynamis.sep_api.notificacao.*'`, restauracao por backup + `cmp`, resíduo
+de `notificacao` apagado entre rodadas; nenhum sobrevivente, nenhuma morte por compilacao):
+
+| Mutante | Aplicacao | Mortos por |
+|---|---|---|
+| Retirar dono da lista | JPQL `(n.usuarioId = :usuarioId or 1 = 1)` | IT A/B da central; adapter `listar_soInAppDoDono` |
+| Retirar dono do contador | idem na contagem de nao lidas | IT A/B; adapter; IT do Pix (contador da outra conta); IT de replay |
+| Retirar dono da marcacao | `findById` no lugar da busca com dono e canal | IT A/B; IT e-mail fora da central; adapter |
+| Desabilitar deduplicacao efetiva | V61 com indice **nao unico**, base descartavel `sep_test_mut38` (`indexdef` conferido) | replay pelo evento (2 linhas), paralelo (2), reavaliacao do bloqueio (2), adapter replay e concorrencia (8 linhas), esquema |
+| Retirar so a guarda da aplicacao | adapter repassa a violacao da chave | adapter replay e concorrencia; **ITs de evento seguem verdes** — defesa registrada: a constraint mantem uma linha e o listener engole a excecao |
+| Trocar `IN_APP` por `EMAIL` no gatilho | listener Pix chama `enviarEmail` | IT do Pix (canal e envio); IT de replay e payload; unitario |
+| Propagar falha para a origem | listener Pix em `BEFORE_COMMIT` **e** repassando a excecao | IT do Pix: desembolso deixa de ficar `CONCLUIDA`; unitario |
+| Permitir payload sensivel — Pix | `externalId` concatenado na mensagem | IT de payload; unitario |
+| Permitir payload sensivel — lockout | username concatenado no corpo | IT de payload; unitario |
+| Permitir payload sensivel — motivo | `getMessage()` no lugar do nome da classe | IT de payload; IT do lockout; unitarios do caso de uso |
+
+**Registro honesto de uma rodada invalida**: a primeira execucao da deduplicacao usou a base
+`sep_ensaio38_mut`, e os ITs recusam base cujo nome nao contem `sep_test` — metade das "mortes" foi
+pela guarda de ambiente. Refeita em `sep_test_mut38`; a tabela registra so a rodada valida (6 mortes
+por comportamento). A mutacao "propagar falha" so com `throw` no listener nao chega a origem (medido na
+38.5 e na 38.6); a que chega exige `BEFORE_COMMIT`.
 
 ## Task 38.8 - Documentacao operacional e consumidores
 
@@ -313,28 +568,73 @@ Central vazia para usuario sem desembolso e limite esperado deste primeiro gatil
 
 **Pronto quando**:
 
-- [ ] Docs e collections coerentes com comportamento e ADR.
-- [ ] Follow-ups tem destino; consumidores sabem qual contrato usar.
+- [x] Docs e collections coerentes com comportamento e ADR.
+- [x] Follow-ups tem destino; consumidores sabem qual contrato usar.
+
+**Resultado medido (2026-09-14)** — so `docs-SEP` (working tree), nenhum arquivo no `sep-api`:
+
+- `repos/sep-api/NOTIFICACOES.md` reescrito em dois caminhos: modulo `notificacao` (quem e avisado de que,
+  estados, contrato da central, idempotencia, tabela de falhas com o que o sistema garante e o que
+  **nao** garante, consulta de e-mails `PENDENTE`, dados que nunca entram, retencao de 5 anos com
+  procedimento manual, pendencias da Fase 5) e a regua de cobranca como legado, com a hierarquia de
+  titulos rebaixada. Nao anuncia reenvio, retry nem expurgo automatico.
+- `docs-sep/SEGURANCA.md` §lockout: o e-mail sai pelo modulo via `ContaBloqueadaEvent`; o texto antigo
+  sobre `LogEmailService` saiu. `repos/sep-api/PIX.md`: conclusao do desembolso gera aviso na central.
+- **Collections**: pasta "Notificacoes (Sprint 38)" com os tres requests e variavel `notificacaoId` no
+  Postman (`{{clienteToken}}`) e no Insomnia (`{{ clienteAccessToken }}`); 150 -> 153 requests, sem dado
+  pessoal. A primeira gravacao reformatou os dois JSON inteiros (indentacao detectada errada); restaurado
+  do backup e refeito com o formato original reproduzido byte a byte (indent 1, UTF-8, quebra final) —
+  diff final +201/-1.
+- `AI-ROADMAP.md`: linha do modulo `notificacao`, entrada em "Se a tarefa menciona" e bloco da Sprint 38,
+  como "implementada na branch, merge pendente". `PRD-FASE-4.md`: linha da 38 idem.
+- **Follow-ups com destino** (registro no `STATE.md` no fechamento): migrar a regua de cobranca e
+  remover o `CanalNotificacao` duplicado; revisao juridica de retencao e opt-out; cobertura por personas
+  (frente B); push (frente D, gated); adapter real de e-mail com envio assincrono; limite de pool do
+  padrao `AFTER_COMMIT` + `REQUIRES_NEW`; acentuacao do texto exibido na central (decisao de produto).
+- **Consumidores** (F-27/M-19): contrato no OpenAPI do runtime e na secao "Contrato da central" do
+  `NOTIFICACOES.md`; snapshot e telas ficam nas sprints consumidoras.
 
 **Commit sugerido**: `docs(notificacao): documentar historico canais e limites operacionais`
 (somente se houver arquivos no `sep-api`; git de `docs-SEP` permanece manual).
 
 ## Fechamento
 
-- [ ] `./gradlew clean build` e `./gradlew spotlessCheck` verdes na ponta final, testes >= baseline,
+- [x] `./gradlew clean build` e `./gradlew spotlessCheck` verdes na ponta final, testes >= baseline,
   zero falhas/erros. Reexecutar checks afetados se hooks modificarem arquivos.
-- [ ] Oito aceites da spec rastreados: gates (38.0/fechamento), migration (38.2), owner (38.4/38.7),
+- [x] Oito aceites da spec rastreados: gates (38.0/fechamento), migration (38.2), owner (38.4/38.7),
   replay (38.7), falha (38.5/38.6), payload (38.7), mutacoes (38.7), email/historico (38.5).
-- [ ] Regressoes de cobranca, Pix e autenticacao verdes; codigos publicados preservados. Se novos
+- [x] Regressoes de cobranca, Pix e autenticacao verdes; codigos publicados preservados. Se novos
   codigos existirem, incluir no registro/catalogo e lista congelada da Sprint 37.
-- [ ] Smoke contra `:8080` com dados controlados: concluir Pix, listar/contar como A, marcar lida,
+- [x] Smoke contra `:8080` com dados controlados: concluir Pix, listar/contar como A, marcar lida,
   recontar e negar acesso cruzado como B. Se inviavel, declarar motivo/limite conforme spec;
   nao chamar mock de smoke real.
-- [ ] Revisao final focada em transacoes, ownership, unique parcial, retencao e logs.
-- [ ] Criar descricao temporaria `repos/sep-api/SPRINT-38-PR.md` com commits, testes, migration,
+- [x] Revisao final focada em transacoes, ownership, unique parcial, retencao e logs.
+- [x] Criar descricao temporaria `repos/sep-api/SPRINT-38-PR.md` com commits, testes, migration,
   decisoes, limites e follow-ups; atualizar STATE e historico conforme AGENT.
 - [ ] Checkpoint antes de commit; push/PR pelo responsavel. Apos integracao, conferir conteudo
   de `develop`/`main` e eventual back-merge; nao presumir equivalencia por hash.
 
 **Resultado da preparacao**: roteiro disponivel. ADR, baseline, migration, codigo e testes ainda
 pendentes de execucao; nenhum resultado foi presumido a partir destes steps.
+
+**Resultado do fechamento (2026-09-14)**:
+
+- **Codigos congelados**: `NTF-400-001` e `NTF-404-001` em `CodigosPublicadosNaoMudamTest` (143 -> 145).
+  Mutacao: renomear `NTF-404-001` no fonte **e** no catalogo passa na particao e na convencao e so a lista
+  congelada reprova — a garantia que a Sprint 37 descreveu.
+- **Suite final** da branch: `./gradlew clean build` e `spotlessCheck` exit 0 (numeros no checkpoint do
+  commit de fechamento).
+- **Smoke real** contra `:8080` (perfil `dev`, `bootRun`): 20 de 20 verificacoes — cadastro e login de A e
+  B; transferencia `SOLICITADA` semeada por SQL e concluida por webhook `pix.transfer.status` assinado
+  com HMAC; aviso nao lido na central de A com a referencia do contrato e sem `externalId`; contagem 1,
+  marca, reconta 0, remarca com o mesmo `lidaEm`; B com lista vazia e `404 NTF-404-001` ao marcar o aviso
+  de A, que segue nao lido no banco; `400 NTF-400-001` com `size=101`; `401` sem token; bloqueio real de B
+  com `CONTA_BLOQUEADA`/`EMAIL`/`SIMULADA` e nenhum endereco gravado. Todos os dados do smoke apagados do
+  `sep_dev` (usuarios, notificacoes, transferencia, evento de webhook, tentativas e audit), conferido por
+  contagem.
+- **Revisao final**: um code review por Task (38.2 a 38.7), com hotfix na 38.4 (indices parciais); nenhum
+  achado bloqueante aberto.
+- **Merge conferido (2026-09-14)**: `develop` (#112 squash `9703432` + back-merge `98d427c`, `--cc` vazio) e
+  `main` (#113 `57b770b`) na mesma arvore `6b3aab2` da branch verificada `b54e692`; proximo back-merge
+  previsto limpo por `merge-tree`.
+- **Pendente do responsavel**: review humano de fim de sprint; destino do `SPRINT-37-PR.md`.

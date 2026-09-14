@@ -210,11 +210,19 @@ recebam dois pares validos.
   > ele precisa constar em `app.cors.exposed-headers` — sem isso o
   > `headers.get('Retry-After')` devolve `null` no `sep-app`/`sep-mobile`, que sao
   > origens distintas da API, e nenhum IT percebe (RestAssured nao aplica CORS).
-- Audit `LOCKOUT` + email sao emitidos **na transicao** (quando a falha
-  recem-registrada e a que trancou a conta), uma vez por evento de bloqueio,
-  em transacao propria (`REQUIRES_NEW`) — o registro da tentativa e o audit
-  sobrevivem ao rollback do `BadCredentialsException` do chamador (dev-local:
-  `LogEmailService` apenas registra; em ambientes reais, integrar SES/SMTP).
+- Audit `LOCKOUT` e emitido **na transicao** (quando a falha recem-registrada e a
+  que trancou a conta), uma vez por evento de bloqueio, em transacao propria
+  (`REQUIRES_NEW`) — o registro da tentativa e o audit sobrevivem ao rollback do
+  `BadCredentialsException` do chamador.
+- **E-mail de conta bloqueada pelo modulo `notificacao` (Sprint 38, ADR 0021).**
+  O `LockoutService` publica `ContaBloqueadaEvent` e o `ContaBloqueadaListener`
+  envia depois do commit, com o mesmo assunto e corpo de antes. Ate a Sprint 37 o
+  envio rodava dentro da transacao do audit: uma excecao do e-mail reverteria o
+  `LOCKOUT` e trocaria o `401` por `500`. Agora a tentativa fica no historico
+  (`notificacao`, canal `EMAIL`), deduplicada pelo instante do bloqueio, e a falha
+  do provider vira `FALHOU` sem tocar o login. O endereco nao e persistido nem
+  logado. Nao ha adapter real: `LogEnvioEmailAdapter` grava `SIMULADA`
+  (detalhe em [`NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md)).
 - **Risco residual aceito (Sprint 33)**: cumprir a regra documentada torna o
   sistema 2x mais permissivo contra brute force lento — para nunca bloquear,
   o atacante passa de 4 falhas/30 min (192/dia/conta) para 4 falhas/15 min

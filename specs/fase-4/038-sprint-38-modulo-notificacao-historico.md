@@ -5,7 +5,7 @@
 - **ID da Spec**: 038
 - **Titulo**: Sprint 38 - Tirar a notificacao de dentro do modulo `cobranca`, dar historico
   persistido e idempotencia, criar o canal `IN_APP` e provar o pipeline com **um** gatilho real
-- **Status**: **planejada** (criada em 2026-09-01)
+- **Status**: **MERGEADA develop+main** em 2026-09-14 (PR #112/#113, arvore `6b3aab2` conferida por conteudo); planejada em 2026-09-01. ADR [0021](../../adr/0021-modulo-notificacao-transversal.md) aceito
 - **Fase do produto**: Fase 4 - produto novo (modulo, tabela e endpoints novos); **migration `V61`**.
   **ADR previsto** — ver §Por que esta sprint exige ADR
 - **Trilha**: Backend (`sep-api`)
@@ -256,4 +256,39 @@ Abre a frente **A** do levantamento de notificacoes, ao lado da
 
 Steps de execucao criados em 2026-09-11:
 [`038-sprint-38-steps.md`](../../steps-fase-4/backend/038-sprint-38-steps.md).
-Implementacao ainda nao iniciada; decisoes do ADR ficam na Task 38.1.
+Decisoes do ADR tomadas na Task 38.1 (ADR 0021, aceito em 2026-09-14).
+
+## Resultado medido (2026-09-14)
+
+Branch `feature/sprint-38-notificacao-historico`, de `develop` `30c1f2b`, 8 commits (`30c1f2b..b54e692`); mergeada via PR #112 (`develop`, squash `9703432`) e #113 (`main`, `57b770b`), as tres pontas na arvore `6b3aab2`. Detalhe por Task nos steps.
+
+| Aceite | Evidencia |
+|---|---|
+| 1. Testes >= baseline, `clean build` e `spotlessCheck` verdes | **2318 -> 2434**, 0 falhas; exit 0 nos dois |
+| 2. `V61` aplica e reverte limpa, do zero e com dados | base vazia e copia do `sep_dev` em V60 (contagens identicas); reversao por `DROP` + historico do Flyway, schema identico ao pre-V61; reaplica limpa |
+| 3. Owner-scope nos tres endpoints | `CentralNotificacoesIT` (JWT e banco reais, `lida_em` de B conferido no banco); smoke `:8080` |
+| 4. Idempotencia por replay do evento | `NotificacaoReplayEMinimizacaoIT`: mesmo evento duas vezes e em paralelo -> uma linha, contador 1 |
+| 5. Falha da notificacao nao derruba a origem | Pix concluido com a gravacao falhando segue `CONCLUIDA` + audit; lockout com provider falhando responde `401`/`423` com audit |
+| 6. Payload minimizado | CPF, CNPJ, chave Pix e token dentro de `externalId`, username e excecao: ausentes do banco, do HTTP e dos logs do modulo |
+| 7. Mutacoes obrigatorias | matriz completa nos steps 38.7, todas mortas por comportamento |
+| 8. E-mail de lockout sai e aparece no historico | `LockoutLoginIT` e smoke: `CONTA_BLOQUEADA`/`EMAIL`/`SIMULADA` |
+
+**Premissas que o Gate 38.0 confirmou**: 71 eventos e 3 pontos de envio (o do lockout mudou de linha,
+`:155` -> `:175`); `tomadorId` e o id do usuario (`contrato.tomador_id REFERENCES usuario`).
+
+**Desvios declarados**: o lockout publica `ContaBloqueadaEvent` em vez de chamar o modulo (ADR 0021
+§1, evita ciclo `identity <-> notificacao`); o dominio do modulo nao usa JPA, ao contrario dos 12 modulos
+existentes; o adapter de log de e-mail ficou incondicional, porque o condicional derrubaria o contexto
+com `smtp-zenvia`.
+
+**Achados fora do plano**: `lidaEm` com nanossegundos contra microssegundos do banco; `nullable` que o
+springdoc 3.1 descarta (o `mensagemPublica` do Pix perde a marca do mesmo jeito); indices parciais
+inuteis com o canal como parametro (hotfix com literal, plano medido); limite de pool do padrao
+`AFTER_COMMIT` + `REQUIRES_NEW`, anterior a sprint.
+
+**Smoke real contra `:8080`** (perfil `dev`, dados controlados e apagados ao fim): cadastro e login de A
+e B, transferencia `SOLICITADA` semeada, webhook `pix.transfer.status` assinado -> `CONCLUIDA`; A lista
+1 aviso nao lido com a referencia do contrato e sem `externalId`, conta 1, marca, reconta 0, remarca com
+o mesmo `lidaEm`; B lista vazio e recebe `404 NTF-404-001` ao marcar o aviso de A, que segue nao lido
+no banco; `size=101` -> `400 NTF-400-001`; sem token `401`; bloqueio real de B -> `401` x5 e `423`, com
+`CONTA_BLOQUEADA`/`EMAIL`/`SIMULADA` e nenhum endereco gravado. **20 de 20 verificacoes.**

@@ -2807,3 +2807,56 @@ preve o resultado sem tocar no repo.
 **Estado final, conferido por conteudo**: `sep-app` develop `ac0e24a` == main `6a99521`; `sep-mobile`
 develop `ab3ae09` == main `c00901b`; CI verde nas quatro pontas. Nenhum PR do Dependabot aberto no app;
 cinco no mobile (majors de `vitest`, Ionic e jsdoc, o grupo minor/patch e o `fast-uri`).
+
+## Sprint 38 (backend) — Modulo de notificacao transversal, historico e canal in-app — MERGEADA develop+main (2026-09-14)
+
+Spec [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md), steps
+[`038`](../steps-fase-4/backend/038-sprint-38-steps.md), ADR
+[`0021`](../adr/0021-modulo-notificacao-transversal.md). Branch `feature/sprint-38-notificacao-historico`
+de `develop` `30c1f2b`, 8 commits (`30c1f2b..b54e692`). Mergeada via PR #112 (`develop`, squash `9703432`,
+back-merge `98d427c` limpo por `--cc`) e #113 (`main`, `57b770b`); as tres pontas na arvore `6b3aab2`,
+conferida por conteudo. Abre a frente A de notificacao.
+
+**O que entrou**: modulo `notificacao` com historico por usuario (`V61`), dominio sem JPA — primeiro
+modulo aderente ao ADR 0007 —, idempotencia por unique parcial `(tipo, origem_id, usuario_id) WHERE
+situacao <> 'FALHOU'` e central owner-scoped (`GET /notificacoes`, `GET /nao-lidas/contagem`,
+`POST /{id}/leitura`, codigos `NTF-400-001`/`NTF-404-001`). Dois gatilhos por evento em `AFTER_COMMIT`:
+Pix concluido vira aviso `IN_APP` ao tomador, e conta bloqueada vira e-mail com historico via
+`ContaBloqueadaEvent` — o `identity` nao depende do modulo. `shared.email` removido. A regua de cobranca
+**nao** migrou.
+
+**Decisoes do responsavel** (Task 38.1): retencao provisoria de 5 anos, central so `IN_APP`, gatilho por
+evento consumido pelo modulo, dominio sem JPA. Testes **2318 -> 2434**, 0 falhas; catalogo de codigos
+143 -> 145; rotas no OpenAPI 98 -> 101. Smoke real contra `:8080` com 20 de 20 verificacoes (webhook
+Pix assinado, isolamento A/B conferido no banco, bloqueio real com historico), dados apagados ao fim.
+Cerca de 40 mutacoes em sete campanhas, nenhum sobrevivente.
+
+**O que mais se paga**:
+
+- **O IT pegou dois defeitos que leitura nao pegaria**: `lidaEm` com nanossegundos na primeira marcacao
+  e microssegundos na segunda (relogio Java contra PostgreSQL), e `nullable = true` descartado pelo
+  springdoc em OpenAPI 3.1 — o documento inteiro tem zero marcas de nulidade, e o precedente do Pix ja
+  perdia a sua.
+- **Indice parcial com o valor do predicado como parametro nao serve.** Medido com 200 mil linhas: o
+  plano generico de prepared statement faz seq scan (custo ~12.000); com o literal no SQL, index only
+  scan (39). Guarda por `StatementInspector`, e a mutacao que volta ao parametro so morre nela.
+- **Limite de pool anterior a sprint, agora medido**: listener `REQUIRES_NEW` em `AFTER_COMMIT` segura a
+  conexao da origem e pede outra. Com pool 5, oito publicacoes simultaneas falham ja so com o audit do Pix
+  da Sprint 20; a notificacao dobra a espera.
+- **Guarda de ambiente contamina mutacao**: a primeira rodada de "dedup desligada" usou base cujo nome
+  nao continha `sep_test`, e os ITs morreram pela guarda, nao pelo comportamento. Refeita e registrada
+  como invalida.
+- **Ensaio de migration por variavel de ambiente precisa de `--rerun`**: o Gradle deu a task `test` como em
+  dia e o "upgrade" saiu verde com a base ainda em V60.
+- **Excecao de listener `AFTER_COMMIT` nao chega a origem**: medido no lockout e no Pix. A mutacao que
+  prova "falha propaga para a origem" precisa de `BEFORE_COMMIT`.
+
+**Ambiente**: `LockoutLoginIT` apaga `notificacao` antes do `deleteAll()` de usuario (FK). Nenhum outro IT
+conclui Pix pelo sincronizador — o log de notificacao nao registrada so aparece nos testes que provocam a
+falha. A memoria "collection defasada" estava errada desde a F-19; collections foram de 150 para 153.
+
+**Follow-ups**: migrar a regua de cobranca e remover o enum duplicado; revisao juridica de retencao e
+opt-out; pool de conexoes ou listener assincrono (rever ADR 0021 §6); adapter real de e-mail com envio
+assincrono (Fase 5); frente B por personas; push (frente D); acentuacao do texto da central (decisao de
+produto); CHECKs da `V61` sem barrar texto em branco; `toString` do `ContaBloqueadaEvent` com e-mail.
+Documentacao operacional em [`NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md).
