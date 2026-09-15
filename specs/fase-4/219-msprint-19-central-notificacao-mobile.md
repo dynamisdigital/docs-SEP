@@ -175,5 +175,30 @@ Abre a frente **A** do levantamento de notificacoes, ao lado da
 [`038`](./038-sprint-38-modulo-notificacao-historico.md) e da
 [`127`](./127-fsprint-27-central-notificacao-web.md).
 
-Steps criados just-in-time em `steps-fase-4/mobile/219-msprint-19-steps.md` quando a sprint for
-aprovada para execucao.
+Steps de execucao criados em 2026-09-14:
+[`219-msprint-19-steps.md`](../../steps-fase-4/mobile/219-msprint-19-steps.md).
+Planejamento preparado contra o contrato entregue pela 038/ADR 0021; baseline e Tasks ainda nao
+executadas. O helper da M-18 ja existe; os steps o reutilizam. Contagens antigas acima sao historicas:
+a referencia da M-18 e 575 testes/72 arquivos e 45 E2E, a remedir no Gate M-19.0.
+
+## O que a F-27 (web) aprendeu e vale para esta sprint (registrado em 2026-09-14)
+
+A [`127`](./127-fsprint-27-central-notificacao-web.md) foi mergeada em `develop` e `main` (PR #170/#171)
+consumindo o mesmo contrato. Nada do codigo do web e reaproveitavel no mobile, mas estes pontos custaram
+investigacao e valem como criterio no Gate M-19.0 e nas Tasks:
+
+- **Desconto duplo no contador** (achado P2 do review humano, depois de 59 mutacoes verdes): com duas
+  leituras em voo, a recontagem pedida pela primeira confirmacao pode ja incluir a segunda, e a segunda
+  confirmacao desconta de novo — o contador zera com aviso nao lido se a recontagem seguinte falhar. O
+  mesmo acontece no retry apos timeout que gravou. A regra que fechou: so ha baixa local quando nenhuma
+  contagem chegou depois do primeiro envio daquela leitura; na duvida o contador fica alto, nunca baixo.
+  Testar **duas leituras concorrentes com recontagem**, nao so cada guarda isolada.
+- **`404` neutro se prova comparando com o `404` de aviso inexistente**: o `path` do corpo repete a URL
+  da propria requisicao, no backend e em qualquer mock fiel.
+- **`lidaEm` chega com micro ou nanossegundos**; conferir o texto renderizado, nao so a presenca do rotulo.
+- **Mock fiel filtra dono e canal antes de paginar e contar**; o `404` de aviso de e-mail do proprio dono e
+  o mesmo de aviso alheio.
+- **Largura da tela e propriedade global**: a F-27 verificava o sino visivel e deixou passar 58px de
+  transbordo horizontal. Em mobile, medir `scrollWidth` da pagina, nao so o elemento novo.
+- **Smoke real contra `:8080`**: procedimento, dados semeados e limpeza transacional na skill de projeto
+  `sep-web-smoke-real-8080`, adaptavel ao `ionic serve`.

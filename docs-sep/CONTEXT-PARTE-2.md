@@ -2860,3 +2860,58 @@ opt-out; pool de conexoes ou listener assincrono (rever ADR 0021 §6); adapter r
 assincrono (Fase 5); frente B por personas; push (frente D); acentuacao do texto da central (decisao de
 produto); CHECKs da `V61` sem barrar texto em branco; `toString` do `ContaBloqueadaEvent` com e-mail.
 Documentacao operacional em [`NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md).
+
+## F-Sprint 27 (web) — Central de notificacao — MERGEADA develop+main (2026-09-14)
+
+Spec [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md), steps
+[`127`](../steps-fase-4/web/127-fsprint-27-steps.md). Branch `feature/fsprint-27-central-notificacao` do
+`sep-app`, de `develop` `ac0e24a` (arvore `7692e3b`, igual a `main`), 12 commits (`ac0e24a..164d351`), 21
+arquivos, +3046/-21. Mergeada via PR #170 (`develop`, squash `06e5b39`) e #171 (`main`, squash
+`af9d9b1`); as tres pontas na arvore `b8e6012`, conferida por conteudo. Lado web da frente A; consome o contrato da Sprint 38, conferida por arvore
+(`6b3aab2`) em `develop` e `main` do `sep-api`. Nada mudou em `sep-api`/`sep-mobile`.
+
+**O que entrou**: sino com contador de nao lidas no header (rotulo textual, `aria-current` na central),
+central paginada em `/app/notificacoes` com quatro superficies distintas e marcar como lida por gesto.
+Contador root vinculado a sessao, sem polling. Handlers MSW owner-scoped e snapshot OpenAPI renovado do
+runtime `develop@98d427c`. Vitest **875/97 -> 951/100**, Playwright **42 -> 48**, `contract:check`
+**85 -> 88 / 0**, audit 0 high. **67 mutantes distintos** em oito campanhas. Smoke real contra `:8080`
+**19/19**, com usuarios e avisos semeados e apagados ao fim (base de volta a 0 usuarios e 8335 registros
+de auditoria).
+
+**O que mais se paga**:
+
+- **Guarda que nao morre por mutacao sai.** A checagem de usuario na chegada da resposta e o contador de
+  versao do store pareciam defesa; os mutantes sobreviveram porque o `computed` por dono e o
+  `unsubscribe` ja cobriam. Removidas, e o store ficou menor e igualmente provado.
+- **happy-dom mente sobre foco em dois sentidos**: nao move foco no clique (um teste de "foco apos trocar
+  pagina" passava porque o `h1` seguia focado desde a abertura) e nao tira foco de botao desabilitado
+  (`aria-disabled` so fica provado pelo atributo). Foco se prova no Playwright, com teclado.
+- **Sobrepor leituras confirmadas vence cancelar requisicao**: lista pedida antes da confirmacao chega com
+  o aviso nao lido e nao pode ressuscita-lo.
+- **Neutralidade do `404` nao e "o id nao aparece no corpo"**: o `path` repete a URL da requisicao, no mock e
+  no `ApiExceptionHandler`. O teste certo compara com o `404` de um aviso inexistente.
+- **Handlers MSW precisam nascer com o primeiro consumidor**: o Vitest do web roda MSW com
+  `onUnhandledRequest: 'error'`, entao o mock foi adiantado da 127.5 para a 127.2.
+- **Horario em teste depende do fuso da maquina**: afirmar so a data.
+
+**Review humano de fim de sprint — dois P2 que as 59 mutacoes nao pegaram, corrigidos na branch**:
+
+- **Contador zerava com aviso nao lido** (`b7b0072`): com duas leituras em voo, a recontagem pedida pela
+  primeira confirmacao ja incluia a segunda, que descontava de novo; o mesmo no retry depois de timeout que
+  gravou. O store avanca um marco a cada contagem recebida e so desconta localmente quando nenhuma chegou
+  depois do primeiro envio daquele aviso. Na duvida o contador fica alto, nunca baixo.
+- **Sino agravava o transbordo horizontal** (`164d351`): 455 -> 513px a 390px. Sem reset global de
+  `box-sizing`, header e sidenav empilhada somavam o padding a `width: 100%` (o header estourava ate o
+  desktop, 1328px a 1280). `border-box` nos dois e, ate 600px, header sem nome/papel.
+- **A licao**: mutacao valida o que o teste pergunta. A campanha provava cada guarda isolada, mas nenhum teste
+  combinava duas leituras concorrentes com recontagem, e o e2e estreito verificava o sino, nao a largura do
+  documento.
+
+**Achado fora do plano, anterior a sprint e ainda aberto**: depois do login a 390px a navegacao SPA mantem
+`scrollY=160` com o header `sticky` em `top=-160` — some inteiro. Registrado no teste estreito e como
+follow-up.
+
+**Follow-ups**: Playwright no CI-APP (a prova de owner-scope do mock so roda localmente); header `sticky`
+fora da tela apos o login a 390px; consolidar as sete copias de `formatarDataHora`; contador apos `404` + "Atualizar lista" (decisao
+de produto). Documentacao operacional em [`repos/sep-app/README.md`](../repos/sep-app/README.md)
+§Central de notificacoes.

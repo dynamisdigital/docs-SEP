@@ -10,9 +10,47 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-14 (**Sprint 38 MERGEADA develop+main**, PR #112/#113, conferida por conteudo — modulo `notificacao`, ADR 0021, `V61`; antes: GHSA-hh8m e itens 3 e 4 do Dependabot fechados em 2026-09-11)._
+_Atualizado em: 2026-09-14 (**F-Sprint 27 MERGEADA develop+main** no `sep-app`, PR #170/#171, arvore `b8e6012` conferida por conteudo, 12 commits com as duas correcoes do review de fim de sprint; antes, no mesmo dia: **Sprint 38 MERGEADA develop+main**, PR #112/#113, conferida por conteudo — modulo `notificacao`, ADR 0021, `V61`; antes: GHSA-hh8m e itens 3 e 4 do Dependabot fechados em 2026-09-11)._
 
 ## Leia agora
+
+- **A F-Sprint 27 esta MERGEADA em `develop` e `main`** (2026-09-14): PR **#170** em `develop` (squash
+  `06e5b39`) e **#171** em `main` (squash `af9d9b1`). **Conferido por conteudo**: a branch verificada
+  `164d351`, `develop` e `main` apontam para a mesma arvore `b8e6012`, e o proximo back-merge sai limpo
+  (`merge-tree` exit 0, arvore = `develop`). Branch `feature/fsprint-27-central-notificacao`, de `develop`
+  `ac0e24a`, **12 commits**, 21 arquivos, +3046/-21; a branch remota ainda existe. Os dois PRs entraram
+  por **squash** — ver decisao (aa)/(aj). Primeira superficie de notificacao do web: sino com contador de nao lidas
+  no header, central paginada em `/app/notificacoes` e marcar como lida, sem polling. Vitest **875/97 ->
+  951/100**, Playwright **42 -> 48**, `contract:check` **85 -> 88 / 0**, audit 0 high, todos re-rodados
+  depois dos commits e de `npm ci` limpo. **67 mutantes distintos**. **Smoke real contra `:8080` 19/19**,
+  dados semeados e apagados (base de volta a 0 usuarios e 8335 registros de auditoria). Snapshot
+  OpenAPI renovado do runtime `develop@98d427c`, com o diff da 038 separado do acumulado da 037.
+  Descricao do PR em [`SPRINT-F-27-PR.md`](../repos/sep-app/SPRINT-F-27-PR.md); resultado na spec
+  [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md) §Resultado medido. A **M-19** segue
+  destravada e independente.
+- **O review humano de fim de sprint da F-27 achou dois P2, os dois corrigidos na branch**: (1) **contador
+  zerava com aviso nao lido** (`b7b0072`) — com duas leituras em voo, a recontagem da primeira confirmacao
+  ja incluia a segunda, que descontava de novo (e o mesmo no retry apos timeout que gravou); agora so ha
+  baixa local quando nenhuma contagem chegou depois do primeiro envio; (2) **o sino agravava o transbordo
+  horizontal** a 390px (455 -> 513px, `164d351`) — causa de fundo `width: 100%` + padding sem `border-box`
+  no header e na sidenav empilhada, que tambem estourava o desktop (1328px a 1280). Documento agora sem
+  rolagem horizontal de 360 a 1280px, com asserção no e2e. **Os dois escaparam as 59 mutacoes da sprint**:
+  a campanha provava cada guarda, mas nenhum teste combinava duas leituras concorrentes com recontagem, e o
+  e2e estreito verificava o sino, nao a largura. Mutacao valida o que o teste pergunta.
+- **Aprendizados da F-27, o que mais se paga**: (1) **guarda que nao morre por mutacao sai** — duas guardas
+  do store de contagem sobreviveram porque outras ja cobriam, e foram removidas; (2) **happy-dom nao move
+  foco no clique nem tira foco de botao desabilitado**: um teste de foco passava provando nada, e foco se
+  prova no Playwright com teclado; (3) **handlers MSW nascem com o primeiro consumidor**, porque o Vitest
+  do web roda MSW com `onUnhandledRequest: 'error'`; (4) **neutralidade do `404` e "igual ao de aviso
+  inexistente"**, nao "sem id no corpo" — o `path` repete a URL no mock e no backend; (5) **horario em teste
+  depende do fuso** (CI em UTC); (6) **sem reset global de `box-sizing`, `width: 100%` + padding estoura a
+  viewport** — medir a largura do documento, nao so a visibilidade do elemento.
+- **Decisoes pendentes do responsavel, da F-27**: (a) review humano de fim de sprint **feito**, dois P2
+  corrigidos antes do merge; (b) **header fora da tela apos o
+  login a 390px**, anterior a sprint: a navegacao SPA herda `scrollY=160` e o header `sticky` fica em
+  `top=-160` (o transbordo horizontal ja foi corrigido); (c) contador nao reconsulta ao "Atualizar lista"
+  depois de `404` (a spec fixa tres momentos; mudar e decisao de produto); (d) `SPRINT-F-28-PR.md` segue no
+  `docs-SEP`, uso no PR #151 nao confirmado (`gh` sem autenticacao).
 
 - **A Sprint 38 esta MERGEADA em `develop` e `main`** (2026-09-14): PR **#112** em `develop` (squash
   `9703432`, back-merge `98d427c` limpo por `--cc`) e **#113** em `main` (`57b770b`, squash). **Conferido
@@ -250,9 +288,11 @@ _Atualizado em: 2026-09-14 (**Sprint 38 MERGEADA develop+main**, PR #112/#113, c
   5. ~~**[`037`](../specs/fase-4/037-sprint-37-normalizacao-taxonomia-erro.md)** normaliza os 53
      excluidos.~~ **MERGEADA develop+main em 2026-09-10**, PR #110/#111 (ADR 0020). Este item seguia
      como pendente — decimo primeiro caso do padrao "o STATE declara pendente o que esta feito".
-  6. **Frente A de notificacao** — [`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)
-     (**preve ADR**, migration `V61`), [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)
-     e [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md). **Corre em paralelo.**
+  6. **Frente A de notificacao** — ~~[`038`](../specs/fase-4/038-sprint-38-modulo-notificacao-historico.md)~~
+     **MERGEADA develop+main em 2026-09-14** (PR #112/#113, ADR 0021, `V61`);
+     ~~[`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)~~ **MERGEADA develop+main em
+     2026-09-14** (PR #170/#171); [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md)
+     (M-19) **segue a executar**, e e a proxima sprint executavel da frente.
 - **Regra vigente**: **faixa de numeracao por fase** — Fases 1-4 em **0-49**, Fase 5 em **50-99**,
   dentro da banda por repo. Documentada em [`../AGENT.md`](../AGENT.md) §Numeracao de sprint e de spec.
 - **O code review de fechamento da 36 achou 7 codigos ambiguos ja publicados**, e a licao vale mais
@@ -267,6 +307,13 @@ _Atualizado em: 2026-09-14 (**Sprint 38 MERGEADA develop+main**, PR #112/#113, c
   `ModelResolver` sem `openapi31` apagando 21 `description` e 17 `example` em silencio).
 
 ## Onde estamos
+
+- **F-Sprint 27 (web) MERGEADA develop+main em 2026-09-14** (PR #170/#171, arvore `b8e6012`, conferida por conteudo) — central de notificacao
+  (Fase 4, produto novo; consome o contrato da Sprint 38; **sem endpoint, DTO de escrita, migration, regra
+  nova ou ADR**). Branch `feature/fsprint-27-central-notificacao` de `develop` `ac0e24a`, 12 commits.
+  Nada mudou em `sep-api`/`sep-mobile`. Detalhe em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §F-Sprint 27,
+  na spec [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md) §Resultado medido e em
+  [`repos/sep-app/README.md`](../repos/sep-app/README.md) §Central de notificacoes.
 
 - **Sprint 38 (backend) MERGEADA develop+main em 2026-09-14** (PR #112/#113, arvore `6b3aab2`, conferida por conteudo) — modulo de notificacao
   transversal, historico e canal in-app (Fase 4, produto novo; migration `V61`, ADR 0021). Nada mudou em
@@ -993,8 +1040,13 @@ _Atualizado em: 2026-09-14 (**Sprint 38 MERGEADA develop+main**, PR #112/#113, c
    **Proximas, em paralelo e destravadas**:
    [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md) (F-27, web) e
    [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md) (M-19, mobile), que consomem o
-   contrato da secao "Contrato da central" do [`NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md) e
-   renovam os snapshots OpenAPI nas proprias sprints (3 rotas e 2 codigos novos).
+   contrato da secao "Contrato da central" do [`NOTIFICACOES.md`](../repos/sep-api/NOTIFICACOES.md).
+   **Steps criados em 2026-09-14**: [`F-27`](../steps-fase-4/web/127-fsprint-27-steps.md) e
+   [`M-19`](../steps-fase-4/mobile/219-msprint-19-steps.md), seis Tasks cada. Web renova snapshot e declara
+   as tres operacoes no `contract:check`; mobile confere contrato manualmente, sem portar snapshot/checker
+   (fora da spec 219).
+   **F-27 MERGEADA develop+main em 2026-09-14** (PR #170/#171, arvore `b8e6012`, conferida por conteudo;
+   12 commits com as correcoes do review de fim de sprint). **M-19 segue a executar**, independente da F-27.
 
 6. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
    de `sep-api`):
@@ -1019,6 +1071,14 @@ _Atualizado em: 2026-09-14 (**Sprint 38 MERGEADA develop+main**, PR #112/#113, c
    §Gates externos).
 
 10. **Follow-ups tecnicos abertos** (nao bloqueiam).
+   **ABERTOS pela F-Sprint 27** (2026-09-14, web): (ak27) **Playwright fora do CI-APP** — a prova de
+   owner-scope do mock (6 das 8 mutacoes do mock sao invisiveis ao Vitest), a de teclado/foco e a de largura
+   em tela estreita rodam so localmente; (al27) **header `sticky` fora da tela apos o login a 390px**, anterior
+   a sprint (`scrollY` herdado da navegacao SPA; o transbordo horizontal foi corrigido na propria F-27); (am27) **sete copias de `formatarDataHora`** com `Intl.DateTimeFormat`, uma
+   por feature — consolidar junto de `idCurto`/`formatarMoeda`; (an27) contador desatualizado apos `404` +
+   "Atualizar lista" (decisao de produto); (ao27) `paginar` do mock devolve `totalPages: 1` com lista vazia,
+   o Spring devolve 0 — ninguem le hoje; (ap27) `aria-disabled` durante a leitura provado so pelo atributo
+   (happy-dom nao reproduz perda de foco, e o caminho de falha nao e provocavel no e2e sem override).
    **ABERTOS pela Sprint 38** (2026-09-14, backend): (aa38) **migrar a regua de cobranca** para o modulo
    `notificacao` e remover o `CanalNotificacao` duplicado (sincronia hoje travada por
    `CanalNotificacaoCompatibilidadeTest`); (ab38) **revisao juridica** da retencao provisoria de 5 anos e

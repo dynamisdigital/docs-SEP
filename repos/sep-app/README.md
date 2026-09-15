@@ -738,3 +738,81 @@ Sprint 31), fechando a pendencia de visibilidade web registrada no Gate F-18.0. 
 - A negacao da **rota** para role indevida nao e demonstravel no smoke offline (um `page.goto`
   reinicia o MSW e a sessao volta ao usuario default); e coberta nos testes de `roleGuard` e da
   configuracao de rotas no Vitest. O smoke cobre a ausencia do item de menu.
+
+## Central de notificacoes (F-Sprint 27)
+
+Primeira superficie de notificacao do web, sobre o modulo `notificacao` do `sep-api` (Sprint 38, ADR
+[0021](../../adr/0021-modulo-notificacao-transversal.md)): contador de nao lidas no header, central
+paginada e marcar como lida. So o canal `IN_APP` do usuario autenticado; com um gatilho ativo (desembolso
+Pix concluido, ao tomador), a central nasce quase vazia por desenho. Spec:
+[`127`](../../specs/fase-4/127-fsprint-27-central-notificacao-web.md); steps:
+[`127-fsprint-27-steps.md`](../../steps-fase-4/web/127-fsprint-27-steps.md). Doc do backend:
+[`NOTIFICACOES.md`](../sep-api/NOTIFICACOES.md).
+
+### Personas e acesso
+
+Qualquer usuario autenticado, sem `roleGuard`: o recorte e owner-scoped no backend (o dono vem do token).
+Nao ha persona documentada (P2 do `DIAGNOSTICO-PRODUTO.md`); a copy reusa o vocabulario do `sep-api`.
+
+### Rotas
+
+- Sino no header (`layout/header`), visivel so com sessao: `/app/notificacoes`, com `aria-current` dentro
+  da central.
+- `/app/notificacoes` -> central paginada (10 por pagina), filha do shell autenticado.
+
+### Contratos consumidos
+
+- `GET /notificacoes?page&size` -> `Page<NotificacaoResponse>` (le `content`, `totalElements`, `id`,
+  `titulo`, `mensagem`, `criadaEm`, `lidaEm`).
+- `GET /notificacoes/nao-lidas/contagem` -> `{ naoLidas }`.
+- `POST /notificacoes/{id}/leitura` sem corpo -> `NotificacaoResponse`; a tela ramifica o `404` (declarado
+  em `erros`). Nenhum parametro de dono; nenhum `Idempotency-Key` (o POST e idempotente).
+- Snapshot OpenAPI renovado do runtime `develop@98d427c` na F-27; `contract:check` 88 operacoes.
+
+### Decisoes
+
+- **Sem polling, sem tempo real.** O contador atualiza ao montar o shell, ao abrir a central e depois de
+  marcar leitura — garantia "read your writes", nao "read others' writes". A tela diz isso ao usuario.
+- **Contador root vinculado a sessao** (`core/notificacoes/notificacoes-nao-lidas.store.ts`): expoe so a
+  contagem do usuario logado, deduplica header e central na mesma abertura e descarta estado e consulta
+  em voo quando a sessao acaba (logout, `401`, `423`). Falha nunca afirma zero; reconsulta que falha nao
+  apaga numero conhecido.
+- **Leitura so por gesto.** Reentrada bloqueada por id; o item recebe o `lidaEm` do servidor; o contador
+  baixa uma vez, so sobre numero conhecido, e reconcilia; leituras confirmadas se sobrepoem a listas
+  pedidas antes. Falha nao confirma nada e libera retry com o mesmo id.
+- **Baixa local so quando a base e anterior a leitura.** O store avanca um marco a cada contagem recebida e
+  cada leitura guarda o marco do primeiro envio (`leituraEnviada`); se uma contagem chegou depois, ela pode
+  ja ter descontado a leitura, e so a reconsulta decide. Na duvida o contador fica alto, nunca baixo.
+- **`404` neutro**: aviso inexistente, de outra conta ou de e-mail tem a mesma mensagem, com "Atualizar
+  lista".
+- **Resposta malformada e erro, nunca vazio.** Vazio e `200` com `content: []`; pagina alem do fim nao
+  afirma que a central inteira esta vazia.
+- Titulo e mensagem renderizados como texto; `referencia` nao vira link; `tipo` nao e lido.
+
+### Estados e acessibilidade
+
+- Carregando, lista, vazio e erro com "Tentar novamente" sao superficies distintas.
+- Foco no `h1` ao abrir e depois de trocar pagina ou repetir; foco no titulo do aviso depois da leitura;
+  botao com `aria-disabled` durante a leitura para nao perder foco.
+- Regiao de status permanente anuncia a leitura e a pagina nova; `role="list"` explicito (WebKit).
+- Sino com rotulo textual ("Notificacoes, 3 nao lidas"); marcador `99+` e `?` quando indisponivel.
+
+### Testes
+
+- Vitest: service (contrato HTTP), store (sessao, dedup, baixa unica, desconhecida continua
+  desconhecida), header (rotulos, sem polling, `aria-current`) e central (superficies, erros, opcionais,
+  paginacao, leitura com respostas controladas por `HttpTestingController`).
+- `scripts/contract-check.spec.ts`: inventario das tres operacoes e reprovacao por rota ou `lidaEm`
+  ausentes no snapshot.
+- Playwright `e2e/notificacoes.spec.ts` contra os handlers **reais** do MSW: jornada do tomador,
+  owner-scope entre tomador e credora, fidelidade do mock ao contrato, teclado, URL direta e 390px.
+- Smoke real contra `:8080` executado na F-27 (19/19), com dados controlados e apagados.
+
+### Limitacoes da fase
+
+- Um gatilho ativo; preferencias, filtros, agrupamento, acoes em lote e push fora (frentes B, C e D).
+- Nulidade de resposta nao e verificada pelo `contract:check`.
+- Playwright fora do CI-APP: a prova de owner-scope do mock roda so localmente.
+- Header fora da tela apos o login a 390px: a navegacao SPA herda `scrollY` e o header `sticky` fica acima
+  da viewport (anterior a F-27, follow-up). O transbordo horizontal foi corrigido: `border-box` no header e na
+  sidenav empilhada e, ate 600px, header sem nome/papel.

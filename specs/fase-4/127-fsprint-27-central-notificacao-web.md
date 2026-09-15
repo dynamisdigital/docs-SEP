@@ -5,7 +5,8 @@
 - **ID da Spec**: 127
 - **Titulo**: F-Sprint 27 - Primeira superficie de notificacao do `sep-app`: contador de nao-lidas no
   shell autenticado, lista paginada, marcar como lida, e mock MSW fiel
-- **Status**: **planejada** (criada em 2026-09-01)
+- **Status**: **MERGEADA develop+main** (2026-09-14) — PR #170 em `develop` (squash `06e5b39`) e #171 em
+  `main` (`af9d9b1`), as tres pontas na arvore `b8e6012`, conferida por conteudo; criada em 2026-09-01
 - **Fase do produto**: Fase 4 - produto novo (tela e consumo de contrato novo); sem endpoint, DTO de
   escrita, migration ou regra nova. **Sem ADR previsto**
 - **Trilha**: Web (`sep-app`)
@@ -168,5 +169,86 @@ Abre a frente **A** do levantamento de notificacoes, ao lado da
 [`038`](./038-sprint-38-modulo-notificacao-historico.md) e da
 [`219`](./219-msprint-19-central-notificacao-mobile.md).
 
-Steps criados just-in-time em `steps-fase-4/web/127-fsprint-27-steps.md` quando a sprint for aprovada
-para execucao.
+Steps de execucao criados em 2026-09-14:
+[`127-fsprint-27-steps.md`](../../steps-fase-4/web/127-fsprint-27-steps.md).
+Planejamento preparado contra o contrato entregue pela 038/ADR 0021; baseline e Tasks ainda nao
+executadas. Os steps atualizam as ancoras de preparacao: shell em `layout/`, helper de erro existente
+e `typecheck:spec` integrado pela F-28.
+
+## Resultado medido (2026-09-14)
+
+Branch `feature/fsprint-27-central-notificacao` do `sep-app`, de `develop` `ac0e24a` (arvore `7692e3b`,
+identica a `main`), **12 commits** (`ac0e24a..164d351`), 21 arquivos, +3046/-21. **Mergeada** via PR **#170** em `develop` (squash `06e5b39`) e **#171** em `main` (squash `af9d9b1`), conferidos por conteudo: a branch verificada `164d351`, `develop` e `main` na mesma arvore `b8e6012`. Detalhe por Task no checklist dos steps.
+
+**Gate F-27.0**: a 038 conferida por conteudo em `sep-api` `origin/develop` `98d427c` e `origin/main`
+`57b770b`, as duas na arvore `6b3aab2`; baseline em `develop` com os dez gates exit 0.
+
+| Aceite | Evidencia |
+|---|---|
+| 1. `contract:check` 0 lacunas, operacoes so pelo que a 038 acrescentou | **85 -> 88 / 0**; snapshot renovado do runtime `develop@98d427c` com o diff separado por natureza: da 038 (+3 operacoes, +6 schemas, 2 codigos) e da 037 acumulada (+63 codigos) |
+| 2. Vitest e Playwright >= baseline, 0 falhas | Vitest **875/97 -> 951/100**; Playwright **42 -> 48**; re-rodados depois dos commits e de `npm ci` limpo |
+| 3. `lint`, `lint:scss`, `format:check`, `build`, `audit` verdes | exit 0; audit 0 high (4 moderate, iguais a baseline) |
+| 4. Acessibilidade | sino com rotulo textual ("Notificacoes, 3 nao lidas") e `aria-current` na central; foco no `h1` ao abrir e apos gesto; lista com `role="list"`; regiao de status permanente anuncia leitura e pagina nova; alvo de toque >= 24px a 390px; jornada inteira por teclado no Playwright |
+| 5. Quatro superficies distintas e testadas | carregando, lista, vazio (`200` com `content: []`) e erro com retry; pagina alem do fim nao afirma central vazia; resposta sem `content` e erro, nunca vazio |
+| 6. Mutacao obrigatoria | tirar a baixa do contador e trocar vazio por erro reprovam; **67 mutantes distintos** em oito campanhas (uma por Task e uma por correcao do review). Dois sobreviventes viraram remocao de guarda redundante, um revelou teste de foco vazio (corrigido) e um so morre no Vitest (`aria-disabled`) |
+| 7. Opcional ausente nao quebra a lista | `lidaEm`/`referencia` ausentes e nulos testados; mutante que acessa sem tolerar reprova |
+
+**Decisoes e desvios declarados**:
+
+- Servico em `core/notificacoes/`, e nao `core/api/` como a spec escrevia: e a convencao do repo
+  (`core/pix/`, `core/credora/`).
+- **Handlers MSW adiantados da 127.5 para a 127.2**: o Vitest roda o MSW com `onUnhandledRequest:
+  'error'`, e o contador geraria requisicao nao tratada em todo spec que renderiza o header. A 127.5
+  ficou com a prova Playwright contra os handlers reais.
+- **Contador root vinculado a sessao sem guardas redundantes**: a guarda por usuario na chegada da
+  resposta e o contador de versao sobreviveram a mutacao (o `computed` por dono e o `unsubscribe` ja
+  cobrem) e foram removidos. Guarda que nao morre por mutacao nao guarda.
+- **Leituras confirmadas sobrepostas as listas**: uma lista pedida antes da confirmacao nao ressuscita
+  aviso lido, sem depender de cancelar requisicao.
+- A tela ramifica o `404` da leitura por **status**, e nao pelo `codigo`: nesta rota ha uma condicao so,
+  e ler `NTF-404-001` seria consumidor decorativo. `erros: [404]` declarado; o `codigo` nao.
+- `tipo` nao e lido nem declarado no descriptor; a referencia nao vira link.
+
+**Achados fora do plano**:
+
+- O mutante de foco apos troca de pagina sobreviveu na primeira rodada: o happy-dom nao move foco no
+  clique, e o `h1` seguia focado desde a abertura. O teste foi corrigido, nao o mutante ignorado.
+- `disabled` no lugar de `aria-disabled` so morre pela assercao do atributo: o happy-dom nao tira foco de
+  botao desabilitado, e no Playwright o caminho de falha nao e provocavel sem override do mock.
+- Horario na lista depende do fuso (CI em UTC, dev em -03); os testes afirmam so a data.
+- **Header a 390px**: o documento ja tinha 455px sem o sino (o `Sair` ficava fora da tela), e a navegacao
+  SPA do login mantem `scrollY=160` com o header `sticky` em `top=-160`. O segundo defeito segue aberto e
+  registrado no teste estreito; o transbordo foi corrigido pelo review (abaixo).
+- O `lidaEm` real chega com microssegundos e o `Date` do browser formata certo.
+
+**Smoke real contra `:8080`** (perfil `dev`, `sep-api` na arvore `6b3aab2`, web sem MSW, dados controlados
+e apagados ao fim): dois usuarios de teste cadastrados; dois avisos `IN_APP` e um `EMAIL` semeados por SQL
+para A — a origem por evento ja foi provada no smoke da 038; este prova a UI no fio. Contador e lista de A
+sem o e-mail; `referencia`/`lidaEm` presentes e nulos; ordem `criadaEm` desc; leitura na tela, contador
+reconciliado e persistencia apos reload; remarcar preserva o `lidaEm`; e-mail do proprio A `404`; sem
+token `401`; `size=101` `400 NTF-400-001`; B com contador zero e central vazia, e `404 NTF-404-001` ao
+marcar o aviso de A, que seguiu nao lido no banco; nenhum erro de CORS. **19 de 19 verificacoes.** Base
+de volta a 0 usuarios, 0 notificacoes e 8335 registros de auditoria, o numero de partida.
+
+**Review humano de fim de sprint — dois P2, corrigidos na branch**:
+
+- **Contador zerava com aviso nao lido** (`b7b0072`): com duas leituras em voo, a recontagem pedida pela
+  primeira confirmacao podia ja incluir a segunda, e a segunda confirmacao descontava de novo; o mesmo no
+  retry depois de timeout que gravou. Reproduzido antes da correcao (`0` onde era `1`, `1` onde era `2`).
+  O store avanca um marco a cada contagem recebida, cada leitura guarda o marco do primeiro envio, e so ha
+  baixa local quando nenhuma contagem chegou depois dele. Na duvida o contador fica alto, nunca baixo.
+  Cinco mutantes mortos.
+- **Sino agravava o transbordo horizontal** (`164d351`): 455 -> 513px a 390px. Duas causas somadas: sem
+  reset global de `box-sizing`, header e sidenav empilhada usavam `width: 100%` + padding em `content-box`
+  (48px e 32px alem da viewport, o header tambem no desktop, 1328px a 1280) e o conteudo do header nao
+  cabia. `border-box` nos dois e, ate 600px, header sem nome/papel (a sidenav empilhada mostra o usuario).
+  Documento medido sem rolagem horizontal em 360, 390, 700 e 1280px; o e2e estreito exige
+  `scrollWidth <= 390`, e as tres mutacoes reprovam com a largura da propria causa (513, 422, 422).
+
+Depois das correcoes: bateria completa a partir de `npm ci` com Vitest 951/100, Playwright 48, contrato 88/0,
+audit 0 high e demais gates verdes.
+
+**Limites que seguem**: central so `IN_APP` e um gatilho ativo; contador nao e tempo real; nulidade de
+resposta fora do checker; **o Playwright nao roda no CI-APP**, entao a prova de owner-scope do mock so roda
+localmente.
+
