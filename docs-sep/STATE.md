@@ -10,9 +10,59 @@
 > ([`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md)). Mantenha este arquivo pequeno; ele nao duplica
 > historico nem PRD, so aponta.
 
-_Atualizado em: 2026-09-14 (**F-Sprint 27 MERGEADA develop+main** no `sep-app`, PR #170/#171, arvore `b8e6012` conferida por conteudo, 12 commits com as duas correcoes do review de fim de sprint; antes, no mesmo dia: **Sprint 38 MERGEADA develop+main**, PR #112/#113, conferida por conteudo — modulo `notificacao`, ADR 0021, `V61`; antes: GHSA-hh8m e itens 3 e 4 do Dependabot fechados em 2026-09-11)._
+_Atualizado em: 2026-09-15 (**Fase 4 ENCERRADA**, marco `v1.0-local` atingido: §41 do `PRD-FASE-4.md` preenchido com medicao nos remotos e [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) escrito para fechar o Epic 16; antes, no mesmo dia, **M-Sprint 19 MERGEADA develop+main** no `sep-mobile`, PR #183 em `develop` e #184/#185 em `main`, conferida por conteudo: `develop` e `main` na arvore `f9409ea`, com `src/`, `e2e/` e `android/` identicos a branch verificada `c3400eb`; gates re-rodados na ponta mergeada; antes, em 2026-09-14: **F-Sprint 27 MERGEADA develop+main** no `sep-app` e **Sprint 38 MERGEADA develop+main** — modulo `notificacao`, ADR 0021, `V61`)._
 
 ## Leia agora
+
+- **A Fase 4 esta ENCERRADA** (2026-09-15), com o marco `v1.0-local` atingido. Balanco em
+  [`PRD-FASE-4.md`](./PRD-FASE-4.md) §41, **medido nos remotos**: `develop` == `main` por arvore nos tres
+  repos (`sep-api` `6b3aab2`, `sep-app` `b8e6012`, `sep-mobile` `f9409ea`), CI verde nas seis pontas,
+  `npm audit --omit=dev` 0 nos dois fronts, e o proximo back-merge sai limpo com a mesma arvore nos tres.
+  **A medicao achou um item da DoD em aberto**: o Epic 16 exigia documento de planejamento AWS e so havia a
+  observabilidade da Sprint 22 e templates de deploy que falham de proposito. Por decisao do responsavel,
+  o documento foi escrito antes de fechar: [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) — topologia em
+  `sa-east-1`, secrets, backup, Flyway forward-only, deploy/rollback, IAM, alarmes, **pre-condicoes de codigo
+  P1-P9** e decisoes para o ADR de deploy/secrets. **Adiados** (nao pendentes): M-14/M-15 (gate macOS) e o
+  recorte mobile do Epic 15 (Gate M-16.0).
+- **O que o plano AWS achou no codigo, e muda a topologia**: desafios de MFA e step-up **em memoria** e rate
+  limit **por instancia**, e **quatro dos cinco jobs sem lock distribuido** — logo, **uma instancia do
+  `sep-api` por ambiente** ate P5-P7. E ainda: `apiBaseUrl` fixo em `localhost` nos dois fronts (o `sep-app`
+  nem tem environment de producao), datasource de `prod` sem TLS obrigatorio e Swagger publico em `prod`.
+  Nada disso foi corrigido; esta em §Proximo passo 10 (ABERTOS pelo encerramento da Fase 4).
+
+- **A M-Sprint 19 esta MERGEADA em `develop` e `main`** (2026-09-15): PR **#183** em `develop` (squash `b993c22`, arvore identica a da branch verificada `c3400eb`) e **#184**/**#185** em `main` (`7a25afa`/`8703076`, squash), back-merge `f79007d` limpo (`--cc` vazio).
+  **Conferido por conteudo**: `develop` e `main` apontam para a mesma arvore `f9409ea`, que difere da branch
+  verificada so em `package.json`, lock e `ci.yml` — os PRs do Dependabot #180 (`setup-java` v6) e #181
+  (`build-angular` 20.3.37, `@angular/cli` 21.2.24), que entraram em `develop` depois do #183; `src/`, `e2e/` e
+  `android/` identicos. **Gates re-rodados na ponta mergeada** (`develop` `f79007d`, `npm ci` limpo): Vitest
+  673/76, Playwright 62, format/lint/scss/build/audit, `cap sync` e APK, todos exit 0. Branch de `develop`
+  `60a0540`, **7 commits**, 25 arquivos, +3222/-8. Fecha o lado mobile da frente A, e com ela **a frente A nos
+  tres repos**: sino com contador no header de toda pagina autenticada, central paginada em
+  `/app/notificacoes`, marcar como lida e "Ver contrato" por rota interna validada; sem polling e **sem push**
+  (plugins, manifest e busca conferidos). Vitest **575/72 -> 673/76**, Playwright **45 -> 62**, audit 0 high,
+  `cap sync` e APK verdes, re-rodados sobre a arvore final. **83 mutantes**: 80 mortos, 2 equivalentes
+  declarados, 1 sem alvo depois de remover guarda redundante. **Conferencia no APK dev-offline em emulador
+  15/15** (toque real, back fisico) e **smoke real contra `:8080` 27/27**, base de volta a 0 usuarios, 0
+  notificacoes, 8335 registros de auditoria e 1963 `login_attempt`. Descricao do PR em
+  [`SPRINT-M-19-PR.md`](../repos/sep-mobile/SPRINT-M-19-PR.md); resultado na spec
+  [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md) §Resultado medido; doc em
+  [`repos/sep-mobile/README.md`](../repos/sep-mobile/README.md) §Central de notificacoes. O
+  `SPRINT-M-18-PR.md` foi removido depois de conferido que foi o corpo do PR #165. **Os dois PRs `develop ->
+  main` entraram de novo por squash**, a decisao (aa)/(aj) segue em aberto; o back-merge desta vez saiu limpo.
+  Review humano de fim de sprint nao registrado nesta sessao.
+- **Aprendizados da M-19, o que mais se paga**: (1) **no Ionic, a largura do documento nao mede transbordo do
+  conteudo** — o `ion-content` recorta, e so a medida no scroll element dele matou o mutante de item largo;
+  (2) **`page.route` nao ve requisicao atendida pelo service worker do MSW**, entao falha no e2e vem de flag
+  do mock; (3) **`toBe` entre elementos DOM estoura a memoria do worker quando falha** — exit 1 sem teste
+  reprovando nao e morte; (4) **o WebView Android e automatizavel sem aparelho** (emulador headless, `adb
+  input tap`, CDP cru; o `connectOverCDP` do Playwright nao serve), skill de projeto
+  `sep-mobile-apk-conferencia-emulador`; (5) **CORS do perfil `dev` aceita `localhost:8100`, nao
+  `127.0.0.1:8100`**.
+- **Correcao de registro**: `develop` do `sep-mobile` recebeu o `eslint-plugin-jsdoc` 64 (Dependabot #163,
+  2026-09-11) que este arquivo nao registrava; `develop` != `main` so por esse bump, sem pendencia.
+- **Decisoes pendentes do responsavel, da M-19**: marcador `?` e ausencia de marca visual para contagem
+  desatualizada; copy do vazio; foco no `h1`, e nao no "Ver contrato", ao voltar do contrato; contador apos
+  `404` + "Atualizar lista" (mesma decisao aberta na F-27). Lista completa na spec 219.
 
 - **A F-Sprint 27 esta MERGEADA em `develop` e `main`** (2026-09-14): PR **#170** em `develop` (squash
   `06e5b39`) e **#171** em `main` (squash `af9d9b1`). **Conferido por conteudo**: a branch verificada
@@ -26,8 +76,8 @@ _Atualizado em: 2026-09-14 (**F-Sprint 27 MERGEADA develop+main** no `sep-app`, 
   dados semeados e apagados (base de volta a 0 usuarios e 8335 registros de auditoria). Snapshot
   OpenAPI renovado do runtime `develop@98d427c`, com o diff da 038 separado do acumulado da 037.
   Descricao do PR em [`SPRINT-F-27-PR.md`](../repos/sep-app/SPRINT-F-27-PR.md); resultado na spec
-  [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md) §Resultado medido. A **M-19** segue
-  destravada e independente.
+  [`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md) §Resultado medido. A **M-19** foi
+  implementada em seguida (bloco acima).
 - **O review humano de fim de sprint da F-27 achou dois P2, os dois corrigidos na branch**: (1) **contador
   zerava com aviso nao lido** (`b7b0072`) — com duas leituras em voo, a recontagem da primeira confirmacao
   ja incluia a segunda, que descontava de novo (e o mesmo no retry apos timeout que gravou); agora so ha
@@ -235,8 +285,9 @@ _Atualizado em: 2026-09-14 (**F-Sprint 27 MERGEADA develop+main** no `sep-app`, 
   A remocao ja existe no working tree da branch local `fix/duplicatas-evil-merge-login-spec`,
   sem commit; preservada nesta sessao. Nenhum gate web foi reexecutado nesta conferencia.
 
-- **Fase corrente**: [`PRD-FASE-4.md`](./PRD-FASE-4.md). A Fase 5 segue **inteiramente gated** por
-  acesso externo (Celcoin, AWS, contas de loja).
+- **Fase corrente**: **Fase 4 encerrada em 2026-09-15** ([`PRD-FASE-4.md`](./PRD-FASE-4.md) §41). A
+  [`PRD-FASE-5.md`](./PRD-FASE-5.md) segue **inteiramente gated** por acesso externo (Celcoin, AWS, contas
+  de loja); o que anda sem acesso esta em §Proximo passo 8.
 - **Mudou em 2026-09-08 (segunda entrega do dia)**: a **F-Sprint 26 fechou na branch**
   `feature/fsprint-26-codigos-erro` do `sep-app` — 5 commits, 10 arquivos, +969/−458. **Push e PR
   confirmados em 2026-09-09**, com a ressalva acima. Vitest **833 -> 855 / 97**, Playwright **42**, `contract:check` **85 / 0**,
@@ -292,7 +343,7 @@ _Atualizado em: 2026-09-14 (**F-Sprint 27 MERGEADA develop+main** no `sep-app`, 
      **MERGEADA develop+main em 2026-09-14** (PR #112/#113, ADR 0021, `V61`);
      ~~[`127`](../specs/fase-4/127-fsprint-27-central-notificacao-web.md)~~ **MERGEADA develop+main em
      2026-09-14** (PR #170/#171); [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md)
-     (M-19) **segue a executar**, e e a proxima sprint executavel da frente.
+     (M-19) **MERGEADA develop+main em 2026-09-15** (PR #183, #184/#185). **A frente A esta fechada nos tres repos.**
 - **Regra vigente**: **faixa de numeracao por fase** — Fases 1-4 em **0-49**, Fase 5 em **50-99**,
   dentro da banda por repo. Documentada em [`../AGENT.md`](../AGENT.md) §Numeracao de sprint e de spec.
 - **O code review de fechamento da 36 achou 7 codigos ambiguos ja publicados**, e a licao vale mais
@@ -307,6 +358,17 @@ _Atualizado em: 2026-09-14 (**F-Sprint 27 MERGEADA develop+main** no `sep-app`, 
   `ModelResolver` sem `openapi31` apagando 21 `description` e 17 `example` em silencio).
 
 ## Onde estamos
+
+- **Encerramento da Fase 4 em 2026-09-15** — documental, sem codigo de app tocado: §41 do
+  [`PRD-FASE-4.md`](./PRD-FASE-4.md) preenchido a partir de medicao nos remotos (arvores, CI, audit,
+  back-merge) e [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) escrito para cumprir a DoD do Epic 16. Detalhe em
+  [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §Encerramento da Fase 4.
+
+- **M-Sprint 19 (mobile) MERGEADA develop+main em 2026-09-15** (PR #183 em `develop`, #184/#185 em `main`, arvore `f9409ea`,
+  conferida por conteudo) — central de notificacao (Fase 4, produto novo; consome o contrato da Sprint 38;
+  **sem endpoint, migration, regra nova, ADR, plugin ou permissao nativa**). Nada mudou em `sep-api`/`sep-app`.
+  Detalhe em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md) §M-Sprint 19 e na spec
+  [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md) §Resultado medido.
 
 - **F-Sprint 27 (web) MERGEADA develop+main em 2026-09-14** (PR #170/#171, arvore `b8e6012`, conferida por conteudo) — central de notificacao
   (Fase 4, produto novo; consome o contrato da Sprint 38; **sem endpoint, DTO de escrita, migration, regra
@@ -1046,7 +1108,9 @@ _Atualizado em: 2026-09-14 (**F-Sprint 27 MERGEADA develop+main** no `sep-app`, 
    as tres operacoes no `contract:check`; mobile confere contrato manualmente, sem portar snapshot/checker
    (fora da spec 219).
    **F-27 MERGEADA develop+main em 2026-09-14** (PR #170/#171, arvore `b8e6012`, conferida por conteudo;
-   12 commits com as correcoes do review de fim de sprint). **M-19 segue a executar**, independente da F-27.
+   12 commits com as correcoes do review de fim de sprint). **M-19 MERGEADA develop+main em 2026-09-15**
+   (PR #183, #184/#185, arvore `f9409ea`, conferida por conteudo e com gates re-rodados na ponta). **A frente A
+   de notificacao esta fechada nos tres repos**; o proximo item de rumo e o 8 (fechar a Fase 4).
 
 6. **Regularizar as duas pontas que a varredura de 2026-09-02 achou e a Sprint 35 nao tocou** (ela e
    de `sep-api`):
@@ -1062,15 +1126,40 @@ _Atualizado em: 2026-09-14 (**F-Sprint 27 MERGEADA develop+main** no `sep-app`, 
    **por IP** no login e no TOTP. Este item seguia pendente — decimo caso do padrao "o STATE declara
    pendente o que esta feito".
 
-8. **Decisao de rumo, depois da cadeia P1 e da frente de notificacao.** Fechar a Fase 4 preenchendo o
-   §41 do [`PRD-FASE-4.md`](./PRD-FASE-4.md) (hoje em branco) com status, PRs, back-merges e as
-   dividas aceitas — o recorte mobile do Epic 15 (Gate M-16.0) e o iOS do Epic 14 (M-14/M-15) entram
-   como **adiados**, nao como pendencias em aberto.
+8. ~~Fechar a Fase 4~~ **FEITO em 2026-09-15**: §41 do [`PRD-FASE-4.md`](./PRD-FASE-4.md) preenchido e
+   [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) escrito. **O que anda sem acesso externo**, em ordem sugerida
+   (decisao do responsavel): (1) **ADR de deploy/secrets AWS** a partir do §13 do plano; (2) sprint de
+   pre-condicoes **P1** (`apiBaseUrl` por ambiente, web e mobile), **P2** (TLS no datasource), **P3**
+   (Swagger em producao), **P4** (defaults `placeholder`) e **P8** (scan de dependencias no `sep-api`);
+   (3) decisao (aa)/(aj) sobre promocao por merge commit; (4) revisao do ADR 0018 (Angular 22) marcada para
+   **2026-09-30**; (5) a pedido, a rotina de **melhoria de fim de fase** do [`../AGENT.md`](../AGENT.md), que
+   comeca em modo plano.
 
 9. **M-14 (iOS) e M-15 (biometria iOS)** aguardam gate externo de hardware macOS 13+ (ver
    §Gates externos).
 
 10. **Follow-ups tecnicos abertos** (nao bloqueiam).
+   **ABERTOS pelo encerramento da Fase 4** (2026-09-15, [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) §12):
+   (P1) `apiBaseUrl` fixo em `http://localhost:8080` em todos os environments do `sep-app` e do
+   `sep-mobile`, sem environment de producao no web; (P2) `application-prod.yml` sem `sslmode`; (P3) Swagger UI
+   e `/v3/api-docs` publicos e ativos em `prod`; (P4) conferir que defaults `placeholder`/`change-me` nao sobem
+   fora de `dev`/`test`; (P5) `PostgresAdvisoryJobLock` so no `MarcarParcelaAtrasadaJob` — faltam
+   `MarcarParcelaInadimplenteJob`, `EscaladorCobrancaJob`, `ExpirarRenegociacaoJob` e
+   `VerificadorPendenciasJob`; (P6) `MfaChallengeService` e `StepUpChallengeService` em `ConcurrentHashMap`;
+   (P7) rate limit por instancia; (P8) `sep-api` sem scan de dependencias; (P9) `APP_TRUSTED_PROXIES` a
+   provar no `aws-develop`.
+   **ABERTOS pela M-Sprint 19** (2026-09-15, mobile): (a219) **Playwright fora do `CI-MOBILE`** — owner-scope
+   do mock, foco e largura so rodam localmente; (b219) **back fisico provado so no emulador**, sem teste
+   versionado e sem aparelho fisico; (c219) marcador `?` e ausencia de marca visual para contagem
+   `desatualizada` (produto); (d219) copy do vazio e concordancia de "pode estar desatualizado"; (e219) role
+   `CLIENTE` repetida entre a central e a rota do contrato; (f219) foco no `h1`, e nao no "Ver contrato", no
+   retorno; (g219) duas contagens na primeira entrada quando a primeira falha rapido; (h219) alvo de toque de
+   40px no sino e no tema; (i219) anuncio de leitura pode sair com outra pagina na tela; (j219) mock:
+   `mock.auth` antigo esconde as contas novas no dev-offline, ordenacao textual, `lidaEm` em UTC; (k219) linha
+   da M-18 no indice de specs ainda diz "planejada"; (l219) **audit do mobile 10 -> 11 moderate** na ponta
+   mergeada, 0 high: `express` passou a contar por depender do `qs` sob `webpack-dev-server` (nova advisory
+   GHSA-4mjr, so dev server; `npm audit fix` sem `--force` disponivel para o `qs`); (m219) PRs #184/#185
+   `develop -> main` de novo por squash — mais um caso da decisao (aa)/(aj).
    **ABERTOS pela F-Sprint 27** (2026-09-14, web): (ak27) **Playwright fora do CI-APP** — a prova de
    owner-scope do mock (6 das 8 mutacoes do mock sao invisiveis ao Vitest), a de teclado/foco e a de largura
    em tela estreita rodam so localmente; (al27) **header `sticky` fora da tela apos o login a 390px**, anterior

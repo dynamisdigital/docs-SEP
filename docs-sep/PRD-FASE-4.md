@@ -129,6 +129,9 @@ de estrategia de Pix avancado.
 
 **Status de partida**: apenas Observabilidade MVP (Sprint 22); sem conta/ambiente AWS.
 
+**Status de encerramento (2026-09-15)**: documento de planejamento entregue em
+[`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md), sem provisionar e sem custo. Ver §41.
+
 Nesta Fase 4 o Epic 16 entrega **apenas o documento de planejamento executavel** (sem provisionar);
 o provisionamento e o deploy remoto sao a Fase 5 (ver [`PRD-FASE-5.md`](./PRD-FASE-5.md)). Entregar:
 
@@ -221,7 +224,7 @@ em `steps-fase-4/{backend,web,mobile}/`, criados antes de cada execucao. A numer
 | M-16 | Epic 14/15 | Aporte/matching e Pix avancado visiveis ao usuario (quando backend existir) | [`216`](../specs/fase-4/216-msprint-16-aporte-pix-avancado-mobile.md) | concluida com **escopo reduzido** (PR #124/#125, 2026-07-20; Gate M-16.0: so a leitura owner-scoped de aportes — matching, aporte POST e chaves Pix exigem `FINANCEIRO`/`ADMIN`, role inexistente no `sep-mobile`) |
 | M-17 | Follow-up / correcao de divida | Jornada de conta bloqueada alcancavel e testada (o mock nunca produziu `423`, e as tres camadas que ja o tratam nao tinham teste), guard de reentrancia em `consultarStatusPix` nos **dois** componentes, landmark `main` duplicado dentro do `ion-content` em 4 telas, foco nos destinos de redirect e recuperacao do smoke `golden-path-mobile` (vermelho desde a **M-4**, nao desde a M-13) | [`217`](../specs/fase-4/217-msprint-17-followups-lockout-a11y-mobile.md) | concluida (PR #135 develop, squash `4c33367` / #136 main, `96cd13c`, 2026-07-31). As 6 tasks fecharam os 4 defeitos e a **suite e2e foi a 41 verdes, zero falhas** — o smoke estava vermelho ha 4 meses. Vitest 527/70 (era 503/68); `cap sync android` e `assembleDebug` verdes localmente. Os reviews acharam **3 defeitos fora do escopo**, corrigidos com teste: o `errorInterceptor` nao redirecionava se `clearSession()` rejeitasse; `consultarAportes` (M-16) prendia o card carregando para sempre na reentrada com Pix em voo; e o mock era mais permissivo que producao em politica de senha, ownership do `PATCH` e step-up. A copy de `/account-locked` teve cada afirmacao conferida contra o `sep-api` e **tres estavam erradas**. **Nao entrega escopo novo** |
 | M-18 | Produto novo / contrato de erro | Criar o `core/api/api-error.ts` que o `sep-mobile` **nunca teve**, unificar os **9** casts inline de `as ApiErrorResponse` espalhados por 8 arquivos (com duas assinaturas de tipo distintas convivendo) e trocar ramificacao por status por ramificacao por codigo | [`218`](../specs/fase-4/218-msprint-18-consumo-codigos-erro-mobile.md) | **MERGEADA develop+main** (PR #165/#166, 2026-09-09, conferida por conteudo; fecha a cadeia P1 nos tres repos). Planejada em 2026-09-01. Lado mobile da recomendacao **P1**. O mobile esta uma camada atras do web: sem helper de extracao, publicar o `codigo` sem consertar isso espalharia a leitura por mais nove lugares — por isso a ordem e **helper primeiro, consumo depois**, com definicao de pronto de **zero** ocorrencia de `as ApiErrorResponse` fora do helper. **Depende da 036 em `develop`**; independente da F-26. Fora de escopo declarado: portar o `contract:check` (follow-up proprio) — sem ele a sprint fica sem gate automatico de contrato, e isso e **declarado, nao disfarcado**. Consome M-18 e renumera o mobile da Fase 5 para **M-19/M-20** |
-| M-19 | Produto novo / notificacao | Central de notificacao no `sep-mobile`, com o contrato do `IN_APP` nascendo compativel com push **sem implementar push** | [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md) | **planejada** (2026-09-01). Lado mobile da frente **A**. **Depende da 038**; ordem preferida **apos a M-18**, que cria o `core/api/api-error.ts` inexistente — rodar antes faz o decimo cast inline. **Nenhuma permissao de notificacao e solicitada**: pedir antes de ter push queima a permissao uma vez so, e quem nega nao e perguntado de novo. Metade das personas ve central vazia (o unico gatilho e do tomador). Consome M-19 e provocou o **2o e ultimo recuo** do mobile da Fase 5 — a faixa por fase encerrou o mecanismo; a Frente C vive em **M-50/M-51** |
+| M-19 | Produto novo / notificacao | Central de notificacao no `sep-mobile`, com o contrato do `IN_APP` nascendo compativel com push **sem implementar push** | [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md) | **MERGEADA develop+main** (2026-09-15, PR #183 em `develop`, #184/#185 em `main`, arvore `f9409ea` conferida por conteudo; Vitest 575/72 -> 673/76, Playwright 45 -> 62, APK conferido no emulador 15/15, smoke real `:8080` 27/27, nenhuma permissao de push). Planejada em 2026-09-01. Lado mobile da frente **A**. **Depende da 038**; ordem preferida **apos a M-18**, que cria o `core/api/api-error.ts` inexistente — rodar antes faz o decimo cast inline. **Nenhuma permissao de notificacao e solicitada**: pedir antes de ter push queima a permissao uma vez so, e quem nega nao e perguntado de novo. Metade das personas ve central vazia (o unico gatilho e do tomador). Consome M-19 e provocou o **2o e ultimo recuo** do mobile da Fase 5 — a faixa por fase encerrou o mecanismo; a Frente C vive em **M-50/M-51** |
 
 **Decisoes de planejamento**:
 
@@ -287,6 +290,9 @@ Este e o corte que permite "implementar tudo menos AWS e Celcoin".
   admita a credora dona nesses contratos. Ate essa decisao, o recorte mobile do Epic 15 permanece
   **adiado por decisao formal**, nao em aberto.
 - Epic 16 entregue como **documento de planejamento** (arquitetura AWS + CI/CD de deploy).
+  **Atendido em 2026-09-15** por [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md): a medicao de encerramento
+  achou o item em aberto (so havia o incremento de observabilidade da Sprint 22 e templates de deploy
+  que falham de proposito), e o documento foi escrito antes de fechar a fase.
 - Follow-ups da Fase 3 saldados: step-up estrito server-side no aceite (**fechado na Sprint 27** —
   bloqueio de go-live que **nao** depende de acesso externo eliminado), renegociacao web, portas de
   persistencia de `cobranca`, refresh da collection Postman + hardening de tooling (**fechado na
@@ -361,6 +367,76 @@ Herdadas do [`AGENT.md`](../AGENT.md) e do PRD-FASE-3 §26:
 
 ## 41. Encerramento da Fase 4
 
-_A preencher quando a fase for concluida (status, PRs, back-merges, itens adiados e dividas
-aceitas), seguindo o padrao do PRD-FASE-3 §31. Ao fechar, confirmar que o marco `v1.0-local` (§37)
-esta atingido e que restam apenas os dois gates externos, escopo da Fase 5._
+**Status: concluida em 2026-09-15, marco `v1.0-local` atingido.** Restam os gates externos de §37
+(credenciais Celcoin/BaaS, conta AWS e host macOS 13+), escopo da Fase 5 ou desbloqueio por hardware. A
+conferencia foi feita **por conteudo nos remotos**, nao pelo registro: `git fetch` nos tres repos,
+arvores de `develop` e `main` comparadas, status do CI lido nas pontas e `npm audit` rodado sobre os
+lockfiles de `develop`.
+
+**Pontas dos repositorios no encerramento**
+
+| Repo | `develop` | `main` | Arvore | Ultima entrega | CI nas duas pontas |
+|---|---|---|---|---|---|
+| `sep-api` | `98d427c` | `57b770b` | `6b3aab2` (igual) | Sprint 38, PR #112/#113 | verde |
+| `sep-app` | `06e5b39` | `af9d9b1` | `b8e6012` (igual) | F-Sprint 27, PR #170/#171 | verde (CI-APP e CONTRACT-DRIFT) |
+| `sep-mobile` | `f79007d` | `8703076` | `f9409ea` (igual) | M-Sprint 19, PR #183 e #184/#185 | verde |
+
+**Back-merges**: as promocoes `develop -> main` da Fase 4 entraram na maior parte por **squash**, entao
+`main` nao e ancestral de `develop` em nenhum dos tres repos. O proximo back-merge sai limpo e com arvore
+igual a de `develop` nos tres (`git merge-tree` medido): nao ha conteudo a reconciliar, so historico. O
+back-merge do `sep-mobile` depois da M-19 (`f79007d`) foi feito e conferido com `--cc` vazio.
+
+**Definition of Done da `v1.0-local` (§37), medida**
+
+| Item | Resultado |
+|---|---|
+| Epic 13 web completo | atendido: renegociacao do tomador (F-16) e gaps financeiro/conciliacao (F-17), alem das jornadas da Fase 3 |
+| Epic 14 nativo com biometria | **Android atendido** (M-13, [ADR 0019](../adr/0019-baseline-capacitor-8-mobile.md)); **iOS e biometria nativa iOS adiados** (M-14/M-15), gate de hardware macOS 13+ |
+| Epic 15 sobre provider fake | atendido no backend (Sprints 29-32) e no web (F-18, F-20); **recorte mobile adiado por decisao formal** (Gate M-16.0: a credora autentica como `CLIENTE` e os contratos exigem `FINANCEIRO`/`ADMIN`) |
+| Epic 16 como documento de planejamento | atendido por [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) (2026-09-15) |
+| Follow-ups da Fase 3 | os quatro fechados: Sprint 27 (step-up estrito), Sprint 28 (portas de `cobranca`), F-16 (renegociacao web), F-19 (collections e tooling, Angular 22 adiado pelo [ADR 0018](../adr/0018-avaliacao-angular-22-no-web.md)) |
+| Suite verde, `main` == `develop`, audit de producao limpo | atendido: CI verde nas seis pontas; paridade por arvore nos tres repos; `npm audit --omit=dev` com 0 vulnerabilidades no `sep-app` e no `sep-mobile` |
+
+**O que a Fase 4 entregou alem do planejado** (sprints abertas durante a fase, todas mergeadas
+develop+main): o **par corretivo de lockout** (Sprint 33 + F-21, com a descoberta de que o lockout nunca
+bloqueava desde a Sprint 5) e seus follow-ups (Sprints 34 e 35, F-22 a F-24); a **divida de dependencias**
+nos dois fronts com gate de audit no CI (D-Sprint 1); **transparencia de cookies** no web (F-25); a
+**cadeia P1 do [`DIAGNOSTICO-PRODUTO.md`](./DIAGNOSTICO-PRODUTO.md)** — codigos de erro no fio, consumo e
+normalizacao (Sprints 36 e 37, [ADR 0020](../adr/0020-convencao-codigos-de-erro.md), F-26, F-28, M-18); e a
+**frente A de notificacao** nos tres repos (Sprint 38, [ADR 0021](../adr/0021-modulo-notificacao-transversal.md),
+F-27, M-19). O detalhe por sprint esta no §36 e em [`CONTEXT-PARTE-2.md`](./CONTEXT-PARTE-2.md).
+
+**Itens adiados** (nao sao pendencia em aberto da Fase 4):
+
+- **M-14 e M-15** (iOS nativo e biometria nativa iOS): gate de host macOS 13+; handoff em
+  `repos/sep-mobile/M-14-IOS-HANDOFF-MACOS.md`. Pode abrir a qualquer momento, sem esperar a Fase 5.
+- **Recorte mobile do Epic 15** (matching, registro de aporte e chaves Pix no app): exige ADR expondo a
+  persona operacional no mobile e revisao da spec 216, ou backend que admita a credora dona.
+- **Integracao real Celcoin/BaaS, provisionamento AWS, lojas e go-live**: Fase 5
+  ([`PRD-FASE-5.md`](./PRD-FASE-5.md)).
+- **Angular 22**: adiado pelo ADR 0018, com revisao marcada para 2026-09-30.
+
+**Dividas aceitas no encerramento**
+
+- **Pre-condicoes do primeiro deploy remoto** (P1 a P9 do [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md)
+  §12): `apiBaseUrl` fixo em `localhost` nos dois fronts, datasource de `prod` sem TLS obrigatorio,
+  Swagger publico em `prod`, conferencia de defaults `placeholder`, lock distribuido em quatro jobs,
+  desafios de MFA/step-up em memoria, rate limit por instancia, scan de dependencias no `sep-api` e
+  `APP_TRUSTED_PROXIES`. Enquanto P5 a P7 nao forem feitos, **uma instancia do `sep-api` por ambiente**.
+- **Audit completo com residual `moderate`** so em tooling: 4 no `sep-app` e 11 no `sep-mobile`, 0 high; o
+  aumento de 10 para 11 no mobile veio de advisory nova do `qs` sob o `webpack-dev-server`.
+- **Playwright fora do CI-APP e do CI-MOBILE**: owner-scope do mock, foco e largura so rodam localmente.
+- **`contract:check` so no web**; o mobile confere contrato manualmente.
+- **Personas documentadas e metricas de produto** (P2 e P3 do `DIAGNOSTICO-PRODUTO.md`): nao atacadas na
+  fase.
+- **Revisao juridica pendente**: texto da politica de privacidade (F-25), retencao provisoria de 5 anos das
+  notificacoes (ADR 0021) e `PLD.md`.
+- **Promocao `develop -> main` por squash**, contra o modelo de merge commit (decisao (aa)/(aj) em aberto no
+  [`STATE.md`](./STATE.md)).
+- Follow-ups menores por sprint seguem no `STATE.md` §Proximo passo 10, com dono e origem.
+
+**Encaminhamento**: a Fase 5 segue **inteiramente gated** por acesso externo. O que pode andar sem esses
+acessos: o ADR de deploy/secrets AWS ([`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) §13), as pre-condicoes
+P1 a P4, P8 e P9, as dividas acima e, a pedido, a rotina de **melhoria de fim de fase** do
+[`AGENT.md`](../AGENT.md), que comeca em modo plano a partir do
+[`TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md`](./TEMPLATE-PLANO-MELHORIA-FIM-DE-FASE.md).

@@ -70,7 +70,7 @@ Os templates antigos (anteriores a 2026-05-04) tinham `paths-filter` por subpast
 - Distribuicao Android exige secrets separados no environment `mobile-android-homologacao`.
 - iOS exige conta Apple Developer, certificados, provisioning profile e runner macOS.
 - AWS so pode iniciar apos conclusao completa da Sprint 3; preferencialmente apos Sprint 4.
-- Producao exige estrategia explicita de secrets, rollback, backup, migrations, controle de acesso, logs e monitoramento.
+- Producao exige estrategia explicita de secrets, rollback, backup, migrations, controle de acesso, logs e monitoramento — desenhada em [`PLANO-INFRA-AWS.md`](../PLANO-INFRA-AWS.md) (encerramento da Fase 4, 2026-09-15). Os templates `aws-deploy-*.yml` continuam falhando de proposito ate a Frente B da Fase 5 e o ADR de deploy/secrets AWS.
 
 ## Secrets previstos
 

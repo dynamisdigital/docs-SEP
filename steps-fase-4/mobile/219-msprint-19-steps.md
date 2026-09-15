@@ -1,7 +1,8 @@
 # Steps - M-Sprint 19 - Central de notificacao no mobile
 
 **Spec**: [`219`](../../specs/fase-4/219-msprint-19-central-notificacao-mobile.md).
-**Status**: planejada; steps criados em 2026-09-14. Nenhuma Task implementada ou baseline executada nesta preparacao.
+**Status**: **MERGEADA develop+main** (2026-09-15, PR #183 em `develop`, #184/#185 em `main`, arvore `f9409ea`,
+conferida por conteudo e com gates re-rodados na ponta mergeada). Resultado medido na spec [`219`](../../specs/fase-4/219-msprint-19-central-notificacao-mobile.md).
 **Destino**: `sep-mobile`; backend/web somente leitura; documentacao em `docs-SEP`, com Git manual.
 **Branch sugerida**: `feature/msprint-19-central-notificacao`, de `develop` atualizado e verificado.
 **Dependencia**: Sprint 38 integrada (registro de 2026-09-14), a reconferir por conteudo no Gate.
@@ -256,15 +257,29 @@ smokes anteriores de MFA/Pix nao provam a central mobile.
 
 ## Fechamento e rastreabilidade
 
-- [ ] 219.1: tipos, servico e conferencia do contrato; helper existente reutilizado.
-- [ ] 219.2: contador/acesso global, sessao isolada e abas preservadas.
-- [ ] 219.3: quatro superficies, pagina, foco e referencia interna segura.
-- [ ] 219.4: leitura no servidor, reflexo imediato, retry e reconciliacao sem dupla baixa.
-- [ ] 219.5: MSW owner-scoped e vazio provados no Playwright.
-- [ ] 219.6: gates, campanha restaurada, acessibilidade, APK e permissoes conferidos.
-- [ ] Revalidar apos commits que reescrevam arquivos via lint-staged e instalacao limpa.
-- [ ] Atualizar spec com resultados/desvios, `repos/sep-mobile/README.md`, `STATE.md`, historico,
-      indice de specs e `AI-ROADMAP.md`; Git documental manual.
-- [ ] Criar `repos/sep-mobile/SPRINT-M-19-PR.md`: commits, resultados, central IN_APP com um gatilho,
-      ausencia deliberada de push/contract:check/MSW no Vitest e smokes executados ou pendentes.
-- [ ] Checkpoint final antes de staging/commit; push/PR manuais, sem declarar merge antecipadamente.
+- [x] Gate M-19.0: 038 conferida por arvore (`6b3aab2`) em `sep-api` `develop`/`main`; `sep-mobile` `develop`
+      `60a0540` com baseline verde (Vitest 575/72, Playwright 45, audit 0 high, `cap sync` e APK);
+      `SPRINT-M-18-PR.md` removido depois de conferir que foi o corpo do PR #165.
+- [x] 219.1 (`c9ff7df`): tipos e servico em `core/notificacoes/` (desvio de `core/api/`), sem dono na query;
+      contrato conferido na fonte de `develop@98d427c`; 4 mutacoes mortas.
+- [x] 219.2 (`202f381`, hotfix `589a59f`): store root por dono, deduplicado e descartado no fim da sessao;
+      shell pede a contagem uma vez; sino no `HeaderMobileComponent` com rotulo textual e marcador; sem polling;
+      19 mutacoes mortas, uma delas depois do teste que faltava.
+- [x] 219.3 (`aabb07d`): quatro superficies, pagina por `totalElements`, geracao contra resposta antiga, foco
+      em `ionViewDidEnter`, referencia `CONTRATO` como rota interna validada; 16 mutacoes mortas.
+- [x] 219.4 (`d895357`): leitura so por gesto, trava por id, confirmacao so com mesmo `id` e `lidaEm`,
+      sobreposicao a listas pedidas antes, marco de contagem contra desconto duplo, situacao `desatualizada`;
+      25 mutantes: 23 mortos, 1 equivalente, 1 sem alvo depois de remover guarda redundante.
+- [x] 219.5 (`7af26a8`): handlers owner-scoped com contas semeadas e oito testes Playwright contra os
+      handlers reais, sem `page.route`; 11 mutacoes do mock mortas.
+- [x] 219.6 (`9cc2907`): nove testes de jornada/acessibilidade/largura e flag de falha no mock; 8 mutantes
+      (7 mortos, 1 equivalente); bateria inteira do Gate verde; APK dev-offline conferido no emulador 15/15;
+      ausencia de push conferida; smoke real contra `:8080` 27/27 com dados apagados.
+- [x] Revalidado sobre a arvore final depois de `npm ci` limpo: Vitest 673/76, Playwright 62, audit 0 high,
+      `cap sync` e `assembleDebug` verdes.
+- [x] Spec com resultados/desvios, `repos/sep-mobile/README.md`, `STATE.md`, historico, indice de specs e
+      `AI-ROADMAP.md` atualizados; Git documental manual.
+- [x] `repos/sep-mobile/SPRINT-M-19-PR.md` criado com resultados, commits e limitacoes.
+- [x] Checkpoint antes de cada commit e um code review por Task; push e PR manuais pelo responsavel. Merge
+      conferido por arvore: squash #183 com a arvore da branch (`c3400eb`); `develop` e `main` em `f9409ea`, que
+      so acrescenta os PRs do Dependabot #180/#181; back-merge `f79007d` com `--cc` vazio; gates re-rodados.

@@ -17,9 +17,16 @@ Ao iniciar a Fase 5, a Fase 4 entregou o marco `v1.0-local` (ver [`PRD-FASE-4.md
   escrito e coberto por WireMock, com Fake como default;
 - Epic 14 empacotado nativo (Android/iOS) com biometria nativa, **sem publicacao em lojas**;
 - Epic 16 entregue como **documento de planejamento** (arquitetura AWS + CI/CD de deploy), sem
-  provisionar;
+  provisionar — [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md), escrito no encerramento da Fase 4
+  (2026-09-15);
 - follow-ups de go-live saldados (incluindo step-up estrito server-side no aceite);
-- restam **dois gates externos**: credenciais Celcoin/BaaS e conta/ambiente AWS.
+- restam **dois gates externos**: credenciais Celcoin/BaaS e conta/ambiente AWS — mais o de host
+  macOS 13+ para iOS, que pode abrir antes.
+
+**Estado real no encerramento da Fase 4** ([`PRD-FASE-4.md`](./PRD-FASE-4.md) §41, 2026-09-15): o
+empacotamento nativo **iOS** e a biometria nativa iOS (M-14/M-15) ficaram **adiados** pelo gate de
+hardware, e o recorte mobile do Epic 15 ficou adiado por decisao formal (Gate M-16.0). O primeiro deploy
+remoto tem pre-condicoes de codigo medidas (P1 a P9 do `PLANO-INFRA-AWS.md` §12).
 
 A Fase 5 so pode **executar** cada frente apos o acesso correspondente ser liberado; ate la, cada
 frente permanece planejada.
@@ -66,6 +73,10 @@ mantido ate decisao de produto.
 ### Frente B - Infraestrutura AWS e deploy remoto (Epic 16 execucao)
 
 **Gate**: conta/ambiente AWS aprovado.
+
+**Plano de referencia**: [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) (topologia, secrets, backup,
+migrations, deploy/rollback, IAM, alarmes, pre-condicoes de codigo e decisoes para o ADR de deploy/secrets
+AWS; ordem de execucao no §14 dele).
 
 - provisionar a arquitetura desenhada na Fase 4: VPC, EC2 (aplicacao), RDS for PostgreSQL, IAM, SNS,
   alarmes; regiao `sa-east-1`;

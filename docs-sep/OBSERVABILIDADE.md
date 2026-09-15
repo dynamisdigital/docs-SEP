@@ -214,7 +214,9 @@ Alarmes:
 
 ## Pendencias
 
-- Provisionar EC2, IAM, log groups, SNS e alarmes no Epic 16.
+- Provisionar EC2, IAM, log groups, SNS e alarmes no Epic 16 — desenho em
+  [`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md) §9 e §10, incluindo os alarmes de ALB, EC2, RDS e custo que
+  so existem com a infra, e o `LOG_PATH` por servico na EC2 compartilhada (§4).
 - Validar o agent em ambiente remoto real.
 - Definir SLOs antes de criar alarmes de latencia/availability.
 - Reavaliar OpenTelemetry quando houver multiplos processos ou necessidade de spans.

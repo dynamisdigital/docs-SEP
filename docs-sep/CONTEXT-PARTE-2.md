@@ -2915,3 +2915,78 @@ follow-up.
 fora da tela apos o login a 390px; consolidar as sete copias de `formatarDataHora`; contador apos `404` + "Atualizar lista" (decisao
 de produto). Documentacao operacional em [`repos/sep-app/README.md`](../repos/sep-app/README.md)
 §Central de notificacoes.
+
+## M-Sprint 19 (mobile) — Central de notificacao — MERGEADA develop+main (2026-09-15)
+
+Spec [`219`](../specs/fase-4/219-msprint-19-central-notificacao-mobile.md), steps
+[`219`](../steps-fase-4/mobile/219-msprint-19-steps.md). Branch `feature/msprint-19-central-notificacao` do
+`sep-mobile`, de `develop` `60a0540`, 7 commits (`60a0540..9cc2907`), 25 arquivos, +3222/-8, arvore
+`c3400eb`. Mergeada via PR #183 (`develop`, squash `b993c22` com a mesma arvore) e #184/#185 (`main`, squash);
+`develop` e `main` na arvore `f9409ea`, que so acrescenta os PRs do Dependabot #180/#181; back-merge `f79007d`
+limpo; gates re-rodados na ponta. Fecha a frente A nos tres repos. Lado mobile da frente A; consome o contrato da Sprint 38,
+conferida por arvore (`6b3aab2`) em `develop` e `main` do `sep-api`. Nada mudou em `sep-api`/`sep-app`.
+
+**O que entrou**: sino com contador no header de toda pagina autenticada, central paginada em
+`/app/notificacoes` com quatro superficies, marcar como lida por gesto e "Ver contrato" por rota interna
+validada. Store root por dono, sem polling, com situacao `desatualizada` e baixa coordenada por marco de
+contagem (a correcao do P2 da F-27, testada desde a primeira versao). Handlers MSW owner-scoped com tres
+contas. Vitest **575/72 -> 673/76**, Playwright **45 -> 62**, audit 0 high, `cap sync` e APK verdes.
+**83 mutantes**: 80 mortos, 2 equivalentes declarados, 1 sem alvo depois de remover guarda redundante.
+Conferencia no APK dev-offline em emulador **15/15** (toque real, back fisico) e smoke real contra `:8080`
+**27/27**, com base de volta a 0 usuarios, 0 notificacoes, 8335 registros de auditoria e 1963
+`login_attempt`. Nenhuma permissao de push: plugins, manifest e busca conferidos.
+
+**O que mais se paga**:
+
+- **No Ionic, a largura do documento nao mede transbordo do conteudo.** O `ion-content` recorta: um item de
+  420px deixou `scrollWidth` do documento igual a tela e o teste verde. So a medida no scroll element do
+  `ion-content` matou o mutante. A licao da F-27 ("medir o documento") nao transfere literalmente.
+- **`page.route` nao ve requisicao atendida pelo service worker do MSW.** Falha no e2e vem de flag do mock.
+- **`toBe` entre elementos DOM, quando falha, estoura a memoria do worker**: exit 1 por OOM sem teste
+  reprovando. Exit 1 nao e morte; comparar booleano.
+- **O WebView Android e automatizavel sem aparelho**: emulador headless, `adb input tap` e CDP cru no socket
+  `webview_devtools_remote`. O `connectOverCDP` do Playwright nao serve. Procedimento na skill de projeto
+  `sep-mobile-apk-conferencia-emulador`.
+- **Guarda que nao morre por mutacao sai**, de novo: a guarda de dono em `registrarLeitura` era coberta pelo
+  `contagem` computado e pelo `carregar` seguinte.
+- **CORS do perfil `dev` aceita `localhost:8100`, nao `127.0.0.1:8100`**: o smoke real do mobile precisa da
+  origem `localhost`.
+
+**Correcao de registro**: `develop` do `sep-mobile` tinha o `eslint-plugin-jsdoc` 64 (Dependabot #163,
+2026-09-11) que o `STATE.md` nao registrava; nao e pendencia, so diferenca de conteudo com `main`.
+
+**Follow-ups**: marcador `?` e ausencia de marca visual para `desatualizada`; copy do vazio; role
+`CLIENTE` repetida entre a central e a rota do contrato; foco no `h1` ao voltar do contrato; alvo de toque
+de 40px no header; contador apos `404` + "Atualizar lista" (decisao aberta tambem no web); back fisico
+sem teste versionado; Playwright fora do `CI-MOBILE`. Documentacao operacional em
+[`repos/sep-mobile/README.md`](../repos/sep-mobile/README.md) §Central de notificacoes.
+
+## Encerramento da Fase 4 — marco `v1.0-local` atingido (2026-09-15)
+
+Sessao documental, sem codigo de app tocado. O §41 do [`PRD-FASE-4.md`](./PRD-FASE-4.md) foi preenchido a
+partir de **medicao nos remotos**, e nao do registro: `git fetch` nos tres repos, arvores de `develop` e
+`main` comparadas (`sep-api` `6b3aab2`, `sep-app` `b8e6012`, `sep-mobile` `f9409ea`, iguais nas duas pontas),
+status do CI lido pela API publica nas seis pontas (todos verdes), `npm audit --omit=dev` sobre os lockfiles
+de `develop` (0 nos dois fronts) e `git merge-tree` provando que o proximo back-merge sai limpo com a mesma
+arvore nos tres.
+
+**A medicao achou a DoD incompleta**: o Epic 16 exigia documento de planejamento AWS e ele nao existia — so
+a observabilidade da Sprint 22 e os templates `aws-deploy-*.yml`, que falham de proposito ate "topology and
+rollback are documented". Por decisao do responsavel, o documento foi escrito antes de fechar:
+[`PLANO-INFRA-AWS.md`](./PLANO-INFRA-AWS.md).
+
+**O que o plano mediu no codigo e muda a infra**: desafios de MFA e step-up em `ConcurrentHashMap`, rate limit
+por instancia e quatro dos cinco jobs sem `PostgresAdvisoryJobLock` — **uma instancia do `sep-api` por
+ambiente** ate isso mudar; documentos KYC/KYB e contrato assinado no banco (sem S3 hoje); Flyway no boot e
+forward-only; `apiBaseUrl` fixo em `localhost` nos dois fronts; datasource de `prod` sem TLS obrigatorio;
+Swagger publico em `prod`; origem `https://localhost` do app Android no CORS. As nove pre-condicoes viraram
+P1-P9 no `STATE.md`.
+
+**Adiados**: M-14/M-15 (gate macOS 13+) e o recorte mobile do Epic 15 (Gate M-16.0). **Dividas aceitas**:
+P1-P9, residual `moderate` de tooling (4 web, 11 mobile), Playwright fora dos CIs dos fronts, personas e
+metricas de produto (P2/P3 do diagnostico), revisoes juridicas pendentes e promocao por squash.
+
+**Licao**: o `STATE.md` e o §36 nunca apontaram o Epic 16 como pendente — a DoD ficou silenciosamente
+incompleta porque o entregavel nao tinha sprint no mapa. Item de Definition of Done sem sprint dona precisa
+ser medido no fechamento, nao presumido pelo mapa.
+

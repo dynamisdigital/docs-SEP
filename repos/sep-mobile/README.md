@@ -566,3 +566,83 @@ Spec e steps:
 - [`specs/fase-4/213-msprint-13-empacotamento-nativo-android.md`](../../specs/fase-4/213-msprint-13-empacotamento-nativo-android.md)
 - [`steps-fase-4/mobile/213-msprint-13-steps.md`](../../steps-fase-4/mobile/213-msprint-13-steps.md)
 - [`adr/0019-baseline-capacitor-8-mobile.md`](../../adr/0019-baseline-capacitor-8-mobile.md)
+
+## Central de notificacoes (M-Sprint 19)
+
+Primeira superficie de notificacao do mobile, sobre o modulo `notificacao` do `sep-api` (Sprint 38, ADR
+[0021](../../adr/0021-modulo-notificacao-transversal.md)): contador de nao lidas no header de toda pagina
+autenticada, central paginada, marcar como lida e "Ver contrato". So o canal `IN_APP` do usuario
+autenticado; com um gatilho ativo (desembolso Pix concluido, ao tomador), quem so atua como credora ve a
+central vazia — caso comum, nao de borda. Spec:
+[`219`](../../specs/fase-4/219-msprint-19-central-notificacao-mobile.md); steps:
+[`219-msprint-19-steps.md`](../../steps-fase-4/mobile/219-msprint-19-steps.md). Doc do backend:
+[`NOTIFICACOES.md`](../sep-api/NOTIFICACOES.md). Par web: `repos/sep-app/README.md` §Central de
+notificacoes.
+
+**Status**: **mergeada** em `develop` (PR #183) e `main` (PR #184/#185) em 2026-09-15, conferida por conteudo.
+
+### Rotas e acesso
+
+- Sino no `HeaderMobileComponent` (`layout/header-mobile`), presente nas paginas autenticadas de tomador,
+  credora e telas com Pix embutido; so com sessao. Toque navega para `/app/notificacoes`.
+- `/app/notificacoes` -> central (10 por pagina), filha do shell, sem guarda de tomador ou credora: o
+  recorte e owner-scoped no backend.
+- "Ver contrato" -> `/app/formalizacao/contratos/:contratoId`, montada no app (nunca URL do backend), so
+  para referencia `CONTRATO` com id em formato de segmento seguro e usuario `CLIENTE`, a role da rota de
+  destino.
+
+### Contratos consumidos
+
+- `GET /notificacoes?page&size` -> `Page<NotificacaoResponse>` (`content`, `totalElements`).
+- `GET /notificacoes/nao-lidas/contagem` -> `{ naoLidas }`.
+- `POST /notificacoes/{id}/leitura` sem corpo -> `NotificacaoResponse`; `404` ramificado por status.
+- Nenhum parametro de dono, `Idempotency-Key` ou step-up. Sem `contract:check` no mobile: contrato conferido
+  na fonte do `sep-api` e no smoke real.
+
+### Decisoes
+
+- **Sem polling, sem tempo real.** O `ShellComponent` pede a contagem ao montar; a central reconsulta lista e
+  contagem a cada entrada na pilha do Ionic (`ionViewWillEnter`) e depois de confirmar leitura.
+- **Store root por dono** (`core/notificacoes/notificacoes-nao-lidas.store.ts`): expoe so a contagem do
+  usuario logado, deduplica consultas em voo, descarta resposta de geracao vencida (o `firstValueFrom` nao
+  cancela) e apaga estado no fim da sessao. Situacoes: `carregando`, `indisponivel`, `conhecida` e
+  `desatualizada` (numero ja recebido cuja reconsulta falhou). Falha nunca afirma zero.
+- **Leitura so por gesto**, com trava por id; so o `200` com o mesmo `id` e `lidaEm` confirma. Leituras
+  confirmadas se sobrepoem a listas pedidas antes delas.
+- **Baixa local so quando a base e anterior a leitura**: cada leitura guarda o marco de contagem do primeiro
+  envio (`leituraEnviada`); se uma contagem chegou depois, so a reconsulta decide. Na duvida o contador fica
+  alto, nunca baixo.
+- **Resposta malformada e erro, nunca vazio**; pagina alem do fim oferece a ultima pagina valida.
+- Titulo e mensagem renderizados como texto; data invalida mostra o texto recebido.
+- **Sem push**: nenhum plugin, token, permissao, badge de icone ou service worker novo. Pedir permissao
+  antes de haver push queima a permissao uma vez so; a instalacao de `@capacitor/push-notifications` e
+  decisao da Fase 5, nao passagem.
+
+### Estados e acessibilidade
+
+- Carregando, lista, vazio e erro com "Tentar novamente" sao superficies distintas.
+- Foco no `h1` em `ionViewDidEnter` (inclusive no back) e depois de trocar pagina ou repetir; foco no `h2`
+  do aviso depois da leitura; `aria-disabled` durante a leitura.
+- Regiao `role="status"` anuncia leitura e pagina nova; `role="list"` explicito; "Nao lida"/"Lida em" em
+  texto.
+- Sino com rotulo textual ("Notificacoes, 3 nao lidas", "carregando contagem", "contagem indisponivel",
+  "pode estar desatualizado"); marcador numerico ate `99+` e `?` quando indisponivel.
+
+### Testes
+
+- Vitest: service, store (sessao, dedup, geracao, marco de contagem, duas leituras concorrentes, retry
+  apos timeout), header (rotulos e marcador), shell e central (superficies, erros com o helper real,
+  paginacao, referencia, leitura).
+- Playwright `e2e/notificacoes-mobile.spec.ts` contra os handlers **reais** do MSW: owner-scope entre tres
+  contas, vazio da credora, idempotencia, `404` neutro, codigos so onde o backend publica, reentrada,
+  teclado, URL direta e largura a 320/360/390px (documento e `ion-content`). Falha provocada por
+  `mock.notificacoes.falhar`, nao por `page.route` (o service worker do MSW nao passa pelo roteamento).
+- Conferencia no APK dev-offline em emulador (toque real e back fisico) e smoke real contra `:8080`
+  executados na M-19. Procedimento do APK: skill de projeto `sep-mobile-apk-conferencia-emulador`.
+
+### Limitacoes da fase
+
+- Um gatilho ativo; preferencias, filtros, agrupamento, acoes em lote e push fora (frentes B, C e D).
+- Sem `contract:check` no mobile; Playwright fora do `CI-MOBILE`.
+- Back fisico provado so no emulador, sem teste versionado; iOS depende de gate externo.
+
